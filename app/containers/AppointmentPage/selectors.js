@@ -101,6 +101,18 @@ const makeTimeStaffID = () =>
     appointmentState.get('time_staffId'),
   );
 
+  const makeStatusDeleteWaiting = () =>
+  createSelector(currentAppointment, appointmentState =>
+    appointmentState.get('StatusDeleteWaiting'),
+  );
+
+  const makeInfoCheckPhone = () =>
+  createSelector(currentAppointment, appointmentState =>
+    appointmentState.get('info_after_check_phone'),
+  );
+
+
+
 export {
   currentAppointment,
   makeCurrentDay,
@@ -122,4 +134,6 @@ export {
   makeLoadWaiting,
   makeLoadCalendar,
   makeTimeStaffID,
+  makeStatusDeleteWaiting,
+  makeInfoCheckPhone
 };

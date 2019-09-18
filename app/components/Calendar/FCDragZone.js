@@ -3,10 +3,13 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { FaCaretUp, FaCaretDown } from 'react-icons/fa';
 
+
 import $ from 'jquery';
 import 'jquery-ui';
 import moment from 'moment';
-
+import { IoIosCloseCircle } from 'react-icons/io';
+import ConfirmDeleteWaiting from './ConfirmDeleteWaiting'
+import signalR from '@aspnet/signalr'
 
 const DragZoneWrapper = styled.div`
   height: calc(100vh - 4rem - 4rem - 4rem);
@@ -17,9 +20,22 @@ const EventWrapper = styled.div`
   background: #f4f4f5;
   border: 1px solid #ffffff;
   color: #333333;
-  height : 127px;
+  height : 110px;
   overflow : hidden;
+  position : relative;
 `;
+
+EventWrapper.buttonDelete = styled.div`
+  position: absolute;
+  right: 0.25rem;
+  top: 0.25rem;
+  line-height: 1;
+  font-size: 2rem;
+  color: #ffffff;
+  font-size : 1.25rem;
+  color : #717171;
+  cursor: pointer;
+`
 
 const PrevButton = styled.div`
   color: #3883bb;
@@ -47,11 +63,18 @@ function getDiffHoursString(start, end) {
 
 function handleDrag() {
   const eventInformation = $(this).data('event-information');
+  var totalDuration = 0;
+  eventInformation.options.forEach(el => {
+    totalDuration += parseInt(el.duration);
+  });
+  eventInformation.extras.forEach(el => {
+    totalDuration += parseInt(el.duration);
+  });
   $(this).data('event', {
     data: eventInformation,
     color: '#00b4f7',
     stick: true,
-    duration: getDiffHoursString(eventInformation.start, eventInformation.end),
+    duration: totalDuration > 0 ? moment.utc().startOf('day').add({ minutes: totalDuration }).format('HH:mm') : moment.utc().startOf('day').add({ minutes: 15 }).format('HH:mm')
   });
 
   $(this).draggable({
@@ -67,7 +90,8 @@ function handleDrag() {
 class FCDragZone extends React.PureComponent {
   state = {
     slideIndex: 0,
-    slidesToShow: 3,
+    slidesToShow: 4,
+    event: ''
   };
 
   updateDimensions() {
@@ -111,40 +135,59 @@ class FCDragZone extends React.PureComponent {
     }
   }
 
+  deleteEventWaiting(event) {
+    this.setState({ event });
+    const { deleteWaitingAppointment } = this.props;
+    deleteWaitingAppointment(true);
+  }
+
   render() {
-    const { events } = this.props;
+    const { events, StatusDeleteWaiting, deleteWaitingAppointment, deleteEventWaitingList } = this.props;
     const { slideIndex, slidesToShow } = this.state;
-    const displayedEvents = events.slice(
+    const displayedEvents = events.sort(function (a, b) {
+      var c = new Date(a.id);
+      var d = new Date(b.id);
+      return c - d;
+    }).slice(
       slideIndex * slidesToShow,
       slideIndex * slidesToShow + slidesToShow,
     );
+
     return (
-      <DragZoneWrapper>
-        <PrevButton onClick={() => this.prevSlide()}>
-          <FaCaretUp />
-        </PrevButton>
-        <NextButton onClick={() => this.nextSlide()}>
-          <FaCaretDown />
-        </NextButton>
-        <div id="waiting-events">
-          {displayedEvents.map(event => (
-            <EventWrapper
-              className="app-event"
-              key={event.id}
-              data-event-information={JSON.stringify(event)}
-            >
-              <div className="app-event__id-number">#{event.id}</div>
-              <div className="app-event__full-name">{event.userFullName}</div>
-              <div className="app-event__phone-number">{event.phoneNumber}</div>
-              {event.options.map(option => (
-                <div className="app-event__option" key={option.id}>
-                  - {option.name}
-                </div>
-              ))}
-            </EventWrapper>
-          ))}
-        </div>
-      </DragZoneWrapper>
+      <React.Fragment>
+        <DragZoneWrapper>
+          <PrevButton onClick={() => this.prevSlide()}>
+            <FaCaretUp />
+          </PrevButton>
+          <NextButton onClick={() => this.nextSlide()}>
+            <FaCaretDown />
+          </NextButton>
+          <div id="waiting-events">
+            {displayedEvents.map((event) => (
+              <EventWrapper
+                className="app-event"
+                key={event.id}
+                data-event-information={JSON.stringify(event)}
+              >
+                <EventWrapper.buttonDelete onClick={() => this.deleteEventWaiting(event)}>
+                  <IoIosCloseCircle />
+                </EventWrapper.buttonDelete>
+                <div className="app-event__id-number">#{event.id}</div>
+                <div className="app-event__full-name">{event.userFullName}</div>
+                <div className="app-event__phone-number">
+                  <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1.5em" width="1.3em" xmlns="http://www.w3.org/2000/svg"><path d="M335.7 32H177.1C158.8 32 144 46.6 144 64.9v381c0 18.4 14.8 34.1 33.1 34.1h158.5c18.3 0 32.3-15.7 32.3-34.1v-381C368 46.6 354 32 335.7 32zM241 55h30c2.2 0 4 1.8 4 4s-1.8 4-4 4h-30c-2.2 0-4-1.8-4-4s1.8-4 4-4zm15.5 410c-9.6 0-17.4-7.8-17.4-17.4 0-9.6 7.8-17.4 17.4-17.4 9.6 0 17.4 7.8 17.4 17.4 0 9.6-7.8 17.4-17.4 17.4zm93.5-49H162c-1.1 0-2-.9-2-2V85c0-1.1.9-2 2-2h188c1.1 0 2 .9 2 2v329c0 1.1-.9 2-2 2z"></path></svg>
+                  {event.phoneNumber}</div>
+                {event.options.map((option, index) => (
+                  <div className="app-event__option" key={index}>
+                    - {option.serviceName}
+                  </div>
+                ))}
+              </EventWrapper>
+            ))}
+          </div>
+        </DragZoneWrapper>
+        <ConfirmDeleteWaiting StatusDeleteWaiting={StatusDeleteWaiting} event={this.state.event} deleteEventWaitingList={deleteEventWaitingList} deleteWaitingAppointment={deleteWaitingAppointment} />
+      </React.Fragment>
     );
   }
 }

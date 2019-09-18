@@ -9,6 +9,7 @@ import {
   makeSelectError,
   makeSelectMembers,
   makeSelectCalendarAppointments,
+  makeCurrentDay
 } from './selectors';
 import {
   selectDayOnCalendar,
@@ -29,6 +30,7 @@ const mapStateToProps = createStructuredSelector({
   error: makeSelectError(),
   resources: makeSelectMembers(),
   calendarMembers: makeSelectCalendarAppointments(),
+  currentDay : makeCurrentDay(),
 });
 
 const withConnect = connect(

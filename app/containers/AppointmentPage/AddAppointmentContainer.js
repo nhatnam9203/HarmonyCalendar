@@ -6,13 +6,16 @@ import AddAppointment from 'components/AddAppointment';
 
 import {
   makeAddingAppointment, makeCheckPhoneSuccess, makeCheckPhoneError,
-  makeAddCustomerSuccess, makeTimeStaffID
+  makeAddCustomerSuccess, makeTimeStaffID,
+  makeInfoCheckPhone
 } from './selectors';
 import {
   closeAddingAppointment, checkPhoneNumberCustomer,
   addCustomer, checkPhoneNumberCustomerSuccess,
   checkPhoneNumberCustomerError, addCustomerSuccess,
-  TimeAndStaffID
+  TimeAndStaffID,
+  disableCalendar,
+  infoCheckPhone
 } from './actions';
 
 export function mapDispatchToProps(dispatch) {
@@ -23,7 +26,9 @@ export function mapDispatchToProps(dispatch) {
     checkPhoneNumberCustomerError: (error) => dispatch(checkPhoneNumberCustomerError(error)),
     addCustomer: (customer) => dispatch(addCustomer(customer)),
     addCustomerSuccess: (status) => dispatch(addCustomerSuccess(status)),
-    closeTimeAndStaffID: (data) => dispatch(TimeAndStaffID(data))
+    closeTimeAndStaffID: (data) => dispatch(TimeAndStaffID(data)),
+    disableCalendar:(status)=>dispatch(disableCalendar(status)),
+     infoCheckPhone:(data)=>dispatch( infoCheckPhone(data)),
   };
 }
 
@@ -32,7 +37,8 @@ const mapStateToProps = createStructuredSelector({
   checkPhoneSuccess: makeCheckPhoneSuccess(),
   checkPhoneError: makeCheckPhoneError(),
   StateAddCustomerSuccess: makeAddCustomerSuccess(),
-  TimeAndStaffID: makeTimeStaffID()
+  TimeAndStaffID: makeTimeStaffID(),
+  InfoAfterCheckPhone : makeInfoCheckPhone(),
 });
 
 const withConnect = connect(

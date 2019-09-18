@@ -15,7 +15,6 @@ const LoadingCalendar = styled.div`
     font-size: 24px;
 `
 
-
 export default class CalendarLoading extends Component {
   render() {
     return (
@@ -25,3 +24,4 @@ export default class CalendarLoading extends Component {
     )
   }
 }
+

@@ -64,6 +64,25 @@ import {
   LOADING_WAITING,
   TIME_STAFFID,
   ADD_APPOINTMENT_TO_CALENDAR,
+  DELETE_EVENT_WAITINGLIST,
+  DELETE_EVENT_WAITINGLIST_SUCCESS,
+  DELETE_EVENT_WAITINGLIST_ERROR,
+  REMOVE_APPOINTMENT_WAITING,
+  DELETE_WAITING_APPPOINTMENT,
+  CHANGE_APPOINTMENT_TIME,
+  CHANGE_APPOINTMENT_TIME_SUCCESS,
+  CHANGE_APPOINTMENT_TIME_ERROR,
+  UPDATE_APPOINTMENT_OFFLINE,
+  UPDATE_APPOINTMENT_OFFLINE_SUCCESS,
+  UPDATE_APPOINTMENT_OFFLINE_ERROR,
+  LOAD_APPOINTMENT_AGAIN,
+  ADD_APPOINTMENT_TO_WAITING,
+  ADD_APPOINTMENT_RELOAD_CALENDAR,
+  ADD_APPOINTMENT_REALTIME,
+  INFO_CHECK_PHONE,
+  UPDATE_APPOINTMENT_PAID,
+  DELETE_APPOINTMENT_CALENDAR,
+  UPDATE_STAFF
 } from './constants';
 
 /**
@@ -546,7 +565,98 @@ export const TimeAndStaffID = (data) => ({
 export const addAppointmentToCalendar = (appointment) => ({
   type: ADD_APPOINTMENT_TO_CALENDAR,
   appointment
-})
+});
+
+export const deleteEventWaitingList = (appointment) => ({
+  type: DELETE_EVENT_WAITINGLIST,
+  appointment
+});
+export const deleteEventWaitingList_Success = (appointment) => ({
+  type: DELETE_EVENT_WAITINGLIST_SUCCESS,
+  appointment
+});
+export const deleteEventWaitingList_Error = (appointment) => ({
+  type: DELETE_EVENT_WAITINGLIST_ERROR,
+  appointment
+});
+
+export const removeAppointmentWaiting = (appointment) => ({
+  type: REMOVE_APPOINTMENT_WAITING,
+  appointment
+});
+
+export const deleteWaitingAppointment = (status) => ({
+  type: DELETE_WAITING_APPPOINTMENT,
+  status
+});
+
+export const changeAppointmentTime = (appointment) => ({
+  type: CHANGE_APPOINTMENT_TIME,
+  appointment
+});
+
+export const changeAppointmentTime_Success = (appointment) => ({
+  type: CHANGE_APPOINTMENT_TIME_SUCCESS,
+  appointment
+});
+export const changeAppointmentTime_Error = (appointment) => ({
+  type: CHANGE_APPOINTMENT_TIME_ERROR,
+  appointment
+});
+
+export const updateAppointmentOffline = (data) => ({
+  type: UPDATE_APPOINTMENT_OFFLINE,
+  data
+});
+export const updateAppointmentOfflineSuccess = (data) => ({
+  type: UPDATE_APPOINTMENT_OFFLINE_SUCCESS,
+  data
+});
+export const updateAppointmentOfflineError = (data) => ({
+  type: UPDATE_APPOINTMENT_OFFLINE_ERROR,
+  data
+});
+export const loadAppointmentAgain = (data) => ({
+  type: LOAD_APPOINTMENT_AGAIN,
+  data
+});
+
+export const addAppointmentWaiting = (data) => ({
+  type: ADD_APPOINTMENT_TO_WAITING,
+  data
+});
+
+export const addAppointmentReloadCalendar = (data) => ({
+  type: ADD_APPOINTMENT_RELOAD_CALENDAR,
+  data
+});
+
+export const addAppointmentRealTime = (data) => ({
+  type: ADD_APPOINTMENT_REALTIME,
+  data
+});
+export const infoCheckPhone = (data) => ({
+  type: INFO_CHECK_PHONE,
+  data
+});
+
+export const updateAppointmentPaid = (appointment) => ({
+  type: UPDATE_APPOINTMENT_PAID,
+  appointment
+});
+
+export const deleteAppointmentCalendar = (appointment) => ({
+  type: DELETE_APPOINTMENT_CALENDAR,
+  appointment
+});
+
+export const updateStaff = (staff) => ({
+  type: UPDATE_STAFF,
+  staff
+});
+
+
+
 
 
 

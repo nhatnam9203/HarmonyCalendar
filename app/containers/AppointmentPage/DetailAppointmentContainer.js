@@ -4,13 +4,14 @@ import { compose } from 'redux';
 
 import DetailAppointment from 'components/DetailAppointment';
 
-import { makeSelectAppointment } from './selectors';
+import { makeSelectAppointment,makeCurrentDay } from './selectors';
 import {
   cancelAppointment,
   deselectAppointment,
   updateStatusAppointment,
   updateAppointment,
-  disableCalendar
+  disableCalendar,
+  changeAppointmentTime
 } from './actions';
 
 export function mapDispatchToProps(dispatch) {
@@ -22,13 +23,15 @@ export function mapDispatchToProps(dispatch) {
     updateAppointment:(appointment)=>{
       dispatch(updateAppointment(appointment))
     },
-    disableCalendar:(status)=>dispatch(disableCalendar(status))
+    disableCalendar:(status)=>dispatch(disableCalendar(status)),
+    changeAppointmentTime:(appointment)=>dispatch(changeAppointmentTime(appointment)),
+    
   };
 }
 
 const mapStateToProps = createStructuredSelector({
   appointment: makeSelectAppointment(),
-
+  currentDay : makeCurrentDay(),
 });
 
 const withConnect = connect(

@@ -11,6 +11,19 @@ import {
   updateWaitingAppointment,
   loadingCalendar,
   loadingWaiting,
+  disableCalendar,
+  deleteEventWaitingList,
+  deleteWaitingAppointment,
+  updateAppointmentOffline,
+  loadAppointmentAgain,
+  addAppointmentRealTime,
+  addAppointmentWaiting,
+  updateAppointmentPaid,
+  removeAppointmentWaiting,
+  deleteAppointmentCalendar,
+  updateStaff,
+  loadMembers,
+  loadAppointmentByMembers,
 } from './actions';
 import {
   makeSelectWaitingAppointments,
@@ -20,6 +33,7 @@ import {
   makeDisableCalendar,
   makeLoadCalendar,
   makeLoadWaiting,
+  makeStatusDeleteWaiting
 } from './selectors';
 
 export function mapDispatchToProps(dispatch) {
@@ -30,6 +44,19 @@ export function mapDispatchToProps(dispatch) {
     updateWaitingAppointment : appointment => dispatch(updateWaitingAppointment(appointment)),
     loadingCalendar: status=>dispatch(loadingCalendar(status)),
     loadingWaiting: status=>dispatch(loadingWaiting(status)),
+    disable_Calendar: status=>dispatch(disableCalendar(status)),
+    deleteEventWaitingList: appointment=>dispatch(deleteEventWaitingList(appointment)),
+    deleteWaitingAppointment: status=>dispatch(deleteWaitingAppointment(status)),
+    updateAppointmentOffline: data=>dispatch(updateAppointmentOffline(data)),
+    loadAppointmentAgain: ()=>dispatch(loadAppointmentAgain()),
+    addAppointmentRealTime: (app)=>dispatch(addAppointmentRealTime(app)),
+    addAppointmentWaiting: (app)=>dispatch(addAppointmentWaiting(app)),
+    updateAppointmentPaid: (app)=>dispatch(updateAppointmentPaid(app)),
+    removeAppointmentWaiting: (app)=>dispatch(removeAppointmentWaiting(app)),
+    deleteAppointmentCalendar: (app)=>dispatch(deleteAppointmentCalendar(app)),
+    updateStaff: (staff)=>dispatch(updateStaff(staff)),
+    loadMembers: ()=>dispatch(loadMembers()),
+    loadAppointmentByMembers :()=>dispatch(loadAppointmentByMembers()),
   };
 }
 
@@ -41,6 +68,7 @@ const mapStateToProps = createStructuredSelector({
   disableCalendar : makeDisableCalendar(),
   isLoadWaiting : makeLoadWaiting(),
   isLoadCalendar : makeLoadCalendar(),
+  StatusDeleteWaiting : makeStatusDeleteWaiting(),
 });
 
 const withConnect = connect(

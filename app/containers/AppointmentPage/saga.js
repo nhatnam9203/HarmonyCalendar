@@ -1,9 +1,8 @@
 import { delay } from 'redux-saga';
-import { call, fork, put, takeLatest, all, select } from 'redux-saga/effects';
+import { fork, put, takeLatest, all, select } from 'redux-saga/effects';
 import moment from 'moment';
 import axios from 'axios';
-import getURLParam from 'utils/helper'
-import request from 'utils/request';
+import { differenceBy } from 'lodash'
 
 import {
   SELECT_DAY,
@@ -15,13 +14,15 @@ import {
   ASSIGN_APPOINTMENT,
   MOVE_APPOINTMENT,
   PUT_BACK_APPOINTMENT,
-  UPDATE_STATUS_APPOINTMENT,
   CANCEL_APPOINTMENT,
-  UPDATE_STATUS_APPOINTMENT_SUCCESS,
   UPDATE_CALENDAR_INTERVAL,
   UPDATE_APPOINTMENT_STATUS,
   ADD_CUSTOMER,
   CHECK_PHONE_ADD_CUSTOMER,
+  DELETE_EVENT_WAITINGLIST,
+  CHANGE_APPOINTMENT_TIME,
+  UPDATE_APPOINTMENT_OFFLINE,
+  LOAD_APPOINTMENT_AGAIN,
 } from './constants';
 import {
   selectDay,
@@ -34,7 +35,6 @@ import {
   loadAppointmentByMembers,
   appointmentByMembersLoaded,
   appointmentByMemberLoadingError,
-  appointmentAssigned,
   appointmentAssigningError,
   appointmentMoved,
   appointmentMovingError,
@@ -47,72 +47,79 @@ import {
   appointmentUpdatingStatusError,
   updateAppointmentError,
   updateAppointmentSuccess,
-  addCustomer,
   addCustomerSuccess,
   addCustomerError,
-  checkPhoneNumberCustomer,
   checkPhoneNumberCustomerSuccess,
   checkPhoneNumberCustomerError,
-  loadWaitingAppointments,
   loadingWaiting,
   loadingCalendar,
   TimeAndStaffID,
-  addAppointmentToCalendar
+  addAppointmentToCalendar,
+  removeAppointmentWaiting,
+  deleteEventWaitingList_Success,
+  changeAppointmentTime_Success,
+  updateAppointmentOfflineSuccess,
+  updateAppointmentOfflineError,
+  addAppointmentWaiting,
+  addAppointmentReloadCalendar,
+  infoCheckPhone,
+  addAppointmentRealTime,
+  loadMembers,
+  loadWaitingAppointments,
+
+
 } from './actions';
 import {
   makeCurrentDay,
   makeSelectCalendarAppointments,
   makeSelectDisplayedMembers,
   makeSelectFCEvent,
+  makeInfoCheckPhone,
 } from './selectors';
 
 import {
   GET_MEMBERS_API,
-  GET_WAITING_APPOINTMENTS_API,
-  GET_APPOINTMENTS_BY_MEMBERS_DATE_API,
-  POST_ASSIGN_APPOINTMENT_API,
-  POST_MOVE_APPOINTMENT_API,
-  // POST_PUT_BACK_APPOINTMENT_API
-  // POST_CANCEL_APPOINTMENT_API
-  POST_STATUS_APPOINTMENT_API,
-  POST_UPDATE_APPOINTMENT_API,
-  POST_CHECK_PHONE_CUSTOMER,
-  POST_DETAIL_APPOINTMENT,
   POST_ADD_CUSTOMER,
   BASE_URL,
-  API_BASE_URL,
   token,
-  storeid,
-  VAR_DEFAULT_AVATAR_PATH
+  VAR_DEFAULT_AVATAR_PATH,
+  GET_APPOINTMENT_BY_DATE,
+  PUT_STATUS_APPOINTMENT_API,
+  GET_BY_PHONE,
+  POST_ADD_APPOINTMENT,
+  merchantId,
+  GET_APPOINTMENT_BY_ID,
+  GET_APPOINTMENT_STATUS
 } from '../../../app-constants';
 
-// import { members as mockedMembers } from '../../assets/mocks/members';
-// import { appointments as mockedAppointments } from '../../assets/mocks/appointments';
 import { assignAppointment as mockedPostAppointment } from '../../assets/mocks/assignAppointment';
 import {
   addEventsToCalendar,
   deleteEventFromCalendar,
-  updateEventFromCalendar,
+  updateEventToCalendar,
+
 } from '../../components/Calendar/constants';
 
-/* **************************** API Caller ********************************* */
 
 const headers = {
   'Content-Type': 'application/json',
   Authorization: `Bearer ${token}`,
 };
 
-const statusConvertKey = {
+export const statusConvertKey = {
   unconfirm: 'ASSIGNED',
   confirm: 'CONFIRMED',
   checkin: 'CHECKED_IN',
   paid: 'PAID',
   waiting: 'WAITING',
   cancel: 'CANCEL',
+  pending: 'PENDING'
 };
 
 const appointmentAdapter = appointment => {
+
   const options = [];
+  const products = [];
   if (appointment.options && appointment.options.service) {
     appointment.options.service.forEach(service => {
       options.push({
@@ -123,37 +130,62 @@ const appointmentAdapter = appointment => {
       });
     });
   }
-  // if (appointment.options && appointment.options.product) {
-  //   appointment.options.product.forEach(service => {
-  //     options.push(service.name);
-  //   });
-  // }
-  // if (appointment.options && appointment.options.extra) {
-  //   appointment.options.extra.forEach(service => {
-  //     options.push(service.name);
-  //   });
-  // }
+
+  if (appointment.options && appointment.options.product.length > 0) {
+    appointment.options.product.forEach(product => {
+      products.push(product);
+    });
+  }
 
   return {
-    id: appointment.id,
-    userFullName: appointment.userFullName,
+    id: appointment.appointmentId,
+    userFullName: appointment.firstName + ' ' + appointment.lastName,
     phoneNumber: appointment.phoneNumber,
-    options,
+    options: appointment.services,
+    products: appointment.products,
+    extras: appointment.extras,
     status: statusConvertKey[appointment.status],
     memberId: appointment.staffId,
-    start: appointment.start,
-    end: appointment.end,
+    start: appointment.fromTime,
+    end: appointment.toTime,
+    user_id: appointment.userId,
+    createDate: appointment.createdDate,
+    tipPercent: appointment.tipPercent,
+    tipAmount: appointment.tipAmount,
+    subTotal: appointment.subTotal,
+    total: appointment.total,
+    tax: appointment.tax,
+    discount: appointment.discount,
+    giftCard: appointment.giftCard,
+    notes: appointment.notes === null ? [] : appointment.notes
   };
 };
 
-const memberAdapter = member => ({
-  id: member.id,
-  title: `${member.first_name} ${member.last_name}`,
-  imageUrl:
-    (member.imageurl && `${BASE_URL}/${member.imageurl}`) ||
-    `${BASE_URL}/${VAR_DEFAULT_AVATAR_PATH}`,
-  orderNumber: member.orderNumber,
-});
+const memberAdapter = member => {
+  return {
+    id: member.staffId,
+    title: `${member.displayName}`,
+    imageUrl:
+      (member.imageUrl && `${member.imageUrl}`) ||
+      `${BASE_URL}/${VAR_DEFAULT_AVATAR_PATH}`,
+    orderNumber: member.orderNumber,
+    workingTimes: member.workingTimes,
+    isDisabled : member.isDisabled
+  }
+};
+
+export const memberAdapter_update = member => {
+  return {
+    id: member.StaffId,
+    title: `${member.DisplayName}`,
+    imageUrl:
+      (member.ImageUrl && `${member.ImageUrl}`) ||
+      `${BASE_URL}/${VAR_DEFAULT_AVATAR_PATH}`,
+    orderNumber: member.OrderNumber,
+    workingTimes: JSON.parse(member.WorkingTime)
+  }
+};
+
 
 const statusConvertData = {
   ASSIGNED: 'unconfirm',
@@ -167,79 +199,66 @@ const statusConvertData = {
 const statusAdapter = status => statusConvertData[status]
 
 
-
 export function* getMembers() {
   try {
-    /* |||||||||||||||||||||| MOCKED DATA BLOCK |||||||||||||||||||||| */
-    /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| */
-    // yield delay(200);
-    // const members = mockedMembers;
-    /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| */
-    /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| */
-
-    /* ------------------ REAL DATA FROM API BLOCK ------------------- */
-    /* --------------------------------------------------------------- */
-
-    const requestURL = new URL(`${GET_MEMBERS_API}/${storeid}`);
-    const response = yield call(request, requestURL.toString(), {
-      method: 'POST',
-      headers,
+    const requestURL = new URL(`${GET_MEMBERS_API}/${merchantId}`);
+    const response = yield axios.get(requestURL.toString(), {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    }).then((result) => {
+      return result;
+    }).catch((err) => {
+      console.log(err)
     });
-    const members =
-      response &&
-      response.data &&
-      response.data.map(member => memberAdapter(member));
-    /* --------------------------------------------------------------- */
-    /* --------------------------------------------------------------- */
-    yield put(membersLoaded(members));
-    yield put(setDisplayedMembers(members.slice(0, 6)));
+    if (response.status === 200 && response.data.codeStatus === 1) {
+      const members = response.status === 200 ? response.data.data.map(member => memberAdapter(member)).filter(mem=>mem.isDisabled === 0) : '';
+      yield put(membersLoaded(members));
+      yield put(setDisplayedMembers(members.slice(0, 6)));
+    }
   } catch (err) {
+    alert(err)
     yield put(memberLoadingError(err));
   }
 }
 
+function* checkResponse(response) {
+  alert(response.data.message);
+  yield put(loadMembers());
+  yield put(loadWaitingAppointments());
+  yield put(loadAppointmentByMembers());
+  return;
+}
+
 export function* getWaitingAppointments() {
-  // Query params for this api
-  const apiWaitingListStatusQuery = 'waiting';
-
   try {
-    /* |||||||||||||||||||||| MOCKED DATA BLOCK |||||||||||||||||||||| */
-    /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| */
-    // yield delay(200);
-    // const appointments = mockedAppointments.filter(
-    //   app => app.status === apiWaitingListStatusQuery,
-    // );
-    /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| */
-    /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| */
-
-    /* ------------------ REAL DATA FROM API BLOCK ------------------- */
-    /* --------------------------------------------------------------- */
     yield put(loadingWaiting(true))
-    const requestURL = new URL(GET_WAITING_APPOINTMENTS_API);
-    const currentDate = yield select(makeCurrentDay());
-    const apiDateQuery =
-      currentDate.format('YYYY-MM-DD') || moment().format('YYYY-MM-DD');
-
-    let formDataWaitingListSaga = new FormData();
-    formDataWaitingListSaga.append("date", apiDateQuery);
-    formDataWaitingListSaga.append("storeid", storeid);
-    formDataWaitingListSaga.append("status", apiWaitingListStatusQuery);
-
-    const response = yield call(request, requestURL.toString(), {
-      method: 'POST',
+    const requestURL = new URL(GET_APPOINTMENT_STATUS);
+    const url = `${requestURL.toString()}`;
+    const response = yield axios.get(url, {
       headers: {
-        Authorization: `Bearer ${token}`
-      },
-      body: formDataWaitingListSaga
-    });
+        Authorization: `Bearer ${token}`,
+      }
+    })
+      .then((result) => {
+        if (result.status === 200) {
+
+          return result;
+        }
+      }).catch((err) => {
+
+      });
+
+    const appointments =
+      response &&
+      response.status === 200 &&
+      response.data.data.map(appointment => appointmentAdapter(appointment));
+
+
     if (response) {
       yield put(loadingWaiting(false))
     }
 
-    const appointments =
-      response &&
-      response.data &&
-      response.data.map(appointment => appointmentAdapter(appointment));
     yield put(waitingAppointmentsLoaded(appointments));
   } catch (err) {
     yield put(waitingAppointmentLoadingError(err));
@@ -247,48 +266,271 @@ export function* getWaitingAppointments() {
 }
 
 export function* getAppointmentsByMembersAndDate() {
-  yield put(loadingCalendar(true))
-  const displayedMembers = yield select(makeSelectDisplayedMembers());
-  const currentDate = yield select(makeCurrentDay());
-  let apiDateQuery =
-    currentDate.format('YYYY-MM-DD') || moment().format('YYYY-MM-DD');
-  const apiMemberIdsQuery = displayedMembers.map(member => member.id);
   try {
+    yield put(loadingCalendar(true))
+    const displayedMembers = yield select(makeSelectDisplayedMembers());
+    const currentDate = yield select(makeCurrentDay());
+    let apiDateQuery =
+      currentDate.format('YYYY-MM-DD') || moment().format('YYYY-MM-DD');
 
-    const requestURL = new URL(GET_APPOINTMENTS_BY_MEMBERS_DATE_API);
-    const requestBody = JSON.stringify({
-      date: apiDateQuery,
-      memberId: apiMemberIdsQuery,
-    });
-
-    const response = yield call(request, requestURL.toString(), {
-      method: 'POST',
-      headers,
-      body: requestBody,
-    });
-
-
-    if (response) {
-      yield put(loadingCalendar(false))
-    }
+    const requestURL = new URL(GET_APPOINTMENT_BY_DATE);
+    const url = `${requestURL.toString()}/${apiDateQuery}`;
+    const response = yield axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    })
+      .then((result) => {
+        if (result.status === 200) {
+          return result;
+        }
+      }).catch((err) => {
+        alert(err)
+      });
 
     const appointments =
       response &&
-      response.data &&
-      response.data.map(appointment => appointmentAdapter(appointment));
+      response.status === 200 &&
+      response.data.data.map(appointment => appointmentAdapter(appointment));
 
-    /* --------------------------------------------------------------- */
-    /* --------------------------------------------------------------- */
     const appointmentsMembers = displayedMembers.map(member => ({
       memberId: member.id,
       appointments: appointments.filter(
-        appointment => appointment.memberId === member.id && appointment.status !== 'CANCEL',
-      ),
+        appointment => appointment.memberId === member.id
+          && appointment.status !== 'CANCEL'
+          && appointment.status !== 'WAITING'
+          && appointment.status !== 'PENDING'
+          && appointment.status !== undefined
+        ,
+      )
     }));
 
-    yield put(appointmentByMembersLoaded(appointmentsMembers));
-    // Update main calendar
-    addEventsToCalendar(currentDate, appointmentsMembers);
+    switch (moment(currentDate).format('dddd')) {
+      case 'Monday':
+        appointmentsMembers.forEach(mem => {
+          const memFind = displayedMembers.find(member => member.id === mem.memberId);
+          mem.appointments.push({
+            status: 'BLOCK',
+            memberId: mem.memberId,
+            start: `${moment(currentDate).day('Monday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Monday.timeEnd, ["h:mm A"]).format("HH:mm:ss")}`,
+            end: `${moment(currentDate).day('Monday').endOf('days').format('YYYY-MM-DD')}T${moment().endOf('days').subtract(1, 'hours').add(1, 'seconds').format('HH:mm:ss')}`,
+            id: '',
+            userFullName: '',
+            phoneNumber: '',
+            options: [],
+            products: [],
+            extras: [],
+            notes: [],
+          }, {
+              status: 'BLOCK',
+              memberId: mem.memberId,
+              start: `${moment(currentDate).day('Monday').format('YYYY-MM-DD')}T${moment().startOf('days').add(6, 'hours').format("HH:mm:ss")}`,
+              end: `${moment(currentDate).day('Monday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Monday.timeStart, ["h:mm A"]).format("HH:mm:ss")}`,
+              id: '',
+              userFullName: '',
+              phoneNumber: '',
+              options: [],
+              products: [],
+              extras: [],
+              notes: [],
+            })
+        });
+        break;
+      case 'Tuesday':
+        appointmentsMembers.forEach(mem => {
+          const memFind = displayedMembers.find(member => member.id === mem.memberId);
+          mem.appointments.push({
+            status: 'BLOCK',
+            memberId: mem.memberId,
+            start: `${moment(currentDate).day('Tuesday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Tuesday.timeEnd, ["h:mm A"]).format("HH:mm:ss")}`,
+            end: `${moment(currentDate).day('Tuesday').endOf('days').format('YYYY-MM-DD')}T${moment().endOf('days').subtract(1, 'hours').add(1, 'seconds').format('HH:mm:ss')}`,
+            id: '',
+            userFullName: '',
+            phoneNumber: '',
+            options: [],
+            products: [],
+            extras: [],
+            notes: [],
+          }, {
+              status: 'BLOCK',
+              memberId: mem.memberId,
+              start: `${moment(currentDate).day('Tuesday').format('YYYY-MM-DD')}T${moment().startOf('days').add(6, 'hours').format("HH:mm:ss")}`,
+              end: `${moment(currentDate).day('Tuesday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Tuesday.timeStart, ["h:mm A"]).format("HH:mm:ss")}`,
+              id: '',
+              userFullName: '',
+              phoneNumber: '',
+              options: [],
+              products: [],
+              extras: [],
+              notes: [],
+            })
+        });
+        break;
+      case 'Wednesday':
+        appointmentsMembers.forEach(mem => {
+          const memFind = displayedMembers.find(member => member.id === mem.memberId);
+          mem.appointments.push({
+            status: 'BLOCK',
+            memberId: mem.memberId,
+            start: `${moment(currentDate).day('Wednesday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Wednesday.timeEnd, ["h:mm A"]).format("HH:mm:ss")}`,
+            end: `${moment(currentDate).day('Wednesday').endOf('days').format('YYYY-MM-DD')}T${moment().endOf('days').subtract(1, 'hours').add(1, 'seconds').format('HH:mm:ss')}`,
+            id: '',
+            userFullName: '',
+            phoneNumber: '',
+            options: [],
+            products: [],
+            extras: [],
+            notes: [],
+          }, {
+              status: 'BLOCK',
+              memberId: mem.memberId,
+              start: `${moment(currentDate).day('Wednesday').format('YYYY-MM-DD')}T${moment().startOf('days').add(6, 'hours').format("HH:mm:ss")}`,
+              end: `${moment(currentDate).day('Wednesday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Wednesday.timeStart, ["h:mm A"]).format("HH:mm:ss")}`,
+              id: '',
+              userFullName: '',
+              phoneNumber: '',
+              options: [],
+              products: [],
+              extras: [],
+              notes: [],
+            })
+        });
+        break;
+
+      case 'Thursday':
+        appointmentsMembers.forEach(mem => {
+          const memFind = displayedMembers.find(member => member.id === mem.memberId);
+          mem.appointments.push({
+            status: 'BLOCK',
+            memberId: mem.memberId,
+            start: `${moment(currentDate).day('Thursday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Thursday.timeEnd, ["h:mm A"]).format("HH:mm:ss")}`,
+            end: `${moment(currentDate).day('Thursday').endOf('days').format('YYYY-MM-DD')}T${moment().endOf('days').subtract(1, 'hours').add(1, 'seconds').format('HH:mm:ss')}`,
+            id: '',
+            userFullName: '',
+            phoneNumber: '',
+            options: [],
+            products: [],
+            extras: [],
+            notes: [],
+          }, {
+              status: 'BLOCK',
+              memberId: mem.memberId,
+              start: `${moment(currentDate).day('Thursday').format('YYYY-MM-DD')}T${moment().startOf('days').add(6, 'hours').format("HH:mm:ss")}`,
+              end: `${moment(currentDate).day('Thursday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Thursday.timeStart, ["h:mm A"]).format("HH:mm:ss")}`,
+              id: '',
+              userFullName: '',
+              phoneNumber: '',
+              options: [],
+              products: [],
+              extras: [],
+              notes: [],
+            })
+        });
+        break;
+
+      case 'Friday':
+        appointmentsMembers.forEach(mem => {
+          const memFind = displayedMembers.find(member => member.id === mem.memberId);
+          mem.appointments.push({
+            status: 'BLOCK',
+            memberId: mem.memberId,
+            start: `${moment(currentDate).day('Friday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Friday.timeEnd, ["h:mm A"]).format("HH:mm:ss")}`,
+            end: `${moment(currentDate).day('Friday').endOf('days').format('YYYY-MM-DD')}T${moment().endOf('days').subtract(1, 'hours').add(1, 'seconds').format('HH:mm:ss')}`,
+            id: '',
+            userFullName: '',
+            phoneNumber: '',
+            options: [],
+            products: [],
+            extras: [],
+            notes: [],
+          }, {
+              status: 'BLOCK',
+              memberId: mem.memberId,
+              start: `${moment(currentDate).day('Friday').format('YYYY-MM-DD')}T${moment().startOf('days').add(6, 'hours').format("HH:mm:ss")}`,
+              end: `${moment(currentDate).day('Friday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Friday.timeStart, ["h:mm A"]).format("HH:mm:ss")}`,
+              id: '',
+              userFullName: '',
+              phoneNumber: '',
+              options: [],
+              products: [],
+              extras: [],
+              notes: [],
+            })
+        });
+        break;
+
+      case 'Saturday':
+        appointmentsMembers.forEach(mem => {
+          const memFind = displayedMembers.find(member => member.id === mem.memberId);
+          mem.appointments.push({
+            status: 'BLOCK',
+            memberId: mem.memberId,
+            start: `${moment(currentDate).day('Saturday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Saturday.timeEnd, ["h:mm A"]).format("HH:mm:ss")}`,
+            end: `${moment(currentDate).day('Saturday').endOf('days').format('YYYY-MM-DD')}T${moment().endOf('days').subtract(1, 'hours').add(1, 'seconds').format('HH:mm:ss')}`,
+            id: '',
+            userFullName: '',
+            phoneNumber: '',
+            options: [],
+            products: [],
+            extras: [],
+            notes: [],
+          }, {
+              status: 'BLOCK',
+              memberId: mem.memberId,
+              start: `${moment(currentDate).day('Saturday').format('YYYY-MM-DD')}T${moment().startOf('days').add(6, 'hours').format("HH:mm:ss")}`,
+              end: `${moment(currentDate).day('Saturday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Saturday.timeStart, ["h:mm A"]).format("HH:mm:ss")}`,
+              id: '',
+              userFullName: '',
+              phoneNumber: '',
+              options: [],
+              products: [],
+              extras: [],
+              notes: [],
+            })
+        });
+        break;
+
+      case 'Sunday':
+        appointmentsMembers.forEach(mem => {
+          const memFind = displayedMembers.find(member => member.id === mem.memberId);
+          mem.appointments.push({
+            status: 'BLOCK',
+            memberId: mem.memberId,
+            start: `${moment(currentDate).day(0).format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Sunday.timeEnd, ["h:mm A"]).format("HH:mm:ss")}`,
+            end: `${moment(currentDate).day(0).endOf('days').format('YYYY-MM-DD')}T${moment().endOf('days').subtract(1, 'hours').add(1, 'seconds').format('HH:mm:ss')}`,
+            id: '',
+            userFullName: '',
+            phoneNumber: '',
+            options: [],
+            products: [],
+            extras: [],
+            notes: [],
+          }, {
+              status: 'BLOCK',
+              memberId: mem.memberId,
+              start: `${moment(currentDate).day(0).format('YYYY-MM-DD')}T${moment().startOf('days').add(6, 'hours').format("HH:mm:ss")}`,
+              end: `${moment(currentDate).day(0).format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Sunday.timeStart, ["h:mm A"]).format("HH:mm:ss")}`,
+              id: '',
+              userFullName: '',
+              phoneNumber: '',
+              options: [],
+              products: [],
+              extras: [],
+              notes: [],
+            })
+        });
+        break;
+
+      default:
+        break;
+    }
+
+    if (response.status === 200) {
+      yield put(loadingCalendar(false));
+      yield put(appointmentByMembersLoaded(appointmentsMembers));
+      addEventsToCalendar(currentDate, appointmentsMembers);
+    }
+
   } catch (err) {
     yield put(appointmentByMemberLoadingError(err));
   }
@@ -315,112 +557,81 @@ export function* moveAppointment(action) {
     yield put(appointmentMovingError('Cannot find moved appointment.'));
   }
 
-  const appointment = {
+  let appointment = {
     ...movedAppointment,
     start: action.newTime,
     end: action.newEndTime,
     memberId: assignedMember.id,
   };
 
-  let formdt = new FormData();
-  formdt.append('id', movedAppointment.id);
-  var start = movedAppointment.start;
-  var end = movedAppointment.end;
-  var newTime = (Date.parse(end) - Date.parse(start));
-  var minutes = Math.floor(newTime / 60000);
-  var ToTime = moment(appointment.start).add(minutes, 'minutes').format();
-  try {
-    /* |||||||||||||||||||||| MOCKED DATA BLOCK |||||||||||||||||||||| */
-    /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| */
-    // yield delay(200);
-    // const result = mockedPostAppointment;
-    /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| */
-    /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| */
-
-    /* ------------------ REAL DATA FROM API BLOCK ------------------- */
-    /* --------------------------------------------------------------- */
-    // const requestURL = new URL(POST_MOVE_APPOINTMENT_API);
-    // const formData = new FormData();
-    // formData.append('FromTime', appointment.start);
-    // formData.append('staff_id', appointment.memberId);
-    // formData.append('appointment_id', appointment.id);
-    // const result = dragAppointment(requestURL.toString(), formData);
-    /* --------------------------------------------------------------- */
-    /* --------------------------------------------------------------- */
-
-
-    const kq = yield detail_Appointment(POST_DETAIL_APPOINTMENT + '/id', formdt);
-    const requestURL = new URL(POST_STATUS_APPOINTMENT_API);
-    const result = yield update_Appointment(requestURL.toString(), {
-      id: appointment.id,
-      Staff_id: appointment.memberId,
-      StoreId: storeid,
-      FromTime: appointment.start,
-      ToTime: ToTime.substr(0, 19),
-      total: kq.data.data.total,
-      duration: kq.data.data.duration,
-      CheckinStatus: kq.data.data.checkinStatus,
-      PaidStatus: true,
-      Status: 1,
-      CreateDate: new Date().toString().substring(0, 15),
-      BookingServices2: kq.data.data.bookingServices2,
-      User_id: kq.data.data.user_id,
-    });
-
-    if (result) {
-      yield put(appointmentMoved(appointment));
-    } else {
-      yield put(appointmentMovingError(result));
+  if (parseInt(appointment.memberId) !== parseInt(movedAppointment.memberId)) {
+    if (appointment.status === "CHECKED_IN") {
+      appointment.status = "CONFIRMED";
     }
-  } catch (err) {
-    yield put(appointmentMovingError(err));
+  }
+  const { memberId, start, end, status, options, products, extras } = appointment;
+
+  const data = {
+    staffId: memberId,
+    fromTime: start,
+    toTime: end,
+    status: statusConvertData[status],
+    services: options,
+    products,
+    extras
+  }
+  console.log(data);
+
+  const requestURL = new URL(PUT_STATUS_APPOINTMENT_API);
+  const kq = yield axios.put(`${requestURL.toString()}/${appointment.id}`, data, {
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", }
+  }).then((result) => {
+    return result
+  }).catch((err) => {
+
+  });
+  if (kq.status === 200 && kq.data.codeStatus !== 1) {
+    return yield* checkResponse(kq);
+  }
+
+  if (kq.status === 200) {
+    yield put(appointmentMoved(appointment));
+  } else {
+    yield put(appointmentMovingError(result));
   }
 }
 
 export function* putBackAppointment(action) {
   try {
-    /* |||||||||||||||||||||| MOCKED DATA BLOCK |||||||||||||||||||||| */
-    /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| */
-    yield delay(200);
-    // const result = mockedPostAppointment;
+    const { appointment } = action;
+    let { memberId, start, end, options, products, extras } = appointment;
+    const requestURL = new URL(PUT_STATUS_APPOINTMENT_API);
+    yield put(appointmentPutBack(action.appointment));
+    const data = {
+      staffId: memberId,
+      fromTime: start,
+      toTime: end,
+      status: 'waiting',
+      services: options,
+      products,
+      extras
+    }
+    const kq = yield axios.put(`${requestURL.toString()}/${appointment.id}`, data, {
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", }
+    }).then((result) => {
+      return result
+    }).catch((err) => {
+      const data_offline = JSON.parse(localStorage.getItem('updateAppointment')) ? JSON.parse(localStorage.getItem('updateAppointment')) : [];
+      data_offline.push(data);
+      localStorage.setItem('updateAppointment', JSON.stringify(data_offline));
+      return { error: err }
+    });
 
-    const { id, memberId, start, end } = action.appointment;
-    let formdt = new FormData();
-    formdt.append('id', id)
-    const kq = yield detail_Appointment(POST_DETAIL_APPOINTMENT + '/id', formdt);
-    const requestURL = new URL(POST_STATUS_APPOINTMENT_API);
-    const result = drag_Appointment(requestURL.toString(), {
-      id,
-      Staff_id: memberId,
-      StoreId: 1,
-      FromTime: start,
-      ToTime: end,
-      total: 0,
-      duration: 0,
-      CheckinStatus: "waiting",
-      PaidStatus: true,
-      Status: 1,
-      CreateDate: new Date().toString().substring(0, 15),
-      User_id: kq.data.data.user_id,
-    })
+    if (kq.status === 200 && kq.data.codeStatus !== 1) {
+      return yield* checkResponse(kq);
+    }
 
-    /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| */
-    /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| */
-
-    /* ------------------ REAL DATA FROM API BLOCK ------------------- */
-    /* --------------------------------------------------------------- */
-    // const requestURL = new URL(POST_PUT_BACK_APPOINTMENT_API);
-    // const options = {
-    //   method: 'POST',
-    //   body: JSON.stringify({
-    //     appointmentId: action.appointment.id,
-    //   }),
-    // };
-    // const result = yield call(request, requestURL.toString(), options);
-    /* --------------------------------------------------------------- */
-    /* --------------------------------------------------------------- */
-    if (result) {
-      yield put(appointmentPutBack(action.appointment));
+    if (kq.status === 200) {
     } else {
       yield put(appointmentPuttingBackError(result));
     }
@@ -431,34 +642,14 @@ export function* putBackAppointment(action) {
 
 export function* cancelAppointment(action) {
   const fcEvent = yield select(makeSelectFCEvent());
-
   if (!fcEvent) {
     yield put(appointmentCancellingError('Cannot find selected fcEvent'));
   }
-
   try {
-    /* |||||||||||||||||||||| MOCKED DATA BLOCK |||||||||||||||||||||| */
-    /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| */
     yield delay(200);
     const result = mockedPostAppointment;
-    /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| */
-    /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| */
-
-    /* ------------------ REAL DATA FROM API BLOCK ------------------- */
-    /* --------------------------------------------------------------- */
-    // const requestURL = new URL(POST_CANCEL_APPOINTMENT_API);
-    // const options = {
-    //   method: 'POST',
-    //   body: JSON.stringify({
-    //     appointmentId: action.appointmentId,
-    //   }),
-    // };
-    // const result = yield call(request, requestURL.toString(), options);
-    /* --------------------------------------------------------------- */
-    /* --------------------------------------------------------------- */
     if (result) {
       yield put(appointmentCanceled(action.appointmentId));
-      /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
       deleteEventFromCalendar(fcEvent._id);
       yield put(deselectAppointment());
     } else {
@@ -466,91 +657,6 @@ export function* cancelAppointment(action) {
     }
   } catch (err) {
     yield put(appointmentCancellingError(err));
-  }
-}
-
-export function* updateStatusAppointment(action) {
-  const fcEvent = yield select(makeSelectFCEvent());
-
-  if (!fcEvent) {
-    yield put(appointmentUpdatingStatusError('Cannot find selected fcEvent'));
-  }
-
-  try {
-    /* |||||||||||||||||||||| MOCKED DATA BLOCK |||||||||||||||||||||| */
-    /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| */
-    // yield delay(200);
-    // const result = mockedPostAppointment;
-    /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| */
-    /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| */
-
-    /* ------------------ REAL DATA FROM API BLOCK ------------------- */
-    /* --------------------------------------------------------------- */
-    const requestURL = new URL(POST_STATUS_APPOINTMENT_API);
-    // const formData = new FormData();
-    // formData.append('id', fcEvent.data.id);
-    // formData.append('Staff_id', fcEvent.data.memberId);
-    // formData.append('StoreId', 1);
-    // formData.append('FromTime', fcEvent.data.start);
-    // formData.append('ToTime', fcEvent.data.end);
-    // formData.append('TipPercent', 1);
-    // formData.append('User_id', 1);
-    // formData.append('total', 1);
-    // formData.append('duration', 1);
-    // formData.append('waitingtime', 1);
-    // formData.append('CheckinStatus', statusAdapter(fcEvent.data.status));
-    // formData.append('PaidStatus', 'false');
-    // formData.append('Status', 1);
-    // formData.append('CreateDate', fcEvent.data.start);
-    // formData.append(
-    //   'BookingServices2',
-    //   `[${action.bookingServices.join(', ')}]`,
-    // );
-    // const result = dragAppointment(requestURL.toString(), formData);
-
-    let status = statusAdapter(fcEvent.data.status);
-
-    if (status == 'UnConfirm') {
-      status = 'Confirm';
-    } else if (status == 'Confirm') {
-      status = 'CheckIn';
-    } else if (status == 'CheckIn') {
-      status = 'Paid';
-    }
-
-    const options = {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        id: fcEvent.data.id,
-        Staff_id: fcEvent.data.memberId,
-        StoreId: storeid,
-        FromTime: fcEvent.data.start,
-        ToTime: fcEvent.data.end,
-        TipPercent: null,
-        User_id: null,
-        total: 1,
-        duration: 1,
-        waitingtime: 1,
-        CheckinStatus: status,
-        PaidStatus: false,
-        Status: 1,
-        CreateDate: fcEvent.data.start,
-        BookingServices2: action.bookingServices,
-      }),
-    };
-    const result = yield call(request, requestURL.toString(), options);
-    /* --------------------------------------------------------------- */
-    /* --------------------------------------------------------------- */
-    if (result) {
-      yield put(appointmentUpdatedStatus(action.appointmentId));
-      updateEventFromCalendar(fcEvent);
-      yield put(deselectAppointment());
-    } else {
-      yield put(appointmentUpdatingStatusError(result));
-    }
-  } catch (err) {
-    yield put(appointmentUpdatingStatusError(err));
   }
 }
 
@@ -563,49 +669,55 @@ export function* assignAppointment(action) {
     memberId: assignedMember.id,
   };
   try {
-    yield put(loadingWaiting(true));
-    const { id, memberId, start, end } = appointment;
-    let formdt = new FormData();
+    yield put(removeAppointmentWaiting(appointment));
 
-    formdt.append('id', id);
-    const kq = yield detail_Appointment(POST_DETAIL_APPOINTMENT + '/id', formdt);
-    var totalduration = 0;
-    const servicesUpdate = kq.data.data.bookingServices2;
-    for (let i = 0; i < servicesUpdate.length; i++) {
-      const index = servicesUpdate[i].search('@');
-      totalduration += parseInt(servicesUpdate[i].charAt(index + 1) + servicesUpdate[i].charAt(index + 2));
-    }
-    const requestURL = new URL(POST_STATUS_APPOINTMENT_API);
+    const { memberId, start, status, options, products, extras } = appointment;
+    let duration_total = 0;
+    appointment.options.forEach(el => {
+      duration_total += parseInt(el.duration);
+    });
+    extras.forEach(ext => {
+      duration_total += parseInt(ext.duration);
+    });
 
     yield put(addAppointmentToCalendar({
       appointment: appointment,
-      status: 'checkin',
-      BookingServices2: servicesUpdate,
-      newDate: moment(start).add(totalduration, 'minutes').format().substr(0, 19),
-      memberId : appointment.memberId
+      new_end_time: duration_total > 0 ? moment(start).add(duration_total, 'minutes').format().substr(0, 19) : moment(start).add(15, 'minutes').format().substr(0, 19),
+      memberId: appointment.memberId
     }));
+
     const displayedMember_app = yield select(makeSelectCalendarAppointments());
+
     const currentDate = yield select(makeCurrentDay());
     addEventsToCalendar(currentDate, displayedMember_app);
+    const data = {
+      staffId: memberId,
+      fromTime: start,
+      toTime: duration_total > 0 ? moment(start).add(duration_total, 'minutes').format().substr(0, 19) : moment(start).add(15, 'minutes').format().substr(0, 19),
+      status: statusConvertData[status],
+      services: options,
+      products,
+      extras
+    }
 
-    const result = yield drag_Appointment(requestURL.toString(), {
-      id,
-      Staff_id: memberId,
-      StoreId: storeid,
-      FromTime: start,
-      ToTime: moment(start).add(totalduration, 'minutes').format().substr(0, 19),
-      total: 0,
-      duration: totalduration,
-      CheckinStatus: "checkin",
-      PaidStatus: false,
-      Status: 1,
-      CreateDate: new Date().toString().substring(0, 15),
-      User_id: kq.data.data.user_id,
-      BookingServices2 : servicesUpdate,
+    const requestURL = new URL(PUT_STATUS_APPOINTMENT_API);
+    const kq = yield axios.put(`${requestURL.toString()}/${appointment.id}`, data, {
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", }
+    }).then((result) => {
+      return result
+    }).catch((err) => {
+      const data_offline = JSON.parse(localStorage.getItem('updateAppointment')) ? JSON.parse(localStorage.getItem('updateAppointment')) : [];
+      data_offline.push(data);
+      localStorage.setItem('updateAppointment', JSON.stringify(data_offline));
+      return { error: err }
     });
 
-    if (result) {
-      yield put(loadWaitingAppointments())
+    if (kq.status === 200 && kq.data.codeStatus !== 1) {
+      return yield* checkResponse(kq);
+    }
+
+    if (kq.status === 200) {
+
     } else {
       yield put(appointmentAssigningError(result));
     }
@@ -620,65 +732,76 @@ export function* upddateAppointment(action) {
     if (!fcEvent) {
       yield put(appointmentUpdatingStatusError('Cannot find selected fcEvent'));
     }
-    const { appointment, total, duration, BookingServices2, status, old_duration } = action.appointment;
-    const { memberId, start, end, id } = appointment;
-    const fcEventStatus = fcEvent.data.status;
-    if (fcEventStatus === 'ASSIGNED') {
-      fcEvent.data.status = 'CHECKD_IN';
-    } else if (status === 'CONFIRMED') {
-      fcEvent.data.status = 'CHECKD_IN';
-    } else if (status === 'UNCOFIRM') {
-      fcEvent.data.status = 'CONFIRMED';
-    }
+    let { appointment, status, old_duration, servicesUpdate, productsUpdate, notes } = action.appointment;
+    let { end, start, extras, memberId } = appointment;
 
-    let formdt = new FormData();
-    formdt.append('id', id);
-    var newDate;
-    //status to update
+    let new_total_duration = 0;
+    servicesUpdate.forEach(sv => {
+      new_total_duration += parseInt(sv.duration);
+    });
+    extras.forEach(ext => {
+      new_total_duration += parseInt(ext.duration);
+    });
 
+    let newDate;
     if (status === 'checkin' || status === 'confirm') {
-      if (parseInt(old_duration) > parseInt(duration)) {
-        const newDuration = parseInt(old_duration) - parseInt(duration);
+      if (parseInt(old_duration) > parseInt(new_total_duration)) {
+        const newDuration = parseInt(old_duration) - parseInt(new_total_duration);
         newDate = moment(end).subtract(newDuration, 'minutes').format();
       } else {
-        const newDuration = parseInt(duration) - parseInt(old_duration);
+        const newDuration = parseInt(new_total_duration) - parseInt(old_duration);
         newDate = moment(end).add(newDuration, 'minutes').format();
       }
     } else {
-      newDate = moment(end).add(duration, 'minutes').format();
+      newDate = moment(end).add(new_total_duration, 'minutes').format();
     }
 
-    fcEvent.data.end = newDate.substr(0, 19);
-    if(status === 'cancel'){
+    if (status === 'cancel') {
       yield put(appointmentCanceled(appointment.id));
       deleteEventFromCalendar(fcEvent._id);
       yield put(deselectAppointment());
-    }else{
-    yield put(appointmentUpdatedStatus({ appointmentID: appointment.id, status, BookingServices2, newDate }));
-    const displayedMember_app = yield select(makeSelectCalendarAppointments());
-    const currentDate = yield select(makeCurrentDay());
-    addEventsToCalendar(currentDate, displayedMember_app);
+    } else {
+      yield put(appointmentUpdatedStatus({ appointmentID: appointment.id, status, BookingServices2: servicesUpdate, newDate, productsUpdate, notes }));
+      const displayedMember_app = yield select(makeSelectCalendarAppointments());
+      const currentDate = yield select(makeCurrentDay());
+      addEventsToCalendar(currentDate, displayedMember_app);
+    }
+    let notesUpdate = []
+    notes.forEach(note => {
+      notesUpdate.push({
+        note: note.note
+      })
+    });
+
+    let data = {
+      staffId: memberId,
+      fromTime: start,
+      toTime: newDate,
+      status,
+      services: servicesUpdate,
+      products: productsUpdate,
+      extras,
+      notes: notesUpdate
     }
 
-    const kq = yield detail_Appointment(POST_DETAIL_APPOINTMENT + '/id', formdt);
-    const requestURL = new URL(POST_STATUS_APPOINTMENT_API);
-    const result = yield update_Appointment(requestURL.toString(), {
-      id,
-      Staff_id: memberId,
-      StoreId: storeid,
-      FromTime: start,
-      ToTime: newDate.substr(0, 19),
-      total: total,
-      duration: duration,
-      CheckinStatus: action.appointment.status,
-      PaidStatus: true,
-      Status: 1,
-      CreateDate: new Date().toString().substring(0, 15),
-      BookingServices2: BookingServices2,
-      User_id: kq.data.data.user_id,
+    const requestURL = new URL(PUT_STATUS_APPOINTMENT_API);
+    const kq = yield axios.put(`${requestURL.toString()}/${appointment.id}`, data, {
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", }
+    }).then((result) => {
+      return result
+    }).catch((err) => {
+      const data_offline = JSON.parse(localStorage.getItem('updateAppointment')) ? JSON.parse(localStorage.getItem('updateAppointment')) : [];
+      data_offline.push(data);
+      localStorage.setItem('updateAppointment', JSON.stringify(data_offline));
+      return { error: err }
     });
-    if (result) {
-      yield put(updateAppointmentSuccess(result))
+
+    if (response.status === 200 && response.data.codeStatus !== 1) {
+      return yield* checkResponse(response);
+    }
+
+    if (kq.status === 200) {
+      yield put(updateAppointmentSuccess(result.data.data))
     } else {
       yield put(updateAppointmentError(error))
     }
@@ -688,39 +811,268 @@ export function* upddateAppointment(action) {
   }
 }
 
+export function* changeTimeAppointment(action) {
+  try {
+    let check = true;
+    const fcEvent = yield select(makeSelectFCEvent());
+    if (!fcEvent) {
+      yield put(appointmentUpdatingStatusError('Cannot find selected fcEvent'));
+    }
+
+    let { appointment, dayPicker, fromTime, notes } = action.appointment;
+    let { memberId, options, products, extras, id } = appointment;
+
+    let totalDuration = 0;
+    appointment.options.forEach(app => {
+      totalDuration += app.duration;
+    });
+    extras.forEach(ext => {
+      totalDuration += ext.duration;
+    });
+
+    const start_time = `${moment(dayPicker).format('YYYY-MM-DD')}T${moment(fromTime).format('HH:mm')}`;
+    const end_time = totalDuration > 0 ? moment((start_time)).add(totalDuration, 'minutes').format('YYYY-MM-DD HH:mm') :
+      moment((start_time)).add(15, 'minutes').format('YYYY-MM-DD HH:mm');
+
+    let displayedMember_app = yield select(makeSelectCalendarAppointments());
+    const member = displayedMember_app.find(mem =>
+      mem.appointments.find(app => parseInt(app.id) === parseInt(id)),
+    );
+
+    member.appointments.forEach(app => {
+      if (parseInt(app.id) !== parseInt(id)) {
+        if ((moment(start_time).isBetween(app.start, app.end)) || (moment(end_time).isBetween(app.start, app.end))) {
+          if (app.status === 'CHECKED_IN' || app.status === 'CONFIRMED' || app.status === "BLOCK") {
+            check = false;
+          }
+        }
+      }
+    });
+
+    if (check === false) {
+      window.alert('You can not override this appointment to another checkin or confirm appointment, or Working Time of this staff is over !!!')
+    }
+    else {
+      if (moment(dayPicker).format('YYYY-MM-DD') === moment(new Date()).format('YYYY-MM-DD')) {
+        if (moment(start_time).isBefore(moment().add(1, 'hours'))) {
+          window.alert('Your time change must be bigger than your current time at least 1 hour !!!')
+        } else {
+          yield* changeTime(appointment, fcEvent, start_time, end_time, memberId, options, products, extras, notes);
+        }
+      } else {
+        yield* changeTime(appointment, fcEvent, start_time, end_time, memberId, options, products, extras, notes);
+      }
+    }
+  }
+  catch (error) {
+    yield put(updateAppointmentError(error))
+  }
+
+  function* changeTime(appointment, fcEvent, start_time, end_time, memberId, options, products, extras, notes) {
+
+    yield put(appointmentCanceled(appointment.id));
+    deleteEventFromCalendar(fcEvent._id);
+    yield put(deselectAppointment());
+    yield put(changeAppointmentTime_Success({
+      ...appointment,
+      start: start_time,
+      end: end_time,
+      notes
+    }));
+    const displayedMember_app = yield select(makeSelectCalendarAppointments());
+    const currentDate = yield select(makeCurrentDay());
+    addEventsToCalendar(currentDate, displayedMember_app);
+
+    let notesUpdate = []
+
+    notes.forEach(note => {
+      notesUpdate.push({
+        note: note.note
+      })
+    });
+
+    let data = {
+      staffId: memberId,
+      fromTime: start_time,
+      toTime: end_time,
+      status: 'unconfirm',
+      services: options,
+      products: products,
+      extras,
+      notes: notesUpdate
+    };
+    const requestURL = new URL(PUT_STATUS_APPOINTMENT_API);
+    const kq = yield axios.put(`${requestURL.toString()}/${appointment.id}`, data, {
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", }
+    }).then((result) => {
+      return result;
+    }).catch((err) => {
+      const data_offline = JSON.parse(localStorage.getItem('updateAppointment')) ? JSON.parse(localStorage.getItem('updateAppointment')) : [];
+      data_offline.push(data);
+      localStorage.setItem('updateAppointment', JSON.stringify(data_offline));
+      return { error: err };
+    });
+
+    if (response.status === 200 && response.data.codeStatus !== 1) {
+      return yield* checkResponse(response);
+    }
+
+    if (kq.status === 200) {
+      yield put(updateAppointmentSuccess(result));
+    }
+    else {
+      yield put(updateAppointmentError(error));
+    }
+  }
+}
+
+function checkTimeToAddAppointmdent() {
+  let time = moment();
+  let time_15 = moment().startOf('hours').add(15, 'minutes');
+  let time_30 = moment().startOf('hours').add(30, 'minutes');
+  let time_45 = moment().startOf('hours').add(45, 'minutes');
+  let time_60 = moment().startOf('hours').add(60, 'minutes');
+  if (time.isBefore(time_15)) {
+    time = time_15;
+  }
+  if (time.isBetween(time_15, time_30)) {
+    time = time_30;
+  }
+  if (time.isBetween(time_30, time_45)) {
+    time = time_45;
+  }
+  if (time.isBetween(time_45, time_60)) {
+    time = time_60;
+  }
+  return time.format('YYYY-MM-DD HH:mm');
+}
 
 export function* addNewCustomer(action) {
   try {
-    const { first_name, last_name, phone, staffID, time } = action.customer;
-    const result = yield axios.post(POST_ADD_CUSTOMER, {
-      first_name, last_name, phone: phone,status : 1,
-    }, {
+    const { first_name, last_name, phone, staffID, time, refPhone, note, email } = action.customer;
+
+    const Info_CheckPhone = yield select(makeInfoCheckPhone());
+    let customerId;
+    let user_Id;
+
+    if (Info_CheckPhone === '') {
+      const requestURL = new URL(POST_ADD_CUSTOMER);
+      const data = {
+        FirstName: first_name,
+        LastName: last_name,
+        Email: email,
+        Phone: phone,
+        referrerPhone: refPhone,
+        favourite: note
+      }
+
+      const result = yield axios.post(requestURL.toString(), data, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         }
       }
-    );
+      ).then((kq) => {
+        return kq.data
+      }).catch((err) => {
+        console.log(err);
+      });
+      customerId = result.data.customerId;
+      user_Id = result.data.userId;
+    }
+    else {
+      customerId = Info_CheckPhone.customerId;
+      user_Id = Info_CheckPhone.userId;
+    }
 
-    if (result.data.codeStatus === 1) {
-      const id = result.data.data;
-      console.log(result.data)
-      if (staffID) {
-        window.postMessage(JSON.stringify({
-          consumerId: result.data.data,
-          staffid: staffID,
-          from_time: time,
-          action: 'newAppointment'
-        }));
-      } else {
-        window.postMessage(JSON.stringify({
-          consumerId: id,
-          action: 'newAppointment'
-        }));
+    const data = {
+      staffId: time ? staffID : 0,
+      customerId,
+      merchantId: merchantId,
+      userId: user_Id,
+      status: time ? "checkin" : "waiting",
+      services: [
+      ],
+      products: [],
+      extras: [],
+      fromTime: time ? moment(new Date(time)).format('YYYY-MM-DD HH:mm') : checkTimeToAddAppointmdent(),
+      toTime: time ? moment(new Date(time)).add(15, 'minutes').format('YYYY-MM-DD HH:mm') : moment(checkTimeToAddAppointmdent()).add(15, 'minutes').format('YYYY-MM-DD HH:mm'),
+    }
+
+    /* Add Appointment  */
+    const requestURL_AddAppointment = new URL(POST_ADD_APPOINTMENT);
+    const resultAddAppointment = yield axios.post(requestURL_AddAppointment.toString(), data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       }
-      yield put(addCustomerSuccess(true))
+    }).then((kq) => {
+      return kq;
+    }).catch((err) => {
+      console.log(err)
+    });
+    let id_appointment = '';
+    if (resultAddAppointment.status === 200) {
+      id_appointment = resultAddAppointment.data.data;
+    }
+
+
+    /* get appointment by id after add, add appointment to  waiting list */
+    const requestURL_DeailAppointment = new URL(GET_APPOINTMENT_BY_ID).toString();
+    const response_DetailAppointment = yield axios.get(`${requestURL_DeailAppointment}/${id_appointment}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    })
+      .then((res) => {
+        return res;
+      }).catch((err) => {
+        console.log(err);
+      });
+
+    yield put(addCustomerSuccess(true));
+
+    const { appointmentId, createdDate, fromTime, toTime, staffId, phoneNumber, services, products, userId, firstName, lastName, extras } = response_DetailAppointment.data.data;
+    let waitingAppointment = {
+      id: appointmentId,
+      createDate: createdDate,
+      end: moment(toTime),
+      start: moment(fromTime),
+      memberId: time ? staffID : staffId,
+      phoneNumber: phoneNumber,
+      options: services,
+      products: products,
+      extras: extras,
+      status: time ? 'CHECKED_IN' : 'WAITING',
+      tipPercent: 0,
+      user_id: userId,
+      userFullName: firstName + ' ' + lastName,
+      notes: [],
+    }
+
+    if (time) {
     } else {
-      yield put(addCustomerSuccess(true))
+      yield put(addAppointmentWaiting(waitingAppointment));
+    }
+
+    if (staffID) {
+      window.postMessage(JSON.stringify({
+        customerId, userId, appointmentId,
+        action: 'newAppointment'
+      }));
+      window.postMessage(JSON.stringify({
+        customerId, userId, appointmentId,
+        action: 'signinAppointment'
+      }));
+    } else {
+      window.postMessage(JSON.stringify({
+        customerId, userId, appointmentId,
+        action: 'newAppointment'
+      }));
+      window.postMessage(JSON.stringify({
+        customerId, userId, appointmentId,
+        action: 'signinAppointment'
+      }));
     }
   } catch (error) {
     yield put(addCustomerError(error))
@@ -729,39 +1081,150 @@ export function* addNewCustomer(action) {
 
 export function* checkPhoneCustomer(action) {
   try {
-    let formdt = new FormData();
     const { phone, staffID, time } = action.phone;
-    formdt.append('phone', phone);
-    const result = yield axios.post(POST_CHECK_PHONE_CUSTOMER, formdt, {
+    const requestURL = new URL(GET_BY_PHONE);
+    const result = yield axios.get(`${requestURL.toString()}/${phone}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       }
+    }).then((kq) => {
+      return kq.data
+    }).catch((err) => {
+
     });
 
-    if (result.data.data === "{}") {
-      yield put(checkPhoneNumberCustomerSuccess(true))
+    if (result.codeStatus === 2) {
+      yield put(checkPhoneNumberCustomerSuccess(true));//phone is not exist
     } else {
+      yield put(checkPhoneNumberCustomerError(true));
+      yield put(infoCheckPhone(result.data));
       if (staffID) {
         window.postMessage(JSON.stringify({
-          consumerId: result.data.data.user_id,
+          consumerId: result.data.customerId,
           staffid: staffID,
           from_time: time,
           action: 'newAppointment'
         }));
       } else {
         window.postMessage(JSON.stringify({
-          consumerId: result.data.data.user_id,
+          consumerId: result.data.customerId,
           action: 'newAppointment'
         }));
         yield put(TimeAndStaffID(''));
       }
-      yield put(checkPhoneNumberCustomerError(true));
     }
   } catch (error) {
     yield put(checkPhoneNumberCustomerError(error))
   }
 }
 
+export function* deleteEventInWaitingList(action) {
+  try {
+    const { appointment } = action;
+
+    const { memberId, start, end, options, products, extras } = appointment;
+    yield put(removeAppointmentWaiting(appointment));
+
+    let data = {
+      staffId: memberId,
+      fromTime: start,
+      toTime: end,
+      status: 'cancel',
+      services: options,
+      products: products,
+      extras
+    }
+
+    const requestURL = new URL(PUT_STATUS_APPOINTMENT_API);
+    const kq = yield axios.put(`${requestURL.toString()}/${appointment.id}`, data, {
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", }
+    }).then((result) => {
+      return result
+    }).catch((err) => {
+
+    });
+
+    if (response.status === 200 && response.data.codeStatus !== 1) {
+      return yield* checkResponse(response);
+    }
+
+    if (kq.status === 200) {
+      yield put(deleteEventWaitingList_Success(appointment));
+    }
+  } catch (error) {
+
+  }
+}
+
+export function* updateAppointment_Offline(action) {
+  try {
+    const appointment = action.data;
+    const requestURL = new URL(UPPOST_STATUS_APPOINTMENT_APIDATE);
+    const result = yield axios.post(requestURL.toString(), appointment, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      }
+    }).then((kq) => {
+      return kq;
+    }).catch((err) => {
+
+    });
+    if (result) {
+      yield put(updateAppointmentOfflineSuccess(result));
+    }
+  } catch (error) {
+
+  }
+}
+
+export function* getAppointmentAgain() {
+  yield takeLatest(LOAD_APPOINTMENT_AGAIN, function* () {
+    try {
+      const displayedMembers = yield select(makeSelectDisplayedMembers());
+      const currentDate = yield select(makeCurrentDay());
+      let apiDateQuery =
+        currentDate.format('YYYY-MM-DD') || moment().format('YYYY-MM-DD');
+
+      const requestURL = new URL(GET_APPOINTMENT_BY_DATE);
+      const url = `${requestURL.toString()}/${apiDateQuery}`;
+      const response = yield axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      })
+        .then((result) => {
+          if (result.status === 200) {
+            return result;
+          }
+        }).catch((err) => {
+
+        });
+
+      const appointments =
+        response &&
+        response.status === 200 &&
+        response.data.data.map(appointment => appointmentAdapter(appointment));
+
+      const app_calendar = yield select(makeSelectCalendarAppointments());
+      let arr_appointment = [];
+      app_calendar.forEach(mem =>
+        mem.appointments.forEach(app => arr_appointment = [...arr_appointment, app])
+      );
+
+      let diff = differenceBy(appointments, arr_appointment, 'id');
+      diff = diff.filter(app => app.status === "ASSIGNED");
+
+      for (let index = 0; index < diff.length; index++) {
+        const app = diff[index];
+        yield put(addAppointmentReloadCalendar(app));
+        updateEventToCalendar(app);
+      }
+    } catch (err) {
+      yield put(appointmentByMemberLoadingError(err));
+    }
+  })
+}
 
 
 
@@ -799,13 +1262,10 @@ export function* appointmentsByMembersData() {
     LOAD_APPOINTMENTS_BY_MEMBERS,
     getAppointmentsByMembersAndDate,
   );
-  // yield takeLatest(
-  //   UPDATE_STATUS_APPOINTMENT_SUCCESS,
-  //   getAppointmentsByMembersAndDate,
-  // );
+
   yield takeLatest(SELECT_DAY, getAppointmentsByMembersAndDate);
 
-  // FIXME: This is hard code for real-time calendar
+
   yield takeLatest(UPDATE_CALENDAR_INTERVAL, getAppointmentsByMembersAndDate);
 }
 
@@ -825,9 +1285,6 @@ export function* putBackAppointmentData() {
   yield takeLatest(PUT_BACK_APPOINTMENT, putBackAppointment);
 }
 
-export function* updateStatusAppointmentData() {
-  yield takeLatest(UPDATE_STATUS_APPOINTMENT, updateStatusAppointment);
-}
 
 export function* cancelAppointmentData() {
   yield takeLatest(CANCEL_APPOINTMENT, cancelAppointment);
@@ -841,6 +1298,15 @@ export function* add_Customer() {
 }
 export function* check_Phone() {
   yield takeLatest(CHECK_PHONE_ADD_CUSTOMER, checkPhoneCustomer)
+}
+export function* deleteEvent_WaitingList() {
+  yield takeLatest(DELETE_EVENT_WAITINGLIST, deleteEventInWaitingList)
+}
+export function* change_time_appointment() {
+  yield takeLatest(CHANGE_APPOINTMENT_TIME, changeTimeAppointment)
+}
+export function* update_App_Offline() {
+  yield takeLatest(UPDATE_APPOINTMENT_OFFLINE, updateAppointment_Offline)
 }
 
 /**
@@ -856,74 +1322,17 @@ export default function* root() {
     fork(assignAppointmentData),
     fork(moveAppointmentData),
     fork(putBackAppointmentData),
-    fork(updateStatusAppointmentData),
     fork(cancelAppointmentData),
     fork(updateAppointmentStatus),
     fork(add_Customer),
     fork(check_Phone),
-
+    fork(deleteEvent_WaitingList),
+    fork(change_time_appointment),
+    fork(update_App_Offline),
+    fork(getAppointmentAgain)
   ]);
 }
 
-async function dragAppointment(api, formData) {
-  return axios({
-    method: 'POST',
-    url: api,
-    data: formData,
-    headers,
-    config: {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    },
-  });
-}
-
-async function drag_Appointment(api, data) {
-  return axios({
-    method: 'POST',
-    url: api,
-    data: data,
-    headers,
-    config: {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    },
-  });
-}
-
-
-async function update_Appointment(api, data) {
-  return axios({
-    method: 'POST',
-    url: api,
-    data: data,
-    headers,
-    config: {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    },
-  });
-}
-
-async function detail_Appointment(api, data) {
-  return axios({
-    method: 'POST',
-    url: api,
-    data: data,
-    headers,
-    config: {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    },
-  });
-}
 
 
 

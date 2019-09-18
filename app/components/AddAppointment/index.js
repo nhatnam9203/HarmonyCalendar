@@ -5,7 +5,7 @@ import Popup from 'reactjs-popup';
 import { FaTimesCircle } from 'react-icons/fa';
 import Enter from '../../images/enter.png';
 
-const AppPopup = styled(Popup)`
+const AppPopup = styled(Popup) `
   border-radius: 1.5rem;
   padding: 0 !important;
   border: none !important;
@@ -46,11 +46,16 @@ AppPopupWrapper.Body = styled.div`
 
 AppPopupWrapper.Footer = styled.div`
   display: flex;
+  flex-direction : row;
   padding: 0.5rem 1rem 1rem 1rem;
 
   & > div {
-    width: 1000%;
+    flex : 1;
     text-align: center;
+  }
+  & > select{
+    width : 5rem;
+    height : 3rem;
   }
 `;
 
@@ -58,55 +63,62 @@ AppPopupWrapper.Footer = styled.div`
 // ************************************************* //
 // ************************************************* //
 
-const SearchingPopup = styled(AppPopup)`
+const SearchingPopup = styled(AppPopup) `
   width: 30rem !important;
+  
 `;
 
-const SearchingWrapper = styled(AppPopupWrapper)`
+const SearchingWrapper = styled(AppPopupWrapper) `
   //
 `;
 
-SearchingWrapper.Header = styled(AppPopupWrapper.Header)`
+SearchingWrapper.Header = styled(AppPopupWrapper.Header) `
   //
 `;
 
-SearchingWrapper.Body = styled(AppPopupWrapper.Body)`
+SearchingWrapper.Body = styled(AppPopupWrapper.Body) `
   text-align: center;
 `;
 
-SearchingWrapper.Close = styled(AppPopupWrapper.Close)`
+SearchingWrapper.Close = styled(AppPopupWrapper.Close) `
   //
 `;
 
-SearchingWrapper.Footer = styled(AppPopupWrapper.Footer)`
-  //
+SearchingWrapper.Footer = styled.div`
+  display: flex;
+  padding: 0.5rem 1rem 1rem 1rem;
+
 `;
 
+
+
 // ************************************************* //
 // ************************************************* //
 // ************************************************* //
 
-const AddingPopup = styled(AppPopup)`
+const AddingPopup = styled(AppPopup) `
   width: 30rem !important;
 `;
 
-const AddingWrapper = styled(AppPopupWrapper)`
+const AddingWrapper = styled(AppPopupWrapper) `
+
+`;
+
+AddingWrapper.Header = styled(AppPopupWrapper.Header) `
   //
 `;
 
-AddingWrapper.Header = styled(AppPopupWrapper.Header)`
-  //
-`;
-
-AddingWrapper.Body = styled(AppPopupWrapper.Body)`
+AddingWrapper.Body = styled(AppPopupWrapper.Body) `
   text-align: center;
+  height : 26rem;
+  overflow-y : scroll;
 `;
 
-AddingWrapper.Close = styled(AppPopupWrapper.Close)`
+AddingWrapper.Close = styled(AppPopupWrapper.Close) `
   //
 `;
 
-AddingWrapper.Footer = styled(AppPopupWrapper.Footer)`
+AddingWrapper.Footer = styled(AppPopupWrapper.Footer) `
   //
 `;
 
@@ -120,19 +132,54 @@ const Img = styled.img`
 
 const Label = styled.div`
   margin-bottom: 1rem;
+  text-align : left;
 `;
 
-const Form = styled.form`
-  width: 100%;
-  text-align: center;
 
-  &.left {
-    text-align: left;
+const FooterChekPhone = styled.div`
+  width : 100%;
+  padding : 1rem;
+  text-align : center;
+`
 
-    input {
-      text-align: left;
-    }
+const FormCheckPhone = styled.div`
+  display : flex;
+  flex-direction : row;
+  width : 100%;
+  height : 2.5rem;
+  margin-bottom : 1rem;
+  & > input{
+    flex : 1;
+    text-align : left;
+    background: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius : 4px;
+    padding-left : 1.3rem;
+    -moz-appearance: none;
+  /* for Chrome */
+  -webkit-appearance: none;
   }
+  & > select{
+    width : 4rem;
+    background: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius : 4px;
+    margin-right : 0.5rem;
+    padding-left : 1.2rem;
+    -moz-appearance: none;
+  /* for Chrome */
+  -webkit-appearance: none;
+  }
+`
+
+
+
+
+
+const Form = styled.form`
+  flex : 1;
+  text-align: center;
+  };
 
   input {
     width: 100%;
@@ -142,7 +189,10 @@ const Form = styled.form`
     border-bottom-left-radius: 4px;
     padding: 0.5rem 1rem;
     margin-bottom: 1rem;
-    text-align: center;
+    text-align: left;
+    -moz-appearance: none;
+  /* for Chrome */
+  -webkit-appearance: none;
 
     &.w-50 {
       width: 48%;
@@ -162,6 +212,7 @@ const Button = styled.button`
   text-align: center;
   padding: 0 2rem;
 `;
+
 
 const NoteWrapper = styled.div`
   border: 1px solid #dddddd;
@@ -186,6 +237,9 @@ NoteWrapper.Form = styled.form`
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
     padding: 0 1rem;
+    -moz-appearance: none;
+  /* for Chrome */
+  -webkit-appearance: none;
   }
   & > button {
     width: 5rem;
@@ -213,25 +267,26 @@ const NoteInformation = styled.div`
   }
 `;
 
-const token = location.search.replace('?token=', '');
-
-
 class AddAppointment extends React.Component {
-  state = {
-    isOpenSearchingPopup: true,
-    isOpenAddingPopup: false,
-    first_name: '',
-    last_name: '',
-    phone: '',
-    phoneNumber: '',
-    noteValue: '',
-    notes: [],
 
-    error_phone: '',
-    success_addApointment: '',
-    error_addApointment: '',
-  };
-
+  constructor(props){
+    super(props);
+    this.state={
+        isOpenSearchingPopup: true,
+        isOpenAddingPopup: false,
+        first_name: '',
+        last_name: '',
+        phone: '',
+        phoneNumber: '',
+        phoneCheck: "1",
+        noteValue: '',
+        notes: [],
+        email: '',
+        error_phone: '',
+        success_addApointment: '',
+        error_addApointment: '',
+    }
+  }
 
   closeAllModal() {
     this.setState({
@@ -239,34 +294,58 @@ class AddAppointment extends React.Component {
       isOpenAddingPopup: false,
       phoneNumber: '',
     });
-    const { closeAddingAppointment, checkPhoneNumberCustomerSuccess,closeTimeAndStaffID, checkPhoneNumberCustomerError } = this.props;
+    this.resetState();
+    const {
+      closeAddingAppointment,
+      checkPhoneNumberCustomerSuccess,
+      closeTimeAndStaffID,
+      checkPhoneNumberCustomerError,
+      disableCalendar,
+      infoCheckPhone,
+      addCustomerSuccess } = this.props;
     checkPhoneNumberCustomerError(false);
     checkPhoneNumberCustomerSuccess(false);
+    disableCalendar(false);
     closeAddingAppointment();
     closeTimeAndStaffID('');
+    infoCheckPhone('');
+    addCustomerSuccess(false);
   }
 
-  handleSubmitVerifyPhone(e) {
-    e.preventDefault();
-    const {time,staffID} = this.props.TimeAndStaffID
-    this.props.checkPhoneNumberCustomer({
-      phone : this.state.phoneNumber,
-      time,staffID
+  handleSubmitVerifyPhone() {
+    const { time, staffID } = this.props.TimeAndStaffID
+    const { checkPhoneNumberCustomer } = this.props;
+    checkPhoneNumberCustomer({
+      phone: `${this.state.phoneCheck}${this.state.phoneNumber}`,
+      time, staffID
     });
   }
   handleSubmitAppointment = () => {
-    const {time,staffID} = this.props.TimeAndStaffID
-    const { first_name, last_name, phoneNumber } = this.state;
-    this.props.addCustomer({ first_name, last_name, phone: phoneNumber,time,staffID });
+    const { time, staffID } = this.props.TimeAndStaffID
+    const { first_name, last_name, phoneNumber, phone, notes, email, phoneCheck } = this.state;
+    const { addCustomer, infoCheckPhone } = this.props;
+    if(first_name.trim() !== '' && last_name.trim() !== ''){
+      addCustomer({
+        first_name,
+        last_name,
+        phone: `+${phoneCheck}${phoneNumber}`,
+        refPhone: phone,
+        note: notes.toString(),
+        time, staffID, email
+      });
+      infoCheckPhone('');
+      this.closeAllModal();
+    }
   }
 
-  handleChange(e) {
-    this.setState({ phoneNumber: e.target.value });
+  async handleChange(e) {
+      const val = e.target.value;
+      if (e.target.validity.valid) this.setState({phoneNumber: e.target.value.replace(/^0+/, "")});
+      else if (val === '' || val === '-') this.setState({phoneNumber: val});
   }
 
   handleSubmitNote(e) {
     e.preventDefault();
-    // TODO: Call api for notes here
   }
 
   handleChangeNote(e) {
@@ -276,10 +355,8 @@ class AddAppointment extends React.Component {
   renderNote = (note, index) => (
     <NoteInformation key={index}>
       <div>
-        <strong>{note.date}</strong>
+        {note}
       </div>
-      <div>{note.name}</div>
-      <div>{note.content}</div>
     </NoteInformation>
   );
 
@@ -293,53 +370,85 @@ class AddAppointment extends React.Component {
   }
 
   showInsertCustomerSuccess = () => {
-    this.setState({
-      success_addApointment: 'Inserted customer',
-    });
     setTimeout(() => {
       this.setState({
         first_name: '',
         last_name: '',
+        countryCode: "+1",
         phone: '',
         phoneNumber: '',
-        isOpenSearchingPopup: false,
-        isOpenAddingPopup: false,
-        success_addApointment: '',
+        success_addApointment: 'Add appointment succesful !!!',
       });
-      this.props.addCustomerSuccess(false)
-    }, 3000);
+      this.closeAllModal();
+    }, 300);
   }
 
   openFormInsertAfterCheckPhone = () => {
-    this.setState({
-      isOpenSearchingPopup: false,
-      isOpenAddingPopup: true,
-    });
+    if (this.state.phoneNumber.trim() !== '') {
+      this.setState({
+        isOpenSearchingPopup: false,
+        isOpenAddingPopup: true,
+      });
+    }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.checkPhoneError === true) {
-      this.phoneNumberError();
+  resetState() {
+    this.setState({
+      first_name: '',
+      last_name: '',
+      email: '',
+      noteValue: '',
+      notes: [],
+      phone: '',
+      success_addApointment: '',
+    })
+  }
+
+  async componentWillReceiveProps(nextProps) {
+
+    if (nextProps.StateAddCustomerSuccess === true) {
+      this.showInsertCustomerSuccess();
     }
-    if (nextProps.checkPhoneError === false) {
+    if (nextProps.checkPhoneError === true) { // phone is not exist
+      const { firstName, lastName, email, phone, referrerPhone,favourite } = nextProps.InfoAfterCheckPhone;
+      this.setState({
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        phoneNumber: phone === undefined ? ' ' :phone.slice(2),
+        phone: referrerPhone,
+        notes : favourite.split(","),
+      })
+      this.openFormInsertAfterCheckPhone();
+    }
+    if (nextProps.checkPhoneError === false) { // phone exist
       if (nextProps.checkPhoneSuccess === true) {
         this.openFormInsertAfterCheckPhone();
-        if (nextProps.StateAddCustomerSuccess === true) {
-          this.showInsertCustomerSuccess();
-        }
       }
+    }
+  }
+
+
+  addNotes() {
+    const { notes, noteValue } = this.state;
+    if (noteValue !== '') {
+      this.setState({ notes: [...notes, noteValue], noteValue: '' });
     }
   }
 
   render() {
     const { isOpenSearchingPopup, isOpenAddingPopup, notes, error_phone, success_addApointment } = this.state;
-    const { appointment } = this.props;
+    const { appointment, InfoAfterCheckPhone, StateAddCustomerSuccess } = this.props;
+    const PhoneShow = "+" + this.state.phoneCheck + '-' + this.state.phoneNumber;
+
     if (!appointment) return '';
     return (
       <div>
         <SearchingPopup
           open={isOpenSearchingPopup}
           closeOnDocumentClick={false}
+          lockScroll={true}
+          
         >
           <SearchingWrapper>
             <SearchingWrapper.Close onClick={() => this.closeAllModal()}>
@@ -349,27 +458,38 @@ class AddAppointment extends React.Component {
               Add Appointment
             </SearchingWrapper.Header>
             <SearchingWrapper.Body>Enter phone number</SearchingWrapper.Body>
-            <SearchingWrapper.Footer>
-              <Form onSubmit={e => this.handleSubmitVerifyPhone(e)}>
+            <FooterChekPhone>
+              <FormCheckPhone>
+                <select value={this.state.phoneCheck} onChange={(e) => this.setState({ phoneCheck: e.target.value })}
+                  className="" name="" id="">
+                  <option value="1">+1</option>
+                  <option value="84">+84</option>
+                  <option></option>
+                </select>
                 <input
+                  type='text'
                   value={this.state.phoneNumber}
                   onChange={e => this.handleChange(e)}
-                  type="number"
+                  pattern="^-?[0-9]\d*\.?\d*$"
+                  placeholder="Phone Number"
                 />
-                <div>
-                  <Button id="submit-create-appointment" type="submit" primary>
-                    Next
-                  </Button>
-                </div>
-                {error_phone && <p style={{ color: 'red' }}>{error_phone}</p>}
-              </Form>
-            </SearchingWrapper.Footer>
+              </FormCheckPhone>
+              <Button
+                onClick={() => this.handleSubmitVerifyPhone()}
+                id="submit-create-appointment" primary>
+                Next
+              </Button>
+              {error_phone && <p style={{ color: 'red' }}>{error_phone}</p>}
+            </FooterChekPhone>
           </SearchingWrapper>
         </SearchingPopup>
         <AddingPopup
           open={isOpenAddingPopup}
           onClose={() => this.closeAllModal()}
           closeOnDocumentClick={false}
+          modal={true}
+          position={'left'}
+          // lockScroll={true}
         >
           <AddingWrapper>
             <AddingWrapper.Close onClick={() => this.closeAllModal()}>
@@ -381,40 +501,53 @@ class AddAppointment extends React.Component {
             <AddingWrapper.Body>
               <Form onSubmit={e => e.preventDefault()}>
                 {success_addApointment && <p style={{ color: '#8D9440' }}>{success_addApointment}</p>}
-                <Label>Phone number is not exist ! Get information !</Label>
-                <input value={this.state.phoneNumber} type="number" disabled />
+                <Label style={{ textAlign: 'center' }}>Phone number is not exist ! Get information !</Label>
+                <input style={{ textAlign: 'center' }} value={PhoneShow} type="text" disabled />
               </Form>
               <Form className="left" onSubmit={e => e.preventDefault()}>
-                <Label>Customer Name</Label>
+                <Label>Customer Name *</Label>
                 <div
                   style={{ display: 'flex', justifyContent: 'space-between' }}
                 >
-                  <input value={this.state.first_name} onChange={e => this.setState({ first_name: e.target.value })} placeholder="First Name" className="w-50" />
-                  <input value={this.state.last_name} onChange={e => this.setState({ last_name: e.target.value })} placeholder="Last Name" className="w-50" />
+                  <input disabled={InfoAfterCheckPhone !== ''} value={this.state.first_name} onChange={e => this.setState({ first_name: e.target.value })} placeholder="First Name" className="w-50" />
+                  <input disabled={InfoAfterCheckPhone !== ''} value={this.state.last_name} onChange={e => this.setState({ last_name: e.target.value })} placeholder="Last Name" className="w-50" />
+                </div>
+              </Form>
+              <Form className="left" onSubmit={e => e.preventDefault()}>
+                <Label>Email</Label>
+                <div
+                  style={{ display: 'flex', justifyContent: 'space-between' }}
+                >
+                  <input disabled={InfoAfterCheckPhone !== ''} type="email" value={this.state.email} onChange={e => this.setState({ email: e.target.value })} placeholder="Email" />
                 </div>
               </Form>
               <Form className="left" onSubmit={e => e.preventDefault()}>
                 <Label>Referrer Phone Number</Label>
-                <input value={this.state.phone} onChange={e => this.setState({ phone: e.target.value })} placeholder="Phone number" />
+                <input disabled={InfoAfterCheckPhone !== ''} value={this.state.phone} onChange={e => this.setState({ phone: e.target.value })} placeholder="Phone number" />
               </Form>
               <NoteWrapper>
                 <Label>Note:</Label>
-                {notes.map(this.renderNote)}
+                {notes.map((note, index) => this.renderNote(note, index))}
                 <NoteWrapper.Form onSubmit={e => e.preventDefault()}>
                   <input
                     value={this.state.noteValue}
+                    disabled={InfoAfterCheckPhone !== ''}
                     onChange={e => this.handleChangeNote(e)}
                   />
-                  <button type="submit">
+                  <button type="submit" onClick={() => this.addNotes()}>
                     <Img src={Enter} alt="icon" />
                   </button>
                 </NoteWrapper.Form>
               </NoteWrapper>
+              <div style={{height:70}}>
+
+              </div>
             </AddingWrapper.Body>
             <AddingWrapper.Footer>
               <div>
                 <Button
                   onClick={this.handleSubmitAppointment}
+                  disabled={StateAddCustomerSuccess}
                   type="button" primary>
                   Next
                 </Button>

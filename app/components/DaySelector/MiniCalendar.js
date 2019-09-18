@@ -49,7 +49,7 @@ CalendarPopup.Heading = styled.div`
   color: #ffffff;
   height: 3rem;
   font-size: 1.5rem;
-  line-height: 2;
+  line-height: 2; 
 `;
 
 CalendarPopup.Body = styled.div``;

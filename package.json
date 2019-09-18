@@ -1,6 +1,7 @@
 {
   "name": "react-app",
   "version": "3.7.0",
+  "homepage": "https://nhatnam9203.github.io/calendar2/",
   "scripts": {
     "mock:server": "json-server --watch app/assets/mocks/db.json --port 8010",
     "analyze:clean": "rimraf stats.json",
@@ -32,7 +33,9 @@
     "test": "cross-env NODE_ENV=test jest --coverage",
     "test:watch": "cross-env NODE_ENV=test jest --watchAll",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
-    "prettify": "prettier --write"
+    "prettify": "prettier --write",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "lint-staged": {
     "*.js": [
@@ -48,6 +51,7 @@
     "babel-core": "7.0.0-bridge.0"
   },
   "dependencies": {
+    "@aspnet/signalr": "^1.1.4",
     "@babel/polyfill": "7.0.0",
     "axios": "^0.18.0",
     "chalk": "^2.4.1",
@@ -59,6 +63,7 @@
     "fontfaceobserver": "2.0.13",
     "fullcalendar": "^3.10.0",
     "fullcalendar-scheduler": "^1.9.4",
+    "gh-pages": "^2.0.1",
     "history": "4.7.2",
     "hoist-non-react-statics": "3.0.1",
     "immutable": "3.8.2",
@@ -74,6 +79,7 @@
     "moment": "^2.24.0",
     "nuka-carousel": "^4.4.8",
     "prop-types": "15.6.2",
+    "rc-time-picker": "^3.7.1",
     "react": "16.6.0",
     "react-alice-carousel": "^1.13.1",
     "react-day-picker": "^7.3.0",
@@ -81,6 +87,7 @@
     "react-helmet": "5.2.0",
     "react-icons": "^3.4.0",
     "react-intl": "2.7.2",
+    "react-live-clock": "^3.1.0",
     "react-outside-click-handler": "^1.2.2",
     "react-redux": "5.0.7",
     "react-router-dom": "4.3.1",

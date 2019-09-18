@@ -122,10 +122,11 @@ const GlobalStyle = createGlobalStyle`
   }
   .app-event__phone-number {
     font-size: 13px;
-    margin-left: 8px;
+    margin-left: 0px;
     margin-bottom: 4px;
     line-height: 1.8;
     font-style: italic;
+    font-weight : 500;
   }
   .app-event__option {
     font-size: 13px;
@@ -143,14 +144,78 @@ const GlobalStyle = createGlobalStyle`
     z-index: 999;
   }
 
-  @keyframes placeHolderShimmer {
-    0% {
-      background-position: -468px 0
-    }
-    100% {
-      background-position: 468px 0
-    }
+  .fc-event {
+    border: 1px solid ;
+}
+.event-assigned, .event-confirmed{
+  font-weight : 500;
+  color : #333;
+}
+
+
+.event-assigned{
+  background: linear-gradient(
+        to right,
+        #873f72,
+        #ed3144,
+        #f20920,
+        #b9ce2b,
+        #873f72
+      )
+      160%
+      0
+      repeat-x,
+    linear-gradient(to top, #873f72, #ed3144, #f20920, #b9ce2b, #873f72)
+      100%
+      20%
+      repeat-y,
+    linear-gradient(to left, #873f72, #ed3144, #f20920, #b9ce2b, #873f72)
+      10%
+      100%
+      repeat-x,
+    linear-gradient(to bottom, #873f72, #ed3144, #f20920, #b9ce2b, #873f72)
+      0%
+      10%
+      repeat-y;
+
+  background-size: 300% 2px, 2px 300%;/* increase size to show at once the bit from 2 gradient colors */
+  animation: bd 5s infinite linear;
+}
+
+.timePicker{
+  border : 10px !important;
+  margin-top : 5px;
+}
+
+.rc-time-picker-input{
+  border : 0 !important;
+}
+.rc-time-picker-clear{
+  display : none;
+
+}
+.rc-time-picker-input{
+  font-size : 1rem !important;
+  color : #333;
+  padding-left : 10px !important;
+}
+
+.event-assigned:hover ,.event-confirmed:hover{
+  font-weight : 500;
+  color : #333;
+}
+.DayPickerInput input{
+  color : #666 !important;
+}
+::-webkit-scrollbar { 
+    display: none; 
+}
+
+@keyframes bd {
+  50% {
+    background-position: 460% 0, 100% 320%, 310% 100%, 0% 310%;/* average reset of bg-position , tune it to desired effect */
   }
+}
 `;
 
 export default GlobalStyle;

@@ -4,8 +4,9 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Carousel from 'nuka-carousel';
 import { FaCaretLeft, FaCaretRight } from 'react-icons/fa';
-
+import {staffId} from '../../../app-constants'
 import LoadingIndicator from 'components/LoadingIndicator';
+
 
 const ResourceSelectorWrapper = styled.div`
   width: 100%;
@@ -56,6 +57,7 @@ const Resource = styled.div`
   position: relative;
   border-right: 1px solid #ddd;
   text-align: center;
+  background-color : ${props => (props.active ? '#1EB5F4' : '#ffffff')};
 `;
 
 Resource.Avatar = styled.div`
@@ -63,7 +65,9 @@ Resource.Avatar = styled.div`
 
   & img {
     width: 3rem;
+    height : 3rem;
     border-radius: 50%;
+    object-fit : cover;
   }
 `;
 
@@ -71,7 +75,7 @@ Resource.OrderNumber = styled.div`
   position: absolute;
   top: 2px;
   right: 2px;
-  background: ${props => (props.notEmpty ? '#3883bb' : '#ff1b22')};
+  background: ${props => (props.next ? '#1073C2' : '#1073C2')};
   width: 16px;
   height: 16px;
   border-radius: 50%;
@@ -81,17 +85,34 @@ Resource.OrderNumber = styled.div`
   line-height: 1.3;
 `;
 
-Resource.Title = styled.div`
+Resource.WorkingTime = styled.div`
   position: absolute;
   bottom: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0.75;
+  text-align: center;
+  padding-bottom: 4px;
+  padding-left : 5px;
+  font-size: 7px;
+  line-height: 1.3;
+  font-weight : 500;
+  color : ${props => (props.notWork ? '#ffffff' : '')};
+  background: ${props => (props.notWork ? 'red' : '#ffffff')};
+`;
+
+Resource.Title = styled.div`
+  position: absolute;
+  bottom: 13px;
   left: 0;
   background: #ffffff;
   width: 100%;
   opacity: 0.75;
   text-align: center;
   padding-bottom: 4px;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.3;
+  font-weight : 500;
 `;
 
 const PrevButton = styled.div`
@@ -155,18 +176,141 @@ class ResourceSelector extends React.Component {
     onChangeToday(moment().format('DDMMYYYY'));
   }
 
+  getWorrkingTime(staff, currentDay) {
+    switch (moment(currentDay).format('dddd')) {
+      case 'Monday':
+        if (staff.workingTimes.Monday.isCheck) {
+          return (
+            <Resource.WorkingTime>
+              {staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd}
+            </Resource.WorkingTime>
+          )
+        } else{
+          return (
+            <Resource.WorkingTime notWork>
+              {staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd} (Off)
+            </Resource.WorkingTime>
+          )
+        }
+        break;
+
+        case 'Tuesday':
+        if (staff.workingTimes.Tuesday.isCheck) {
+          return (
+            <Resource.WorkingTime>
+              {staff.workingTimes.Tuesday.timeStart} - {staff.workingTimes.Tuesday.timeEnd}
+            </Resource.WorkingTime>
+          )
+        } else{
+          return (
+            <Resource.WorkingTime notWork>
+              {staff.workingTimes.Tuesday.timeStart} - {staff.workingTimes.Tuesday.timeEnd} (Off) 
+            </Resource.WorkingTime>
+          )
+        }
+        break;
+
+        case 'Wednesday':
+        if (staff.workingTimes.Wednesday.isCheck) {
+          return (
+            <Resource.WorkingTime>
+              {staff.workingTimes.Wednesday.timeStart} - {staff.workingTimes.Wednesday.timeEnd}
+            </Resource.WorkingTime>
+          )
+        } else{
+          return (
+            <Resource.WorkingTime notWork>
+              {staff.workingTimes.Wednesday.timeStart} - {staff.workingTimes.Wednesday.timeEnd} (Off)
+            </Resource.WorkingTime>
+          )
+        }
+        break;
+
+        case 'Thursday':
+        if (staff.workingTimes.Thursday.isCheck) {
+          return (
+            <Resource.WorkingTime>
+              {staff.workingTimes.Thursday.timeStart} - {staff.workingTimes.Thursday.timeEnd}
+            </Resource.WorkingTime>
+          )
+        } else{
+          return (
+            <Resource.WorkingTime notWork>
+              {staff.workingTimes.Thursday.timeStart} - {staff.workingTimes.Thursday.timeEnd} (Off)
+            </Resource.WorkingTime>
+          )
+        }
+        break;
+
+        case 'Friday':
+        if (staff.workingTimes.Friday.isCheck) {
+          return (
+            <Resource.WorkingTime>
+              {staff.workingTimes.Friday.timeStart} - {staff.workingTimes.Friday.timeEnd}
+            </Resource.WorkingTime>
+          )
+        } else{
+          return (
+            <Resource.WorkingTime notWork>
+              {staff.workingTimes.Friday.timeStart} - {staff.workingTimes.Friday.timeEnd} (Off)
+            </Resource.WorkingTime>
+          )
+        }
+        break;
+
+        case 'Saturday':
+        if (staff.workingTimes.Saturday.isCheck) {
+          return (
+            <Resource.WorkingTime>
+              {staff.workingTimes.Saturday.timeStart} - {staff.workingTimes.Saturday.timeEnd}
+            </Resource.WorkingTime>
+          )
+        } else{
+          return (
+            <Resource.WorkingTime notWork>
+              {staff.workingTimes.Saturday.timeStart} - {staff.workingTimes.Saturday.timeEnd} (Off)
+            </Resource.WorkingTime>
+          )
+        }
+        break;
+
+        case 'Monday':
+        if (staff.workingTimes.Monday.isCheck) {
+          return (
+            <Resource.WorkingTime>
+              {staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd}
+            </Resource.WorkingTime>
+          )
+        } else{
+          return (
+            <Resource.WorkingTime notWork>
+              {staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd} (Off)
+            </Resource.WorkingTime>
+          )
+        }
+        break;
+
+      default:
+        break;
+    }
+  }
+
   renderResource(resource, index) {
-    const { calendarMembers } = this.props;
+    const { calendarMembers, currentDay } = this.props;
     const member = calendarMembers.find(mem => mem.memberId === resource.id);
-    const numberOfAppointments = member ? member.appointments.length : 0;
+    const numberOfAppointments = member ? member.appointments.filter(app=>app.status !== "BLOCK").length : 0;
+
     return (
-      <Resource key={index}>
+      <Resource active={parseInt(resource.id) === parseInt(staffId) ? true : false} key={index}>
         <Resource.Avatar>
           <img src={resource.imageUrl} alt={resource.orderNumber} />
         </Resource.Avatar>
-        <Resource.OrderNumber notEmpty={numberOfAppointments}>
+        <Resource.OrderNumber next={numberOfAppointments}>
           {resource.orderNumber}
         </Resource.OrderNumber>
+        <Resource.WorkingTime>
+          {this.getWorrkingTime(resource, currentDay)}
+        </Resource.WorkingTime>
         <Resource.Title>{resource.title}</Resource.Title>
       </Resource>
     );
@@ -215,7 +359,7 @@ class ResourceSelector extends React.Component {
         </TodayWrapper>
         <ResourceSliderWrapper>
           <Carousel
-            dragging={false}
+            dragging={true}
             renderBottomCenterControls={() => ''}
             renderCenterLeftControls={({ previousSlide }) => (
               <PrevButton onClick={ev => this.onPrevClick(ev, previousSlide)}>
@@ -248,3 +392,5 @@ ResourceSelector.propTypes = {
 };
 
 export default ResourceSelector;
+
+
