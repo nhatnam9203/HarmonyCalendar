@@ -4,9 +4,9 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Carousel from 'nuka-carousel';
 import { FaCaretLeft, FaCaretRight } from 'react-icons/fa';
-import {staffId} from '../../../app-constants'
+import { staffId } from '../../../app-constants'
 import LoadingIndicator from 'components/LoadingIndicator';
-
+import Pincode from './Pincode'
 
 const ResourceSelectorWrapper = styled.div`
   width: 100%;
@@ -52,6 +52,7 @@ const ResourceWrapper = styled.div`
 `;
 
 const Resource = styled.div`
+  cursor : pointer;
   width: calc(100% / 6);
   padding: 0.25rem;
   position: relative;
@@ -62,7 +63,7 @@ const Resource = styled.div`
 
 Resource.Avatar = styled.div`
   padding: 2px;
-
+  cursor : pointer;
   & img {
     width: 3rem;
     height : 3rem;
@@ -75,7 +76,7 @@ Resource.OrderNumber = styled.div`
   position: absolute;
   top: 2px;
   right: 2px;
-  background: ${props => (props.next ? '#1073C2' : '#1073C2')};
+  background: ${props => (props.next ? 'red' : '#1073C2')};
   width: 16px;
   height: 16px;
   border-radius: 50%;
@@ -185,7 +186,7 @@ class ResourceSelector extends React.Component {
               {staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd}
             </Resource.WorkingTime>
           )
-        } else{
+        } else {
           return (
             <Resource.WorkingTime notWork>
               {staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd} (Off)
@@ -194,30 +195,30 @@ class ResourceSelector extends React.Component {
         }
         break;
 
-        case 'Tuesday':
+      case 'Tuesday':
         if (staff.workingTimes.Tuesday.isCheck) {
           return (
             <Resource.WorkingTime>
               {staff.workingTimes.Tuesday.timeStart} - {staff.workingTimes.Tuesday.timeEnd}
             </Resource.WorkingTime>
           )
-        } else{
+        } else {
           return (
             <Resource.WorkingTime notWork>
-              {staff.workingTimes.Tuesday.timeStart} - {staff.workingTimes.Tuesday.timeEnd} (Off) 
+              {staff.workingTimes.Tuesday.timeStart} - {staff.workingTimes.Tuesday.timeEnd} (Off)
             </Resource.WorkingTime>
           )
         }
         break;
 
-        case 'Wednesday':
+      case 'Wednesday':
         if (staff.workingTimes.Wednesday.isCheck) {
           return (
             <Resource.WorkingTime>
               {staff.workingTimes.Wednesday.timeStart} - {staff.workingTimes.Wednesday.timeEnd}
             </Resource.WorkingTime>
           )
-        } else{
+        } else {
           return (
             <Resource.WorkingTime notWork>
               {staff.workingTimes.Wednesday.timeStart} - {staff.workingTimes.Wednesday.timeEnd} (Off)
@@ -226,14 +227,14 @@ class ResourceSelector extends React.Component {
         }
         break;
 
-        case 'Thursday':
+      case 'Thursday':
         if (staff.workingTimes.Thursday.isCheck) {
           return (
             <Resource.WorkingTime>
               {staff.workingTimes.Thursday.timeStart} - {staff.workingTimes.Thursday.timeEnd}
             </Resource.WorkingTime>
           )
-        } else{
+        } else {
           return (
             <Resource.WorkingTime notWork>
               {staff.workingTimes.Thursday.timeStart} - {staff.workingTimes.Thursday.timeEnd} (Off)
@@ -242,14 +243,14 @@ class ResourceSelector extends React.Component {
         }
         break;
 
-        case 'Friday':
+      case 'Friday':
         if (staff.workingTimes.Friday.isCheck) {
           return (
             <Resource.WorkingTime>
               {staff.workingTimes.Friday.timeStart} - {staff.workingTimes.Friday.timeEnd}
             </Resource.WorkingTime>
           )
-        } else{
+        } else {
           return (
             <Resource.WorkingTime notWork>
               {staff.workingTimes.Friday.timeStart} - {staff.workingTimes.Friday.timeEnd} (Off)
@@ -258,14 +259,14 @@ class ResourceSelector extends React.Component {
         }
         break;
 
-        case 'Saturday':
+      case 'Saturday':
         if (staff.workingTimes.Saturday.isCheck) {
           return (
             <Resource.WorkingTime>
               {staff.workingTimes.Saturday.timeStart} - {staff.workingTimes.Saturday.timeEnd}
             </Resource.WorkingTime>
           )
-        } else{
+        } else {
           return (
             <Resource.WorkingTime notWork>
               {staff.workingTimes.Saturday.timeStart} - {staff.workingTimes.Saturday.timeEnd} (Off)
@@ -274,14 +275,14 @@ class ResourceSelector extends React.Component {
         }
         break;
 
-        case 'Monday':
+      case 'Monday':
         if (staff.workingTimes.Monday.isCheck) {
           return (
             <Resource.WorkingTime>
               {staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd}
             </Resource.WorkingTime>
           )
-        } else{
+        } else {
           return (
             <Resource.WorkingTime notWork>
               {staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd} (Off)
@@ -295,17 +296,25 @@ class ResourceSelector extends React.Component {
     }
   }
 
-  renderResource(resource, index) {
-    const { calendarMembers, currentDay } = this.props;
-    const member = calendarMembers.find(mem => mem.memberId === resource.id);
-    const numberOfAppointments = member ? member.appointments.filter(app=>app.status !== "BLOCK").length : 0;
+  openPincode(pincode){
+    const {disableCalendar,togglePopupPincode} = this.props;
+    togglePopupPincode(true,pincode);
+    disableCalendar(true);
+  }
 
+  renderResource(resource, index) {
+    const { calendarMembers, currentDay, togglePopupPincode } = this.props;
+    const member = calendarMembers ? calendarMembers.find(mem => mem.memberId === resource.id) : '';
+    const numberOfAppointments = member ? member.appointments.filter(app => app.status !== "BLOCK").length : 0;
     return (
-      <Resource active={parseInt(resource.id) === parseInt(staffId) ? true : false} key={index}>
+      <Resource 
+      // onClick={() => this.openPincode(resource.pincode)}
+      active={parseInt(resource.id) === parseInt(staffId) ? true : false} key={index}>
         <Resource.Avatar>
           <img src={resource.imageUrl} alt={resource.orderNumber} />
         </Resource.Avatar>
-        <Resource.OrderNumber next={numberOfAppointments}>
+
+       <Resource.OrderNumber next={resource.isNextAvailableStaff === 1 ? true : false}>
           {resource.orderNumber}
         </Resource.OrderNumber>
         <Resource.WorkingTime>
@@ -350,34 +359,47 @@ class ResourceSelector extends React.Component {
   }
 
   render() {
+    const { checkPinCode, popupPincode,togglePopupPincode,disableCalendar,PinStaff } = this.props;
+
     return (
-      <ResourceSelectorWrapper>
-        <TodayWrapper>
-          <TodayWrapper.Button onClick={() => this.onTodayClick()}>
-            Today
+      <React.Fragment>
+        <ResourceSelectorWrapper>
+          <TodayWrapper>
+            <TodayWrapper.Button onClick={() => this.onTodayClick()}>
+              Today
           </TodayWrapper.Button>
-        </TodayWrapper>
-        <ResourceSliderWrapper>
-          <Carousel
-            dragging={true}
-            renderBottomCenterControls={() => ''}
-            renderCenterLeftControls={({ previousSlide }) => (
-              <PrevButton onClick={ev => this.onPrevClick(ev, previousSlide)}>
-                <FaCaretLeft />
-              </PrevButton>
-            )}
-            renderCenterRightControls={({ nextSlide }) => (
-              <NextButton onClick={ev => this.onNextClick(ev, nextSlide)}>
-                <FaCaretRight />
-              </NextButton>
-            )}
-            afterSlide={slideIndex => this.afterSlide(slideIndex)}
-          >
-            {this.renderCarouselSlide()}
-          </Carousel>
-        </ResourceSliderWrapper>
-        <WaitingHeader>Waiting</WaitingHeader>
-      </ResourceSelectorWrapper>
+          </TodayWrapper>
+          <ResourceSliderWrapper>
+            <Carousel
+              // slideIndex={1}
+              dragging={true}
+              renderBottomCenterControls={() => ''}
+              renderCenterLeftControls={({ previousSlide }) => (
+                <PrevButton onClick={ev => this.onPrevClick(ev, previousSlide)}>
+                  <FaCaretLeft />
+                </PrevButton>
+              )}
+              renderCenterRightControls={({ nextSlide }) => (
+                <NextButton onClick={ev => this.onNextClick(ev, nextSlide)}>
+                  <FaCaretRight />
+                </NextButton>
+              )}
+              afterSlide={slideIndex => this.afterSlide(slideIndex)}
+            >
+              {this.renderCarouselSlide()}
+            </Carousel>
+          </ResourceSliderWrapper>
+          <WaitingHeader>Waiting</WaitingHeader>
+        </ResourceSelectorWrapper>
+        {/* <Pincode
+          checkPinCode={checkPinCode}
+          popupPincode={popupPincode}
+          togglePopupPincode={togglePopupPincode}
+          disableCalendar={disableCalendar}
+          PinStaff={PinStaff}
+
+        /> */}
+      </React.Fragment>
     );
   }
 }

@@ -23,6 +23,8 @@ import {
   CHANGE_APPOINTMENT_TIME,
   UPDATE_APPOINTMENT_OFFLINE,
   LOAD_APPOINTMENT_AGAIN,
+  CHECKPINCODE,
+  UPDATE_NEXT_STAFF
 } from './constants';
 import {
   selectDay,
@@ -66,8 +68,8 @@ import {
   addAppointmentRealTime,
   loadMembers,
   loadWaitingAppointments,
-
-
+  checkPinCode,
+  updateNextStaffSuccess
 } from './actions';
 import {
   makeCurrentDay,
@@ -89,7 +91,9 @@ import {
   POST_ADD_APPOINTMENT,
   merchantId,
   GET_APPOINTMENT_BY_ID,
-  GET_APPOINTMENT_STATUS
+  GET_APPOINTMENT_STATUS,
+  GET_CHECKPINCODE,
+  PUT_UPDATE_STATUS_APPOINTMENT
 } from '../../../app-constants';
 
 import { assignAppointment as mockedPostAppointment } from '../../assets/mocks/assignAppointment';
@@ -117,7 +121,6 @@ export const statusConvertKey = {
 };
 
 const appointmentAdapter = appointment => {
-
   const options = [];
   const products = [];
   if (appointment.options && appointment.options.service) {
@@ -136,9 +139,9 @@ const appointmentAdapter = appointment => {
       products.push(product);
     });
   }
-
   return {
     id: appointment.appointmentId,
+    code: `#${appointment.code}`,
     userFullName: appointment.firstName + ' ' + appointment.lastName,
     phoneNumber: appointment.phoneNumber,
     options: appointment.services,
@@ -157,7 +160,11 @@ const appointmentAdapter = appointment => {
     tax: appointment.tax,
     discount: appointment.discount,
     giftCard: appointment.giftCard,
-    notes: appointment.notes === null ? [] : appointment.notes
+    notes: appointment.notes.sort(function(a, b) {
+      var c = a.appointmentNoteId;
+      var d = b.appointmentNoteId;
+      return d-c;
+    })
   };
 };
 
@@ -170,7 +177,9 @@ const memberAdapter = member => {
       `${BASE_URL}/${VAR_DEFAULT_AVATAR_PATH}`,
     orderNumber: member.orderNumber,
     workingTimes: member.workingTimes,
-    isDisabled : member.isDisabled
+    isDisabled: member.isDisabled,
+    pincode: member.pin,
+    isNextAvailableStaff: member.isNextAvailableStaff
   }
 };
 
@@ -211,13 +220,13 @@ export function* getMembers() {
     }).catch((err) => {
       console.log(err)
     });
+
     if (response.status === 200 && response.data.codeStatus === 1) {
-      const members = response.status === 200 ? response.data.data.map(member => memberAdapter(member)).filter(mem=>mem.isDisabled === 0) : '';
+      const members = response.status === 200 ? response.data.data.map(member => memberAdapter(member)).filter(mem => mem.isDisabled === 0) : '';
       yield put(membersLoaded(members));
       yield put(setDisplayedMembers(members.slice(0, 6)));
     }
   } catch (err) {
-    alert(err)
     yield put(memberLoadingError(err));
   }
 }
@@ -265,6 +274,23 @@ export function* getWaitingAppointments() {
   }
 }
 
+function addFullBlock(memberId,currentDate,day){
+  return {
+    status: 'BLOCK',
+    memberId: memberId,
+    start: `${moment(currentDate).day(day).format('YYYY-MM-DD')}T06:00:00`,
+    end: `${moment(currentDate).day(day).format('YYYY-MM-DD')}T23:00:00`,
+    id: '',
+    code: '',
+    userFullName: '',
+    phoneNumber: '',
+    options: [],
+    products: [],
+    extras: [],
+    notes: [],
+  }
+}
+
 export function* getAppointmentsByMembersAndDate() {
   try {
     yield put(loadingCalendar(true))
@@ -285,7 +311,7 @@ export function* getAppointmentsByMembersAndDate() {
           return result;
         }
       }).catch((err) => {
-        alert(err)
+        // alert(err)
       });
 
     const appointments =
@@ -301,6 +327,7 @@ export function* getAppointmentsByMembersAndDate() {
           && appointment.status !== 'WAITING'
           && appointment.status !== 'PENDING'
           && appointment.status !== undefined
+        // && appointment.user_id !== 0  
         ,
       )
     }));
@@ -309,12 +336,17 @@ export function* getAppointmentsByMembersAndDate() {
       case 'Monday':
         appointmentsMembers.forEach(mem => {
           const memFind = displayedMembers.find(member => member.id === mem.memberId);
+          if(memFind.workingTimes.Monday.isCheck === false || memFind.orderNumber === 0){
+            mem.appointments.push(addFullBlock(mem.memberId,currentDate,'Monday'))
+          }
+          else
           mem.appointments.push({
             status: 'BLOCK',
             memberId: mem.memberId,
             start: `${moment(currentDate).day('Monday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Monday.timeEnd, ["h:mm A"]).format("HH:mm:ss")}`,
             end: `${moment(currentDate).day('Monday').endOf('days').format('YYYY-MM-DD')}T${moment().endOf('days').subtract(1, 'hours').add(1, 'seconds').format('HH:mm:ss')}`,
             id: '',
+            code: '',
             userFullName: '',
             phoneNumber: '',
             options: [],
@@ -327,6 +359,7 @@ export function* getAppointmentsByMembersAndDate() {
               start: `${moment(currentDate).day('Monday').format('YYYY-MM-DD')}T${moment().startOf('days').add(6, 'hours').format("HH:mm:ss")}`,
               end: `${moment(currentDate).day('Monday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Monday.timeStart, ["h:mm A"]).format("HH:mm:ss")}`,
               id: '',
+              code: '',
               userFullName: '',
               phoneNumber: '',
               options: [],
@@ -339,12 +372,17 @@ export function* getAppointmentsByMembersAndDate() {
       case 'Tuesday':
         appointmentsMembers.forEach(mem => {
           const memFind = displayedMembers.find(member => member.id === mem.memberId);
+          if(memFind.workingTimes.Tuesday.isCheck === false || memFind.orderNumber === 0){
+            mem.appointments.push(addFullBlock(mem.memberId,currentDate,'Tuesday'))
+          }
+          else
           mem.appointments.push({
             status: 'BLOCK',
             memberId: mem.memberId,
             start: `${moment(currentDate).day('Tuesday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Tuesday.timeEnd, ["h:mm A"]).format("HH:mm:ss")}`,
             end: `${moment(currentDate).day('Tuesday').endOf('days').format('YYYY-MM-DD')}T${moment().endOf('days').subtract(1, 'hours').add(1, 'seconds').format('HH:mm:ss')}`,
             id: '',
+            code: '',
             userFullName: '',
             phoneNumber: '',
             options: [],
@@ -357,6 +395,7 @@ export function* getAppointmentsByMembersAndDate() {
               start: `${moment(currentDate).day('Tuesday').format('YYYY-MM-DD')}T${moment().startOf('days').add(6, 'hours').format("HH:mm:ss")}`,
               end: `${moment(currentDate).day('Tuesday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Tuesday.timeStart, ["h:mm A"]).format("HH:mm:ss")}`,
               id: '',
+              code: '',
               userFullName: '',
               phoneNumber: '',
               options: [],
@@ -369,12 +408,17 @@ export function* getAppointmentsByMembersAndDate() {
       case 'Wednesday':
         appointmentsMembers.forEach(mem => {
           const memFind = displayedMembers.find(member => member.id === mem.memberId);
+          if(memFind.workingTimes.Wednesday.isCheck === false || memFind.orderNumber === 0){
+            mem.appointments.push(addFullBlock(mem.memberId,currentDate,'Wednesday'))
+          }
+          else
           mem.appointments.push({
             status: 'BLOCK',
             memberId: mem.memberId,
             start: `${moment(currentDate).day('Wednesday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Wednesday.timeEnd, ["h:mm A"]).format("HH:mm:ss")}`,
             end: `${moment(currentDate).day('Wednesday').endOf('days').format('YYYY-MM-DD')}T${moment().endOf('days').subtract(1, 'hours').add(1, 'seconds').format('HH:mm:ss')}`,
             id: '',
+            code: '',
             userFullName: '',
             phoneNumber: '',
             options: [],
@@ -387,6 +431,7 @@ export function* getAppointmentsByMembersAndDate() {
               start: `${moment(currentDate).day('Wednesday').format('YYYY-MM-DD')}T${moment().startOf('days').add(6, 'hours').format("HH:mm:ss")}`,
               end: `${moment(currentDate).day('Wednesday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Wednesday.timeStart, ["h:mm A"]).format("HH:mm:ss")}`,
               id: '',
+              code: '',
               userFullName: '',
               phoneNumber: '',
               options: [],
@@ -400,12 +445,17 @@ export function* getAppointmentsByMembersAndDate() {
       case 'Thursday':
         appointmentsMembers.forEach(mem => {
           const memFind = displayedMembers.find(member => member.id === mem.memberId);
+          if(memFind.workingTimes.Thursday.isCheck === false || memFind.orderNumber === 0){
+            mem.appointments.push(addFullBlock(mem.memberId,currentDate,'Thursday'))
+          }
+          else
           mem.appointments.push({
             status: 'BLOCK',
             memberId: mem.memberId,
             start: `${moment(currentDate).day('Thursday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Thursday.timeEnd, ["h:mm A"]).format("HH:mm:ss")}`,
             end: `${moment(currentDate).day('Thursday').endOf('days').format('YYYY-MM-DD')}T${moment().endOf('days').subtract(1, 'hours').add(1, 'seconds').format('HH:mm:ss')}`,
             id: '',
+            code: '',
             userFullName: '',
             phoneNumber: '',
             options: [],
@@ -418,6 +468,7 @@ export function* getAppointmentsByMembersAndDate() {
               start: `${moment(currentDate).day('Thursday').format('YYYY-MM-DD')}T${moment().startOf('days').add(6, 'hours').format("HH:mm:ss")}`,
               end: `${moment(currentDate).day('Thursday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Thursday.timeStart, ["h:mm A"]).format("HH:mm:ss")}`,
               id: '',
+              code: '',
               userFullName: '',
               phoneNumber: '',
               options: [],
@@ -431,12 +482,17 @@ export function* getAppointmentsByMembersAndDate() {
       case 'Friday':
         appointmentsMembers.forEach(mem => {
           const memFind = displayedMembers.find(member => member.id === mem.memberId);
+          if(memFind.workingTimes.Friday.isCheck === false || memFind.orderNumber === 0){
+            mem.appointments.push(addFullBlock(mem.memberId,currentDate,'Friday'))
+          }
+          else
           mem.appointments.push({
             status: 'BLOCK',
             memberId: mem.memberId,
             start: `${moment(currentDate).day('Friday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Friday.timeEnd, ["h:mm A"]).format("HH:mm:ss")}`,
             end: `${moment(currentDate).day('Friday').endOf('days').format('YYYY-MM-DD')}T${moment().endOf('days').subtract(1, 'hours').add(1, 'seconds').format('HH:mm:ss')}`,
             id: '',
+            code: '',
             userFullName: '',
             phoneNumber: '',
             options: [],
@@ -449,6 +505,7 @@ export function* getAppointmentsByMembersAndDate() {
               start: `${moment(currentDate).day('Friday').format('YYYY-MM-DD')}T${moment().startOf('days').add(6, 'hours').format("HH:mm:ss")}`,
               end: `${moment(currentDate).day('Friday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Friday.timeStart, ["h:mm A"]).format("HH:mm:ss")}`,
               id: '',
+              code: '',
               userFullName: '',
               phoneNumber: '',
               options: [],
@@ -462,12 +519,17 @@ export function* getAppointmentsByMembersAndDate() {
       case 'Saturday':
         appointmentsMembers.forEach(mem => {
           const memFind = displayedMembers.find(member => member.id === mem.memberId);
+          if(memFind.workingTimes.Saturday.isCheck === false || memFind.orderNumber === 0){
+            mem.appointments.push(addFullBlock(mem.memberId,currentDate,'Saturday'))
+          }
+          else
           mem.appointments.push({
             status: 'BLOCK',
             memberId: mem.memberId,
             start: `${moment(currentDate).day('Saturday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Saturday.timeEnd, ["h:mm A"]).format("HH:mm:ss")}`,
             end: `${moment(currentDate).day('Saturday').endOf('days').format('YYYY-MM-DD')}T${moment().endOf('days').subtract(1, 'hours').add(1, 'seconds').format('HH:mm:ss')}`,
             id: '',
+            code: '',
             userFullName: '',
             phoneNumber: '',
             options: [],
@@ -480,6 +542,7 @@ export function* getAppointmentsByMembersAndDate() {
               start: `${moment(currentDate).day('Saturday').format('YYYY-MM-DD')}T${moment().startOf('days').add(6, 'hours').format("HH:mm:ss")}`,
               end: `${moment(currentDate).day('Saturday').format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Saturday.timeStart, ["h:mm A"]).format("HH:mm:ss")}`,
               id: '',
+              code: '',
               userFullName: '',
               phoneNumber: '',
               options: [],
@@ -493,12 +556,17 @@ export function* getAppointmentsByMembersAndDate() {
       case 'Sunday':
         appointmentsMembers.forEach(mem => {
           const memFind = displayedMembers.find(member => member.id === mem.memberId);
+          if(memFind.workingTimes.Sunday.isCheck === false || memFind.orderNumber === 0){
+            mem.appointments.push(addFullBlock(mem.memberId,currentDate,'Sunday'))
+          }
+          else
           mem.appointments.push({
             status: 'BLOCK',
             memberId: mem.memberId,
             start: `${moment(currentDate).day(0).format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Sunday.timeEnd, ["h:mm A"]).format("HH:mm:ss")}`,
             end: `${moment(currentDate).day(0).endOf('days').format('YYYY-MM-DD')}T${moment().endOf('days').subtract(1, 'hours').add(1, 'seconds').format('HH:mm:ss')}`,
             id: '',
+            code: '',
             userFullName: '',
             phoneNumber: '',
             options: [],
@@ -511,6 +579,7 @@ export function* getAppointmentsByMembersAndDate() {
               start: `${moment(currentDate).day(0).format('YYYY-MM-DD')}T${moment().startOf('days').add(6, 'hours').format("HH:mm:ss")}`,
               end: `${moment(currentDate).day(0).format('YYYY-MM-DD')}T${moment(memFind.workingTimes.Sunday.timeStart, ["h:mm A"]).format("HH:mm:ss")}`,
               id: '',
+              code: '',
               userFullName: '',
               phoneNumber: '',
               options: [],
@@ -564,11 +633,16 @@ export function* moveAppointment(action) {
     memberId: assignedMember.id,
   };
 
+  if (appointment.status !== "CHECKED_IN") {
+    appointment.status = "ASSIGNED";
+  }
+
   if (parseInt(appointment.memberId) !== parseInt(movedAppointment.memberId)) {
     if (appointment.status === "CHECKED_IN") {
-      appointment.status = "CONFIRMED";
+      appointment.status = "CHECKED_IN";
     }
   }
+
   const { memberId, start, end, status, options, products, extras } = appointment;
 
   const data = {
@@ -580,7 +654,6 @@ export function* moveAppointment(action) {
     products,
     extras
   }
-  console.log(data);
 
   const requestURL = new URL(PUT_STATUS_APPOINTMENT_API);
   const kq = yield axios.put(`${requestURL.toString()}/${appointment.id}`, data, {
@@ -717,7 +790,7 @@ export function* assignAppointment(action) {
     }
 
     if (kq.status === 200) {
-
+      // yield put(loadMembers());
     } else {
       yield put(appointmentAssigningError(result));
     }
@@ -732,9 +805,12 @@ export function* upddateAppointment(action) {
     if (!fcEvent) {
       yield put(appointmentUpdatingStatusError('Cannot find selected fcEvent'));
     }
-    let { appointment, status, old_duration, servicesUpdate, productsUpdate, notes } = action.appointment;
-    let { end, start, extras, memberId } = appointment;
+    let { appointment, status, old_duration, 
+      servicesUpdate, productsUpdate, notes,old_status,
+      old_appointment,extrasUpdate
+    } = action.appointment;
 
+    let { end, start, extras, memberId } = appointment;
     let new_total_duration = 0;
     servicesUpdate.forEach(sv => {
       new_total_duration += parseInt(sv.duration);
@@ -761,11 +837,39 @@ export function* upddateAppointment(action) {
       deleteEventFromCalendar(fcEvent._id);
       yield put(deselectAppointment());
     } else {
-      yield put(appointmentUpdatedStatus({ appointmentID: appointment.id, status, BookingServices2: servicesUpdate, newDate, productsUpdate, notes }));
-      const displayedMember_app = yield select(makeSelectCalendarAppointments());
-      const currentDate = yield select(makeCurrentDay());
-      addEventsToCalendar(currentDate, displayedMember_app);
+      // yield put(appointmentUpdatedStatus({ appointmentID: appointment.id, status, BookingServices2: servicesUpdate, newDate, productsUpdate, notes }));
+      // const displayedMember_app = yield select(makeSelectCalendarAppointments());
+      // const currentDate = yield select(makeCurrentDay());
+      // addEventsToCalendar(currentDate, displayedMember_app);
     }
+    
+    if (status === 'cancel') {
+      const url_update_status = new URL(PUT_UPDATE_STATUS_APPOINTMENT);
+      const kq = yield axios.put(`${url_update_status.toString()}/${appointment.id}`, {
+        status: status
+      }, {
+          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", }
+        }).then((result) => {
+          return result
+        }).catch((err) => {
+          // const data_offline = JSON.parse(localStorage.getItem('updateAppointment')) ? JSON.parse(localStorage.getItem('updateAppointment')) : [];
+          // data_offline.push(data);
+          // localStorage.setItem('updateAppointment', JSON.stringify(data_offline));
+          // return { error: err }
+        });
+      if (kq.status === 200 && kq.data.codeStatus !== 1) {
+        return yield* checkResponse(kq);
+      }
+
+      if (kq.status === 200) {
+        yield put(updateAppointmentSuccess(result.data.data))
+        return;
+      } else {
+        yield put(updateAppointmentError(error));
+        return;
+      }
+    }
+
     let notesUpdate = []
     notes.forEach(note => {
       notesUpdate.push({
@@ -773,15 +877,30 @@ export function* upddateAppointment(action) {
       })
     });
 
-    let data = {
-      staffId: memberId,
-      fromTime: start,
-      toTime: newDate,
-      status,
-      services: servicesUpdate,
-      products: productsUpdate,
-      extras,
-      notes: notesUpdate
+    let data;
+
+    if(old_status === 'ASSIGNED'){
+      data = {
+        staffId: memberId,
+        fromTime: old_appointment.start,
+        toTime: old_appointment.end,
+        status,
+        services: old_appointment.options,
+        products: old_appointment.products,
+        extras : old_appointment.extras,
+        notes: notesUpdate
+      }
+    }else{
+      data = {
+        staffId: memberId,
+        fromTime: start,
+        toTime: newDate,
+        status,
+        services: servicesUpdate,
+        products: productsUpdate,
+        extras : extrasUpdate,
+        notes: notesUpdate
+      }
     }
 
     const requestURL = new URL(PUT_STATUS_APPOINTMENT_API);
@@ -790,14 +909,14 @@ export function* upddateAppointment(action) {
     }).then((result) => {
       return result
     }).catch((err) => {
-      const data_offline = JSON.parse(localStorage.getItem('updateAppointment')) ? JSON.parse(localStorage.getItem('updateAppointment')) : [];
-      data_offline.push(data);
-      localStorage.setItem('updateAppointment', JSON.stringify(data_offline));
-      return { error: err }
+      // const data_offline = JSON.parse(localStorage.getItem('updateAppointment')) ? JSON.parse(localStorage.getItem('updateAppointment')) : [];
+      // data_offline.push(data);
+      // localStorage.setItem('updateAppointment', JSON.stringify(data_offline));
+      // return { error: err }
     });
 
-    if (response.status === 200 && response.data.codeStatus !== 1) {
-      return yield* checkResponse(response);
+    if (kq.status === 200 && kq.data.codeStatus !== 1) {
+      return yield* checkResponse(kq);
     }
 
     if (kq.status === 200) {
@@ -819,8 +938,8 @@ export function* changeTimeAppointment(action) {
       yield put(appointmentUpdatingStatusError('Cannot find selected fcEvent'));
     }
 
-    let { appointment, dayPicker, fromTime, notes } = action.appointment;
-    let { memberId, options, products, extras, id } = appointment;
+    let { appointment, dayPicker, fromTime, notes ,selectedStaff,servicesUpdate,productsUpdate,extrasUpdate} = action.appointment;
+    let { memberId, options, products, extras, id, start } = appointment;
 
     let totalDuration = 0;
     appointment.options.forEach(app => {
@@ -833,56 +952,23 @@ export function* changeTimeAppointment(action) {
     const start_time = `${moment(dayPicker).format('YYYY-MM-DD')}T${moment(fromTime).format('HH:mm')}`;
     const end_time = totalDuration > 0 ? moment((start_time)).add(totalDuration, 'minutes').format('YYYY-MM-DD HH:mm') :
       moment((start_time)).add(15, 'minutes').format('YYYY-MM-DD HH:mm');
-
-    let displayedMember_app = yield select(makeSelectCalendarAppointments());
-    const member = displayedMember_app.find(mem =>
-      mem.appointments.find(app => parseInt(app.id) === parseInt(id)),
-    );
-
-    member.appointments.forEach(app => {
-      if (parseInt(app.id) !== parseInt(id)) {
-        if ((moment(start_time).isBetween(app.start, app.end)) || (moment(end_time).isBetween(app.start, app.end))) {
-          if (app.status === 'CHECKED_IN' || app.status === 'CONFIRMED' || app.status === "BLOCK") {
-            check = false;
-          }
-        }
-      }
-    });
-
-    if (check === false) {
-      window.alert('You can not override this appointment to another checkin or confirm appointment, or Working Time of this staff is over !!!')
-    }
-    else {
-      if (moment(dayPicker).format('YYYY-MM-DD') === moment(new Date()).format('YYYY-MM-DD')) {
-        if (moment(start_time).isBefore(moment().add(1, 'hours'))) {
-          window.alert('Your time change must be bigger than your current time at least 1 hour !!!')
-        } else {
-          yield* changeTime(appointment, fcEvent, start_time, end_time, memberId, options, products, extras, notes);
-        }
-      } else {
-        yield* changeTime(appointment, fcEvent, start_time, end_time, memberId, options, products, extras, notes);
-      }
+    if (window.confirm('Are you sure want to change ?')) {
+      yield* changeTime(appointment, fcEvent, start_time, end_time, memberId, servicesUpdate, productsUpdate, extrasUpdate, notes, start,selectedStaff);
     }
   }
   catch (error) {
     yield put(updateAppointmentError(error))
   }
 
-  function* changeTime(appointment, fcEvent, start_time, end_time, memberId, options, products, extras, notes) {
-
-    yield put(appointmentCanceled(appointment.id));
+  function* changeTime(appointmentEdit, fcEvent, start_time, end_time, memberId, options, products, extras, notes, start,selectedStaff) {
+    yield put(appointmentCanceled(appointmentEdit.id));
     deleteEventFromCalendar(fcEvent._id);
     yield put(deselectAppointment());
-    yield put(changeAppointmentTime_Success({
-      ...appointment,
-      start: start_time,
-      end: end_time,
-      notes
-    }));
-    const displayedMember_app = yield select(makeSelectCalendarAppointments());
-    const currentDate = yield select(makeCurrentDay());
-    addEventsToCalendar(currentDate, displayedMember_app);
-
+    let appointment = {
+      ...appointmentEdit,
+      memberId : selectedStaff.id
+    }
+ 
     let notesUpdate = []
 
     notes.forEach(note => {
@@ -890,12 +976,17 @@ export function* changeTimeAppointment(action) {
         note: note.note
       })
     });
+    let statusChange = 'confirm'
+    let test = moment(start_time).diff(moment(start), 'minutes');
+    if ((test < 45 && test >= 0) || (test < 0 && test > -45)) {
+      statusChange = 'checkin'
+    }
 
     let data = {
-      staffId: memberId,
+      staffId: selectedStaff.id,
       fromTime: start_time,
       toTime: end_time,
-      status: 'unconfirm',
+      status: appointment.status === 'CHECKED_IN' ? statusChange : 'unconfirm',
       services: options,
       products: products,
       extras,
@@ -907,14 +998,11 @@ export function* changeTimeAppointment(action) {
     }).then((result) => {
       return result;
     }).catch((err) => {
-      const data_offline = JSON.parse(localStorage.getItem('updateAppointment')) ? JSON.parse(localStorage.getItem('updateAppointment')) : [];
-      data_offline.push(data);
-      localStorage.setItem('updateAppointment', JSON.stringify(data_offline));
-      return { error: err };
+      alert(err)
     });
 
-    if (response.status === 200 && response.data.codeStatus !== 1) {
-      return yield* checkResponse(response);
+    if (kq.status === 200 && kq.data.codeStatus !== 1) {
+      return yield* checkResponse(kq);
     }
 
     if (kq.status === 200) {
@@ -1011,6 +1099,7 @@ export function* addNewCustomer(action) {
     }).catch((err) => {
       console.log(err)
     });
+
     let id_appointment = '';
     if (resultAddAppointment.status === 200) {
       id_appointment = resultAddAppointment.data.data;
@@ -1025,6 +1114,7 @@ export function* addNewCustomer(action) {
       }
     })
       .then((res) => {
+        console.log(res)
         return res;
       }).catch((err) => {
         console.log(err);
@@ -1144,8 +1234,8 @@ export function* deleteEventInWaitingList(action) {
 
     });
 
-    if (response.status === 200 && response.data.codeStatus !== 1) {
-      return yield* checkResponse(response);
+    if (kq.status === 200 && kq.data.codeStatus !== 1) {
+      return yield* checkResponse(kq);
     }
 
     if (kq.status === 200) {
@@ -1226,6 +1316,57 @@ export function* getAppointmentAgain() {
   })
 }
 
+function* checkPinCode_Saga() {
+  yield takeLatest(CHECKPINCODE, function* (action) {
+    const { pincode } = action;
+    const url = `${GET_CHECKPINCODE}/${pincode}`;
+    const kq = yield axios.put(url, {}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    }).then((result) => {
+      return result;
+    }).catch((err) => {
+ 
+    });
+
+    if (kq.status === 200 && kq.data.codeStatus !== 1) {
+      alert(kq.data.message);
+    }
+
+    if (kq.status === 200 && kq.data.codeStatus === 1) {
+      yield put(loadMembers());
+      yield put(loadWaitingAppointments());
+      yield put(loadAppointmentByMembers());
+    }
+  });
+}
+
+function* updateNextStaff_Saga() {
+  yield takeLatest(UPDATE_NEXT_STAFF, function* () {
+    try {
+      const requestURL = new URL(`${GET_MEMBERS_API}/${merchantId}`);
+      const response = yield axios.get(requestURL.toString(), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      }).then((result) => {
+        return result;
+      }).catch((err) => {
+
+      });
+
+      if (response.status === 200 && response.data.codeStatus === 1) {
+        const members = response.status === 200 ? response.data.data.map(member => memberAdapter(member)).filter(mem => mem.isDisabled === 0) : '';
+        yield put(updateNextStaffSuccess(members));
+      }
+    } catch (err) {
+
+      // yield put(memberLoadingError(err));
+    }
+  });
+}
+
 
 
 
@@ -1234,6 +1375,13 @@ export function* getAppointmentAgain() {
 export function* selectDayAndWeek(action) {
   yield put(selectDay(action.day));
   yield put(selectWeek(action.day));
+  setTimeout(() => {
+    const x = document.getElementsByClassName("fc-now-indicator fc-now-indicator-arrow");
+    for (let i = 0; i < x.length; i++) {
+      x[i].scrollIntoView();
+    }
+  }, 300);
+
 }
 
 export function* getDisplayedMembers() {
@@ -1329,7 +1477,9 @@ export default function* root() {
     fork(deleteEvent_WaitingList),
     fork(change_time_appointment),
     fork(update_App_Offline),
-    fork(getAppointmentAgain)
+    fork(getAppointmentAgain),
+    fork(checkPinCode_Saga),
+    fork(updateNextStaff_Saga),
   ]);
 }
 

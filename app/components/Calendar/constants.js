@@ -18,7 +18,7 @@ const OPTION_RENDER_TEMPLATE = option =>
 
 const EVENT_RENDER_TEMPLATE = event => `
   <div class="app-event">
-    <div class="app-event__id-number">${event.id}</div>
+    <div class="app-event__id-number">${event.code}</div>
     <div class="app-event__full-name">${event.userFullName}</div>
     <div class="app-event__phone-number">
     ${event.phoneNumber}</div>
@@ -44,6 +44,7 @@ export const MAIN_CALENDAR_OPTIONS = {
   minTime: '06:00:00',
   maxTime: '23:00:00',
   timezone: 'local',
+  longPressDelay: 100,
   resources: [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }],
   schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
 
@@ -132,7 +133,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 
     const time = moment(start._d.toString().substr(0, 24));
 
-    if (isCheckWorking) {
+    if (isCheckWorking && mem_resource[resource.id].orderNumber !== 0) {
       if (moment(time).isBefore(timeEnd) && moment(time).isSameOrAfter(timeStart)) {
         store.dispatch(disableCalendar(true));
         store.dispatch(openAddingAppointment({}));
@@ -179,9 +180,9 @@ export const MAIN_CALENDAR_OPTIONS = {
       delete element.memberId;
     });
 
-    if (moment(event.start).format('YYYY-MM-DD HH:mm') !== moment(start_time).format('YYYY-MM-DD HH:mm')) {
-      check = false;
-    }
+    // if (moment(event.start).format('YYYY-MM-DD HH:mm') !== moment(start_time).format('YYYY-MM-DD HH:mm')) {
+    //   check = false;
+    // }
 
     const displayedMembers = store
       .getState()
@@ -252,11 +253,52 @@ export const MAIN_CALENDAR_OPTIONS = {
       }
     }
 
+    if (!displayedMembers[parseInt(resourceId)]) {
+      check = false;
+    }
+    else if (check_workingStaff) {
+      all_appointments.forEach(app => {
+        if (parseInt(app.memberId) === parseInt(displayedMembers[parseInt(resourceId)].id)) {
+          if (
+            moment(start_time).isBetween(app.start, app.end) || moment(end_time).isBetween(app.start, app.end)
+            || moment(app.start).isBetween(start_time,end_time) || moment(app.end).isBetween(start_time,end_time)
+
+            // ((moment(app.start).format('YYYY-MM-DD HH:mm') === moment(start_time).format('YYYY-MM-DD HH:mm')) ||
+            //   (moment(app.end).format('YYYY-MM-DD HH:mm') === moment(end_time).format('YYYY-MM-DD HH:mm')))
+          ) {
+            if (parseInt(app.id) !== parseInt(event.id)) {
+              check = false;
+            }
+          }
+
+          // if (moment(end_time).isBetween(app.start, app.end)) {
+          //   if (parseInt(app.id) !== parseInt(event.data.id)) {
+          //     if (app.status === 'CONFIRMED' || app.status === 'CHECKED_IN' || app.status === 'BLOCK') {
+          //       check = false;
+          //     }
+          //   }
+          // }
+
+          // if ((moment(app.start).format('YYYY-MM-DD HH:mm') === moment(start_time).format('YYYY-MM-DD HH:mm')) &&
+          //   (moment(app.end).format('YYYY-MM-DD HH:mm') === moment(end_time).format('YYYY-MM-DD HH:mm'))) {
+          //   if (parseInt(app.id) !== parseInt(event.data.id)) {
+          //     if (app.status === 'CONFIRMED' || app.status === 'CHECKED_IN' || app.status === 'BLOCK') {
+          //       check = false;
+          //     }
+          //   }
+          // }
+        }
+      });
+    } else {
+      check = false;
+    }
+
+
     let check_time_block = true;
     let checkDate = `${date.format('YYYY-MM-DD')}T${date.format('HH:mm:ss')}`
-    if (moment(checkDate).isSameOrAfter(`${moment().format('YYYY-MM-DD')}T${moment(time_working_end, ["h:mm A"]).format("HH:mm:ss")}`)) {
-      check_time_block = false;
-    }
+    // if (moment(checkDate).isSameOrAfter(`${moment().format('YYYY-MM-DD')}T${moment(time_working_end, ["h:mm A"]).format("HH:mm:ss")}`)) {
+    //   check_time_block = false;
+    // }
     if (moment(checkDate).isBefore(`${moment().format('YYYY-MM-DD')}T${moment(time_working_start, ["h:mm A"]).format("HH:mm:ss")}`)) {
       check_time_block = false;
     }
@@ -271,17 +313,38 @@ export const MAIN_CALENDAR_OPTIONS = {
         event => event.data.id === $(this).data().event.data.id,
       );
     } else {
-      store.dispatch(
-        assignAppointment({
-          eventData: {
-            ...event,
-            status: 'CHECKED_IN',
-            start: `${date.format('YYYY-MM-DD')}T${date.format('HH:mm:ss')}`,
-            end: event.end.toString().substr(0, 19),
-          },
-          resourceId,
-        }),
-      );
+      if (check === false && displayedMembers[parseInt(resourceId)].orderNumber !== 0 ) {
+        if (window.confirm('Are you sure want to assign appointment at this position ?')) {
+          store.dispatch(
+            assignAppointment({
+              eventData: {
+                ...event,
+                status: 'CHECKED_IN',
+                start: `${date.format('YYYY-MM-DD')}T${date.format('HH:mm:ss')}`,
+                end: event.end.toString().substr(0, 19),
+              },
+              resourceId,
+            }),
+          );
+        } else {
+          $('#full-calendar').fullCalendar(
+            'removeEvents',
+            event => event.data.id === $(this).data().event.data.id,
+          );
+        }
+      } else {
+        store.dispatch(
+          assignAppointment({
+            eventData: {
+              ...event,
+              status: 'CHECKED_IN',
+              start: `${date.format('YYYY-MM-DD')}T${date.format('HH:mm:ss')}`,
+              end: event.end.toString().substr(0, 19),
+            },
+            resourceId,
+          }),
+        );
+      }
     }
   },
   eventDrop: (event, delta, revertFunc, jsEvent, ui, view) => {
@@ -304,38 +367,41 @@ export const MAIN_CALENDAR_OPTIONS = {
       .getIn(['appointment', 'currentDay']);
 
     let check_workingStaff = '';
+    if (!displayedMembers[parseInt(event.resourceId)]) {
+      check = false;
+    } else {
+      switch (moment(currentDay).format('dddd')) {
+        case 'Monday':
+          check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Monday.isCheck
+          break;
 
-    switch (moment(currentDay).format('dddd')) {
-      case 'Monday':
-        check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Monday.isCheck
-        break;
+        case 'Tuesday':
+          check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Tuesday.isCheck
+          break;
 
-      case 'Tuesday':
-        check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Tuesday.isCheck
-        break;
+        case 'Wednesday':
+          check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Wednesday.isCheck
+          break;
 
-      case 'Wednesday':
-        check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Wednesday.isCheck
-        break;
+        case 'Thursday':
+          check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Thursday.isCheck
+          break;
 
-      case 'Thursday':
-        check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Thursday.isCheck
-        break;
+        case 'Friday':
+          check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Friday.isCheck
+          break;
 
-      case 'Friday':
-        check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Friday.isCheck
-        break;
+        case 'Saturday':
+          check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Saturday.isCheck
+          break;
 
-      case 'Saturday':
-        check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Saturday.isCheck
-        break;
+        case 'Sunday':
+          check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Sunday.isCheck
+          break;
 
-      case 'Sunday':
-        check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Sunday.isCheck
-        break;
-
-      default:
-        break;
+        default:
+          break;
+      }
     }
 
     let all_appointments = [];
@@ -350,14 +416,16 @@ export const MAIN_CALENDAR_OPTIONS = {
       all_appointments.forEach(app => {
 
         if (parseInt(app.memberId) === parseInt(displayedMembers[parseInt(event.resourceId)].id)) {
-          if (moment(start_time).isBetween(app.start, app.end) || moment(end_time).isBetween(app.start, app.end) ||
-            ((moment(app.start).format('YYYY-MM-DD HH:mm') === moment(start_time).format('YYYY-MM-DD HH:mm')) ||
-              (moment(app.end).format('YYYY-MM-DD HH:mm') === moment(end_time).format('YYYY-MM-DD HH:mm')))
+          if (moment(start_time).isBetween(app.start, app.end) || moment(end_time).isBetween(app.start, app.end)
+          || moment(app.start).isBetween(start_time,end_time) || moment(app.end).isBetween(start_time,end_time)
+            // ((moment(app.start).format('YYYY-MM-DD HH:mm') === moment(start_time).format('YYYY-MM-DD HH:mm')) ||
+            //   (moment(app.end).format('YYYY-MM-DD HH:mm') === moment(end_time).format('YYYY-MM-DD HH:mm')))
           ) {
             if (parseInt(app.id) !== parseInt(event.data.id)) {
-              if (app.status === 'CONFIRMED' || app.status === 'CHECKED_IN' || app.status === 'BLOCK') {
-                check = false;
-              }
+              // if (app.status === 'CONFIRMED' || app.status === 'CHECKED_IN' || app.status === 'BLOCK') {
+
+              // }
+              check = false;
             }
           }
 
@@ -395,8 +463,7 @@ export const MAIN_CALENDAR_OPTIONS = {
       // (!!override && override.id !== event.data.id) ||
       // event.start.isBefore(moment()) ||
       (pos === -1) ||
-      (event.data.status === 'PAID') ||
-      check === false
+      (event.data.status === 'PAID')
 
     ) {
       revertFunc();
@@ -409,15 +476,29 @@ export const MAIN_CALENDAR_OPTIONS = {
       const endTime = event.end !== null ? `${event.end.format('YYYY-MM-DD')}T${event.end.format(
         'HH:mm:ss',
       )}` : moment(start_time).add(90, 'minutes').format('YYYY-MM-DD HH:mm:ss');
-
-      store.dispatch(
-        moveAppointment(
-          event.data.id,
-          event.resourceId,
-          start_time,
-          endTime
-        ),
-      );
+      if(check === false){
+        if (window.confirm('Do you want to move appointment to this position ?')) {
+          store.dispatch(
+            moveAppointment(
+              event.data.id,
+              event.resourceId,
+              start_time,
+              endTime
+            ),
+          );
+        } else {
+          revertFunc();
+        }
+      }else{
+        store.dispatch(
+          moveAppointment(
+            event.data.id,
+            event.resourceId,
+            start_time,
+            endTime
+          ),
+        );
+      }
     }
   },
   /* eslint no-param-reassign: "error" */

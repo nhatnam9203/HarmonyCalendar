@@ -5,6 +5,9 @@ const GlobalStyle = createGlobalStyle`
   body {
     height: 100%;
     width: 100%;
+    position: fixed;
+    overflow: hidden;
+}
   }
 
   body {
@@ -69,6 +72,10 @@ const GlobalStyle = createGlobalStyle`
   }
   .fc-unthemed .fc-axis {
     border-right: 1px solid #1484c0;
+  }
+  .fc-axis { 
+    width: 71px !important;
+    font-size : 1rem;
   }
   .fc th {
     border-width: 1px;
@@ -151,6 +158,9 @@ const GlobalStyle = createGlobalStyle`
   font-weight : 500;
   color : #333;
 }
+.event-checkin,.event-confirmed,.event-paid{
+  border : 1px solid #ffffff !important;
+}
 
 
 .event-assigned{
@@ -205,8 +215,65 @@ const GlobalStyle = createGlobalStyle`
   color : #333;
 }
 .DayPickerInput input{
-  color : #666 !important;
+  color : #333 !important;
 }
+.DayPickerInput{
+  padding-top : 1rem !important;
+}
+
+.fc-highlight{
+  background : #b0e7ff;
+  opacity : 0.7;
+}
+.rc-time-picker-panel{
+  width : 300px !important;
+}
+.rc-time-picker-panel-narrow{
+  max-width : 300px !important;
+}
+.rc-time-picker-panel-select{
+  width : 80px !important;
+}
+.rc-time-picker-panel-select ul li{
+  height : 43px !important;
+}
+
+.txtTimeChange{
+  color : #919191;
+  font-size : 0.9rem;
+}
+
+.am-picker{
+  width:60%;
+  margin:auto;
+}
+.am-picker-popup{
+  left : 25% !important;
+  width : 50% !important;
+  border-top-left-radius : 10px;
+  border-top-right-radius : 10px;
+}
+#full-calendar{
+
+}
+.App-pages {
+    height: 100%;
+    width: calc(((100vw - 5.05rem) / 7) * 6 + 4.75rem);
+    perspective: 960px;
+}
+.am-picker-popup-header{
+  background : #1073C2;
+  border-top-left-radius : 15px;
+  border-top-right-radius : 15px;
+}
+.am-picker-popup{
+  border-top-left-radius : 15px;
+  border-top-right-radius : 15px; 
+}
+.am-picker-popup-item{
+  color : #ffffff !important;
+}
+
 ::-webkit-scrollbar { 
     display: none; 
 }

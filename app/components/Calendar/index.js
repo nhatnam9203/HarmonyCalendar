@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 
 import FCAgenda from './FCAgenda';
 import FCDragZone from './FCDragZone';
-
 import { updateEventToCalendar } from './constants';
 import { MAIN_CALENDAR_OPTIONS } from './constants';
 import { merchantId } from '../../../app-constants';
@@ -91,6 +90,17 @@ const extrasAdapter = extra => {
   };
 };
 
+const notesAdapter = notes => {
+  return {
+    appointmentId: notes.AppointmentId,
+    appointmentNoteId: notes.AppointmentNoteId,
+    createDate: notes.CreateDate,
+    note: notes.Note,
+    staffId: notes.StaffId,
+    staffName: notes.StaffName,
+  };
+};
+
 class Calendar extends React.Component {
   constructor() {
     super();
@@ -109,7 +119,11 @@ class Calendar extends React.Component {
         '***********************RECONNECT SignalR***********************',
       );
       this.runSignalR();
-    }, 120000);
+    }, 60000);
+    const x = document.getElementsByClassName("fc-now-indicator fc-now-indicator-arrow");
+    for (let i = 0; i < x.length; i++) {
+      x[i].scrollIntoView();
+    }
   }
 
   runSignalR() {
@@ -126,21 +140,52 @@ class Calendar extends React.Component {
       updateStaff,
       loadWaitingAppointments,
       loadAppointmentByMembers,
-      loadMembers
+      loadMembers,
+      updateNextStaff,
+      updateConsumer
     } = this.props;
     const url = `${PROD_API_BASE_URL}/notification/?merchantId=${merchantId}&Title=Merchant&kind=calendar`;
     let connection = new signalR.HubConnectionBuilder().withUrl(url).build();
 
     connection.on('ListWaNotification', async data => {
       let app = JSON.parse(data);
+      if (app.type) {
+        switch (app.type) {
+          case 'staff_change_nextavailable':
+            updateNextStaff();
+            break;
+
+          case 'staff_change_ordernumber':
+            updateNextStaff();
+            break
+          default:
+            break;
+        }
+      }
+
       if (app.data) {
         let type = app.data.Type;
         switch (type) {
+          case 'user_update':
+            updateConsumer(app.data.user);
+            const displayMember = store
+              .getState()
+              .getIn(['appointment', 'appointments', 'calendar']);
+            const selectDay = store
+              .getState()
+              .getIn(['appointment', 'currentDay']);
+            addEventsToCalendar(selectDay, displayMember);
+            // loadWaitingAppointments();
+            // loadAppointmentByMembers();
+            break;
+
           case 'appointment_add':
             const appointment = app.data.Appointment;
             if (appointment) {
               let appointment_R = this.returnAppointment(appointment);
-
+              if (appointment_R.status === 'CHECKED_IN' && parseInt(appointment_R.memberId) === 0) {
+                return;
+              }
               if (
                 appointment_R.status === 'ASSIGNED' ||
                 appointment_R.status === 'CHECKED_IN'
@@ -210,22 +255,25 @@ class Calendar extends React.Component {
             }
             break;
           case 'appointment_checkout':
-            let app_checkout = app.data.appointment;
-            if (app_checkout) {
-              let appointment = JSON.parse(app_checkout);
-              let appointment_R = this.returnAppointment(appointment);
+            // let app_checkout = app.data.appointment;
 
-              await updateAppointmentPaid(appointment_R);
-              const displayMember = store
-                .getState()
-                .getIn(['appointment', 'appointments', 'calendar']);
+            // if (app_checkout) {
+            //   let appointment = JSON.parse(app_checkout);
+            //   let appointment_R = this.returnAppointment(appointment);
 
-              const selectDay = store
-                .getState()
-                .getIn(['appointment', 'currentDay']);
+            //   await updateAppointmentPaid(appointment_R);
+            //   const displayMember = store
+            //     .getState()
+            //     .getIn(['appointment', 'appointments', 'calendar']);
 
-              addEventsToCalendar(selectDay, displayMember);
-            }
+            //   const selectDay = store
+            //     .getState()
+            //     .getIn(['appointment', 'currentDay']);
+
+            //   addEventsToCalendar(selectDay, displayMember);
+            // }
+            // loadMembers();
+            loadAppointmentByMembers();
             break;
 
           case 'change_item':
@@ -254,6 +302,7 @@ class Calendar extends React.Component {
   returnAppointment(appointment) {
     return {
       id: appointment.AppointmentId,
+      code: `#${appointment.Code}`,
       userFullName: appointment.FirstName + ' ' + appointment.LastName,
       phoneNumber: appointment.PhoneNumber,
       options: appointment.Services.map(sv => servicesAdapter(sv)),
@@ -266,13 +315,17 @@ class Calendar extends React.Component {
       user_id: appointment.UserId,
       createDate: appointment.CreatedDate,
       tipPercent: appointment.TipPercent,
-      tipAmount : appointment.TipAmount,
-      subTotal : appointment.SubTotal,
-      tax : appointment.Tax,
-      giftCard : appointment.GiftCard,
-      discount : appointment.Discount,
-      total : appointment.Total,
-      notes: appointment.Notes,
+      tipAmount: appointment.TipAmount,
+      subTotal: appointment.SubTotal,
+      tax: appointment.Tax,
+      giftCard: appointment.GiftCard,
+      discount: appointment.Discount,
+      total: appointment.Total,
+      notes: appointment.Notes.sort(function (a, b) {
+        var c = a.AppointmentNoteId;
+        var d = b.AppointmentNoteId;
+        return d - c
+      }).map(note => notesAdapter(note)),
     };
   }
 
@@ -325,8 +378,8 @@ class Calendar extends React.Component {
               deleteWaitingAppointment={deleteWaitingAppointment}
             />
           ) : (
-            ''
-          )}
+              ''
+            )}
           <SignInWrapper>
             <SignInWrapper.Button
               onClick={() => {

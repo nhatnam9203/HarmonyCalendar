@@ -9,12 +9,17 @@ import {
   makeSelectError,
   makeSelectMembers,
   makeSelectCalendarAppointments,
-  makeCurrentDay
+  makeCurrentDay,
+  makeSelectPinCode,
+  makeSelectPinStaff
 } from './selectors';
 import {
   selectDayOnCalendar,
   loadMembers,
   setDisplayedMembers,
+  togglePopupPincode,
+  checkPinCode,
+  disableCalendar
 } from './actions';
 
 export function mapDispatchToProps(dispatch) {
@@ -22,6 +27,9 @@ export function mapDispatchToProps(dispatch) {
     onChangeToday: day => dispatch(selectDayOnCalendar(day)),
     loadMembers: options => dispatch(loadMembers(options)),
     setDisplayedMembers: members => dispatch(setDisplayedMembers(members)),
+    togglePopupPincode: (status,pincode) => dispatch(togglePopupPincode(status,pincode)),
+    checkPinCode: pincode => dispatch(checkPinCode(pincode)),
+    disableCalendar: status => dispatch(disableCalendar(status)),
   };
 }
 
@@ -31,6 +39,8 @@ const mapStateToProps = createStructuredSelector({
   resources: makeSelectMembers(),
   calendarMembers: makeSelectCalendarAppointments(),
   currentDay : makeCurrentDay(),
+  popupPincode : makeSelectPinCode(),
+  PinStaff : makeSelectPinStaff(),
 });
 
 const withConnect = connect(

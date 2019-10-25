@@ -4,7 +4,7 @@ import { compose } from 'redux';
 
 import DetailAppointment from 'components/DetailAppointment';
 
-import { makeSelectAppointment,makeCurrentDay } from './selectors';
+import { makeSelectAppointment,makeCurrentDay,makeSelectMembers } from './selectors';
 import {
   cancelAppointment,
   deselectAppointment,
@@ -32,6 +32,7 @@ export function mapDispatchToProps(dispatch) {
 const mapStateToProps = createStructuredSelector({
   appointment: makeSelectAppointment(),
   currentDay : makeCurrentDay(),
+  staffList : makeSelectMembers(),
 });
 
 const withConnect = connect(

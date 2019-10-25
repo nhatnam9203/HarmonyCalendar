@@ -8,10 +8,12 @@ import { FaCaretLeft, FaCaretRight } from 'react-icons/fa';
 const DateSliderWrapper = styled.div`
   width: calc(100% - 5.05rem);
   position: relative;
+  height : 4rem !important;
 `;
 
 const CarouselItem = styled.div`
   display: flex;
+  flex : 1;
 `;
 
 const NormalDay = styled.div`
@@ -20,7 +22,10 @@ const NormalDay = styled.div`
   text-align: center;
   padding: 0.5rem;
   overflow: hidden;
-
+  height : 4rem ;
+  padding-top : 0.5rem;
+  font-size : 1rem;
+  line-height : 1.5;
   &:last-child {
     border-right: none;
   }
@@ -57,16 +62,20 @@ const NextButton = styled.div`
 `;
 
 class DaySlider extends React.Component {
+
+  constructor() {
+    super();
+    this.state = {
+      currentSlide : 0
+    }
+  }
+
   onPrevClick(event, previousSlide) {
     previousSlide(event);
-    const { days, onChangeWeek } = this.props;
-    onChangeWeek(days[0].subtract(1, 'w').format('DDMMYYYY'));
   }
 
   onNextClick(event, nextSlide) {
     nextSlide(event);
-    const { days, onChangeWeek } = this.props;
-    onChangeWeek(days[0].add(1, 'w').format('DDMMYYYY'));
   }
 
   onDayClick(day) {
@@ -106,13 +115,37 @@ class DaySlider extends React.Component {
     );
   }
 
+  afterSlide(index) {
+    const { days, onChangeWeek } = this.props;
+    const { currentSlide } = this.state;
+    if (
+      (currentSlide === 0 && index === 1)
+      || (currentSlide === 1 && index === 2)
+      ||
+      (currentSlide === 2 && index === 0)
+    ) {
+      onChangeWeek(days[0].add(1, 'w').format('DDMMYYYY'));
+    }
+    if (
+      (currentSlide === 1 && index === 0)
+      || (currentSlide === 0 && index === 2)
+      ||
+      (currentSlide === 2 && index === 1)
+    ) {
+      onChangeWeek(days[0].subtract(1, 'w').format('DDMMYYYY'));
+    }
+
+
+    this.setState({currentSlide : index})
+  }
+
   render() {
     const { days } = this.props;
     return (
       <DateSliderWrapper>
         <Carousel
           wrapAround
-          dragging={false}
+          dragging={true}
           renderBottomCenterControls={() => ''}
           renderCenterLeftControls={({ previousSlide }) => (
             <PrevButton onClick={ev => this.onPrevClick(ev, previousSlide)}>
@@ -124,6 +157,7 @@ class DaySlider extends React.Component {
               <FaCaretRight />
             </NextButton>
           )}
+          afterSlide={slideIndex => this.afterSlide(slideIndex)}
         >
           <CarouselItem>
             {days.map((day, index) => this.renderItems(day, index))}

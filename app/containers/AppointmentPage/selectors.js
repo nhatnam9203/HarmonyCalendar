@@ -101,14 +101,24 @@ const makeTimeStaffID = () =>
     appointmentState.get('time_staffId'),
   );
 
-  const makeStatusDeleteWaiting = () =>
+const makeStatusDeleteWaiting = () =>
   createSelector(currentAppointment, appointmentState =>
     appointmentState.get('StatusDeleteWaiting'),
   );
 
-  const makeInfoCheckPhone = () =>
+const makeInfoCheckPhone = () =>
   createSelector(currentAppointment, appointmentState =>
     appointmentState.get('info_after_check_phone'),
+  );
+
+const makeSelectPinCode = () =>
+  createSelector(currentAppointment, appointmentState =>
+    appointmentState.get('PopupPincode'),
+  );
+
+const makeSelectPinStaff = () =>
+  createSelector(currentAppointment, appointmentState =>
+    appointmentState.get('PinStaff'),
   );
 
 
@@ -135,5 +145,7 @@ export {
   makeLoadCalendar,
   makeTimeStaffID,
   makeStatusDeleteWaiting,
-  makeInfoCheckPhone
+  makeInfoCheckPhone,
+  makeSelectPinCode,
+  makeSelectPinStaff
 };

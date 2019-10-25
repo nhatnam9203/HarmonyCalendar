@@ -16,9 +16,9 @@ class FCAgenda extends React.Component {
   componentWillReceiveProps(nextProps){
     const {disableCalendar} = nextProps;
     if(disableCalendar === true){
-      $('.fc-scroller').css('height','auto');
+      $('.fc-scroller').css('-webkit-overflow-scrolling','auto');
     }else{
-      $('.fc-scroller').css('height','1000px');
+      $('.fc-scroller').css('-webkit-overflow-scrolling:','touch');
     }
   }
 

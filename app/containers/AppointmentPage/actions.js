@@ -82,7 +82,12 @@ import {
   INFO_CHECK_PHONE,
   UPDATE_APPOINTMENT_PAID,
   DELETE_APPOINTMENT_CALENDAR,
-  UPDATE_STAFF
+  UPDATE_STAFF,
+  CHECKPINCODE,
+  OPEN_PINCODE,
+  UPDATE_NEXT_STAFF,
+  UPDATE_NEXT_STAFF_SUCCESS,
+  UPDATE_USER
 } from './constants';
 
 /**
@@ -654,7 +659,28 @@ export const updateStaff = (staff) => ({
   type: UPDATE_STAFF,
   staff
 });
+export const checkPinCode = (pincode) => ({
+  type: CHECKPINCODE,
+  pincode
+});
+export const togglePopupPincode = (data,pincode) => ({
+  type: OPEN_PINCODE,
+  data,
+  pincode
+});
 
+export const updateNextStaff = () => ({
+  type: UPDATE_NEXT_STAFF,
+});
+export const updateNextStaffSuccess = (data) => ({
+  type: UPDATE_NEXT_STAFF_SUCCESS,
+  data,
+});
+
+export const updateConsumer = (data) => ({
+  type: UPDATE_USER,
+  data,
+});
 
 
 

@@ -53,6 +53,9 @@ import {
   UPDATE_APPOINTMENT_PAID,
   DELETE_APPOINTMENT_CALENDAR,
   UPDATE_STAFF,
+  OPEN_PINCODE,
+  UPDATE_NEXT_STAFF_SUCCESS,
+  UPDATE_USER
 } from './constants';
 
 const initialCurrentDay = moment();
@@ -96,6 +99,8 @@ export const initialState = fromJS({
   isLoadingCalendar: false,
   time_staffId: '',
   StatusDeleteWaiting: false,
+  PopupPincode: false,
+  PinStaff: '',
 });
 
 function appointmentReducer(state = initialState, action) {
@@ -166,7 +171,7 @@ function appointmentReducer(state = initialState, action) {
       return state.setIn(['appointments', 'waiting'], []);
 
     case LOAD_WAITING_APPOINTMENT_SUCCESS:
-      const waitingApointments = action.appointments.sort(function(a, b) {
+      const waitingApointments = action.appointments.sort(function (a, b) {
         var c = new Date(a.id);
         var d = new Date(b.id);
         return d - c;
@@ -327,7 +332,7 @@ function appointmentReducer(state = initialState, action) {
           action.appointment.status = 'ASSIGNED';
         }
         if (status_app === 'CHECKED_IN') {
-          action.appointment.status = 'ASSIGNED';
+          action.appointment.status = 'CHECKED_IN';
         }
         member.appointments.push(action.appointment);
 
@@ -351,7 +356,7 @@ function appointmentReducer(state = initialState, action) {
       });
 
     case UPDATE_WAITING_APPOINTMENT:
-      return state.updateIn(['appointments', 'waiting'], arr => {});
+      return state.updateIn(['appointments', 'waiting'], arr => { });
     case ADD_APPOINTMENT_TO_WAITING:
       return state.updateIn(['appointments', 'waiting'], arr => {
         const pos_to_find = arr.findIndex(
@@ -488,8 +493,10 @@ function appointmentReducer(state = initialState, action) {
     case TIME_STAFFID:
       return state.set('time_staffId', action.data);
 
+    case OPEN_PINCODE:
+      return state.set('PopupPincode', action.data).set('PinStaff', action.pincode)
+
     case UPDATE_STAFF:
-    console.log(action.staff);
       return state
         .setIn(['members', 'all'], arr => {
           // const member = arr.find(mem => mem.id === action.staff.id);
@@ -498,12 +505,38 @@ function appointmentReducer(state = initialState, action) {
           // // member = action.staff;
           return [...arr];
         })
-        // .setIn(['members', 'displayed'], arr => {
-        //   const member = arr.find(mem => mem.id === action.staff.id);
-        //   if (!member) return [...arr];
-        //   member = action.staff;
-        //   return [...arr];
-        // });
+    // .setIn(['members', 'displayed'], arr => {
+    //   const member = arr.find(mem => mem.id === action.staff.id);
+    //   if (!member) return [...arr];
+    //   member = action.staff;
+    //   return [...arr];
+    // });
+
+    case UPDATE_NEXT_STAFF_SUCCESS:
+
+      return state.setIn(['members', 'all'], action.data);
+
+    case UPDATE_USER:
+      let userInfo = JSON.parse(action.data);
+      return state.updateIn(['appointments', 'calendar'], arr => {
+        arr.forEach(element => {
+          element.appointments.forEach(app => {
+            if (app.phoneNumber === userInfo.Phone) {
+              app.phoneNumber = userInfo.Phone;
+              app.userFullName = userInfo.FirstName + ' ' + userInfo.LastName;
+            }
+          });
+        });
+        return [...arr]
+      }).updateIn(['appointments', 'waiting'], arr => {
+        arr.forEach(app => {
+          if (app.phoneNumber === userInfo.Phone){
+            app.phoneNumber = userInfo.Phone;
+            app.userFullName = userInfo.FirstName + ' ' + userInfo.LastName;
+          }
+        });
+        return [...arr];
+      });
 
     default:
       return state;

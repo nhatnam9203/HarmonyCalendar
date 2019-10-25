@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import Popup from 'reactjs-popup';
 import { FaTimesCircle } from 'react-icons/fa';
 import Enter from '../../images/enter.png';
+import moment from 'moment'
 
 const AppPopup = styled(Popup) `
   border-radius: 1.5rem;
@@ -131,7 +132,7 @@ const Img = styled.img`
 `;
 
 const Label = styled.div`
-  margin-bottom: 1rem;
+  margin-bottom: 0.3rem;
   text-align : left;
 `;
 
@@ -218,12 +219,12 @@ const NoteWrapper = styled.div`
   border: 1px solid #dddddd;
   background: #eeeeee;
   padding: 0.5rem;
-  overflow-x: scroll;
   height: 10rem;
   text-align: left;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  word-wrap: break-word;
 `;
 
 NoteWrapper.Form = styled.form`
@@ -256,15 +257,8 @@ NoteWrapper.Form = styled.form`
 const NoteInformation = styled.div`
   display: flex;
   padding: 0.5rem;
-
-  & > div:nth-child(1),
-  & > div:nth-child(2) {
-    width: 20%;
-  }
-
-  & > div:last-child {
-    width: 60%;
-  }
+  width : 10rem;
+  background : red;
 `;
 
 class AddAppointment extends React.Component {
@@ -360,6 +354,17 @@ class AddAppointment extends React.Component {
     </NoteInformation>
   );
 
+  renderNotes(){
+    return(
+      <div style={{
+        height : 60,
+        overflowY : 'scroll'
+      }}>
+        {this.state.notes.toString()}
+      </div>
+    )
+  }
+
   phoneNumberError = () => {
     const { checkPhoneNumberCustomerError } = this.props;
     this.setState({ error_phone: 'This phone number already exist !!!' })
@@ -438,7 +443,7 @@ class AddAppointment extends React.Component {
 
   render() {
     const { isOpenSearchingPopup, isOpenAddingPopup, notes, error_phone, success_addApointment } = this.state;
-    const { appointment, InfoAfterCheckPhone, StateAddCustomerSuccess } = this.props;
+    const { appointment, InfoAfterCheckPhone, StateAddCustomerSuccess ,checkPhoneError} = this.props;
     const PhoneShow = "+" + this.state.phoneCheck + '-' + this.state.phoneNumber;
 
     if (!appointment) return '';
@@ -501,7 +506,8 @@ class AddAppointment extends React.Component {
             <AddingWrapper.Body>
               <Form onSubmit={e => e.preventDefault()}>
                 {success_addApointment && <p style={{ color: '#8D9440' }}>{success_addApointment}</p>}
-                <Label style={{ textAlign: 'center' }}>Phone number is not exist ! Get information !</Label>
+               {!checkPhoneError&&<Label style={{ textAlign: 'center' }}>Phone number is not exist ! Get information !</Label>}
+               {checkPhoneError&&<Label style={{ textAlign: 'center' }}>Phone number</Label>}
                 <input style={{ textAlign: 'center' }} value={PhoneShow} type="text" disabled />
               </Form>
               <Form className="left" onSubmit={e => e.preventDefault()}>
@@ -527,7 +533,8 @@ class AddAppointment extends React.Component {
               </Form>
               <NoteWrapper>
                 <Label>Note:</Label>
-                {notes.map((note, index) => this.renderNote(note, index))}
+                {/* {notes.map((note, index) => this.renderNote(note, index))} */}
+                {this.renderNotes()}
                 <NoteWrapper.Form onSubmit={e => e.preventDefault()}>
                   <input
                     value={this.state.noteValue}

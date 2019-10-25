@@ -24,6 +24,8 @@ import {
   updateStaff,
   loadMembers,
   loadAppointmentByMembers,
+  updateNextStaff,
+  updateConsumer
 } from './actions';
 import {
   makeSelectWaitingAppointments,
@@ -57,6 +59,8 @@ export function mapDispatchToProps(dispatch) {
     updateStaff: (staff)=>dispatch(updateStaff(staff)),
     loadMembers: ()=>dispatch(loadMembers()),
     loadAppointmentByMembers :()=>dispatch(loadAppointmentByMembers()),
+    updateNextStaff:()=>dispatch(updateNextStaff()),
+    updateConsumer:(data)=>dispatch(updateConsumer(data)),
   };
 }
 
