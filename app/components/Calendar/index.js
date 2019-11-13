@@ -6,6 +6,8 @@ import FCAgenda from './FCAgenda';
 import FCDragZone from './FCDragZone';
 import { updateEventToCalendar } from './constants';
 import { MAIN_CALENDAR_OPTIONS } from './constants';
+import {getAppointmentOffline,getWaitingListOffline,getStaffOffline} from '../../containers/AppointmentPage/actions'
+import {membersData,appointmentAdapter} from '../../containers/AppointmentPage/saga'
 import { merchantId } from '../../../app-constants';
 import WaitingLoading from './WaitingLoading';
 import CalendarLoading from './CalendarLoading';
@@ -17,6 +19,8 @@ import {
 import { store } from 'app';
 import { addEventsToCalendar } from './constants';
 import { PROD_API_BASE_URL } from '../../../app-constants';
+import _ from 'lodash'
+
 const CalendarWrapper = styled.div`
   display: flex;
   border-left: 2px solid #3883bb;
@@ -52,7 +56,8 @@ SignInWrapper.Button = styled.div`
   background: #0071c5;
   color: #ffffff;
   width: 100%;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  font-weight : bold;
   line-height: 2.8;
   height: 100%;
   cursor: pointer;
@@ -112,7 +117,38 @@ class Calendar extends React.Component {
     // loadingCalendar(true)
   }
 
+  checkAppoointmentOffline(){
+    setInterval(() => {
+      if(navigator.onLine){
+        let appointmentsOffline = JSON.parse(localStorage.getItem('AppointmentsOffline'));
+        if(appointmentsOffline){
+          appointmentsOffline = appointmentsOffline.reverse();
+          const uniqueAppointment = _.unionBy(appointmentsOffline,'id');
+          //gọi hàm update Appointments Offline
+
+          localStorage.removeItem('AppointmentsOffline');
+        }
+      }
+    }, 30000);
+  }
+
+  receiveMessage=async(message)=>{
+    // if(!navigator.onLine && message.data){
+
+    // }
+    const {getWaitingListOffline,getAppointmentOffline,getStaffOffline} = this.props;
+    const data = JSON.parse(message.data);
+    const {waitingList,staffList,Calendars} = data;
+    alert(data)
+    // getWaitingListOffline(waitingList);
+    // await getStaffOffline(staffList);
+    // getAppointmentOffline(Calendars);
+  }
+
   componentDidMount() {
+
+    // window.addEventListener('message',this.receiveMessage)
+
     this.runSignalR();
     setInterval(() => {
       console.log(
@@ -145,7 +181,7 @@ class Calendar extends React.Component {
       updateConsumer
     } = this.props;
     const url = `${PROD_API_BASE_URL}/notification/?merchantId=${merchantId}&Title=Merchant&kind=calendar`;
-    let connection = new signalR.HubConnectionBuilder().withUrl(url).build();
+    let connection = new signalR.HubConnectionBuilder().withUrl(url).build();;
 
     connection.on('ListWaNotification', async data => {
       let app = JSON.parse(data);
@@ -255,24 +291,6 @@ class Calendar extends React.Component {
             }
             break;
           case 'appointment_checkout':
-            // let app_checkout = app.data.appointment;
-
-            // if (app_checkout) {
-            //   let appointment = JSON.parse(app_checkout);
-            //   let appointment_R = this.returnAppointment(appointment);
-
-            //   await updateAppointmentPaid(appointment_R);
-            //   const displayMember = store
-            //     .getState()
-            //     .getIn(['appointment', 'appointments', 'calendar']);
-
-            //   const selectDay = store
-            //     .getState()
-            //     .getIn(['appointment', 'currentDay']);
-
-            //   addEventsToCalendar(selectDay, displayMember);
-            // }
-            // loadMembers();
             loadAppointmentByMembers();
             break;
 
@@ -285,7 +303,6 @@ class Calendar extends React.Component {
         }
       }
       if (app.type) {
-
         let type = app.type;
         if (type === 'staff_update') {
           loadMembers();
@@ -297,6 +314,9 @@ class Calendar extends React.Component {
     });
 
     connection.start();
+    setTimeout(() => {
+      connection.stop();
+    }, 60000);
   }
 
   returnAppointment(appointment) {

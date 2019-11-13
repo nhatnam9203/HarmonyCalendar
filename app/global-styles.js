@@ -1,6 +1,15 @@
 import { createGlobalStyle } from 'styled-components';
+import OpenSan from './utils/font/SF-UI/SF-UI-Text-Regular.otf';
 
 const GlobalStyle = createGlobalStyle`
+
+    @font-face {
+    font-family: 'Open Sans';
+    src: url(${OpenSan});
+    font-weight: 400;
+    font-style: normal;
+  }
+
   html,
   body {
     height: 100%;
@@ -134,6 +143,7 @@ const GlobalStyle = createGlobalStyle`
     line-height: 1.8;
     font-style: italic;
     font-weight : 500;
+    word-wrap: break-word;
   }
   .app-event__option {
     font-size: 13px;
@@ -272,6 +282,9 @@ const GlobalStyle = createGlobalStyle`
 }
 .am-picker-popup-item{
   color : #ffffff !important;
+}
+.popup-overlay{
+
 }
 
 ::-webkit-scrollbar { 

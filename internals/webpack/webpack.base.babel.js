@@ -4,6 +4,7 @@
 
 const path = require('path');
 const webpack = require('webpack');
+const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
 
 // Remove this line once the following warning goes away (it was meant for webpack loader authors not users):
 // 'DeprecationWarning: loaderUtils.parseQuery() received a non-string value which can be problematic,
@@ -18,12 +19,12 @@ module.exports = options => ({
     {
       // Compile into js/build.js
       path: path.resolve(process.cwd(), 'build'),
-      publicPath: '/calendar_20190316/',
+      publicPath: './calendar_20190316/',
     },
     options.output,
   ), // Merge with env dependent settings
   externals: {
-    jquery: 'jQuery',
+    // jquery: 'jQuery',
     moment: 'moment',
   },
   optimization: options.optimization,
@@ -121,11 +122,19 @@ module.exports = options => ({
     // Always expose NODE_ENV to webpack, in order to use `process.env.NODE_ENV`
     // inside your code for any environment checks; Terser will automatically
     // drop any unreachable code.
+    new AddAssetHtmlPlugin({ filepath: require.resolve('../../public/moment') }),
+
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify(process.env.NODE_ENV),
       },
     }),
+
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      jQuery: 'jquery'
+    })
+
   ]),
   resolve: {
     modules: ['node_modules', 'app'],

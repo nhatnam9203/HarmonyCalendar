@@ -10,7 +10,8 @@ import {
   openAddingAppointment,
   disableCalendar,
   TimeAndStaffID,
-
+  closeAddingAppointment,
+  closeTimeAndStaffID
 } from '../../containers/AppointmentPage/actions';
 
 const OPTION_RENDER_TEMPLATE = option =>
@@ -44,16 +45,24 @@ export const MAIN_CALENDAR_OPTIONS = {
   minTime: '06:00:00',
   maxTime: '23:00:00',
   timezone: 'local',
-  longPressDelay: 100,
+  longPressDelay: 200,
   resources: [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }],
   schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
 
   select: (start, end, event, view, resource) => {
+  
+    let check_block_temp = false;
+
     const displayedMembers = store
       .getState()
       .getIn(['appointment', 'appointments', 'calendar']);
     const member = displayedMembers[resource.id];
-
+    
+    member.appointments.forEach(app=>{
+      if(app.status === 'BLOCK_TEMP' && moment(app.start).isSameOrBefore(moment(start)) && moment(app.end).isAfter(moment(start))){
+        check_block_temp = true;
+      }
+    })
 
     const mem_resource = store
       .getState()
@@ -126,213 +135,200 @@ export const MAIN_CALENDAR_OPTIONS = {
           isCheckWorking = mem_resource[resource.id].workingTimes.Sunday.isCheck;
         }
         break;
-
       default:
         break;
     }
 
-    const time = moment(start._d.toString().substr(0, 24));
+const time = moment(start._d.toString().substr(0, 24));
 
-    if (isCheckWorking && mem_resource[resource.id].orderNumber !== 0) {
-      if (moment(time).isBefore(timeEnd) && moment(time).isSameOrAfter(timeStart)) {
-        store.dispatch(disableCalendar(true));
-        store.dispatch(openAddingAppointment({}));
-        store.dispatch(TimeAndStaffID({ time: time, staffID: member.memberId }));
-      }
-    }
-  },
-
-  eventClick: event => {
-    const displayedMembers = store
-      .getState()
-      .getIn(['appointment', 'appointments', 'calendar']);
-
-    const oldPosition = displayedMembers.find(member =>
-      member.appointments.find(appointment => appointment.id === event.data.id),
-    );
-    if (!oldPosition) return;
-
-    const appointment = oldPosition.appointments.find(
-      app => app.id === event.data.id,
-    );
-    if (!appointment) return;
-    store.dispatch(selectAppointment(appointment, event));
+if (isCheckWorking && check_block_temp === false) {
+  if (moment(time).isBefore(timeEnd) && moment(time).isSameOrAfter(timeStart)) {
     store.dispatch(disableCalendar(true));
+    store.dispatch(openAddingAppointment({}));
+    store.dispatch(TimeAndStaffID({ time: time, staffID: member.memberId }));
+  }
+}
   },
+
+
+eventClick: event => {
+  const displayedMembers = store
+    .getState()
+    .getIn(['appointment', 'appointments', 'calendar']);
+
+  const oldPosition = displayedMembers.find(member =>
+    member.appointments.find(appointment => appointment.id === event.data.id),
+  );
+  if (!oldPosition) return;
+
+  const appointment = oldPosition.appointments.find(
+    app => app.id === event.data.id,
+  );
+  if (!appointment) return;
+  store.dispatch(selectAppointment(appointment, event));
+  store.dispatch(disableCalendar(true));
+},
+
 
   drop(date, jsEvent, ui, resourceId) {
 
-    const event = $(this).data().event.data;
-    let totalDuration = 0;
-    event.options.forEach(evt => {
-      totalDuration += evt.duration;
-    });
+  const event = $(this).data().event.data;
+  let totalDuration = 0;
+  event.options.forEach(evt => {
+    totalDuration += evt.duration;
+  });
 
-    const start_time = `${date.format('YYYY-MM-DD')}T${date.format('HH:mm:ss')}`;
-    const end_time = event.options.length > 0 ? moment(start_time).add(totalDuration, 'minutes') : moment(start_time).add(90, 'minutes');
+  const start_time = `${date.format('YYYY-MM-DD')}T${date.format('HH:mm:ss')}`;
+  const end_time = event.options.length > 0 ? moment(start_time).add(totalDuration, 'minutes') : moment(start_time).add(90, 'minutes');
 
 
-    const memberdisplay = store.getState().getIn(['appointment', 'appointments', 'calendar']);
-    let check = true;
-    let check2 = false;
-    let member_clone = JSON.parse(JSON.stringify(memberdisplay))
-    member_clone.forEach(element => {
-      delete element.memberId;
-    });
+  const memberdisplay = store.getState().getIn(['appointment', 'appointments', 'calendar']);
+  let check = true;
+  let check2 = false;
+  let member_clone = JSON.parse(JSON.stringify(memberdisplay))
+  member_clone.forEach(element => {
+    delete element.memberId;
+  });
 
-    // if (moment(event.start).format('YYYY-MM-DD HH:mm') !== moment(start_time).format('YYYY-MM-DD HH:mm')) {
-    //   check = false;
-    // }
+  // if (moment(event.start).format('YYYY-MM-DD HH:mm') !== moment(start_time).format('YYYY-MM-DD HH:mm')) {
+  //   check = false;
+  // }
 
-    const displayedMembers = store
+  const displayedMembers = store
+    .getState()
+    .getIn(['appointment', 'members', 'displayed']);
+
+  let all_appointments = [];
+  member_clone.forEach(apps => {
+    all_appointments = [...all_appointments, ...apps.appointments];
+  });
+
+  let check_workingStaff = '';
+  let check_staff_drop = false;
+  let time_working_start = '';
+  let time_working_end = '';
+
+  const pos = displayedMembers.findIndex(mem => parseInt(mem.resourceId) === parseInt(resourceId));
+
+  if (pos !== -1) {
+    const currentDay = store
       .getState()
-      .getIn(['appointment', 'members', 'displayed']);
+      .getIn(['appointment', 'currentDay']);
 
-    let all_appointments = [];
-    member_clone.forEach(apps => {
-      all_appointments = [...all_appointments, ...apps.appointments];
-    });
+    switch (moment(currentDay).format('dddd')) {
+      case 'Monday':
+        check_workingStaff = displayedMembers[parseInt(resourceId)].workingTimes.Monday.isCheck;
+        time_working_start = displayedMembers[parseInt(resourceId)].workingTimes.Monday.timeStart;
+        time_working_end = displayedMembers[parseInt(resourceId)].workingTimes.Monday.timeEnd;
+        break;
 
-    let check_workingStaff = '';
-    let check_staff_drop = false;
-    let time_working_start = '';
-    let time_working_end = '';
+      case 'Tuesday':
+        check_workingStaff = displayedMembers[parseInt(resourceId)].workingTimes.Tuesday.isCheck;
+        time_working_start = displayedMembers[parseInt(resourceId)].workingTimes.Tuesday.timeStart;
+        time_working_end = displayedMembers[parseInt(resourceId)].workingTimes.Tuesday.timeEnd;
+        break;
 
-    const pos = displayedMembers.findIndex(mem => parseInt(mem.resourceId) === parseInt(resourceId));
+      case 'Wednesday':
+        check_workingStaff = displayedMembers[parseInt(resourceId)].workingTimes.Wednesday.isCheck;
+        time_working_start = displayedMembers[parseInt(resourceId)].workingTimes.Wednesday.timeStart;
+        time_working_end = displayedMembers[parseInt(resourceId)].workingTimes.Wednesday.timeEnd;
+        break;
 
-    if (pos !== -1) {
-      const currentDay = store
-        .getState()
-        .getIn(['appointment', 'currentDay']);
+      case 'Thursday':
+        check_workingStaff = displayedMembers[parseInt(resourceId)].workingTimes.Thursday.isCheck;
+        time_working_start = displayedMembers[parseInt(resourceId)].workingTimes.Thursday.timeStart;
+        time_working_end = displayedMembers[parseInt(resourceId)].workingTimes.Thursday.timeEnd;
+        break;
 
-      switch (moment(currentDay).format('dddd')) {
-        case 'Monday':
-          check_workingStaff = displayedMembers[parseInt(resourceId)].workingTimes.Monday.isCheck;
-          time_working_start = displayedMembers[parseInt(resourceId)].workingTimes.Monday.timeStart;
-          time_working_end = displayedMembers[parseInt(resourceId)].workingTimes.Monday.timeEnd;
-          break;
+      case 'Friday':
+        check_workingStaff = displayedMembers[parseInt(resourceId)].workingTimes.Friday.isCheck;
+        time_working_start = displayedMembers[parseInt(resourceId)].workingTimes.Friday.timeStart;
+        time_working_end = displayedMembers[parseInt(resourceId)].workingTimes.Friday.timeEnd;
+        break;
 
-        case 'Tuesday':
-          check_workingStaff = displayedMembers[parseInt(resourceId)].workingTimes.Tuesday.isCheck;
-          time_working_start = displayedMembers[parseInt(resourceId)].workingTimes.Tuesday.timeStart;
-          time_working_end = displayedMembers[parseInt(resourceId)].workingTimes.Tuesday.timeEnd;
-          break;
+      case 'Saturday':
+        check_workingStaff = displayedMembers[parseInt(resourceId)].workingTimes.Saturday.isCheck;
+        time_working_start = displayedMembers[parseInt(resourceId)].workingTimes.Saturday.timeStart;
+        time_working_end = displayedMembers[parseInt(resourceId)].workingTimes.Saturday.timeEnd;
+        break;
 
-        case 'Wednesday':
-          check_workingStaff = displayedMembers[parseInt(resourceId)].workingTimes.Wednesday.isCheck;
-          time_working_start = displayedMembers[parseInt(resourceId)].workingTimes.Wednesday.timeStart;
-          time_working_end = displayedMembers[parseInt(resourceId)].workingTimes.Wednesday.timeEnd;
-          break;
+      case 'Sunday':
+        check_workingStaff = displayedMembers[parseInt(resourceId)].workingTimes.Sunday.isCheck;
+        time_working_start = displayedMembers[parseInt(resourceId)].workingTimes.Sunday.timeStart;
+        time_working_end = displayedMembers[parseInt(resourceId)].workingTimes.Sunday.timeEnd;
+        break;
 
-        case 'Thursday':
-          check_workingStaff = displayedMembers[parseInt(resourceId)].workingTimes.Thursday.isCheck;
-          time_working_start = displayedMembers[parseInt(resourceId)].workingTimes.Thursday.timeStart;
-          time_working_end = displayedMembers[parseInt(resourceId)].workingTimes.Thursday.timeEnd;
-          break;
-
-        case 'Friday':
-          check_workingStaff = displayedMembers[parseInt(resourceId)].workingTimes.Friday.isCheck;
-          time_working_start = displayedMembers[parseInt(resourceId)].workingTimes.Friday.timeStart;
-          time_working_end = displayedMembers[parseInt(resourceId)].workingTimes.Friday.timeEnd;
-          break;
-
-        case 'Saturday':
-          check_workingStaff = displayedMembers[parseInt(resourceId)].workingTimes.Saturday.isCheck;
-          time_working_start = displayedMembers[parseInt(resourceId)].workingTimes.Saturday.timeStart;
-          time_working_end = displayedMembers[parseInt(resourceId)].workingTimes.Saturday.timeEnd;
-          break;
-
-        case 'Sunday':
-          check_workingStaff = displayedMembers[parseInt(resourceId)].workingTimes.Sunday.isCheck;
-          time_working_start = displayedMembers[parseInt(resourceId)].workingTimes.Sunday.timeStart;
-          time_working_end = displayedMembers[parseInt(resourceId)].workingTimes.Sunday.timeEnd;
-          break;
-
-        default:
-          break;
-      }
+      default:
+        break;
     }
+  }
 
-    if (!displayedMembers[parseInt(resourceId)]) {
-      check = false;
-    }
-    else if (check_workingStaff) {
-      all_appointments.forEach(app => {
-        if (parseInt(app.memberId) === parseInt(displayedMembers[parseInt(resourceId)].id)) {
-          if (
-            moment(start_time).isBetween(app.start, app.end) || moment(end_time).isBetween(app.start, app.end)
-            || moment(app.start).isBetween(start_time,end_time) || moment(app.end).isBetween(start_time,end_time)
+  if (!displayedMembers[parseInt(resourceId)]) {
+    check = false;
+  }
+  else if (check_workingStaff) {
+    all_appointments.forEach(app => {
+      if (parseInt(app.memberId) === parseInt(displayedMembers[parseInt(resourceId)].id)) {
+        if (
+          moment(start_time).isBetween(app.start, app.end) || moment(end_time).isBetween(app.start, app.end)
+          || moment(app.start).isBetween(start_time, end_time) || moment(app.end).isBetween(start_time, end_time)
 
-            // ((moment(app.start).format('YYYY-MM-DD HH:mm') === moment(start_time).format('YYYY-MM-DD HH:mm')) ||
-            //   (moment(app.end).format('YYYY-MM-DD HH:mm') === moment(end_time).format('YYYY-MM-DD HH:mm')))
-          ) {
-            if (parseInt(app.id) !== parseInt(event.id)) {
+          // ((moment(app.start).format('YYYY-MM-DD HH:mm') === moment(start_time).format('YYYY-MM-DD HH:mm')) ||
+          //   (moment(app.end).format('YYYY-MM-DD HH:mm') === moment(end_time).format('YYYY-MM-DD HH:mm')))
+        ) {
+          if (parseInt(app.id) !== parseInt(event.id)) {
+            if(app.status === 'BLOCK_TEMP'){
+              check = 1;
+            }else{
               check = false;
             }
           }
-
-          // if (moment(end_time).isBetween(app.start, app.end)) {
-          //   if (parseInt(app.id) !== parseInt(event.data.id)) {
-          //     if (app.status === 'CONFIRMED' || app.status === 'CHECKED_IN' || app.status === 'BLOCK') {
-          //       check = false;
-          //     }
-          //   }
-          // }
-
-          // if ((moment(app.start).format('YYYY-MM-DD HH:mm') === moment(start_time).format('YYYY-MM-DD HH:mm')) &&
-          //   (moment(app.end).format('YYYY-MM-DD HH:mm') === moment(end_time).format('YYYY-MM-DD HH:mm'))) {
-          //   if (parseInt(app.id) !== parseInt(event.data.id)) {
-          //     if (app.status === 'CONFIRMED' || app.status === 'CHECKED_IN' || app.status === 'BLOCK') {
-          //       check = false;
-          //     }
-          //   }
-          // }
         }
-      });
-    } else {
-      check = false;
-    }
+
+        // if (moment(end_time).isBetween(app.start, app.end)) {
+        //   if (parseInt(app.id) !== parseInt(event.data.id)) {
+        //     if (app.status === 'CONFIRMED' || app.status === 'CHECKED_IN' || app.status === 'BLOCK') {
+        //       check = false;
+        //     }
+        //   }
+        // }
+
+        // if ((moment(app.start).format('YYYY-MM-DD HH:mm') === moment(start_time).format('YYYY-MM-DD HH:mm')) &&
+        //   (moment(app.end).format('YYYY-MM-DD HH:mm') === moment(end_time).format('YYYY-MM-DD HH:mm'))) {
+        //   if (parseInt(app.id) !== parseInt(event.data.id)) {
+        //     if (app.status === 'CONFIRMED' || app.status === 'CHECKED_IN' || app.status === 'BLOCK') {
+        //       check = false;
+        //     }
+        //   }
+        // }
+      }
+    });
+  } else {
+    check = false;
+  }
 
 
-    let check_time_block = true;
-    let checkDate = `${date.format('YYYY-MM-DD')}T${date.format('HH:mm:ss')}`
-    // if (moment(checkDate).isSameOrAfter(`${moment().format('YYYY-MM-DD')}T${moment(time_working_end, ["h:mm A"]).format("HH:mm:ss")}`)) {
-    //   check_time_block = false;
-    // }
-    if (moment(checkDate).isBefore(`${moment().format('YYYY-MM-DD')}T${moment(time_working_start, ["h:mm A"]).format("HH:mm:ss")}`)) {
-      check_time_block = false;
-    }
+  let check_time_block = true;
+  let checkDate = `${date.format('YYYY-MM-DD')}T${date.format('HH:mm:ss')}`
+  // if (moment(checkDate).isSameOrAfter(`${moment().format('YYYY-MM-DD')}T${moment(time_working_end, ["h:mm A"]).format("HH:mm:ss")}`)) {
+  //   check_time_block = false;
+  // }
+  if (moment(checkDate).isBefore(`${moment().format('YYYY-MM-DD')}T${moment(time_working_start, ["h:mm A"]).format("HH:mm:ss")}`)) {
+    check_time_block = false;
+  }
 
-    if (check_workingStaff) {
-      check_staff_drop = true;
-    }
+  if (check_workingStaff) {
+    check_staff_drop = true;
+  }
 
-    if (pos === -1 || check_staff_drop === false || check_time_block === false) {
-      $('#full-calendar').fullCalendar(
-        'removeEvents',
-        event => event.data.id === $(this).data().event.data.id,
-      );
-    } else {
-      if (check === false && displayedMembers[parseInt(resourceId)].orderNumber !== 0 ) {
-        if (window.confirm('Are you sure want to assign appointment at this position ?')) {
-          store.dispatch(
-            assignAppointment({
-              eventData: {
-                ...event,
-                status: 'CHECKED_IN',
-                start: `${date.format('YYYY-MM-DD')}T${date.format('HH:mm:ss')}`,
-                end: event.end.toString().substr(0, 19),
-              },
-              resourceId,
-            }),
-          );
-        } else {
-          $('#full-calendar').fullCalendar(
-            'removeEvents',
-            event => event.data.id === $(this).data().event.data.id,
-          );
-        }
-      } else {
+  if (pos === -1 || check_staff_drop === false || check_time_block === false || check === 1) {
+    $('#full-calendar').fullCalendar(
+      'removeEvents',
+      event => event.data.id === $(this).data().event.data.id,
+    );
+  } else {
+    if (check === false && displayedMembers[parseInt(resourceId)].orderNumber !== 0) {
+      if (window.confirm('Are you sure want to assign appointment at this position ?')) {
         store.dispatch(
           assignAppointment({
             eventData: {
@@ -344,152 +340,153 @@ export const MAIN_CALENDAR_OPTIONS = {
             resourceId,
           }),
         );
+      } else {
+        $('#full-calendar').fullCalendar(
+          'removeEvents',
+          event => event.data.id === $(this).data().event.data.id,
+        );
       }
-    }
-  },
-  eventDrop: (event, delta, revertFunc, jsEvent, ui, view) => {
-    const start_time = event.start;
-    const end_time = event.end;
-    let check = true;
-
-    const memberdisplay = store.getState().getIn(['appointment', 'appointments', 'calendar']);
-    let member_clone = JSON.parse(JSON.stringify(memberdisplay))
-    member_clone.forEach(element => {
-      delete element.memberId;
-    });
-
-    const displayedMembers = store
-      .getState()
-      .getIn(['appointment', 'members', 'displayed']);
-
-    const currentDay = store
-      .getState()
-      .getIn(['appointment', 'currentDay']);
-
-    let check_workingStaff = '';
-    if (!displayedMembers[parseInt(event.resourceId)]) {
-      check = false;
     } else {
-      switch (moment(currentDay).format('dddd')) {
-        case 'Monday':
-          check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Monday.isCheck
-          break;
-
-        case 'Tuesday':
-          check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Tuesday.isCheck
-          break;
-
-        case 'Wednesday':
-          check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Wednesday.isCheck
-          break;
-
-        case 'Thursday':
-          check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Thursday.isCheck
-          break;
-
-        case 'Friday':
-          check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Friday.isCheck
-          break;
-
-        case 'Saturday':
-          check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Saturday.isCheck
-          break;
-
-        case 'Sunday':
-          check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Sunday.isCheck
-          break;
-
-        default:
-          break;
-      }
+      store.dispatch(
+        assignAppointment({
+          eventData: {
+            ...event,
+            status: 'CHECKED_IN',
+            start: `${date.format('YYYY-MM-DD')}T${date.format('HH:mm:ss')}`,
+            end: event.end.toString().substr(0, 19),
+          },
+          resourceId,
+        }),
+      );
     }
+  }
+},
+eventDrop: (event, delta, revertFunc, jsEvent, ui, view) => {
+  const start_time = event.start;
+  const end_time = event.end;
+  let check = true;
+  const memberdisplay = store.getState().getIn(['appointment', 'appointments', 'calendar']);
+  let member_clone = JSON.parse(JSON.stringify(memberdisplay))
+  member_clone.forEach(element => {
+    delete element.memberId;
+  });
 
-    let all_appointments = [];
-    member_clone.forEach(apps => {
-      all_appointments = [...all_appointments, ...apps.appointments];
-    });
+  const displayedMembers = store
+    .getState()
+    .getIn(['appointment', 'members', 'displayed']);
 
-    if (!displayedMembers[parseInt(event.resourceId)]) {
-      check = false;
+  const currentDay = store
+    .getState()
+    .getIn(['appointment', 'currentDay']);
+
+  let check_workingStaff = '';
+  if (!displayedMembers[parseInt(event.resourceId)]) {
+    check = false;
+  } else {
+    switch (moment(currentDay).format('dddd')) {
+      case 'Monday':
+        check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Monday.isCheck
+        break;
+
+      case 'Tuesday':
+        check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Tuesday.isCheck
+        break;
+
+      case 'Wednesday':
+        check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Wednesday.isCheck
+        break;
+
+      case 'Thursday':
+        check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Thursday.isCheck
+        break;
+
+      case 'Friday':
+        check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Friday.isCheck
+        break;
+
+      case 'Saturday':
+        check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Saturday.isCheck
+        break;
+
+      case 'Sunday':
+        check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Sunday.isCheck
+        break;
+
+      default:
+        break;
     }
-    else if (check_workingStaff) {
-      all_appointments.forEach(app => {
+  }
 
-        if (parseInt(app.memberId) === parseInt(displayedMembers[parseInt(event.resourceId)].id)) {
-          if (moment(start_time).isBetween(app.start, app.end) || moment(end_time).isBetween(app.start, app.end)
-          || moment(app.start).isBetween(start_time,end_time) || moment(app.end).isBetween(start_time,end_time)
-            // ((moment(app.start).format('YYYY-MM-DD HH:mm') === moment(start_time).format('YYYY-MM-DD HH:mm')) ||
-            //   (moment(app.end).format('YYYY-MM-DD HH:mm') === moment(end_time).format('YYYY-MM-DD HH:mm')))
-          ) {
-            if (parseInt(app.id) !== parseInt(event.data.id)) {
-              // if (app.status === 'CONFIRMED' || app.status === 'CHECKED_IN' || app.status === 'BLOCK') {
+  let all_appointments = [];
+  member_clone.forEach(apps => {
+    all_appointments = [...all_appointments, ...apps.appointments];
+  });
 
-              // }
+  if (!displayedMembers[parseInt(event.resourceId)]) {
+    check = false;
+  }
+  else if (check_workingStaff) {
+    all_appointments.forEach(app => {
+
+      if (parseInt(app.memberId) === parseInt(displayedMembers[parseInt(event.resourceId)].id)) {
+        if (moment(start_time).isBetween(app.start, app.end) || moment(end_time).isBetween(app.start, app.end)
+          || moment(app.start).isBetween(start_time, end_time) || moment(app.end).isBetween(start_time, end_time)
+          // ((moment(app.start).format('YYYY-MM-DD HH:mm') === moment(start_time).format('YYYY-MM-DD HH:mm')) ||
+          //   (moment(app.end).format('YYYY-MM-DD HH:mm') === moment(end_time).format('YYYY-MM-DD HH:mm')))
+        ) {
+          if (parseInt(app.id) !== parseInt(event.data.id)) {
+            // if (app.status === 'CONFIRMED' || app.status === 'CHECKED_IN' || app.status === 'BLOCK') {
+
+            // }
+            if(app.status === 'BLOCK_TEMP'){
+              check = 1;
+            }else{
               check = false;
             }
           }
-
-          // if (moment(end_time).isBetween(app.start, app.end)) {
-          //   if (parseInt(app.id) !== parseInt(event.data.id)) {
-          //     if (app.status === 'CONFIRMED' || app.status === 'CHECKED_IN' || app.status === 'BLOCK') {
-          //       check = false;
-          //     }
-          //   }
-          // }
-
-          // if ((moment(app.start).format('YYYY-MM-DD HH:mm') === moment(start_time).format('YYYY-MM-DD HH:mm')) &&
-          //   (moment(app.end).format('YYYY-MM-DD HH:mm') === moment(end_time).format('YYYY-MM-DD HH:mm'))) {
-          //   if (parseInt(app.id) !== parseInt(event.data.id)) {
-          //     if (app.status === 'CONFIRMED' || app.status === 'CHECKED_IN' || app.status === 'BLOCK') {
-          //       check = false;
-          //     }
-          //   }
-          // }
         }
-      });
-    } else {
-      check = false;
-    }
-    const resourceId = event.resourceId;
 
-    const pos = displayedMembers.findIndex(mem => parseInt(mem.resourceId) === parseInt(resourceId));
+        // if (moment(end_time).isBetween(app.start, app.end)) {
+        //   if (parseInt(app.id) !== parseInt(event.data.id)) {
+        //     if (app.status === 'CONFIRMED' || app.status === 'CHECKED_IN' || app.status === 'BLOCK') {
+        //       check = false;
+        //     }
+        //   }
+        // }
 
-    //  const mem_move =  displayedMembers[parseInt(event.resourceId)];
-    //  if(mem_move.workingTimes.Monday){
+        // if ((moment(app.start).format('YYYY-MM-DD HH:mm') === moment(start_time).format('YYYY-MM-DD HH:mm')) &&
+        //   (moment(app.end).format('YYYY-MM-DD HH:mm') === moment(end_time).format('YYYY-MM-DD HH:mm'))) {
+        //   if (parseInt(app.id) !== parseInt(event.data.id)) {
+        //     if (app.status === 'CONFIRMED' || app.status === 'CHECKED_IN' || app.status === 'BLOCK') {
+        //       check = false;
+        //     }
+        //   }
+        // }
+      }
+    });
+  } else {
+    check = false;
+  }
+  const resourceId = event.resourceId;
 
-    //  }
+  const pos = displayedMembers.findIndex(mem => parseInt(mem.resourceId) === parseInt(resourceId));
 
-    if (
-      // (!!override && override.id !== event.data.id) ||
-      // event.start.isBefore(moment()) ||
-      (pos === -1) ||
-      (event.data.status === 'PAID')
+  if (
+    (pos === -1) ||
+    (event.data.status === 'PAID') ||
+    check === 1
+  ) {
+    revertFunc();
+  } else {
+    const start_time = `${event.start.format('YYYY-MM-DD')}T${event.start.format(
+      'HH:mm:ss',
+    )}`;
 
-    ) {
-      revertFunc();
-    } else {
-
-      const start_time = `${event.start.format('YYYY-MM-DD')}T${event.start.format(
-        'HH:mm:ss',
-      )}`;
-
-      const endTime = event.end !== null ? `${event.end.format('YYYY-MM-DD')}T${event.end.format(
-        'HH:mm:ss',
-      )}` : moment(start_time).add(90, 'minutes').format('YYYY-MM-DD HH:mm:ss');
-      if(check === false){
-        if (window.confirm('Do you want to move appointment to this position ?')) {
-          store.dispatch(
-            moveAppointment(
-              event.data.id,
-              event.resourceId,
-              start_time,
-              endTime
-            ),
-          );
-        } else {
-          revertFunc();
-        }
-      }else{
+    const endTime = event.end !== null ? `${event.end.format('YYYY-MM-DD')}T${event.end.format(
+      'HH:mm:ss',
+    )}` : moment(start_time).add(90, 'minutes').format('YYYY-MM-DD HH:mm:ss');
+    if (check === false) {
+      if (window.confirm('Do you want to move appointment to this position ?')) {
         store.dispatch(
           moveAppointment(
             event.data.id,
@@ -498,37 +495,51 @@ export const MAIN_CALENDAR_OPTIONS = {
             endTime
           ),
         );
+      } else {
+        revertFunc();
       }
+    } else {
+      store.dispatch(
+        moveAppointment(
+          event.data.id,
+          event.resourceId,
+          start_time,
+          endTime
+        ),
+      );
     }
-  },
+  }
+},
   /* eslint no-param-reassign: "error" */
   eventDragStop: (event, jsEvent) => {
     const trashEl = $('#drag-zone');
-    const ofs = trashEl.offset();
+    if(jsEvent){
+      const ofs = trashEl.offset();
 
-    const x1 = ofs.left;
-    const x2 = ofs.left + trashEl.outerWidth(true);
-    const y1 = ofs.top;
-    const y2 = ofs.top + trashEl.outerHeight(true);
-
-    if (
-      jsEvent.pageX >= x1 &&
-      jsEvent.pageX <= x2 &&
-      jsEvent.pageY >= y1 &&
-      jsEvent.pageY <= y2
-    ) {
-      /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
-      $('#full-calendar').fullCalendar('removeEvents', event._id);
-      const displayedMembers = store
-        .getState()
-        .getIn(['appointment', 'appointments', 'calendar']);
-      const override = displayedMembers[event.resourceId];
-      store.dispatch(
-        putBackAppointment({
-          ...event.data,
-          memberId: override.memberId,
-        }),
-      );
+      const x1 = ofs.left;
+      const x2 = ofs.left + trashEl.outerWidth(true);
+      const y1 = ofs.top;
+      const y2 = ofs.top + trashEl.outerHeight(true);
+  
+      if (
+        jsEvent.pageX >= x1 &&
+        jsEvent.pageX <= x2 &&
+        jsEvent.pageY >= y1 &&
+        jsEvent.pageY <= y2
+      ) {
+        /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
+        $('#full-calendar').fullCalendar('removeEvents', event._id);
+        const displayedMembers = store
+          .getState()
+          .getIn(['appointment', 'appointments', 'calendar']);
+        const override = displayedMembers[event.resourceId];
+        store.dispatch(
+          putBackAppointment({
+            ...event.data,
+            memberId: override.memberId,
+          }),
+        );
+    }
       // setTimeout(() => {
       //   function handleDrag() {
       //     const eventInformation = $(this).data('event-information');
@@ -548,14 +559,14 @@ export const MAIN_CALENDAR_OPTIONS = {
       // }, 1000);
     }
   },
-  /* eslint no-param-reassign: "error" */
-  eventRender: (event, element) => {
-    element[0].innerHTML = EVENT_RENDER_TEMPLATE(event.data);
+    /* eslint no-param-reassign: "error" */
+    eventRender: (event, element) => {
+      element[0].innerHTML = EVENT_RENDER_TEMPLATE(event.data);
 
-  },
-  resourceRender: (resourceObj, labelTds) => {
-    labelTds[0].innerHTML = '';
-  },
+    },
+      resourceRender: (resourceObj, labelTds) => {
+        labelTds[0].innerHTML = '';
+      },
 };
 
 export const addEventsToCalendar = (currentDate, appointmentsMembers) => {
@@ -572,13 +583,14 @@ export const addEventsToCalendar = (currentDate, appointmentsMembers) => {
       if (appointment.status === 'CHECKED_IN') { eventColor = '#00b4f7'; eventClass = 'event-checkin'; }
       if (appointment.status === 'PAID') { eventColor = '#00dc00'; eventClass = 'event-paid'; }
       if (appointment.status === 'BLOCK') { eventColor = '#DDDDDD'; eventClass = 'event-block'; }
+      if (appointment.status === 'BLOCK_TEMP') { eventColor = 'yellow'; eventClass = 'event-block-temp'; }
       events.push({
         resourceId: index,
         start: appointment.start,
         end: appointment.end,
         data: appointment,
         color: eventColor,
-        rendering: appointment.status === "BLOCK" ? "background" : "",
+        rendering: appointment.status === "BLOCK" || appointment.status === "BLOCK_TEMP" ? "background" : "",
         className: eventClass,
         startEditable: !(appointment.status === 'PAID'),
         resourceEditable: !(appointment.status === 'PAID'),

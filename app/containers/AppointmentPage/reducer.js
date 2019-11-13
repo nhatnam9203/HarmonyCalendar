@@ -11,7 +11,7 @@
  */
 import moment from 'moment';
 import { fromJS } from 'immutable';
-
+import { statusConvertKey } from './saga'
 import {
   SELECT_DAY,
   SELECT_WEEK,
@@ -20,6 +20,7 @@ import {
   LOAD_MEMBERS_SUCCESS,
   LOAD_APPOINTMENTS_BY_MEMBERS,
   LOAD_APPOINTMENTS_BY_MEMBERS_SUCCESS,
+  LOAD_ALL_APPOINTMENTS,
   LOAD_APPOINTMENTS_BY_MEMBERS_ERROR,
   SET_DISPLAYED_MEMBERS,
   LOAD_WAITING_APPOINTMENT,
@@ -55,8 +56,14 @@ import {
   UPDATE_STAFF,
   OPEN_PINCODE,
   UPDATE_NEXT_STAFF_SUCCESS,
-  UPDATE_USER
+  UPDATE_USER,
+  UPDATE_APPOINTMENT_CALENDAR_FRONTEND,
+  DELETE_EVENT_WAITINGLIST_SUCCESS,
+  DELETE_BLOCKTIME_SUCCESSS,
+  GET_BLOCKTIME_SUCCESS
 } from './constants';
+
+var _ = require('lodash')
 
 const initialCurrentDay = moment();
 const firstDayOfWeek = initialCurrentDay.clone().startOf('isoWeek');
@@ -102,6 +109,21 @@ export const initialState = fromJS({
   PopupPincode: false,
   PinStaff: '',
 });
+
+function saveAppointmentOffLine(app){
+  if(navigator.onLine === false){
+    const appointments = JSON.parse(localStorage.getItem('AppointmentsOffline'));
+    if(!appointments){
+      const newAppointsTemp = [];
+      newAppointsTemp.push(app);
+      localStorage.setItem('AppointmentsOffline',JSON.stringify(newAppointsTemp));
+    }else{
+      const apps_temp = [...appointments];
+      apps_temp.push(app);
+      localStorage.setItem('AppointmentsOffline',JSON.stringify(apps_temp));
+    }
+  }
+}
 
 function appointmentReducer(state = initialState, action) {
   let startOfWeek;
@@ -186,6 +208,8 @@ function appointmentReducer(state = initialState, action) {
 
     case LOAD_APPOINTMENTS_BY_MEMBERS_SUCCESS:
       return state.setIn(['appointments', 'calendar'], action.appointments);
+    case LOAD_ALL_APPOINTMENTS:
+      return state.setIn(['appointments', 'allAppointment'], action.appointments);
 
     case LOAD_APPOINTMENTS_BY_MEMBERS_ERROR:
       return state.set('error', action.error);
@@ -250,17 +274,27 @@ function appointmentReducer(state = initialState, action) {
           if (movedAppointmentIndex < 0) return [...arr];
 
           oldPosition.appointments.splice(movedAppointmentIndex, 1);
-
+          saveAppointmentOffLine(action.appointment)
           return [...arr];
         })
-        .updateIn(['appointments', 'waiting'], arr => [
-          {
-            ...action.appointment,
-            status: 'WAITING',
-            memberId: null,
-          },
-          ...arr,
-        ]);
+        .updateIn(['appointments', 'waiting'], arr => {
+          arr = [
+            {
+              ...action.appointment,
+              status: 'WAITING',
+              memberId: null,
+            },
+            ...arr,
+          ];
+          localStorage.setItem('AppointmentWaiting', JSON.stringify(arr));
+          return [...arr];
+        }).updateIn(['appointments', 'allAppointment'], arr => {
+          const pos = arr.findIndex(app => app.id === action.appointment.id);
+          if (pos === -1) return [...arr];
+          arr.splice(pos, 1);
+          localStorage.setItem('AppointmentCalendar', JSON.stringify(arr));
+          return [...arr];
+        });
 
     case CANCEL_APPOINTMENT_SUCCESS:
       return state.updateIn(['appointments', 'calendar'], arr => {
@@ -339,22 +373,6 @@ function appointmentReducer(state = initialState, action) {
         return [...arr];
       });
 
-    case ADD_APPOINTMENT_TO_CALENDAR:
-      var indexArr;
-      return state.updateIn(['appointments', 'calendar'], arr => {
-        for (let i = 0; i < arr.length; i++) {
-          if (
-            parseInt(arr[i].memberId) === parseInt(action.appointment.memberId)
-          ) {
-            indexArr = i;
-          }
-        }
-        action.appointment.appointment.end = action.appointment.new_end_time;
-        arr[indexArr].appointments.push(action.appointment.appointment);
-
-        return [...arr];
-      });
-
     case UPDATE_WAITING_APPOINTMENT:
       return state.updateIn(['appointments', 'waiting'], arr => { });
     case ADD_APPOINTMENT_TO_WAITING:
@@ -407,25 +425,10 @@ function appointmentReducer(state = initialState, action) {
             arr.splice(i, 1);
           }
         }
+        localStorage.setItem('AppointmentWaiting', JSON.stringify(arr));
         return [...arr];
       });
 
-    case DELETE_APPOINTMENT_CALENDAR:
-      return state.updateIn(['appointments', 'calendar'], arr => {
-        const oldPosition = arr.find(member =>
-          member.appointments.find(
-            appointment => appointment.id === action.appointment.id,
-          ),
-        );
-        if (!oldPosition) return [...arr];
-
-        const appointmentIndex = oldPosition.appointments.findIndex(
-          appointment => appointment.id === action.appointment.id,
-        );
-        if (appointmentIndex < 0) return [...arr];
-        oldPosition.appointments.splice(appointmentIndex, 1);
-        return [...arr];
-      });
 
     case UPDATE_APPOINTMENT_PAID:
       return state.updateIn(['appointments', 'calendar'], arr => {
@@ -464,7 +467,12 @@ function appointmentReducer(state = initialState, action) {
           member.appointments[appointmentIndex] = action.appointment;
         }
         return [...arr];
-      });
+      }).updateIn(['appointments', 'allAppointment'], arr => {
+        const pos = arr.findIndex(app => app.id === action.appointment.id);
+        if (pos === -1) return [...arr];
+        arr[pos] = action.appointment;
+        return [...arr];
+      })
 
     case INFO_CHECK_PHONE:
       return state.set('info_after_check_phone', action.data);
@@ -499,18 +507,9 @@ function appointmentReducer(state = initialState, action) {
     case UPDATE_STAFF:
       return state
         .setIn(['members', 'all'], arr => {
-          // const member = arr.find(mem => mem.id === action.staff.id);
-          // if (!member) return [...arr];
-          // // console.log(member);
-          // // member = action.staff;
+
           return [...arr];
         })
-    // .setIn(['members', 'displayed'], arr => {
-    //   const member = arr.find(mem => mem.id === action.staff.id);
-    //   if (!member) return [...arr];
-    //   member = action.staff;
-    //   return [...arr];
-    // });
 
     case UPDATE_NEXT_STAFF_SUCCESS:
 
@@ -530,7 +529,7 @@ function appointmentReducer(state = initialState, action) {
         return [...arr]
       }).updateIn(['appointments', 'waiting'], arr => {
         arr.forEach(app => {
-          if (app.phoneNumber === userInfo.Phone){
+          if (app.phoneNumber === userInfo.Phone) {
             app.phoneNumber = userInfo.Phone;
             app.userFullName = userInfo.FirstName + ' ' + userInfo.LastName;
           }
@@ -538,9 +537,122 @@ function appointmentReducer(state = initialState, action) {
         return [...arr];
       });
 
+      case ADD_APPOINTMENT_TO_CALENDAR:
+      var indexArr;
+      return state.updateIn(['appointments', 'calendar'], arr => {
+        for (let i = 0; i < arr.length; i++) {
+          if (
+            parseInt(arr[i].memberId) === parseInt(action.appointment.memberId)
+          ) {
+            indexArr = i;
+          }
+        }
+        action.appointment.appointment.end = action.appointment.new_end_time;
+        arr[indexArr].appointments.push(action.appointment.appointment);
+        return [...arr];
+      }).updateIn(['appointments', 'allAppointment'], arr => {
+        action.appointment.appointment.end = action.appointment.new_end_time;
+        arr.push(action.appointment.appointment);
+        arr = _.unionBy(arr,'id');
+        // saveAppointmentOffLine(action.appointment.appointment)
+        localStorage.setItem('AppointmentCalendar', JSON.stringify(arr));
+        return [...arr];
+      });
+
+    case DELETE_APPOINTMENT_CALENDAR:
+      return state.updateIn(['appointments', 'calendar'], arr => {
+        const oldPosition = arr.find(member =>
+          member.appointments.find(
+            appointment => appointment.id === action.appointment.id,
+          ),
+        );
+        if (!oldPosition) return [...arr];
+
+        const appointmentIndex = oldPosition.appointments.findIndex(
+          appointment => appointment.id === action.appointment.id,
+        );
+        if (appointmentIndex < 0) return [...arr];
+        oldPosition.appointments.splice(appointmentIndex, 1);
+        return [...arr];
+      }).updateIn(['appointments', 'allAppointment'], arr => {
+        const pos = arr.findIndex(app => app.id === action.appointment.id);
+        if (pos === -1) return [...arr];
+        arr.splice(pos, 1);
+        saveAppointmentOffLine(action.appointment)
+        localStorage.setItem('AppointmentCalendar', JSON.stringify(arr));
+        return [...arr];
+      });
+
+    case UPDATE_APPOINTMENT_CALENDAR_FRONTEND:
+      return state.updateIn(['appointments', 'allAppointment'], arr => {
+        let { appointment, id } = action.data;
+        const { fromTime, toTime, extras, products, services, staffId, status } = appointment;
+        const pos = arr.findIndex(app => parseInt(app.id) === parseInt(id));
+        if (pos === -1) return [...arr];
+        arr[pos].start = fromTime;
+        arr[pos].end = toTime;
+        arr[pos].extras = extras;
+        arr[pos].products = products;
+        arr[pos].options = services;
+        arr[pos].memberId = staffId;
+        arr[pos].status = statusConvertKey[status];
+        saveAppointmentOffLine(appointment)
+        localStorage.setItem('AppointmentCalendar', JSON.stringify(arr));
+        return [...arr]
+      });
+
+    case DELETE_EVENT_WAITINGLIST_SUCCESS:
+      return state.updateIn(['appointments', 'waiting'], arr => {
+        let { appointment } = action;
+        const pos = arr.find(app => app.id === appointment.id);
+        if (pos === -1) return [...arr];
+        arr.splice(pos, 1);
+        localStorage.setItem('AppointmentCalendar', JSON.stringify(arr));
+        
+        return [...arr];
+      });
+
+    case DELETE_BLOCKTIME_SUCCESSS:
+      return state.updateIn(['members', 'all'], arr => {
+        const {staff,block} = action.data;
+        const pos = arr.findIndex(s=>s.id === staff.id);
+        if(pos === -1) return [...arr];
+        const vt = arr[pos].blockTime.findIndex(b=>b.blockTimeId === block.blockTimeId);
+        if(vt === -1) return [...arr];
+        arr[pos].blockTime[vt].isDisabled = 1;
+        return [...arr];
+      }).updateIn(['members','displayed'],arr=>{
+        const {staff,block} = action.data;
+        const pos = arr.findIndex(s=>s.id === staff.id);
+        if(pos === -1) return [...arr];
+        const vt = arr[pos].blockTime.findIndex(b=>b.blockTimeId === block.blockTimeId);
+        if(vt === -1) return [...arr];
+        arr[pos].blockTime[vt].isDisabled = 1;
+        return [...arr];
+      });
+
+      case GET_BLOCKTIME_SUCCESS :
+      return state.updateIn(['members','all'], arr=>{
+        arr.forEach(staff => {
+          staff.blockTime = [];
+        });
+        arr.forEach(staff => {
+          let arr_ = [];
+          action.data.forEach(blockTime => {
+            if(staff.id === blockTime.staffId){
+              arr_.push(blockTime)
+            }
+          });
+          staff.blockTime = [...arr_];
+        });
+        return [...arr];
+      })
+
+
     default:
       return state;
   }
 }
+
 
 export default appointmentReducer;

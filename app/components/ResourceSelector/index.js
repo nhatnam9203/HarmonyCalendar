@@ -168,8 +168,9 @@ class ResourceSelector extends React.Component {
   }
 
   afterSlide(index) {
-    const { resources, setDisplayedMembers } = this.props;
+    const { resources, setDisplayedMembers,renderAppointment } = this.props;
     setDisplayedMembers(resources.slice(index * 6, index * 6 + 6));
+    renderAppointment();
   }
 
   onTodayClick() {
@@ -296,10 +297,14 @@ class ResourceSelector extends React.Component {
     }
   }
 
-  openPincode(pincode){
+  openPincode(staff){
     const {disableCalendar,togglePopupPincode} = this.props;
-    togglePopupPincode(true,pincode);
-    disableCalendar(true);
+    if(navigator.onLine){
+      togglePopupPincode(true,staff);
+      disableCalendar(true);
+    }else{
+      alert('You must have an internet connection to perform this !')
+    }
   }
 
   renderResource(resource, index) {
@@ -308,7 +313,7 @@ class ResourceSelector extends React.Component {
     const numberOfAppointments = member ? member.appointments.filter(app => app.status !== "BLOCK").length : 0;
     return (
       <Resource 
-      // onClick={() => this.openPincode(resource.pincode)}
+      onClick={() => this.openPincode(resource)}
       active={parseInt(resource.id) === parseInt(staffId) ? true : false} key={index}>
         <Resource.Avatar>
           <img src={resource.imageUrl} alt={resource.orderNumber} />
@@ -359,7 +364,8 @@ class ResourceSelector extends React.Component {
   }
 
   render() {
-    const { checkPinCode, popupPincode,togglePopupPincode,disableCalendar,PinStaff } = this.props;
+    const { checkPinCode, popupPincode,togglePopupPincode,disableCalendar,
+      PinStaff,calendarMembers,SubmitEditBlockTime,deleteBlockTime,currentDay } = this.props;
 
     return (
       <React.Fragment>
@@ -391,14 +397,18 @@ class ResourceSelector extends React.Component {
           </ResourceSliderWrapper>
           <WaitingHeader>Waiting</WaitingHeader>
         </ResourceSelectorWrapper>
-        {/* <Pincode
+        <Pincode
           checkPinCode={checkPinCode}
           popupPincode={popupPincode}
           togglePopupPincode={togglePopupPincode}
           disableCalendar={disableCalendar}
-          PinStaff={PinStaff}
-
-        /> */}
+          // PinStaff={PinStaff}
+          staff={PinStaff}
+          calendarMembers={calendarMembers}
+          SubmitEditBlockTime={SubmitEditBlockTime}
+          deleteBlockTime={deleteBlockTime}
+          currentDay={currentDay}
+        />
       </React.Fragment>
     );
   }

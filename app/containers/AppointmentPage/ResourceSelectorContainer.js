@@ -11,7 +11,7 @@ import {
   makeSelectCalendarAppointments,
   makeCurrentDay,
   makeSelectPinCode,
-  makeSelectPinStaff
+  makeSelectPinStaff,
 } from './selectors';
 import {
   selectDayOnCalendar,
@@ -19,7 +19,10 @@ import {
   setDisplayedMembers,
   togglePopupPincode,
   checkPinCode,
-  disableCalendar
+  disableCalendar,
+  renderAppointment,
+  SubmitEditBlockTime,
+  deleteBlockTime
 } from './actions';
 
 export function mapDispatchToProps(dispatch) {
@@ -30,6 +33,9 @@ export function mapDispatchToProps(dispatch) {
     togglePopupPincode: (status,pincode) => dispatch(togglePopupPincode(status,pincode)),
     checkPinCode: pincode => dispatch(checkPinCode(pincode)),
     disableCalendar: status => dispatch(disableCalendar(status)),
+    renderAppointment: () => dispatch(renderAppointment()),
+    SubmitEditBlockTime:(data)=>dispatch(SubmitEditBlockTime(data)),
+    deleteBlockTime:(data)=>dispatch(deleteBlockTime(data)),
   };
 }
 

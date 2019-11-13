@@ -355,6 +355,7 @@ class AddAppointment extends React.Component {
   );
 
   renderNotes(){
+    console.log(this.state.notes)
     return(
       <div style={{
         height : 60,
@@ -416,13 +417,14 @@ class AddAppointment extends React.Component {
     }
     if (nextProps.checkPhoneError === true) { // phone is not exist
       const { firstName, lastName, email, phone, referrerPhone,favourite } = nextProps.InfoAfterCheckPhone;
+      console.log(nextProps.InfoAfterCheckPhone)
       this.setState({
         first_name: firstName,
         last_name: lastName,
         email: email,
         phoneNumber: phone === undefined ? ' ' :phone.slice(2),
         phone: referrerPhone,
-        notes : favourite.split(","),
+        notes : favourite ? favourite : '',
       })
       this.openFormInsertAfterCheckPhone();
     }
@@ -493,7 +495,7 @@ class AddAppointment extends React.Component {
           onClose={() => this.closeAllModal()}
           closeOnDocumentClick={false}
           modal={true}
-          position={'left'}
+          position={'left center'}
           // lockScroll={true}
         >
           <AddingWrapper>
@@ -532,10 +534,8 @@ class AddAppointment extends React.Component {
                 <input disabled={InfoAfterCheckPhone !== ''} value={this.state.phone} onChange={e => this.setState({ phone: e.target.value })} placeholder="Phone number" />
               </Form>
               <NoteWrapper>
-                <Label>Note:</Label>
-                {/* {notes.map((note, index) => this.renderNote(note, index))} */}
-                {this.renderNotes()}
-                <NoteWrapper.Form onSubmit={e => e.preventDefault()}>
+              <Label>Note:</Label>
+              <NoteWrapper.Form onSubmit={e => e.preventDefault()}>
                   <input
                     value={this.state.noteValue}
                     disabled={InfoAfterCheckPhone !== ''}
@@ -545,6 +545,8 @@ class AddAppointment extends React.Component {
                     <Img src={Enter} alt="icon" />
                   </button>
                 </NoteWrapper.Form>
+                {/* {notes.map((note, index) => this.renderNote(note, index))} */}
+                {this.renderNotes()}
               </NoteWrapper>
               <div style={{height:70}}>
 

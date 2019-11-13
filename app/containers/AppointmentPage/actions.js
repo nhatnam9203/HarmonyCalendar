@@ -27,6 +27,7 @@ import {
   LOAD_APPOINTMENTS_BY_MEMBERS,
   LOAD_APPOINTMENTS_BY_MEMBERS_ERROR,
   LOAD_APPOINTMENTS_BY_MEMBERS_SUCCESS,
+  LOAD_ALL_APPOINTMENTS,
   LOAD_MEMBERS,
   LOAD_MEMBERS_ERROR,
   LOAD_MEMBERS_SUCCESS,
@@ -87,7 +88,17 @@ import {
   OPEN_PINCODE,
   UPDATE_NEXT_STAFF,
   UPDATE_NEXT_STAFF_SUCCESS,
-  UPDATE_USER
+  UPDATE_USER,
+  RENDER_APPOINTMEMT,
+  UPDATE_APPOINTMENT_CALENDAR_FRONTEND,
+  SUBMIT_EDIT_BLOCKTIME,
+  DELETE_BLOCKTIME,
+  DELETE_BLOCKTIME_SUCCESSS,
+  GET_BLOCKTIME,
+  GET_BLOCKTIME_SUCCESS,
+  GET_APPOINTMENT_OFFLINE,
+  GET_WAITINGLIST_OFFLINE,
+  GET_STAFF_OFFLINE,
 } from './constants';
 
 /**
@@ -273,6 +284,13 @@ export function loadAppointmentByMembers() {
 export function appointmentByMembersLoaded(appointments) {
   return {
     type: LOAD_APPOINTMENTS_BY_MEMBERS_SUCCESS,
+    appointments,
+  };
+}
+
+export function loadedAllAppointments(appointments) {
+  return {
+    type: LOAD_ALL_APPOINTMENTS,
     appointments,
   };
 }
@@ -672,6 +690,9 @@ export const togglePopupPincode = (data,pincode) => ({
 export const updateNextStaff = () => ({
   type: UPDATE_NEXT_STAFF,
 });
+export const renderAppointment = () => ({
+  type: RENDER_APPOINTMEMT,
+});
 export const updateNextStaffSuccess = (data) => ({
   type: UPDATE_NEXT_STAFF_SUCCESS,
   data,
@@ -679,6 +700,47 @@ export const updateNextStaffSuccess = (data) => ({
 
 export const updateConsumer = (data) => ({
   type: UPDATE_USER,
+  data,
+});
+export const updateAppointmentFrontend = (data) => ({
+  type: UPDATE_APPOINTMENT_CALENDAR_FRONTEND,
+  data,
+});
+
+export const SubmitEditBlockTime = (data) => ({
+  type: SUBMIT_EDIT_BLOCKTIME,
+  data,
+});
+
+export const deleteBlockTime = (data) => ({
+  type: DELETE_BLOCKTIME,
+  data,
+});
+export const deleteBlockTimeSuccess = (data) => ({
+  type: DELETE_BLOCKTIME_SUCCESSS,
+  data,
+});
+export const getBlockTime = (data) => ({
+  type: GET_BLOCKTIME,
+  data,
+});
+
+export const getBlockTime_Success = (data) => ({
+  type: GET_BLOCKTIME_SUCCESS,
+  data,
+});
+
+export const getAppointmentOffline = (data) => ({
+  type: GET_APPOINTMENT_OFFLINE,
+  data,
+});
+
+export const getWaitingListOffline = (data) => ({
+  type: GET_WAITINGLIST_OFFLINE,
+  data,
+});
+export const getStaffOffline = (data) => ({
+  type: GET_STAFF_OFFLINE,
   data,
 });
 

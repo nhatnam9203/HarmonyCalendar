@@ -108,7 +108,7 @@ class ConfirmDeleteWaiting extends Component {
                         </ConfirmPopupWrapper.ButtonX>
                     </ConfirmPopupWrapper.Header>
                     <ConfirmPopupWrapper.Body>
-                        {event && `Delete appointment #${ event.id} from Waiting List ?`}
+                        {event && `Delete appointment ${ event.code} from Waiting List ?`}
                     </ConfirmPopupWrapper.Body>
                     <ConfirmPopupWrapper.Footer>
                         <ConfirmPopupWrapper.WrapperButton>

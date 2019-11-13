@@ -20,6 +20,7 @@ const AppPopup = styled(Popup)`
   border-radius: 1.5rem;
   padding: 0 !important;
   border: none !important;
+  box-shadow : ${props => props.BoxShadow};
 `;
 
 const AppPopupWrapper = styled.div`
@@ -328,7 +329,7 @@ class Appointment extends React.Component {
       time: new Date(),
       selectedStaff: '',
       isOpenStaffList: false,
-      cloneAppointment : '',
+      cloneAppointment: '',
     };
   }
 
@@ -425,7 +426,7 @@ class Appointment extends React.Component {
     const selectedStaff = appointment ? staffList.find((staff) => staff.id === appointment.memberId) : '';
     if (nextProps.appointment) {
       await this.resetState();
-      const app_ =JSON.parse(JSON.stringify(nextProps.appointment))
+      const app_ = JSON.parse(JSON.stringify(nextProps.appointment))
       const {
         options,
         userFullName,
@@ -443,7 +444,7 @@ class Appointment extends React.Component {
         extras: extras,
         notes: notes,
         selectedStaff: selectedStaff,
-        cloneAppointment : JSON.parse(JSON.stringify(nextProps.appointment))
+        cloneAppointment: JSON.parse(JSON.stringify(nextProps.appointment))
       });
       var old_duration = 0;
       await nextProps.appointment.options.forEach(el => {
@@ -485,9 +486,18 @@ class Appointment extends React.Component {
   }
 
   openConfirmationModal() {
+
     this.setState({
       confirmationModal: true,
     });
+
+  /*   if (navigator.onLine) {
+      this.setState({
+        confirmationModal: true,
+      });
+    } else {
+      alert('You must have an internet connection to perform this ! ')
+    } */
   }
 
   closeConfirmationModal() {
@@ -531,7 +541,7 @@ class Appointment extends React.Component {
   }
 
   updateChangeAppointment(status, servicesUpdate) {
-    const { products, fromTime, toTime, services, newNotes, selectedStaff,extras } = this.state;
+    const { products, fromTime, toTime, services, newNotes, selectedStaff, extras } = this.state;
     const { appointment, changeAppointmentTime } = this.props;
     changeAppointmentTime({
       appointment,
@@ -539,7 +549,7 @@ class Appointment extends React.Component {
       duration: this.getTotalDuration(),
       servicesUpdate: services,
       productsUpdate: products,
-      extrasUpdate : extras,
+      extrasUpdate: extras,
       status,
       old_duration: this.state.old_total_duration,
       fromTime,
@@ -581,7 +591,7 @@ class Appointment extends React.Component {
   };
 
   updateStatus(status, servicesUpdate) {
-    const { products, services,extras ,newNotes,cloneAppointment} = this.state;
+    const { products, services, extras, newNotes, cloneAppointment } = this.state;
     const { appointment, updateAppointment } = this.props;
     updateAppointment({
       appointment,
@@ -592,7 +602,7 @@ class Appointment extends React.Component {
       notes: newNotes,
       old_duration: this.state.old_total_duration,
       old_status: appointment.status,
-      old_appointment : cloneAppointment
+      old_appointment: cloneAppointment
     });
   }
 
@@ -671,7 +681,7 @@ class Appointment extends React.Component {
               objectFit: 'cover',
               borderRadius: 30
             }}
-            src={staff.imageUrl} />
+            src={staff ? staff.imageUrl : ''} />
           <p style={{
             marginLeft: 10
           }}>{staff.title}</p>
@@ -891,11 +901,11 @@ class Appointment extends React.Component {
           {appointment.status !== 'PAID' && <td style={{ textAlign: 'center' }}>
             <AdjustButton
               active={
-                appointment.status !== 'PAID' &&
+                appointment.status !== 'PAID' && appointment.status !== 'ASSIGNED' &&
                 service.duration > 15
               }
               disabled={
-                appointment.status === 'PAID' ||
+                appointment.status === 'PAID' || appointment.status === 'ASSIGNED' ||
                 service.duration <= 15
               }
               onClick={() => this.subtractService(index)}
@@ -905,11 +915,11 @@ class Appointment extends React.Component {
             {service.duration}
             <AdjustButton
               active={
-                appointment.status !== 'PAID' &&
+                appointment.status !== 'PAID' && appointment.status !== 'ASSIGNED' && 
                 service.duration < 90
               }
               disabled={
-                appointment.status === 'PAID' ||
+                appointment.status === 'PAID' || appointment.status === 'ASSIGNED' ||
                 service.duration >= 90
               }
               onClick={() => this.addService(index)}
@@ -929,7 +939,7 @@ class Appointment extends React.Component {
         </tr>
       );
     } else {
-      if(service.staff){
+      if (service.staff) {
         return (
           <tr key={index}>
             <td>{service.serviceName}</td>
@@ -1009,12 +1019,12 @@ class Appointment extends React.Component {
         <td style={{ textAlign: 'center' }}>
           <ButtonProduct
             active={
-              appointment.status !== 'PAID' &&
+              appointment.status !== 'PAID' && appointment.status !== 'ASSIGNED' &&
               product.quantity > 1
               // appointment.status !== 'CHECKED_IN'
             }
             disabled={
-              appointment.status === 'PAID' ||
+              appointment.status === 'PAID' || appointment.status === 'ASSIGNED' ||
               product.quantity <= 1
               // appointment.status === 'CHECKED_IN'
             }
@@ -1025,11 +1035,11 @@ class Appointment extends React.Component {
           {product.quantity}
           <ButtonProduct
             active={
-              appointment.status !== 'PAID'
+              appointment.status !== 'PAID' && appointment.status !== 'ASSIGNED'
               // appointment.status !== 'CHECKED_IN'
             }
             disabled={
-              appointment.status === 'PAID'
+              appointment.status === 'PAID' || appointment.status === 'ASSIGNED'
               // appointment.status === 'CHECKED_IN'
             }
             onClick={() => this.addProduct(index)}
@@ -1136,11 +1146,11 @@ class Appointment extends React.Component {
             active={
               // appointment.status !== 'CHECKED_IN' &&
               extra.duration > 15 &&
-              appointment.status !== 'PAID'
+              appointment.status !== 'PAID' && appointment.status !== 'ASSIGNED'
             }
             disabled={
               // appointment.status === 'CHECKED_IN' ||
-              appointment.status === 'PAID' ||
+              appointment.status === 'PAID' || appointment.status === 'ASSIGNED' ||
               extra.duration <= 15
             }
             onClick={() => this.subtractExtra(index)}
@@ -1152,12 +1162,12 @@ class Appointment extends React.Component {
             active={
               // appointment.status !== 'CHECKED_IN' &&
               extra.duration < 90 &&
-              appointment.status !== 'PAID'
+              appointment.status !== 'PAID' && appointment.status !== 'ASSIGNED'
             }
             disabled={
               // appointment.status === 'CHECKED_IN' ||
               extra.duration >= 90 ||
-              appointment.status === 'PAID'
+              appointment.status === 'PAID' || appointment.status === 'ASSIGNED'
             }
             onClick={() => this.addExtra(index)}
           >
@@ -1264,12 +1274,37 @@ class Appointment extends React.Component {
     return '';
   }
 
+  getBoxShadow(){
+    const { appointment } = this.props;
+    let boxShadow = '';
+    switch (appointment.status) {
+      case 'ASSIGNED':
+        boxShadow = '0 0px #fff inset, 0 0px 9px #FEE333';
+        break;
+        case 'CHECKED_IN':
+        boxShadow = '0 1px #fff inset, 0 0.6px 9px #1FB5F4';
+        break;
+        case 'CONFIRMED':
+        boxShadow = '0 1px #fff inset, 0 0.6px 9px #1FB5F4';
+        break;
+      
+        case 'PAID':
+        boxShadow = '0 0px #fff inset, 0 0.3px 9px #22DA27';
+        break;
+    
+      default:
+        break;
+    }
+    return boxShadow;
+  }
+
   render() {
     const { appointment } = this.props;
     if (!appointment) return '';
     return (
       <div>
         <AppointmentPopup
+          // BoxShadow={this.getBoxShadow()}
           closeOnDocumentClick
           open
           onOpen={() => this.openModal()}

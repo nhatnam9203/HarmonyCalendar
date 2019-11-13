@@ -42,6 +42,11 @@ const makeSelectWaitingAppointments = () =>
     appointmentState.getIn(['appointments', 'waiting']),
   );
 
+  const makeSelectAllAppointments = () =>
+  createSelector(currentAppointment, appointmentState =>
+    appointmentState.getIn(['appointments', 'allAppointment']),
+  );
+
 const makeSelectWaitingIndexAppointments = () =>
   createSelector(currentAppointment, appointmentState =>
     appointmentState.getIn(['appointments', 'waitingIndex']),
@@ -147,5 +152,6 @@ export {
   makeStatusDeleteWaiting,
   makeInfoCheckPhone,
   makeSelectPinCode,
-  makeSelectPinStaff
+  makeSelectPinStaff,
+  makeSelectAllAppointments
 };

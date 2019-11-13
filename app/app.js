@@ -16,7 +16,13 @@ import { ConnectedRouter } from 'connected-react-router/immutable';
 import FontFaceObserver from 'fontfaceobserver';
 import history from 'utils/history';
 import 'sanitize.css/sanitize.css';
+import 'moment'
+import 'jquery/dist/jquery'
+import 'jquery-ui-dist/jquery-ui';
+import 'jquery-ui-touch-punch'
 import 'fullcalendar/dist/fullcalendar.css';
+import 'fullcalendar/dist/fullcalendar';
+import 'fullcalendar-scheduler';
 import 'fullcalendar-scheduler/dist/scheduler.css';
 
 // Import root app

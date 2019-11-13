@@ -7,11 +7,11 @@ export const staffId = getURLParam('staffId');
 
 export const API_PORT = 8010;
 
-// export const DEV_API_BASE_URL = `https://api.harmonypayment.com`;
-// export const PROD_API_BASE_URL = `https://api.harmonypayment.com`;
+export const DEV_API_BASE_URL = `https://api.harmonypayment.com`;
+export const PROD_API_BASE_URL = `https://api.harmonypayment.com`;
 
-export const DEV_API_BASE_URL = `https://api2.levincidemo.com`;
-export const PROD_API_BASE_URL = `https://api2.levincidemo.com`;
+// export const DEV_API_BASE_URL = `https://api2.levincidemo.com`;
+// export const PROD_API_BASE_URL = `https://api2.levincidemo.com`;
 
 export const API_BASE_URL =
   process.env.NODE_ENV === 'production' ? `${PROD_API_BASE_URL}/api` : `${DEV_API_BASE_URL}/api`;
@@ -29,5 +29,9 @@ export const POST_ADD_CUSTOMER = `${API_BASE_URL}/customer`;
 export const POST_ADD_APPOINTMENT = `${API_BASE_URL}/appointment`;
 export const GET_APPOINTMENT_BY_ID = `${API_BASE_URL}/appointment`;
 export const GET_CHECKPINCODE = `${API_BASE_URL}/staff/signin`;
+export const POST_ADD_BLOCK_TIME = `${API_BASE_URL}/blocktime`;
+export const DELETE_BLOCKTIME_API = `${API_BASE_URL}/blocktime`;
+export const GET_BLOCK_TIME_BY_STAFFID_API = `${API_BASE_URL}/blocktime`;
+export const GET_WORKINGTIME_MERCHANT = `${API_BASE_URL}/blocktime?workingdate=`;
 export const VAR_DEFAULT_AVATAR_PATH = `/upload/staff/avatar.svg`;
 

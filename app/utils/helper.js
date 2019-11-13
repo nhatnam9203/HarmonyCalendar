@@ -10,3 +10,11 @@ export default function getURLParam(name, url) {
   if (!results[2]) return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
+
+export function checkOnline(){
+  let check = false;
+  if(navigator.onLine){
+    check = true;
+  }
+  return check;
+}

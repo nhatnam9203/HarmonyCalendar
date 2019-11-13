@@ -4,8 +4,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
 const OfflinePlugin = require('offline-plugin');
 const { HashedModuleIdsPlugin } = require('webpack');
+const webpack = require('webpack')
 const TerserPlugin = require('terser-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
+
 
 module.exports = require('./webpack.base.babel')({
   mode: 'production',
@@ -73,7 +75,7 @@ module.exports = require('./webpack.base.babel')({
   plugins: [
     // Minify and optimize the index.html
     new HtmlWebpackPlugin({
-      template: 'app/index.html',
+      template: 'public/index.html',
       minify: {
         removeComments: true,
         collapseWhitespace: true,
@@ -89,11 +91,12 @@ module.exports = require('./webpack.base.babel')({
       inject: true,
     }),
 
+
     // Put it in the end to capture all the HtmlWebpackPlugin's
     // assets manipulations and do leak its manipulations to HtmlWebpackPlugin
     new OfflinePlugin({
       relativePaths: false,
-      publicPath: '/calendar_20190316/',
+      publicPath: './calendar_20190316/',
       appShell: '/',
 
       // No need to cache .htaccess. See http://mxs.is/googmp,
@@ -146,6 +149,10 @@ module.exports = require('./webpack.base.babel')({
       hashDigest: 'hex',
       hashDigestLength: 20,
     }),
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      jQuery: 'jquery'
+    })
   ],
 
   performance: {
