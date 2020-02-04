@@ -99,6 +99,13 @@ import {
   GET_APPOINTMENT_OFFLINE,
   GET_WAITINGLIST_OFFLINE,
   GET_STAFF_OFFLINE,
+  GET_APP_BY_ID,
+  GET_APP_BY_ID_SUCCESS,
+  GROUP_APPOINTMENT,
+  CHECKOUT,
+  UPDATE_APPOINTMENT_PAID_OFFLINE,
+  GET_TIME_STAFF_LOGIN,
+  GET_TIME_STAFF_LOGIN_SUCCESS
 } from './constants';
 
 /**
@@ -744,8 +751,40 @@ export const getStaffOffline = (data) => ({
   data,
 });
 
+export const getApppointmentById = (data) => ({
+  type: GET_APP_BY_ID,
+  data,
+});
 
+export const getApppointmentByIdSuccess = (data) => ({
+  type: GET_APP_BY_ID_SUCCESS,
+  data,
+});
 
+export const groupAppointment = (data) => ({
+  type: GROUP_APPOINTMENT,
+  data,
+});
+
+export const checkOut = (data) => ({
+  type: CHECKOUT,
+  data,
+});
+
+export const updateAppointmentPaidOffline = (idAppointment) => ({
+  type: UPDATE_APPOINTMENT_PAID_OFFLINE,
+  idAppointment,
+});
+
+export const getTimeStaffLogin = (staffId) => ({
+  type: GET_TIME_STAFF_LOGIN,
+  staffId,
+});
+
+export const getTimeStaffLoginSuccess = (data) => ({
+  type: GET_TIME_STAFF_LOGIN_SUCCESS,
+  data,
+});
 
 
 

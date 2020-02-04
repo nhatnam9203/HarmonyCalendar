@@ -76,8 +76,12 @@ class MiniCalendar extends React.Component {
   }
 
   onDaySelected(day) {
-    const { onChangeDay } = this.props;
-    onChangeDay(moment(new Date(day)).format('DDMMYYYY'));
+    // if(navigator.onLine){
+      const { onChangeDay } = this.props;
+      onChangeDay(moment(new Date(day)).format('DDMMYYYY'));
+    // }else{
+    //   alert('You must have an internet connection to perform this !!!');
+    // }
   }
 
   renderPopup() {

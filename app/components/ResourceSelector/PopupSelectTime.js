@@ -8,7 +8,7 @@ const minute = [
 ];
 
 const localization = [
-    'am', 'pm'
+    'AM', 'PM'
 ];
 
 function leftPad(number, targetLength) {
@@ -26,7 +26,7 @@ export default class PopupSelectTime extends Component {
         this.state = {
             hour: 2,
             minute: 0,
-            localization: 'pm'
+            localization: 'PM'
         }
     }
 

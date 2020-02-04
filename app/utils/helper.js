@@ -1,20 +1,95 @@
 /**
  * Get Query String Params from URL
  */
+import { PROD_API_BASE_URL } from '../../app-constants';
+
 export default function getURLParam(name, url) {
-  if (!url) url = window.location.href;
-  name = name.replace(/[\[\]]/g, '\\$&');
-  var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-    results = regex.exec(url);
-  if (!results) return null;
-  if (!results[2]) return '';
-  return decodeURIComponent(results[2].replace(/\+/g, ' '));
+	if (!url) url = window.location.href;
+	name = name.replace(/[\[\]]/g, '\\$&');
+	var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+		results = regex.exec(url);
+	if (!results) return null;
+	if (!results[2]) return '';
+	return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 
-export function checkOnline(){
-  let check = false;
-  if(navigator.onLine){
-    check = true;
-  }
-  return check;
+export function checkOnline() {
+	let check = false;
+	if (navigator.onLine) {
+		check = true;
+	}
+	return check;
+}
+
+export function formatUsPhone(phone) {
+	phone = phone.replace(/\D/g, '');
+	const match = phone.match(/^(\d{1,3})(\d{0,3})(\d{0,4})$/);
+	if (match) {
+		phone = `${match[1]}${match[2] ? '-' : ''}${match[2]}${match[3] ? '-' : ''}${match[3]}`;
+	}
+	return phone;
+}
+
+export function isCharNumber(c) {
+	return c >= '0' && c <= '9';
+}
+
+export function checkStringNumber(chuoi) {
+	let number = '';
+	for (let i = 0; i < chuoi.length; i++) {
+		if (isCharNumber(chuoi[i])) {
+			number = number + chuoi[i].toString();
+		}
+	}
+	return number.toString();
+}
+
+export function checkStringNumber2(chuoi) {
+	let number = '';
+	for (let i = 0; i < chuoi.length; i++) {
+		if (isCharNumber(chuoi[i]) || chuoi[i] === '-') {
+			number = number + chuoi[i].toString();
+		}
+	}
+	if (number.charAt(number.length - 1) === '-') number = number.substring(0, number.length - 1);
+	return number.toString();
+}
+
+export function formatPhone(phone) {
+	let phoneFotmat = '';
+	if (phone) {
+		if (phone.charAt(0) === '1') {
+			phoneFotmat = '(+1) ' + formatUsPhone(phone.substring(1));
+		} else if (phone.charAt(0) === '8' && phone.charAt(1) === '4') {
+			phoneFotmat = '(+84) ' + formatUsPhone(phone.substring(2));
+		} else if (phone.charAt(0) === '+' && phone.charAt(1) === '1') {
+			phoneFotmat = '(+1) ' + formatUsPhone(phone.substring(2));
+		} else if (phone.charAt(0) === '+' && phone.charAt(1) === '8' && phone.charAt(2) === '4') {
+			phoneFotmat = '(+84) ' + formatUsPhone(phone.substring(3));
+		} else {
+			return phone;
+		}
+	}
+	return phoneFotmat;
+}
+
+export function api(path, params, method, token) {
+	let options;
+	options = {
+		headers: {
+			Accept: 'application/json',
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${token}`
+			// ...(token && { token: token })
+		},
+		method: method,
+		...(params && { body: JSON.stringify(params) })
+	};
+
+	return fetch(path, options)
+		.then((resp) => {
+			if (resp.status === 200) return resp.json();
+		})
+		.then((json) => json)
+		.catch((error) => error);
 }

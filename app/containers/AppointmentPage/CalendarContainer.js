@@ -25,7 +25,12 @@ import {
   loadMembers,
   loadAppointmentByMembers,
   updateNextStaff,
-  updateConsumer
+  updateConsumer,
+  getApppointmentById,
+  groupAppointment,
+  membersLoaded,
+  setDisplayedMembers,
+  updateAppointmentPaidOffline
 } from './actions';
 import {
   makeSelectWaitingAppointments,
@@ -35,7 +40,7 @@ import {
   makeDisableCalendar,
   makeLoadCalendar,
   makeLoadWaiting,
-  makeStatusDeleteWaiting
+  makeStatusDeleteWaiting,
 } from './selectors';
 
 export function mapDispatchToProps(dispatch) {
@@ -61,6 +66,10 @@ export function mapDispatchToProps(dispatch) {
     loadAppointmentByMembers :()=>dispatch(loadAppointmentByMembers()),
     updateNextStaff:()=>dispatch(updateNextStaff()),
     updateConsumer:(data)=>dispatch(updateConsumer(data)),
+    groupIdAppointment:(idAppointment)=>dispatch(groupAppointment(idAppointment)),
+    membersLoaded:(members)=>dispatch(membersLoaded(members)),
+    setDisplayedMembers:(members)=>dispatch(setDisplayedMembers(members)),
+    updateAppointmentPaidOffline:(idAppointment)=>dispatch(updateAppointmentPaidOffline(idAppointment)),
   };
 }
 

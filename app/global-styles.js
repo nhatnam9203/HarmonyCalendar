@@ -98,6 +98,10 @@ const GlobalStyle = createGlobalStyle`
     background: #00b4f7;
     color: #ffffff;
   }
+
+  .event-block-temp{
+    overflow : hidden;
+  }
   
   .fc-ltr .fc-time-grid .fc-now-indicator-arrow {
     left: 50px;
@@ -131,7 +135,7 @@ const GlobalStyle = createGlobalStyle`
   }
   .app-event__full-name {
     font-size: 18px;
-    font-weight: bold;
+    font-weight: 600;
     margin-left: 8px;
     margin-bottom: 4px;
     line-height: 1.3;
@@ -167,6 +171,7 @@ const GlobalStyle = createGlobalStyle`
 .event-assigned, .event-confirmed{
   font-weight : 500;
   color : #333;
+  letter-spacing : 0.6;
 }
 .event-checkin,.event-confirmed,.event-paid{
   border : 1px solid #ffffff !important;
@@ -244,6 +249,19 @@ const GlobalStyle = createGlobalStyle`
 .rc-time-picker-panel-select{
   width : 80px !important;
 }
+
+.headerRefPhone{
+    width: 4rem !important;
+    height : 2.14rem !important;
+    background: #ffffff !important;
+    border: 1px solid #dddddd !important;
+    border-radius: 4px;
+    margin-right: 0.5rem;
+    padding-left: 1.2rem;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+}
+
 .rc-time-picker-panel-select ul li{
   height : 43px !important;
 }
