@@ -118,7 +118,8 @@ import {
 	GET_WORKINGTIME_MERCHANT,
 	GET_APPOINTMENT_ID,
 	PUT_CHECKOUT,
-	API_GET_TIME_STAFF_LOGIN
+	API_GET_TIME_STAFF_LOGIN,
+	GET_MEMBER
 } from '../../../app-constants';
 
 import {
@@ -234,15 +235,67 @@ export const statusConvertData = {
 
 const statusAdapter = (status) => statusConvertData[status];
 
+const sorrtStaffByDate = (date, staffList) => {
+	let staffOn = [];
+	let staffOff = [];
+
+	switch (date) {
+		case 'Monday':
+			staffOff = staffList.filter((staff) => staff.workingTimes.Monday.isCheck === false);
+			staffOn = staffList.filter((staff) => staff.workingTimes.Monday.isCheck === true);
+			break;
+
+		case 'Tuesday':
+			staffOff = staffList.filter((staff) => staff.workingTimes.Tuesday.isCheck === false);
+			staffOn = staffList.filter((staff) => staff.workingTimes.Tuesday.isCheck === true);
+			break;
+
+		case 'Wednesday':
+			staffOff = staffList.filter((staff) => staff.workingTimes.Wednesday.isCheck === false);
+			staffOn = staffList.filter((staff) => staff.workingTimes.Wednesday.isCheck === true);
+			break;
+
+		case 'Thursday':
+			staffOff = staffList.filter((staff) => staff.workingTimes.Thursday.isCheck === false);
+			staffOn = staffList.filter((staff) => staff.workingTimes.Thursday.isCheck === true);
+			break;
+
+		case 'Friday':
+			staffOff = staffList.filter((staff) => staff.workingTimes.Friday.isCheck === false);
+			staffOn = staffList.filter((staff) => staff.workingTimes.Friday.isCheck === true);
+			break;
+
+		case 'Saturday':
+			staffOff = staffList.filter((staff) => staff.workingTimes.Saturday.isCheck === false);
+			staffOn = staffList.filter((staff) => staff.workingTimes.Saturday.isCheck === true);
+			break;
+
+		case 'Sunday':
+			staffOff = staffList.filter((staff) => staff.workingTimes.Sunday.isCheck === false);
+			staffOn = staffList.filter((staff) => staff.workingTimes.SundayisCheck === true);
+			break;
+
+		default:
+			break;
+	}
+
+	return staffOn.concat(staffOff);
+};
+
 export function* getMembers() {
 	if (navigator.onLine === true) {
 		try {
-			const requestURL = new URL(`${GET_MEMBERS_API}`);
-			const resp = yield api(requestURL.toString(), '', 'GET', token);
+			const requestURL = new URL(`${GET_MEMBER}`);
+			const currentDate = yield select(makeCurrentDay());
+			const url = `${requestURL.toString()}${currentDate.format('YYYY-MM-DD')}`;
+			console.log({url})
+			const resp = yield api( url ,'', 'GET', token);
 			if (resp.codeStatus === 1) {
 				const members = resp.data
 					? resp.data.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0)
 					: [];
+
+				// const Staffs = sorrtStaffByDate('', members);
 
 				localStorage.setItem('staffList', JSON.stringify(members));
 				yield put(membersLoaded(members));
@@ -290,13 +343,14 @@ export function* getWaitingAppointments() {
 			yield put(loadingWaiting(false));
 			const appointments =
 				response &&
-				response.data.map((appointment) => appointmentAdapter(appointment)).filter(app=>moment(app.start).format('YYYY-MM-DD hh:mm A') !== moment(app.end).format('YYYY-MM-DD hh:mm A'));
+				response.data
+					.map((appointment) => appointmentAdapter(appointment))
+					.filter(
+						(app) =>
+							moment(app.start).format('YYYY-MM-DD hh:mm A') !==
+							moment(app.end).format('YYYY-MM-DD hh:mm A')
+					);
 			localStorage.setItem('AppointmentWaiting', JSON.stringify(appointments));
-
-			// window.postMessage({
-			// 	action : 'dataWaitingList',
-			// 	waitingList : appointments
-			// })
 
 			yield put(waitingAppointmentsLoaded(appointments));
 		} catch (err) {
@@ -325,7 +379,13 @@ export function* getAppointmentsByMembersAndDate() {
 			const response = yield api(url.toString(), '', 'GET', token);
 			appointments =
 				response &&
-				response.data.map((appointment) => appointmentAdapter(appointment)).filter(app=>moment(app.start).format('YYYY-MM-DD hh:mm A') !== moment(app.end).format('YYYY-MM-DD hh:mm A'));
+				response.data
+					.map((appointment) => appointmentAdapter(appointment))
+					.filter(
+						(app) =>
+							moment(app.start).format('YYYY-MM-DD hh:mm A') !==
+							moment(app.end).format('YYYY-MM-DD hh:mm A')
+					);
 
 			if (apiDateQuery === moment().format('YYYY-MM-DD')) {
 				localStorage.setItem('AppointmentCalendar', JSON.stringify(appointments));
@@ -798,11 +858,12 @@ export function* addNewCustomer(action) {
 				LastName: last_name,
 				Email: email,
 				Phone: phone,
-				referrerPhone: "+"+refPhone,
+				referrerPhone: '+' + refPhone,
 				favourite: note
 			};
 
 			const result = yield api(requestURL.toString(), data, 'POST', token);
+
 			customerId = result.data.customerId;
 			user_Id = result.data.userId;
 		} else {
@@ -829,6 +890,9 @@ export function* addNewCustomer(action) {
 		const requestURL_AddAppointment = new URL(POST_ADD_APPOINTMENT);
 		const resultAddAppointment = yield api(requestURL_AddAppointment.toString(), data, 'POST', token);
 
+		console.log({ data });
+
+		console.log({ resultAddAppointment });
 		let id_appointment = '';
 		if (resultAddAppointment.codeStatus === 1) {
 			id_appointment = resultAddAppointment.data;
@@ -842,6 +906,8 @@ export function* addNewCustomer(action) {
 			'GET',
 			token
 		);
+
+		console.log({ response_DetailAppointment });
 
 		yield put(addCustomerSuccess(true));
 
@@ -1088,8 +1154,9 @@ function* checkPinCode_Saga() {
 function* updateNextStaff_Saga() {
 	yield takeLatest(UPDATE_NEXT_STAFF, function*() {
 		try {
-			const requestURL = new URL(`${GET_MEMBERS_API}`);
-			const response = yield api(requestURL.toString(), '', 'GET', token);
+			const requestURL = new URL(`${GET_MEMBER}`);
+			const url = `${requestURL.toString()}&timezone=${timezone}`;
+			const response = yield api(url, '', 'GET', token);
 			if (response.codeStatus === 1) {
 				const members = response.data
 					? response.data.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0)
@@ -1248,7 +1315,7 @@ export function* waitingAppointmentsData() {
 export function* appointmentsByMembersData() {
 	yield takeLatest(LOAD_APPOINTMENTS_BY_MEMBERS, getAppointmentsByMembersAndDate);
 
-	yield takeLatest(SELECT_DAY, getAppointmentsByMembersAndDate);
+	yield takeLatest(SELECT_DAY, getMembers);
 
 	yield takeLatest(UPDATE_CALENDAR_INTERVAL, getAppointmentsByMembersAndDate);
 }

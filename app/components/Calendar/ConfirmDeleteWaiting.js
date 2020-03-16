@@ -107,18 +107,19 @@ class ConfirmDeleteWaiting extends Component {
                             <FaTimesCircle />
                         </ConfirmPopupWrapper.ButtonX>
                     </ConfirmPopupWrapper.Header>
+
                     <ConfirmPopupWrapper.Body>
                         {event && `Delete appointment ${ event.code} from Waiting List ?`}
                     </ConfirmPopupWrapper.Body>
+
                     <ConfirmPopupWrapper.Footer>
                         <ConfirmPopupWrapper.WrapperButton>
                             <ConfirmPopupWrapper.Button Color="#fff" backgroundColor={'#FF4136'} onClick={() => this.deleteEventWaiting()}>Yes</ConfirmPopupWrapper.Button>
                         </ConfirmPopupWrapper.WrapperButton>
+
                         <ConfirmPopupWrapper.WrapperButton>
                             <ConfirmPopupWrapper.Button Color="#333" backgroundColor={'#EEEEEE'} onClick={() => this.closeModal()}>No</ConfirmPopupWrapper.Button>
                         </ConfirmPopupWrapper.WrapperButton>
-                        {/* <ConfirmPopupWrapper.ButtonYes Color="#fff" backgroundColor={'#FF4136'} onClick={() => this.deleteEventWaiting()}>Yes</ConfirmPopupWrapper.ButtonYes>
-                        <ConfirmPopupWrapper.ButtonNo Color="#333" backgroundColor={'#EEEEEE'} onClick={() => this.closeModal()}>No</ConfirmPopupWrapper.ButtonNo> */}
                     </ConfirmPopupWrapper.Footer>
                 </ConfirmPopupWrapper>
             </ConfirmPopup>

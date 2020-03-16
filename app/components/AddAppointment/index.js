@@ -420,7 +420,6 @@ class AddAppointment extends React.Component {
 
 	RefPhoneExist() {
 		const { phone } = this.state;
-		console.log({phone})
 		let refPhone = '';
 		if (phone) {
 			if (phone.charAt(1) === '1') {
@@ -481,6 +480,7 @@ class AddAppointment extends React.Component {
 									value={this.state.phoneNumber}
 									onChange={(e) => this.handleChange(e)}
 									placeholder="Enter phone number"
+									type='tel'
 								/>
 							</FormCheckPhone>
 							<Button
@@ -569,6 +569,7 @@ class AddAppointment extends React.Component {
 											mask="_"
 											value={this.state.phone}
 											onChange={(e) => this.setState({ phone: e.target.value })}
+											type='tel'
 										/>
 									</div>
 								)}
@@ -578,6 +579,7 @@ class AddAppointment extends React.Component {
 										value={this.RefPhoneExist()}
 										onChange={(e) => this.setState({ phone: e.target.value })}
 										placeholder="Phone number"
+										type='tel'
 									/>
 								)}
 							</Form>

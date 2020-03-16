@@ -7,7 +7,6 @@ import { FaTimesCircle } from 'react-icons/fa';
 import Enter from '../../images/enter.png';
 import 'react-day-picker/lib/style.css';
 import DayPicker from 'react-day-picker';
-
 import 'rc-time-picker/assets/index.css';
 import NumberFormat from 'react-number-format';
 import { DatePicker } from 'antd-mobile';
@@ -16,422 +15,8 @@ import 'antd-mobile/dist/antd-mobile.css';
 import OutsideClickHandler from 'react-outside-click-handler';
 import { formatPhone } from '../../utils/helper';
 import _ from 'lodash';
-const statusConvertData = {
-	ASSIGNED: 'unconfirm',
-	CONFIRMED: 'confirm',
-	CHECKED_IN: 'checkin',
-	PAID: 'paid',
-	WAITING: 'waiting',
-	CANCEL: 'cancel'
-};
-
-const convertAppointment = (appointment) => {
-	return {
-		id: appointment.id,
-		code: appointment.code,
-		userFullName: appointment.firstName + ' ' + appointment.lastName,
-		firstName: appointment.firstName,
-		lastName: appointment.lastName,
-		phoneNumber: appointment.phoneNumber,
-		services: appointment.options.sort(function(a, b) {
-			var c = a.bookingServiceId;
-			var d = b.bookingServiceId;
-			return d - c;
-		}),
-		products: appointment.products.sort(function(a, b) {
-			var c = a.bookingProductId;
-			var d = b.bookingProductId;
-			return d - c;
-		}),
-		extras: appointment.extras.sort(function(a, b) {
-			var c = a.bookingExtraId;
-			var d = b.bookingExtraId;
-			return d - c;
-		}),
-		status: statusConvertData[appointment.status],
-		staffId: appointment.memberId,
-		fromTime: appointment.start,
-		toTime: appointment.end,
-		userId: appointment.user_id,
-		createDate: appointment.createDate,
-		tipPercent: appointment.tipPercent,
-		tipAmount: appointment.tipAmount,
-		subTotal: appointment.subTotal,
-		total: appointment.total,
-		tax: appointment.tax,
-		discount: appointment.discount,
-		giftCard: appointment.giftCard,
-		giftCards: appointment.giftCards ? appointment.giftCards : [],
-		notes: appointment.notes
-			? appointment.notes.sort(function(a, b) {
-					var c = a.appointmentNoteId;
-					var d = b.appointmentNoteId;
-					return d - c;
-				})
-			: []
-	};
-};
-
-const AppPopup = styled(Popup)`
-  border-radius: 1.5rem;
-  padding: 0 !important;
-  border: none !important;
-  box-shadow : ${(props) => props.BoxShadow};
-`;
-
-const AppPopupWrapper = styled.div`position: relative;`;
-
-AppPopupWrapper.Header = styled.div`
-	height: 3rem;
-	font-size: 23px;
-	font-weight: 600;
-	background: ${(props) => props.backgroundColor};
-	color: ${(props) => (props.color ? props.color : 'white')};
-	letter-spacing: 0.6;
-	width: 100%;
-	padding: 0.5rem 1rem;
-	line-height: 1.5;
-	text-align: center;
-	border-top-left-radius: 1.5rem;
-	border-top-right-radius: 1.5rem;
-`;
-
-AppPopupWrapper.Close = styled.div`
-	position: absolute;
-	right: 0.5rem;
-	top: 0.25rem;
-	line-height: 1;
-	font-size: 2rem;
-	color: #ffffff;
-	cursor: pointer;
-`;
-
-AppPopupWrapper.Body = styled.div`
-	background: #ffffff;
-	width: 100%;
-	padding: 1rem 1rem 0 1rem;
-	height: 450px;
-	overflow-y: scroll;
-`;
-
-AppPopupWrapper.Footer = styled.div`
-	display: flex;
-	padding: 0.5rem 1rem 1rem 1rem;
-	& > div {
-		width: 50%;
-		text-align: center;
-	}
-`;
-
-// ************************************************* //
-// ************************************************ //
-// ************************************************* //
-
-const AppointmentPopup = styled(AppPopup)`
-  width: 50rem !important;
-`;
-
-const AppointmentWrapper = styled(AppPopupWrapper)`
-  //
-`;
-
-AppointmentWrapper.Header = styled(AppPopupWrapper.Header)`
-  //
-`;
-
-AppointmentWrapper.Close = styled(AppPopupWrapper.Close)`
-  //
-`;
-
-AppointmentWrapper.Body = styled(AppPopupWrapper.Body)`
-  //
-`;
-
-AppointmentWrapper.Footer = styled(AppPopupWrapper.Footer)`
-  //
-`;
-
-const UserInformation = styled.div`
-	display: flex;
-	padding: 0.5rem;
-	& > div {
-		width: 50%;
-		display: flex;
-		justify-content: space-between;
-	}
-	& > div:nth-child(1) {
-		margin-right: 1.5rem;
-	}
-`;
-
-const WrapperCancelAppointment = styled.div`
-	display: flex;
-	width: 100%;
-	justify-content: row;
-	margin-top: 20px;
-`;
-
-const AdjustButton = styled.button`
-	background: ${(props) => (props.active ? '#0071c5' : '#dddddd')};
-	color: #ffffff;
-	padding: 2px 15px;
-	margin: 0 10px;
-	border-radius: 6px;
-	cursor: ${(props) => (props.active ? 'pointer' : 'initial')};
-`;
-
-const ButtonProduct = styled.button`
-	background: ${(props) => (props.active ? '#0071c5' : '#dddddd')};
-	color: #ffffff;
-	padding: 2px 15px;
-	margin: 0 10px;
-	border-radius: 6px;
-	cursor: ${(props) => (props.active ? 'pointer' : 'initial')};
-`;
-
-const NoteWrapper = styled.div`
-	border: 1px solid #dddddd;
-	background: #eeeeee;
-	padding: 0.5rem;
-	overflow-x: scroll;
-	height: 10rem;
-`;
-
-NoteWrapper.Form = styled.form`
-	display: flex;
-	& > input {
-		flex: 1;
-		background: #ffffff;
-		border: 1px solid #dddddd;
-		border-right: none;
-		border-top-left-radius: 4px;
-		border-bottom-left-radius: 4px;
-		padding: 0 1rem;
-		-moz-appearance: none;
-		/* for Chrome */
-		-webkit-appearance: none;
-	}
-	& > button {
-		width: 5rem;
-		border-top-right-radius: 4px;
-		border-bottom-right-radius: 4px;
-		background: #0071c5;
-		color: #ffffff;
-		line-height: 2.8;
-		cursor: pointer;
-		text-align: center;
-	}
-`;
-
-const NoteInformation = styled.div`
-	display: flex;
-	padding: 0.5rem;
-	& > div:nth-child(1),
-	& > div:nth-child(2) {
-		width: 20%;
-	}
-	& > div:last-child {
-		width: 60%;
-	}
-`;
-
-const AppointmentInformation = styled.div`
-	display: flex;
-	padding: 0.5rem;
-	justify-content: space-between;
-	& > div {
-	}
-`;
-
-const TipPercent = styled.div`
-	display: flex;
-	padding: 0.5rem;
-	& > div {
-		width: 100%;
-		display: flex;
-		justify-content: flex-end;
-	}
-`;
-
-const Button = styled.button`
-	border-radius: 4px;
-	background: ${(props) => (props.primary ? '#0071c5' : '#eeeeee')};
-	color: ${(props) => (props.primary ? '#ffffff' : '#333333')};
-	border: 1px solid #dddddd;
-	font-size: 1rem;
-	line-height: 2.8;
-	height: 100%;
-	cursor: pointer;
-	text-align: center;
-	padding: 0 2rem;
-`;
-
-const ButtonChangeTime = styled.button`
-	background: ${(props) => (props.disabled ? '#eeeeee' : '#0071c5')};
-	color: ${(props) => (props.primary ? '#333333' : '#ffffff')};
-	height: 40%;
-	justify-content: center;
-	align-items: center;
-	margin-top: 5px;
-	margin-left: 10px;
-	width: 60%;
-	float: right;
-	cursor: pointer;
-	border-radius: 4px;
-	font-size: 1rem;
-`;
-
-const Img = styled.img`filter: invert(100%);`;
-
-const WrapperTimeChange = styled.div`
-	width: 100%;
-	display: flex;
-	flex-direction: row;
-	margin-top: 1rem;
-`;
-
-const SelectDateWrapper = styled.div`
-	width: calc(100%/3);
-	float: left;
-`;
-SelectDateWrapper.SelectDate = styled.div`
-	background: ${(props) => (props.NoneBackground ? '#ffffff' : '#585858')};
-	color: #fff;
-	font-size: 0.95rem;
-	font-weight: 400;
-	padding-left: 10px;
-	line-height: 2;
-`;
-SelectDateWrapper.SelectStaff = styled(SelectDateWrapper.SelectDate)`
-  padding-left : 50%;
-`;
-// ************************************************* //
-// ************************************************* //
-// ************************************************* //
-
-const ConfirmationPopup = styled(AppPopup)`
-  width: 30rem !important;
-  height: 10rem !important;
-`;
-
-const ConfirmationWrapper = styled(AppPopupWrapper)`
-  //
-`;
-
-ConfirmationWrapper.Header = styled(AppPopupWrapper.Header)`
-  //
-`;
-
-ConfirmationWrapper.Body = styled(AppPopupWrapper.Body)`
-  text-align: center;
-  height: 200px;
-  border-bottom-left-radius: 1.5rem;
-  border-bottom-right-radius: 1.5rem;
-`;
-
-ConfirmationWrapper.Close = styled(AppPopupWrapper.Close)`
-  //
-`;
-
-ConfirmationWrapper.Footer = styled(AppPopupWrapper.Footer)`
-  //
-`;
-
-const WrapperFooterPaid = styled.div`
-	padding: 10px;
-	display: flex;
-	flex-direction: row;
-`;
-WrapperFooterPaid.Item = styled.div`
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	width: 50%;
-	margin-left: 10px;
-	color: #0b0b0b;
-`;
-WrapperFooterPaid.ItemLeft = styled(WrapperFooterPaid.Item)`
-  padding-right : 4rem;
-`;
-
-const FooterTotal = styled(WrapperFooterPaid)`
-  justify-content : space-between;
-  border-top: 1px solid #ebebeb;
-  margin-top : 0.3rem;
-  padding-left : 20px;
-`;
-
-const MiniCalendarWrapper = styled.div`
-	width: calc(5.05rem - 1px);
-	height: 100%;
-	text-align: center;
-	border-right: 1px solid #3883bb;
-	position: relative;
-	padding: 0.5rem;
-`;
-
-MiniCalendarWrapper.Button = styled.div`
-	border-radius: 4px;
-	background: #0071c5;
-	color: #ffffff;
-	width: 100%;
-	font-size: 1.5rem;
-	line-height: 1.5;
-	height: 100%;
-	cursor: pointer;
-`;
-
-const CalendarPopup = styled.div`
-	margin-top: 280px;
-	position: absolute;
-	transform: translate3d(0.5rem, calc(-18rem + 0.5rem), 0px);
-	will-change: transform;
-	z-index: 1;
-	background: #fff;
-	color: #000;
-	height: 18rem;
-	line-height: 1;
-	box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-	border-radius: 8px;
-	overflow: hidden;
-`;
-
-CalendarPopup.Heading = styled.div`
-	background: #0071c5;
-	color: #ffffff;
-	height: 3rem;
-	font-size: 1.2rem;
-	line-height: 2;
-	text-align: center;
-	padding-top: 0.3rem;
-`;
-
-CalendarPopup.Body = styled.div``;
-
-const initialState = {
-	noteValue: '',
-	confirmationModal: false,
-	userFullName: '',
-	services: [],
-	products: [],
-	extras: [],
-	prices: [],
-	old_prices: [],
-	pricesExtras: [],
-	old_priceExtras: [],
-	old_total_duration: 0,
-	dayChange: new Date(),
-	fromTime: moment(),
-	toTime: new Date(),
-	notes: [],
-	newNotes: [],
-	time: new Date(),
-	selectedStaff: '',
-	isOpenStaffList: false,
-	cloneAppointment: '',
-	isPopupDay: false,
-	isChange: false
-};
+import { convertAppointment, statusConvertData, initialState } from './utilDetail';
+import PopupStaff from './PopupStaff';
 
 class Appointment extends React.Component {
 	constructor(props) {
@@ -459,6 +44,7 @@ class Appointment extends React.Component {
 				products
 			};
 		});
+		this.setChangeTrue();
 	}
 
 	addProduct(index) {
@@ -469,6 +55,96 @@ class Appointment extends React.Component {
 				products
 			};
 		});
+		this.setChangeTrue();
+	}
+
+	onChangeFromTime(fromTime) {
+		this.setState({ fromTime: fromTime });
+		this.setChangeTrue();
+	}
+	onChangeToTime(toTime) {
+		this.setState({ toTime });
+		this.setChangeTrue();
+	}
+
+	onChangeSelectedStaff(staff, index) {
+		this.setState({
+			selectedStaff: staff
+		});
+		this.setChangeTrue();
+	}
+
+	subtractService(index) {
+		this.setState((state) => {
+			const { services, prices } = state;
+			if (services[index].duration >= 5) {
+				services[index].duration -= 5;
+			}
+			if (services[index].duration < 5) {
+				services[index].duration = 5;
+			}
+			return {
+				services
+				//  prices
+			};
+		});
+		this.setChangeTrue();
+	}
+
+	addService(index) {
+		this.setState((state) => {
+			const { services, prices } = state;
+			services[index].duration += 5;
+			// prices[index] = (services[index].price * (services[index].duration / 10))
+			return {
+				services
+				// prices
+			};
+		});
+		this.setChangeTrue();
+	}
+
+	subtractExtra(index) {
+		this.setState((state) => {
+			const { extras } = state;
+			if (extras[index].duration >= 5) {
+				extras[index].duration -= 5;
+			}
+			if (extras[index].duration < 5) {
+				extras[index].duration = 5;
+			}
+			return {
+				extras
+			};
+		});
+		this.setChangeTrue();
+	}
+
+	addExtra(index) {
+		this.setState((state) => {
+			const { extras } = state;
+			extras[index].duration += 5;
+			return {
+				extras
+			};
+		});
+		this.setChangeTrue();
+	}
+
+	async onChangePriceExtra(value, index) {
+		const { pricesExtras, extras } = this.state;
+		const { floatValue } = value;
+		if (floatValue) {
+			pricesExtras[index] = floatValue;
+			extras[index].price = floatValue;
+			await this.setState({
+				pricesExtras,
+				extras
+			});
+		}
+		if (this.isSame(this.state.prices, this.state.old_prices) === false) {
+			this.setChangeTrue();
+		}
 	}
 
 	handleSubmit(e) {
@@ -537,6 +213,15 @@ class Appointment extends React.Component {
 	async componentWillReceiveProps(nextProps) {
 		const { currentDay, staffList, appointmentDetail } = nextProps;
 		if (appointmentDetail) {
+			let _services = appointmentDetail.options;
+			let _extras = appointmentDetail.extras;
+			_services.forEach((element) => {
+				element.price = parseInt(element.price);
+			});
+			_extras.forEach((element) => {
+				element.price = parseInt(element.price);
+			});
+
 			const selectedStaff = appointmentDetail
 				? staffList.find((staff) => staff.id === appointmentDetail.memberId)
 				: '';
@@ -545,14 +230,20 @@ class Appointment extends React.Component {
 			const { options, userFullName, products, start, extras, notes } = app_;
 
 			await this.setState({
+				old_service: _services,
+				old_product: appointmentDetail.products,
+				old_extra: _extras,
 				services: options,
 				userFullName: userFullName,
 				products: products,
 				dayChange: currentDay,
+				old_dayChange: currentDay,
 				fromTime: moment(start),
+				old_fromTime: moment(start),
 				extras: extras,
 				notes: notes,
 				selectedStaff: selectedStaff,
+				old_selectedStaff: selectedStaff,
 				cloneAppointment: JSON.parse(JSON.stringify(appointmentDetail))
 			});
 
@@ -725,22 +416,6 @@ class Appointment extends React.Component {
 		return <AppointmentWrapper.Header backgroundColor="#00dc00">Appointment</AppointmentWrapper.Header>;
 	}
 
-	onChangeFromTime(fromTime) {
-		this.setState({ fromTime: fromTime });
-		this.setChangeTrue();
-	}
-	onChangeToTime(toTime) {
-		this.setState({ toTime });
-		this.setChangeTrue();
-	}
-
-	onChangeSelectedStaff(staff, index) {
-		this.setState({
-			selectedStaff: staff
-		});
-		this.setChangeTrue();
-	}
-
 	renderStaffList() {
 		const { staffList } = this.props;
 		const { selectedStaff } = this.state;
@@ -782,16 +457,25 @@ class Appointment extends React.Component {
 	}
 
 	renderSelectDay() {
-		const { dayChange, isPopupDay } = this.state;
+		const { dayChange, isPopupDay, old_dayChange } = this.state;
 		return (
 			<div
-				onClick={() => this.setState({ isPopupDay: !isPopupDay })}
 				style={{
 					position: 'relative',
 					paddingTop: 18
 				}}
 			>
-				<div>{moment(dayChange).format('MM/DD/YYYY')}</div>
+				<div
+					onClick={() => this.setState({ isPopupDay: !isPopupDay })}
+					style={{
+						color:
+							moment(dayChange).format('MM/DD/YYYY') === moment(old_dayChange).format('MM/DD/YYYY')
+								? '#333'
+								: '#C3447A'
+					}}
+				>
+					{moment(dayChange).format('MM/DD/YYYY')}
+				</div>
 				{isPopupDay && (
 					<OutsideClickHandler onOutsideClick={() => this.setState({ isPopupDay: !isPopupDay })}>
 						<CalendarPopup>
@@ -800,7 +484,9 @@ class Appointment extends React.Component {
 								<DayPicker
 									firstDayOfWeek={1}
 									selectedDays={moment(dayChange).toDate()}
-									onDayClick={(day) => this.setState({ dayChange: day })}
+									onDayClick={(day) => {
+										this.setState({ dayChange: day });
+									}}
 								/>
 							</CalendarPopup.Body>
 						</CalendarPopup>
@@ -811,8 +497,7 @@ class Appointment extends React.Component {
 	}
 
 	renderChangeAppointTime() {
-		const { currentDay, appointment } = this.props;
-		const { selectedStaff, isOpenStaffList } = this.state;
+		const { selectedStaff, isOpenStaffList, old_selectedStaff, fromTime, old_fromTime } = this.state;
 		return (
 			<WrapperTimeChange>
 				<SelectDateWrapper>
@@ -829,11 +514,19 @@ class Appointment extends React.Component {
 							minuteStep={15}
 							use12Hours
 							title="Select Time"
-							// value={new Date(Date.now())}
 							onChange={(time) => this.onChangeFromTime(time)}
 							locale={enUs}
 						>
-							<p className="txtTimeChange">{moment(this.state.fromTime).format('hh:mm A').toString()}</p>
+							<p
+								style={{
+									color:
+										moment(old_fromTime).format('hh:mm A') === moment(fromTime).format('hh:mm A')
+											? '#333'
+											: '#C3447A'
+								}}
+							>
+								{moment(fromTime).format('hh:mm A').toString()}
+							</p>
 						</DatePicker>
 					</div>
 				</SelectDateWrapper>
@@ -843,7 +536,7 @@ class Appointment extends React.Component {
 						style={{
 							display: 'flex',
 							flexDirection: 'row',
-							marginLeft : 20
+							marginLeft: 20
 						}}
 					>
 						<div style={{ position: 'relative', paddingTop: 3, color: '#333', paddingLeft: 60 }}>
@@ -851,21 +544,14 @@ class Appointment extends React.Component {
 								onClick={() => this.setState({ isOpenStaffList: !this.state.isOpenStaffList })}
 								style={{ display: 'flex', flexDirection: 'row', cursor: 'pointer' }}
 							>
-								<img
-									style={{
-										width: 40,
-										height: 40,
-										objectFit: 'cover',
-										borderRadius: 30
-									}}
-									src={selectedStaff.imageUrl}
-								/>
+								<img style={style.imgStaff} src={selectedStaff.imageUrl} />
 								<p
 									style={{
 										marginLeft: 10,
 										overflow: 'hidden',
 										textOverflow: 'ellipsis',
-										whiteSpace: 'nowrap'
+										whiteSpace: 'nowrap',
+										color: selectedStaff.id === old_selectedStaff.id ? '#333' : '#C3447A'
 									}}
 								>
 									{selectedStaff.title}
@@ -876,35 +562,12 @@ class Appointment extends React.Component {
 									onOutsideClick={() =>
 										this.setState({ isOpenStaffList: false, indexSelectedStaff: '' })}
 								>
-									<div
-										style={{
-											height: 200,
-											width: 170,
-											overflowY: 'scroll',
-											background: '#ffffff',
-											zIndex: 9999,
-											position: 'absolute',
-											top: '110%',
-											borderRadius: 5,
-											boxShadow: '0 3px 9px rgba(0,0,0,.175)'
-										}}
-									>
-										{this.renderStaffList()}
-									</div>
+									<div style={style.staffList}>{this.renderStaffList()}</div>
 								</OutsideClickHandler>
 							)}
 						</div>
 					</div>
 				</SelectDateWrapper>
-				{/* <SelectDateWrapper>
-					<SelectDateWrapper.SelectDate>&nbsp;&nbsp;</SelectDateWrapper.SelectDate>
-					<ButtonChangeTime
-						disabled={appointment.status === 'PAID'}
-						onClick={() => this.ChangeAppointmentTime()}
-					>
-						Change
-					</ButtonChangeTime>
-				</SelectDateWrapper> */}
 			</WrapperTimeChange>
 		);
 	}
@@ -1028,38 +691,92 @@ class Appointment extends React.Component {
 		}
 	};
 
+	buttonService(appointment, service, index) {
+		const { old_service } = this.state;
+		let backgroundColor = '#dddddd';
+		if (appointment.status !== 'PAID' && service.duration > 5) backgroundColor = '#0071c5';
+		if (parseInt(old_service[index].duration) > parseInt(service.duration) && service.duration > 5)
+			backgroundColor = '#C3447A';
+		return backgroundColor;
+	}
+
+	buttonService2(appointment, service, index) {
+		const { old_service } = this.state;
+		let backgroundColor = '#dddddd';
+		if (appointment.status !== 'PAID') backgroundColor = '#0071c5';
+		if (parseInt(old_service[index].duration) < parseInt(service.duration)) backgroundColor = '#C3447A';
+		return backgroundColor;
+	}
+
+	togglePopupStaff = (staff, index) => {
+		if (staff.id) {
+			let { services } = this.state;
+			services[index].staffId = staff.id;
+			this.setState({ services });
+		}
+		const { isPopupStaff } = this.state;
+		this.setState({
+			isPopupStaff: !isPopupStaff,
+			indexPopupStaff : index
+		});
+	};
+
 	renderService(service, index) {
-		const { appointment } = this.props;
+		const { appointment, staffList } = this.props;
+		const staff = staffList.find((s) => parseInt(s.id) === parseInt(service.staffId));
+		const { prices, old_prices, isPopupStaff , indexPopupStaff } = this.state;
 		if (appointment.status !== 'PAID') {
 			return (
 				<tr key={index}>
-					<td>{service.serviceName}</td>
+					<td style={{ width: '25%' }}>{service.serviceName}</td>
+					<td style={{ position: 'relative' }} onClick={()=>this.togglePopupStaff('',index)}>
+						<div style={{ display: 'flex', flexDirection: 'row' }}>
+							<img
+								src={staff.imageUrl}
+								style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 25 }}
+							/>
+							<p style={{ marginLeft: 8 }}>{staff.title}</p>
+						</div>
+						{isPopupStaff && (index === indexPopupStaff) &&  (
+							<PopupStaff
+								togglePopupStaff={(staff) => this.togglePopupStaff(staff, index)}
+								staffList={staffList}
+							/>
+						)}
+					</td>
 					{appointment.status !== 'PAID' && (
 						<td style={{ textAlign: 'center' }}>
-							<AdjustButton
-								active={appointment.status !== 'PAID' && service.duration > 15}
-								disabled={appointment.status === 'PAID' || service.duration <= 15}
+							<ButtonService
+								// active={appointment.status !== 'PAID' && service.duration > 5}
+								backgroundColor={this.buttonService(appointment, service, index)}
+								disabled={appointment.status === 'PAID' || service.duration <= 5}
 								onClick={() => this.subtractService(index)}
 							>
-								-15&#39;
-							</AdjustButton>
+								-5&#39;
+							</ButtonService>
+
 							{service.duration}
-							<AdjustButton
-								active={appointment.status !== 'PAID' && service.duration < 90}
-								disabled={appointment.status === 'PAID' || service.duration >= 90}
+
+							<ButtonService
+								backgroundColor={this.buttonService2(appointment, service, index)}
+								disabled={appointment.status === 'PAID'}
 								onClick={() => this.addService(index)}
 							>
-								+15&#39;
-							</AdjustButton>
+								+5&#39;
+							</ButtonService>
 						</td>
 					)}
 					<td style={{ textAlign: 'center' }}>
 						<NumberFormat
-							value={parseFloat(this.state.prices[index]).toFixed(2)}
+							value={parseFloat(prices[index]).toFixed(2)}
 							onValueChange={(value) => this.onChangePrice(value, index)}
 							thousandSeparator={false}
 							disabled={appointment.status === 'PAID'}
-							style={{ textAlign: 'center' }}
+							style={{
+								textAlign: 'center',
+								color: old_prices[index] === prices[index] ? '#333' : '#C3447A'
+							}}
+							type="tel"
 						/>
 					</td>
 				</tr>
@@ -1085,7 +802,11 @@ class Appointment extends React.Component {
 								onValueChange={(value) => this.onChangePrice(value, index)}
 								thousandSeparator={false}
 								disabled={appointment.status === 'PAID'}
-								style={{ textAlign: 'center' }}
+								style={{
+									textAlign: 'center',
+									color: old_prices[index] === prices[index] ? '#333' : '#C3447A'
+								}}
+								type="tel"
 							/>
 						</td>
 					</tr>
@@ -1103,6 +824,7 @@ class Appointment extends React.Component {
 								thousandSeparator={false}
 								disabled={appointment.status === 'PAID'}
 								style={{ textAlign: 'center' }}
+								type="tel"
 							/>
 						</td>
 					</tr>
@@ -1120,8 +842,11 @@ class Appointment extends React.Component {
 					<table>
 						<thead>
 							<tr>
-								<th width="50%">Selected Services</th>
-								<th width="30%" style={{ textAlign: 'center' }}>
+								<th width="25%">Selected Services</th>
+								<th width="25%" style={{ textAlign: 'center' }}>
+									Staff
+								</th>
+								<th width="25%" style={{ textAlign: 'center' }}>
 									Duration (min)
 								</th>
 								<th width="20%" style={{ textAlign: 'center' }}>
@@ -1154,41 +879,62 @@ class Appointment extends React.Component {
 		}
 	}
 
+	buttonProduct(appointment, product, index) {
+		const { old_product } = this.state;
+		let backgroundColor = '#dddddd';
+		if (appointment.status !== 'PAID' && product.quantity > 1) backgroundColor = '#0071c5';
+		if (parseInt(old_product[index].quantity) > parseInt(product.quantity) && product.quantity > 1)
+			backgroundColor = '#C3447A';
+		return backgroundColor;
+	}
+
+	buttonProduct2(appointment, product, index) {
+		const { old_product } = this.state;
+		let backgroundColor = '#dddddd';
+		if (appointment.status !== 'PAID') backgroundColor = '#0071c5';
+		if (parseInt(old_product[index].quantity) < parseInt(product.quantity)) backgroundColor = '#C3447A';
+		return backgroundColor;
+	}
+
 	renderProduct(product, index) {
 		const { appointment } = this.props;
+		const { old_product } = this.state;
 		return (
 			<tr key={index}>
 				<td>{product.productName}</td>
 				<td style={{ textAlign: 'center' }}>
 					<ButtonProduct
-						active={
-							appointment.status !== 'PAID' && product.quantity > 1
-							// appointment.status !== 'CHECKED_IN'
-						}
-						disabled={
-							appointment.status === 'PAID' || product.quantity <= 1
-							// appointment.status === 'CHECKED_IN'
-						}
+						backgroundColor={this.buttonProduct(appointment, product, index)}
+						// active={appointment.status !== 'PAID' && product.quantity > 1}
+						disabled={appointment.status === 'PAID' || product.quantity <= 1}
 						onClick={() => this.subtractProduct(index)}
 					>
 						-
 					</ButtonProduct>
 					{product.quantity}
 					<ButtonProduct
-						active={
-							appointment.status !== 'PAID'
-							// appointment.status !== 'CHECKED_IN'
-						}
-						disabled={
-							appointment.status === 'PAID'
-							// appointment.status === 'CHECKED_IN'
-						}
+						backgroundColor={this.buttonProduct2(appointment, product, index)}
+						disabled={appointment.status === 'PAID'}
 						onClick={() => this.addProduct(index)}
 					>
 						+
 					</ButtonProduct>
 				</td>
-				<td style={{ textAlign: 'center' }}>{parseFloat(product.price * product.quantity).toFixed(2)}</td>
+				<td
+					style={{
+						textAlign: 'center',
+						color:
+							old_product[index].price * old_product[index].quantity === product.price * product.quantity
+								? '#333'
+								: '#C3447A',
+						fontWeight:
+							old_product[index].price * old_product[index].quantity === product.price * product.quantity
+								? 'normal'
+								: 'bold'
+					}}
+				>
+					{parseFloat(product.price * product.quantity).toFixed(2)}
+				</td>
 			</tr>
 		);
 	}
@@ -1229,120 +975,57 @@ class Appointment extends React.Component {
 		}
 	}
 
-	subtractService(index) {
-		this.setState((state) => {
-			const { services, prices } = state;
-			if (services[index].duration >= 30) {
-				services[index].duration -= 15;
-			}
-			if (services[index].duration < 30) {
-				services[index].duration = 15;
-			}
-			return {
-				services
-				//  prices
-			};
-		});
-		this.setChangeTrue();
+	buttonExtra(appointment, extra, index) {
+		const { old_extra } = this.state;
+		let backgroundColor = '#dddddd';
+		if (appointment.status !== 'PAID' && extra.duration > 5) backgroundColor = '#0071c5';
+		if (parseInt(old_extra[index].duration) > parseInt(extra.duration) && extra.duration > 5)
+			backgroundColor = '#C3447A';
+		return backgroundColor;
 	}
 
-	addService(index) {
-		this.setState((state) => {
-			const { services, prices } = state;
-			services[index].duration += 15;
-			// prices[index] = (services[index].price * (services[index].duration / 10))
-			return {
-				services
-				// prices
-			};
-		});
-		this.setChangeTrue();
-	}
-
-	subtractExtra(index) {
-		this.setState((state) => {
-			const { extras } = state;
-			if (extras[index].duration >= 30) {
-				extras[index].duration -= 15;
-			}
-			if (extras[index].duration < 30) {
-				extras[index].duration = 15;
-			}
-			return {
-				extras
-			};
-		});
-		this.setChangeTrue();
-	}
-
-	addExtra(index) {
-		this.setState((state) => {
-			const { extras } = state;
-			extras[index].duration += 15;
-			return {
-				extras
-			};
-		});
-		this.setChangeTrue();
-	}
-
-	async onChangePriceExtra(value, index) {
-		const { pricesExtras, extras } = this.state;
-		const { floatValue } = value;
-		if (floatValue) {
-			pricesExtras[index] = floatValue;
-			extras[index].price = floatValue;
-			await this.setState({
-				pricesExtras,
-				extras
-			});
-		}
-		if (this.isSame(this.state.prices, this.state.old_prices) === false) {
-			this.setChangeTrue();
-		}
+	buttonExtra2(appointment, extra, index) {
+		const { old_extra } = this.state;
+		let backgroundColor = '#dddddd';
+		if (appointment.status !== 'PAID') backgroundColor = '#0071c5';
+		if (parseInt(old_extra[index].duration) < parseInt(extra.duration)) backgroundColor = '#C3447A';
+		return backgroundColor;
 	}
 
 	renderExtra(extra, index) {
 		const { appointment } = this.props;
+		const { old_priceExtras, pricesExtras } = this.state;
 		return (
 			<tr key={index}>
 				<td>{extra.extraName}</td>
 				<td style={{ textAlign: 'center' }}>
-					<AdjustButton
-						active={
-							// appointment.status !== 'CHECKED_IN' &&
-							extra.duration > 15 && appointment.status !== 'PAID'
-						}
-						disabled={
-							// appointment.status === 'CHECKED_IN' ||
-							appointment.status === 'PAID' || extra.duration <= 15
-						}
+					<ButtonExtra
+						backgroundColor={this.buttonExtra(appointment, extra, index)}
+						disabled={appointment.status === 'PAID' || extra.duration <= 5}
 						onClick={() => this.subtractExtra(index)}
 					>
-						-15&#39;
-					</AdjustButton>
+						-5&#39;
+					</ButtonExtra>
 					{extra.duration}
-					<AdjustButton
-						active={
-							// appointment.status !== 'CHECKED_IN' &&
-							extra.duration < 90 && appointment.status !== 'PAID'
-						}
-						disabled={
-							// appointment.status === 'CHECKED_IN' ||
-							extra.duration >= 90 || appointment.status === 'PAID'
-						}
+					<ButtonExtra
+						backgroundColor={this.buttonExtra2(appointment, extra, index)}
+						disabled={appointment.status === 'PAID'}
 						onClick={() => this.addExtra(index)}
 					>
-						+15&#39;
-					</AdjustButton>
+						+5&#39;
+					</ButtonExtra>
 				</td>
 				<td style={{ textAlign: 'center' }}>
 					<NumberFormat
-						value={parseFloat(this.state.pricesExtras[index]).toFixed(2)}
+						value={parseFloat(pricesExtras[index]).toFixed(2)}
 						onValueChange={(value) => this.onChangePriceExtra(value, index)}
 						thousandSeparator={false}
 						disabled={appointment.status === 'PAID'}
-						style={{ textAlign: 'center' }}
+						style={{
+							textAlign: 'center',
+							color: old_priceExtras[index] === pricesExtras[index] ? '#333' : '#C3447A'
+						}}
+						type="tel"
 					/>
 				</td>
 			</tr>
@@ -1411,10 +1094,38 @@ class Appointment extends React.Component {
 		);
 	}
 
+	conditionButtonChange = () => {
+		const {
+			old_service,
+			old_product,
+			old_extra,
+			services,
+			products,
+			extras,
+			old_fromTime,
+			fromTime,
+			dayChange,
+			old_dayChange,
+			selectedStaff,
+			old_selectedStaff
+		} = this.state;
+		if (
+			_.isEqual(old_service.sort(), services.sort()) &&
+			_.isEqual(old_product.sort(), products.sort()) &&
+			_.isEqual(old_extra.sort(), extras.sort()) &&
+			moment(old_fromTime).format('hh:mm A') === moment(fromTime).format('hh:mm A') &&
+			moment(dayChange).format('MM/DD/YYYY') === moment(old_dayChange).format('MM/DD/YYYY') &&
+			selectedStaff.id === old_selectedStaff.id
+		) {
+			return true;
+		}
+		return false;
+	};
+
 	renderNextStatusButton() {
 		const { appointment } = this.props;
-		const { isChange } = this.state;
-		if (!isChange) {
+		// const { isChange } = this.state;
+		if (this.conditionButtonChange()) {
 			if (appointment.status === 'ASSIGNED')
 				return (
 					<Button onClick={() => this.nextStatus()} primary="true">
@@ -1435,35 +1146,11 @@ class Appointment extends React.Component {
 				);
 		} else {
 			return (
-				<Button onClick={() => this.ChangeAppointmentTime()} primary="true">
+				<ButtonChange onClick={() => this.ChangeAppointmentTime()} primary="true">
 					<strong>Change</strong>
-				</Button>
+				</ButtonChange>
 			);
 		}
-	}
-
-	getBoxShadow() {
-		const { appointment } = this.props;
-		let boxShadow = '';
-		switch (appointment.status) {
-			case 'ASSIGNED':
-				boxShadow = '0 0px #fff inset, 0 0px 9px #FEE333';
-				break;
-			case 'CHECKED_IN':
-				boxShadow = '0 1px #fff inset, 0 0.6px 9px #1FB5F4';
-				break;
-			case 'CONFIRMED':
-				boxShadow = '0 1px #fff inset, 0 0.6px 9px #1FB5F4';
-				break;
-
-			case 'PAID':
-				boxShadow = '0 0px #fff inset, 0 0.3px 9px #22DA27';
-				break;
-
-			default:
-				break;
-		}
-		return boxShadow;
 	}
 
 	render() {
@@ -1475,7 +1162,6 @@ class Appointment extends React.Component {
 		return (
 			<div>
 				<AppointmentPopup
-					// BoxShadow={this.getBoxShadow()}
 					closeOnDocumentClick
 					open
 					onOpen={() => this.openModal()}
@@ -1497,6 +1183,7 @@ class Appointment extends React.Component {
 						</AppointmentWrapper.Footer>
 					</AppointmentWrapper>
 				</AppointmentPopup>
+
 				<ConfirmationPopup open={this.state.confirmationModal}>
 					<ConfirmationWrapper>
 						<ConfirmationWrapper.Close onClick={() => this.closeConfirmationModal()}>
@@ -1523,6 +1210,26 @@ class Appointment extends React.Component {
 	}
 }
 
+const style = {
+	staffList: {
+		height: 200,
+		width: 170,
+		overflowY: 'scroll',
+		background: '#ffffff',
+		zIndex: 9999,
+		position: 'absolute',
+		top: '110%',
+		borderRadius: 5,
+		boxShadow: '0 3px 9px rgba(0,0,0,.175)'
+	},
+	imgStaff: {
+		width: 40,
+		height: 40,
+		objectFit: 'cover',
+		borderRadius: 30
+	}
+};
+
 Appointment.propTypes = {
 	appointment: PropTypes.any,
 	deselectAppointment: PropTypes.func,
@@ -1531,5 +1238,355 @@ Appointment.propTypes = {
 	// services: PropTypes.any,
 	// products: PropTypes.any,
 };
+
+const AppPopup = styled(Popup)`
+	border-radius: 1.5rem;
+	padding: 0 !important;
+	border: none !important;
+	box-shadow : ${(props) => props.BoxShadow};
+	`;
+
+const AppPopupWrapper = styled.div`position: relative;`;
+
+AppPopupWrapper.Header = styled.div`
+	height: 3rem;
+	font-size: 23px;
+	font-weight: 600;
+	background: ${(props) => props.backgroundColor};
+	color: ${(props) => (props.color ? props.color : 'white')};
+	letter-spacing: 0.6;
+	width: 100%;
+	padding: 0.5rem 1rem;
+	line-height: 1.5;
+	text-align: center;
+	border-top-left-radius: 1.5rem;
+	border-top-right-radius: 1.5rem;
+`;
+
+AppPopupWrapper.Close = styled.div`
+	position: absolute;
+	right: 0.5rem;
+	top: 0.25rem;
+	line-height: 1;
+	font-size: 2rem;
+	color: #ffffff;
+	cursor: pointer;
+`;
+
+AppPopupWrapper.Body = styled.div`
+	background: #ffffff;
+	width: 100%;
+	padding: 1rem 1rem 0 1rem;
+	height: 450px;
+	overflow-y: scroll;
+`;
+
+AppPopupWrapper.Footer = styled.div`
+	display: flex;
+	padding: 0.5rem 1rem 1rem 1rem;
+	& > div {
+		width: 50%;
+		text-align: center;
+	}
+`;
+
+// ************************************************* //
+// ************************************************ //
+// ************************************************* //
+
+const AppointmentPopup = styled(AppPopup)`
+	width: 50rem !important;
+	`;
+
+const AppointmentWrapper = styled(AppPopupWrapper)`
+	//
+	`;
+
+AppointmentWrapper.Header = styled(AppPopupWrapper.Header)`
+	//
+	`;
+
+AppointmentWrapper.Close = styled(AppPopupWrapper.Close)`
+	//
+	`;
+
+AppointmentWrapper.Body = styled(AppPopupWrapper.Body)`
+	//
+	`;
+
+AppointmentWrapper.Footer = styled(AppPopupWrapper.Footer)`
+	//
+	`;
+
+const UserInformation = styled.div`
+	display: flex;
+	padding: 0.5rem;
+	& > div {
+		width: 50%;
+		display: flex;
+		justify-content: space-between;
+	}
+	& > div:nth-child(1) {
+		margin-right: 1.5rem;
+	}
+`;
+
+const WrapperCancelAppointment = styled.div`
+	display: flex;
+	width: 100%;
+	justify-content: row;
+	margin-top: 20px;
+`;
+
+const AdjustButton = styled.button`
+	background: ${(props) => (props.active ? '#0071c5' : '#dddddd')};
+	color: #ffffff;
+	padding: 2px 15px;
+	margin: 0 10px;
+	border-radius: 6px;
+	cursor: ${(props) => (props.active ? 'pointer' : 'initial')};
+`;
+
+const ButtonService = styled(AdjustButton)`
+	background: ${(props) => props.backgroundColor};
+`;
+
+const ButtonExtra = styled(AdjustButton)`
+	background: ${(props) => props.backgroundColor};
+`;
+
+const ButtonProduct = styled.button`
+	background: ${(props) => props.backgroundColor};
+	color: #ffffff;
+	padding: 2px 15px;
+	margin: 0 10px;
+	border-radius: 6px;
+	cursor: ${(props) => (props.active ? 'pointer' : 'initial')};
+`;
+
+const NoteWrapper = styled.div`
+	border: 1px solid #dddddd;
+	background: #eeeeee;
+	padding: 0.5rem;
+	overflow-x: scroll;
+	height: 10rem;
+`;
+
+NoteWrapper.Form = styled.form`
+	display: flex;
+	& > input {
+		flex: 1;
+		background: #ffffff;
+		border: 1px solid #dddddd;
+		border-right: none;
+		border-top-left-radius: 4px;
+		border-bottom-left-radius: 4px;
+		padding: 0 1rem;
+		-moz-appearance: none;
+		/* for Chrome */
+		-webkit-appearance: none;
+	}
+	& > button {
+		width: 5rem;
+		border-top-right-radius: 4px;
+		border-bottom-right-radius: 4px;
+		background: #0071c5;
+		color: #ffffff;
+		line-height: 2.8;
+		cursor: pointer;
+		text-align: center;
+	}
+`;
+
+const NoteInformation = styled.div`
+	display: flex;
+	padding: 0.5rem;
+	& > div:nth-child(1),
+	& > div:nth-child(2) {
+		width: 20%;
+	}
+	& > div:last-child {
+		width: 60%;
+	}
+`;
+
+const AppointmentInformation = styled.div`
+	display: flex;
+	padding: 0.5rem;
+	justify-content: space-between;
+	& > div {
+	}
+`;
+
+const TipPercent = styled.div`
+	display: flex;
+	padding: 0.5rem;
+	& > div {
+		width: 100%;
+		display: flex;
+		justify-content: flex-end;
+	}
+`;
+
+const Button = styled.button`
+	border-radius: 4px;
+	background: ${(props) => (props.primary ? '#0071c5' : '#eeeeee')};
+	color: ${(props) => (props.primary ? '#ffffff' : '#333333')};
+	border: 1px solid #dddddd;
+	font-size: 1rem;
+	line-height: 2.8;
+	height: 100%;
+	cursor: pointer;
+	text-align: center;
+	padding: 0 2rem;
+	width: 9rem;
+`;
+
+const ButtonChange = styled(Button)`
+	box-shadow: 0 0px #fff inset, 0 0.6px 10px #1FB5F4;
+	border: none !important;
+`;
+
+const ButtonChangeTime = styled.button`
+	background: ${(props) => (props.disabled ? '#eeeeee' : '#0071c5')};
+	color: ${(props) => (props.primary ? '#333333' : '#ffffff')};
+	height: 40%;
+	justify-content: center;
+	align-items: center;
+	margin-top: 5px;
+	margin-left: 10px;
+	width: 60%;
+	float: right;
+	cursor: pointer;
+	border-radius: 4px;
+	font-size: 1rem;
+`;
+
+const Img = styled.img`filter: invert(100%);`;
+
+const WrapperTimeChange = styled.div`
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	margin-top: 1rem;
+`;
+
+const SelectDateWrapper = styled.div`
+	width: calc(100%/3);
+	float: left;
+`;
+SelectDateWrapper.SelectDate = styled.div`
+	background: ${(props) => (props.NoneBackground ? '#ffffff' : '#585858')};
+	color: #fff;
+	font-size: 0.95rem;
+	font-weight: 400;
+	padding-left: 10px;
+	line-height: 2;
+`;
+SelectDateWrapper.SelectStaff = styled(SelectDateWrapper.SelectDate)`
+	padding-left : 50%;
+	`;
+// ************************************************* //
+// ************************************************* //
+// ************************************************* //
+
+const ConfirmationPopup = styled(AppPopup)`
+	width: 30rem !important;
+	height: 10rem !important;
+	`;
+
+const ConfirmationWrapper = styled(AppPopupWrapper)`
+	//
+	`;
+
+ConfirmationWrapper.Header = styled(AppPopupWrapper.Header)`
+	//
+	`;
+
+ConfirmationWrapper.Body = styled(AppPopupWrapper.Body)`
+	text-align: center;
+	height: 200px;
+	border-bottom-left-radius: 1.5rem;
+	border-bottom-right-radius: 1.5rem;
+	`;
+
+ConfirmationWrapper.Close = styled(AppPopupWrapper.Close)`
+	//
+	`;
+
+ConfirmationWrapper.Footer = styled(AppPopupWrapper.Footer)`
+	//
+	`;
+
+const WrapperFooterPaid = styled.div`
+	padding: 10px;
+	display: flex;
+	flex-direction: row;
+`;
+WrapperFooterPaid.Item = styled.div`
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	width: 50%;
+	margin-left: 10px;
+	color: #0b0b0b;
+`;
+WrapperFooterPaid.ItemLeft = styled(WrapperFooterPaid.Item)`
+	padding-right : 4rem;
+	`;
+
+const FooterTotal = styled(WrapperFooterPaid)`
+	justify-content : space-between;
+	border-top: 1px solid #ebebeb;
+	margin-top : 0.3rem;
+	padding-left : 20px;
+	`;
+
+const MiniCalendarWrapper = styled.div`
+	width: calc(5.05rem - 1px);
+	height: 100%;
+	text-align: center;
+	border-right: 1px solid #3883bb;
+	position: relative;
+	padding: 0.5rem;
+`;
+
+MiniCalendarWrapper.Button = styled.div`
+	border-radius: 4px;
+	background: #0071c5;
+	color: #ffffff;
+	width: 100%;
+	font-size: 1.5rem;
+	line-height: 1.5;
+	height: 100%;
+	cursor: pointer;
+`;
+
+const CalendarPopup = styled.div`
+	margin-top: 280px;
+	position: absolute;
+	transform: translate3d(0.5rem, calc(-18rem + 0.5rem), 0px);
+	will-change: transform;
+	z-index: 1;
+	background: #fff;
+	color: #000;
+	height: 18rem;
+	line-height: 1;
+	box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+	border-radius: 8px;
+	overflow: hidden;
+`;
+
+CalendarPopup.Heading = styled.div`
+	background: #0071c5;
+	color: #ffffff;
+	height: 3rem;
+	font-size: 1.2rem;
+	line-height: 2;
+	text-align: center;
+	padding-top: 0.3rem;
+`;
+
+CalendarPopup.Body = styled.div``;
 
 export default Appointment;

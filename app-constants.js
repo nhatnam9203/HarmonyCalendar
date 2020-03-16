@@ -7,11 +7,11 @@ export const staffId = getURLParam('staffId');
 
 export const API_PORT = 8010;
 
-export const DEV_API_BASE_URL = `https://api.harmonypayment.com`;
-export const PROD_API_BASE_URL = `https://api.harmonypayment.com`;
+// export const DEV_API_BASE_URL = `https://api.harmonypayment.com`;
+// export const PROD_API_BASE_URL = `https://api.harmonypayment.com`;
 
-// export const DEV_API_BASE_URL = `https://api2.levincidemo.com`;
-// export const PROD_API_BASE_URL = `https://api2.levincidemo.com`;
+export const DEV_API_BASE_URL = `https://api2.levincidemo.com`;
+export const PROD_API_BASE_URL = `https://api2.levincidemo.com`;
 
 export const API_BASE_URL =
   process.env.NODE_ENV === 'production' ? `${PROD_API_BASE_URL}/api` : `${DEV_API_BASE_URL}/api`;
@@ -20,6 +20,7 @@ export const BASE_URL =
 
 // export const GET_MEMBERS_API = `${API_BASE_URL}/staff`;
 export const GET_MEMBERS_API = `${API_BASE_URL}/staff/getbymerchant/${merchantId}?getDisabled=${false}`;
+export const GET_MEMBER = `${API_BASE_URL}/staff/getbydate/${merchantId}?date=`;
 export const GET_APPOINTMENT_BY_DATE = `${API_BASE_URL}/appointment/date`;
 export const GET_APPOINTMENT_STATUS = `${API_BASE_URL}/appointment/getbystatus?status=waiting`;
 export const PUT_STATUS_APPOINTMENT_API = `${API_BASE_URL}/appointment`;

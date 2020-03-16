@@ -24,6 +24,9 @@ const makeSelectMembers = () =>
 const makeSelectDisplayedMembers = () =>
 	createSelector(currentAppointment, (appointmentState) => appointmentState.getIn([ 'members', 'displayed' ]));
 
+const makeSelectStaffSort = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.getIn([ 'members', 'staffSort' ]));
+
 const makeSelectWaitingAppointments = () =>
 	createSelector(currentAppointment, (appointmentState) => appointmentState.getIn([ 'appointments', 'waiting' ]));
 
@@ -118,5 +121,6 @@ export {
 	makeSelectPinStaff,
 	makeSelectAllAppointments,
 	makeSelectAppointmentDetail,
-	makeSelectGroupAppointment
+	makeSelectGroupAppointment,
+	makeSelectStaffSort
 };

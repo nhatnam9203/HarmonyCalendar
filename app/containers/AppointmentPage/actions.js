@@ -105,7 +105,8 @@ import {
   CHECKOUT,
   UPDATE_APPOINTMENT_PAID_OFFLINE,
   GET_TIME_STAFF_LOGIN,
-  GET_TIME_STAFF_LOGIN_SUCCESS
+  GET_TIME_STAFF_LOGIN_SUCCESS,
+  LOAD_STAFF_SORT
 } from './constants';
 
 /**
@@ -784,6 +785,11 @@ export const getTimeStaffLogin = (staffId) => ({
 export const getTimeStaffLoginSuccess = (data) => ({
   type: GET_TIME_STAFF_LOGIN_SUCCESS,
   data,
+});
+
+export const loadStaffSort = (staffSort) => ({
+  type: LOAD_STAFF_SORT,
+  staffSort,
 });
 
 

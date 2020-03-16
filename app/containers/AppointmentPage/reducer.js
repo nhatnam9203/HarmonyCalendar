@@ -98,6 +98,7 @@ export const initialState = fromJS({
 	members: {
 		all: [],
 		displayed: [],
+		staffSort : [],
 		blockTime: []
 	},
 	appointments: {
@@ -178,6 +179,9 @@ function appointmentReducer(state = initialState, action) {
 
 		case LOAD_MEMBERS:
 			return state.set('loading', true).set('error', false).setIn([ 'members', 'all' ], []);
+
+		case 'LOAD_STAFF_SORT':
+			return state.setIn([ 'members', 'staffSort' ], action.staff);
 
 		case LOAD_MEMBERS_SUCCESS:
 			return state.setIn([ 'members', 'all' ], action.members).set('loading', false);
