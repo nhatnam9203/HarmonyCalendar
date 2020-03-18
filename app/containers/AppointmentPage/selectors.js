@@ -94,6 +94,9 @@ const makeSelectGroupAppointment = () =>
 		appointmentState.getIn([ 'appointments', 'groupAppointment' ])
 	);
 
+const makeSlideIndex = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.get('slideIndex'));
+
 export {
 	currentAppointment,
 	makeCurrentDay,
@@ -122,5 +125,6 @@ export {
 	makeSelectAllAppointments,
 	makeSelectAppointmentDetail,
 	makeSelectGroupAppointment,
-	makeSelectStaffSort
+	makeSelectStaffSort,
+	makeSlideIndex
 };

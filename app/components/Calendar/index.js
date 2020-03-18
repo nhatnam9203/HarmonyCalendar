@@ -101,22 +101,6 @@ class Calendar extends React.Component {
 						window.location.reload();
 					}, 300);
 				}
-				// const { waitingList, staffList, Calendars } = data;
-	
-				// const members = staffList.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0);
-				// localStorage.setItem('staffList', JSON.stringify(members));
-	
-				// const appointments = Calendars.map((app) => appointmentAdapter(app));
-				// localStorage.setItem('AppointmentCalendar', JSON.stringify(appointments));
-	
-				// const appointmentWaiting = waitingList.map((app) => appointmentAdapter(app));
-				// localStorage.setItem('AppointmentWaiting', JSON.stringify(appointmentWaiting));
-	
-				// setTimeout(() => {
-				// 	this.props.loadMembers();
-				// 	this.props.loadWaitingAppointments();
-				// 	this.props.loadAppointmentByMembers();
-				// }, 500);
 			// }
 		}
 	};
@@ -290,7 +274,7 @@ class Calendar extends React.Component {
 			deleteEventWaitingList,
 			StatusDeleteWaiting,
 			deleteWaitingAppointment,
-			updateAppointmentPaid
+			updateAppointmentPaid,
 		} = this.props;
 		return (
 			<CalendarWrapper>

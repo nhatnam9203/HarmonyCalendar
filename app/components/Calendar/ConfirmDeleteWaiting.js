@@ -16,9 +16,9 @@ const ConfirmPopupWrapper = styled.div`
 `
 ConfirmPopupWrapper.Header = styled.div`
   height: 3rem;
-  font-size: 26px;
+  font-size: 1.6rem;
   font-weight: bold;
-  background: #FF4136;
+  background: #1FB5F4;
   color: #ffffff;
   padding: 0.5rem 1rem;
   line-height: 1.5;
@@ -39,7 +39,7 @@ ConfirmPopupWrapper.ButtonX = styled.div`
 
 ConfirmPopupWrapper.Body = styled.div`
   height: 5rem;
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   color: #333;
   text-align: center;
   padding-top : 1rem;
@@ -59,7 +59,7 @@ ConfirmPopupWrapper.WrapperButton = styled.div`
 ConfirmPopupWrapper.Button = styled.button`
     background-color : ${props => props.backgroundColor};
     color : ${props => props.Color};
-    padding : 0.5rem 2.5rem;
+    padding : 0.8rem 3.5rem;
     border-radius : 3px;
     font-size : 1rem;
     cursor : pointer;
@@ -102,7 +102,7 @@ class ConfirmDeleteWaiting extends Component {
                 onClose={() => this.closeModal()}
             >
                 <ConfirmPopupWrapper>
-                    <ConfirmPopupWrapper.Header>Delete Appointment
+                    <ConfirmPopupWrapper.Header>Confirmation
                         <ConfirmPopupWrapper.ButtonX onClick={()=>this.closeModal()}>
                             <FaTimesCircle />
                         </ConfirmPopupWrapper.ButtonX>
@@ -114,11 +114,11 @@ class ConfirmDeleteWaiting extends Component {
 
                     <ConfirmPopupWrapper.Footer>
                         <ConfirmPopupWrapper.WrapperButton>
-                            <ConfirmPopupWrapper.Button Color="#fff" backgroundColor={'#FF4136'} onClick={() => this.deleteEventWaiting()}>Yes</ConfirmPopupWrapper.Button>
+                            <ConfirmPopupWrapper.Button Color="#333" backgroundColor={'#EEEEEE'} onClick={() => this.deleteEventWaiting()}>Yes</ConfirmPopupWrapper.Button>
                         </ConfirmPopupWrapper.WrapperButton>
 
                         <ConfirmPopupWrapper.WrapperButton>
-                            <ConfirmPopupWrapper.Button Color="#333" backgroundColor={'#EEEEEE'} onClick={() => this.closeModal()}>No</ConfirmPopupWrapper.Button>
+                            <ConfirmPopupWrapper.Button Color="#fff" backgroundColor={'#1FB5F4'} onClick={() => this.closeModal()}>No</ConfirmPopupWrapper.Button>
                         </ConfirmPopupWrapper.WrapperButton>
                     </ConfirmPopupWrapper.Footer>
                 </ConfirmPopupWrapper>

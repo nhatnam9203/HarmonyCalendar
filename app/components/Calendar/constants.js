@@ -1,7 +1,5 @@
 import $ from 'jquery';
 import moment from 'moment';
-import axios from 'axios';
-import { token } from '../../../app-constants';
 import { store } from 'app';
 import {
 	assignAppointment,
@@ -11,8 +9,6 @@ import {
 	openAddingAppointment,
 	disableCalendar,
 	TimeAndStaffID,
-	closeAddingAppointment,
-	closeTimeAndStaffID,
 	getApppointmentById
 } from '../../containers/AppointmentPage/actions';
 import { formatPhone } from '../../utils/helper';

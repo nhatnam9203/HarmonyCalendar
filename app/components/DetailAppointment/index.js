@@ -17,6 +17,9 @@ import { formatPhone } from '../../utils/helper';
 import _ from 'lodash';
 import { convertAppointment, statusConvertData, initialState } from './utilDetail';
 import PopupStaff from './PopupStaff';
+import { FaCaretDown } from 'react-icons/fa';
+import PopupTimePicker from './PopupTimePicker';
+import { MdSubdirectoryArrowLeft } from 'react-icons/md';
 
 class Appointment extends React.Component {
 	constructor(props) {
@@ -59,6 +62,7 @@ class Appointment extends React.Component {
 	}
 
 	onChangeFromTime(fromTime) {
+		console.log({ fromTime });
 		this.setState({ fromTime: fromTime });
 		this.setChangeTrue();
 	}
@@ -462,19 +466,13 @@ class Appointment extends React.Component {
 			<div
 				style={{
 					position: 'relative',
-					paddingTop: 18
+					paddingTop: 8,
+					paddingLeft: 10
 				}}
 			>
-				<div
-					onClick={() => this.setState({ isPopupDay: !isPopupDay })}
-					style={{
-						color:
-							moment(dayChange).format('MM/DD/YYYY') === moment(old_dayChange).format('MM/DD/YYYY')
-								? '#333'
-								: '#C3447A'
-					}}
-				>
+				<div onClick={() => this.setState({ isPopupDay: !isPopupDay })} style={style.buttonDayChange}>
 					{moment(dayChange).format('MM/DD/YYYY')}
+					<FaCaretDown style={{ marginLeft: 10 }} />
 				</div>
 				{isPopupDay && (
 					<OutsideClickHandler onOutsideClick={() => this.setState({ isPopupDay: !isPopupDay })}>
@@ -496,40 +494,64 @@ class Appointment extends React.Component {
 		);
 	}
 
+	openPopupTimePicker() {
+		this.setState({
+			isPopupTimePicker: true
+		});
+	}
+
+	closePopupTimePicker() {
+		const { isPopupTimePicker } = this.state;
+		this.setState({
+			isPopupTimePicker: !isPopupTimePicker
+		});
+	}
+
+	doneTimePicker(time) {
+		this.setState({
+			fromTime: time
+		});
+		this.closePopupTimePicker();
+	}
+
+	cancelTimePicker() {
+		this.closePopupTimePicker();
+	}
+
 	renderChangeAppointTime() {
-		const { selectedStaff, isOpenStaffList, old_selectedStaff, fromTime, old_fromTime } = this.state;
+		const { selectedStaff, isOpenStaffList, fromTime, isPopupTimePicker } = this.state;
 		return (
 			<WrapperTimeChange>
 				<SelectDateWrapper>
 					<SelectDateWrapper.SelectDate>Date</SelectDateWrapper.SelectDate>
 					{this.renderSelectDay()}
 				</SelectDateWrapper>
+
 				<SelectDateWrapper>
 					<SelectDateWrapper.SelectDate>
 						<div style={{ paddingLeft: '35%' }}>Time</div>
 					</SelectDateWrapper.SelectDate>
-					<div style={{ paddingLeft: '35%' }}>
-						<DatePicker
-							mode="time"
-							minuteStep={15}
-							use12Hours
-							title="Select Time"
-							onChange={(time) => this.onChangeFromTime(time)}
-							locale={enUs}
+					<div style={{ paddingLeft: '35%', paddingTop: 8 }}>
+						<div
+							style={{
+								position: 'relative'
+							}}
 						>
-							<p
-								style={{
-									color:
-										moment(old_fromTime).format('hh:mm A') === moment(fromTime).format('hh:mm A')
-											? '#333'
-											: '#C3447A'
-								}}
-							>
+							<div style={style.buttonTime} onClick={() => this.openPopupTimePicker()}>
 								{moment(fromTime).format('hh:mm A').toString()}
-							</p>
-						</DatePicker>
+								<FaCaretDown style={{ marginLeft: 10 }} />
+							</div>
+							{isPopupTimePicker && (
+								<PopupTimePicker
+									cancelTimePicker={() => this.cancelTimePicker()}
+									doneTimePicker={(time) => this.doneTimePicker(time)}
+									currentDay={this.props.currentDay}
+								/>
+							)}
+						</div>
 					</div>
 				</SelectDateWrapper>
+
 				<SelectDateWrapper>
 					<SelectDateWrapper.SelectStaff>Staff</SelectDateWrapper.SelectStaff>
 					<div
@@ -542,20 +564,11 @@ class Appointment extends React.Component {
 						<div style={{ position: 'relative', paddingTop: 3, color: '#333', paddingLeft: 60 }}>
 							<div
 								onClick={() => this.setState({ isOpenStaffList: !this.state.isOpenStaffList })}
-								style={{ display: 'flex', flexDirection: 'row', cursor: 'pointer' }}
+								style={style.row2}
 							>
 								<img style={style.imgStaff} src={selectedStaff.imageUrl} />
-								<p
-									style={{
-										marginLeft: 10,
-										overflow: 'hidden',
-										textOverflow: 'ellipsis',
-										whiteSpace: 'nowrap',
-										color: selectedStaff.id === old_selectedStaff.id ? '#333' : '#C3447A'
-									}}
-								>
-									{selectedStaff.title}
-								</p>
+								<p style={style.staffName2}>{selectedStaff.title}</p>
+								<FaCaretDown style={{ marginLeft: 10 }} />
 							</div>
 							{isOpenStaffList && (
 								<OutsideClickHandler
@@ -640,8 +653,9 @@ class Appointment extends React.Component {
 
 	renderBody() {
 		const { appointment, currentDay } = this.props;
+		const { isPopupTimePicker } = this.state;
 		return (
-			<AppointmentWrapper.Body>
+			<AppointmentWrapper.Body scroll={isPopupTimePicker ? false : true}>
 				<UserInformation>
 					<div>
 						<span>Customer name: </span>
@@ -695,8 +709,8 @@ class Appointment extends React.Component {
 		const { old_service } = this.state;
 		let backgroundColor = '#dddddd';
 		if (appointment.status !== 'PAID' && service.duration > 5) backgroundColor = '#0071c5';
-		if (parseInt(old_service[index].duration) > parseInt(service.duration) && service.duration > 5)
-			backgroundColor = '#C3447A';
+		// if (parseInt(old_service[index].duration) > parseInt(service.duration) && service.duration > 5)
+		// 	backgroundColor = '#C3447A';
 		return backgroundColor;
 	}
 
@@ -704,7 +718,7 @@ class Appointment extends React.Component {
 		const { old_service } = this.state;
 		let backgroundColor = '#dddddd';
 		if (appointment.status !== 'PAID') backgroundColor = '#0071c5';
-		if (parseInt(old_service[index].duration) < parseInt(service.duration)) backgroundColor = '#C3447A';
+		// if (parseInt(old_service[index].duration) < parseInt(service.duration)) backgroundColor = '#C3447A';
 		return backgroundColor;
 	}
 
@@ -717,33 +731,44 @@ class Appointment extends React.Component {
 		const { isPopupStaff } = this.state;
 		this.setState({
 			isPopupStaff: !isPopupStaff,
-			indexPopupStaff : index
+			indexPopupStaff: index
 		});
 	};
+
+	closePopupStaff() {
+		const { isPopupStaff } = this.state;
+		this.setState({
+			isPopupStaff: !isPopupStaff
+		});
+	}
 
 	renderService(service, index) {
 		const { appointment, staffList } = this.props;
 		const staff = staffList.find((s) => parseInt(s.id) === parseInt(service.staffId));
-		const { prices, old_prices, isPopupStaff , indexPopupStaff } = this.state;
+		const { prices, isPopupStaff, indexPopupStaff } = this.state;
 		if (appointment.status !== 'PAID') {
 			return (
 				<tr key={index}>
-					<td style={{ width: '25%' }}>{service.serviceName}</td>
-					<td style={{ position: 'relative' }} onClick={()=>this.togglePopupStaff('',index)}>
-						<div style={{ display: 'flex', flexDirection: 'row' }}>
-							<img
-								src={staff.imageUrl}
-								style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 25 }}
-							/>
-							<p style={{ marginLeft: 8 }}>{staff.title}</p>
+					<td style={{ width: '50%' }}>
+						<div style={style.serviceColumn}>
+							<div style={style.serviceName}>{service.serviceName}</div>
+
+							<div onClick={() => this.togglePopupStaff('', index)} style={style.staffService}>
+								<img src={staff.imageUrl ? staff.imageUrl : ''} style={style.imgStaff} />
+								<p style={style.staffNameColumn}>{staff.title}</p>
+								<FaCaretDown style={{ marginLeft: 10 }} />
+								{isPopupStaff &&
+								index === indexPopupStaff && (
+									<PopupStaff
+										togglePopupStaff={(staff) => this.togglePopupStaff(staff, index)}
+										staffList={staffList}
+										closePopupStaff={() => this.closePopupStaff()}
+									/>
+								)}
+							</div>
 						</div>
-						{isPopupStaff && (index === indexPopupStaff) &&  (
-							<PopupStaff
-								togglePopupStaff={(staff) => this.togglePopupStaff(staff, index)}
-								staffList={staffList}
-							/>
-						)}
 					</td>
+
 					{appointment.status !== 'PAID' && (
 						<td style={{ textAlign: 'center' }}>
 							<ButtonService
@@ -766,18 +791,24 @@ class Appointment extends React.Component {
 							</ButtonService>
 						</td>
 					)}
-					<td style={{ textAlign: 'center' }}>
-						<NumberFormat
-							value={parseFloat(prices[index]).toFixed(2)}
-							onValueChange={(value) => this.onChangePrice(value, index)}
-							thousandSeparator={false}
-							disabled={appointment.status === 'PAID'}
-							style={{
-								textAlign: 'center',
-								color: old_prices[index] === prices[index] ? '#333' : '#C3447A'
-							}}
-							type="tel"
-						/>
+					<td>
+						<div style={style.row}>
+							<NumberFormat
+								value={parseFloat(prices[index]).toFixed(2)}
+								onValueChange={(value) => this.onChangePrice(value, index)}
+								thousandSeparator={false}
+								disabled={appointment.status === 'PAID'}
+								style={style.price}
+								type="tel"
+							/>
+							<img
+								src={require('../../assets/images/edit.png')}
+								style={{
+									width: 16,
+									height: 16
+								}}
+							/>
+						</div>
 					</td>
 				</tr>
 			);
@@ -785,29 +816,32 @@ class Appointment extends React.Component {
 			if (service.staff) {
 				return (
 					<tr key={index}>
-						<td>{service.serviceName}</td>
 						<td>
-							<div style={{ display: 'flex', flexDirection: 'row' }}>
-								<img
-									src={service.staff.imageUrl}
-									style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 25 }}
-								/>
-								<p style={{ marginLeft: 8 }}>{service.staff.displayName}</p>
+							<div style={style.row3}>
+								<div style={style.serviceName}>{service.serviceName}</div>
+								<div style={{ display: 'flex', flexDirection: 'row', marginLeft: 150 }}>
+									<img
+										src={service.staff.imageUrl}
+										style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 25 }}
+									/>
+									<p style={{ marginLeft: 8 }}>{service.staff.displayName}</p>
+								</div>
 							</div>
 						</td>
 						<td style={{ textAlign: 'center' }}>{service.staff.tip}</td>
-						<td style={{ textAlign: 'center' }}>
-							<NumberFormat
-								value={parseFloat(this.state.prices[index]).toFixed(2)}
-								onValueChange={(value) => this.onChangePrice(value, index)}
-								thousandSeparator={false}
-								disabled={appointment.status === 'PAID'}
-								style={{
-									textAlign: 'center',
-									color: old_prices[index] === prices[index] ? '#333' : '#C3447A'
-								}}
-								type="tel"
-							/>
+						<td>
+							<div style={style.row3}>
+								<NumberFormat
+									value={parseFloat(prices[index]).toFixed(2)}
+									onValueChange={(value) => this.onChangePrice(value, index)}
+									thousandSeparator={false}
+									disabled={appointment.status === 'PAID'}
+									style={{
+										textAlign: 'center'
+									}}
+									type="tel"
+								/>
+							</div>
 						</td>
 					</tr>
 				);
@@ -817,15 +851,24 @@ class Appointment extends React.Component {
 						<td>{service.serviceName}</td>
 						<td>You're in Offline</td>
 						<td>You're in Offline</td>
-						<td style={{ textAlign: 'center' }}>
-							<NumberFormat
-								value={parseFloat(this.state.prices[index]).toFixed(2)}
-								onValueChange={(value) => this.onChangePrice(value, index)}
-								thousandSeparator={false}
-								disabled={appointment.status === 'PAID'}
-								style={{ textAlign: 'center' }}
-								type="tel"
-							/>
+						<td>
+							<div style={style.row}>
+								<NumberFormat
+									value={parseFloat(prices[index]).toFixed(2)}
+									onValueChange={(value) => this.onChangePrice(value, index)}
+									thousandSeparator={false}
+									disabled={appointment.status === 'PAID'}
+									style={style.price}
+									type="tel"
+								/>
+								<img
+									src={require('../../assets/images/edit.png')}
+									style={{
+										width: 16,
+										height: 16
+									}}
+								/>
+							</div>
 						</td>
 					</tr>
 				);
@@ -842,16 +885,14 @@ class Appointment extends React.Component {
 					<table>
 						<thead>
 							<tr>
-								<th width="25%">Selected Services</th>
-								<th width="25%" style={{ textAlign: 'center' }}>
+								<th width="50%">Selected Services</th>
+								{/* <th width="25%" style={{ textAlign: 'center' }}>
 									Staff
-								</th>
+								</th> */}
 								<th width="25%" style={{ textAlign: 'center' }}>
 									Duration (min)
 								</th>
-								<th width="20%" style={{ textAlign: 'center' }}>
-									Price ($)
-								</th>
+								<th style={{ textAlign: 'center' }}>Price ($)</th>
 							</tr>
 						</thead>
 						<tbody>{services.map((s, i) => this.renderService(s, i))}</tbody>
@@ -861,10 +902,10 @@ class Appointment extends React.Component {
 				<table>
 					<thead>
 						<tr>
-							<th width="25%">Selected Services</th>
-							<th width="25%" style={{ textAlign: 'center' }}>
+							<th width="50%">Selected Services</th>
+							{/* <th width="25%" style={{ textAlign: 'center' }}>
 								Staff
-							</th>
+							</th> */}
 							<th width="25%" style={{ textAlign: 'center' }}>
 								Tip ($)
 							</th>
@@ -883,8 +924,8 @@ class Appointment extends React.Component {
 		const { old_product } = this.state;
 		let backgroundColor = '#dddddd';
 		if (appointment.status !== 'PAID' && product.quantity > 1) backgroundColor = '#0071c5';
-		if (parseInt(old_product[index].quantity) > parseInt(product.quantity) && product.quantity > 1)
-			backgroundColor = '#C3447A';
+		// if (parseInt(old_product[index].quantity) > parseInt(product.quantity) && product.quantity > 1)
+		// 	backgroundColor = '#C3447A';
 		return backgroundColor;
 	}
 
@@ -892,7 +933,7 @@ class Appointment extends React.Component {
 		const { old_product } = this.state;
 		let backgroundColor = '#dddddd';
 		if (appointment.status !== 'PAID') backgroundColor = '#0071c5';
-		if (parseInt(old_product[index].quantity) < parseInt(product.quantity)) backgroundColor = '#C3447A';
+		// if (parseInt(old_product[index].quantity) < parseInt(product.quantity)) backgroundColor = '#C3447A';
 		return backgroundColor;
 	}
 
@@ -920,20 +961,16 @@ class Appointment extends React.Component {
 						+
 					</ButtonProduct>
 				</td>
-				<td
-					style={{
-						textAlign: 'center',
-						color:
-							old_product[index].price * old_product[index].quantity === product.price * product.quantity
-								? '#333'
-								: '#C3447A',
-						fontWeight:
-							old_product[index].price * old_product[index].quantity === product.price * product.quantity
-								? 'normal'
-								: 'bold'
-					}}
-				>
-					{parseFloat(product.price * product.quantity).toFixed(2)}
+				<td>
+					<div
+						style={{
+							display: 'flex',
+							flexDirection: 'row',
+							justifyContent: 'center'
+						}}
+					>
+						<div style={style.price2}>{parseFloat(product.price * product.quantity).toFixed(2)}</div>
+					</div>
 				</td>
 			</tr>
 		);
@@ -954,13 +991,13 @@ class Appointment extends React.Component {
 	renderProducts() {
 		const { products } = this.state;
 		const { appointment } = this.props;
-		if (products.length > 0 || appointment.giftCards) {
+		if (products.length > 0 || (appointment.giftCards && appointment.giftCards.length > 0)) {
 			return (
 				<table>
 					<thead>
 						<tr>
 							<th style={{ width: '50%' }}>Selected Products</th>
-							<th style={{ width: appointment.status === 'PAID' ? '25%' : '30%', textAlign: 'center' }}>
+							<th style={{ width: appointment.status === 'PAID' ? '25%' : '25%', textAlign: 'center' }}>
 								Amount
 							</th>
 							<th style={{ textAlign: 'center' }}>Price ($)</th>
@@ -979,8 +1016,8 @@ class Appointment extends React.Component {
 		const { old_extra } = this.state;
 		let backgroundColor = '#dddddd';
 		if (appointment.status !== 'PAID' && extra.duration > 5) backgroundColor = '#0071c5';
-		if (parseInt(old_extra[index].duration) > parseInt(extra.duration) && extra.duration > 5)
-			backgroundColor = '#C3447A';
+		// if (parseInt(old_extra[index].duration) > parseInt(extra.duration) && extra.duration > 5)
+		// 	backgroundColor = '#C3447A';
 		return backgroundColor;
 	}
 
@@ -988,7 +1025,7 @@ class Appointment extends React.Component {
 		const { old_extra } = this.state;
 		let backgroundColor = '#dddddd';
 		if (appointment.status !== 'PAID') backgroundColor = '#0071c5';
-		if (parseInt(old_extra[index].duration) < parseInt(extra.duration)) backgroundColor = '#C3447A';
+		// if (parseInt(old_extra[index].duration) < parseInt(extra.duration)) backgroundColor = '#C3447A';
 		return backgroundColor;
 	}
 
@@ -1016,17 +1053,31 @@ class Appointment extends React.Component {
 					</ButtonExtra>
 				</td>
 				<td style={{ textAlign: 'center' }}>
-					<NumberFormat
-						value={parseFloat(pricesExtras[index]).toFixed(2)}
-						onValueChange={(value) => this.onChangePriceExtra(value, index)}
-						thousandSeparator={false}
-						disabled={appointment.status === 'PAID'}
+					<div
 						style={{
-							textAlign: 'center',
-							color: old_priceExtras[index] === pricesExtras[index] ? '#333' : '#C3447A'
+							display: 'flex',
+							flexDirection: 'row',
+							justifyContent: 'center'
 						}}
-						type="tel"
-					/>
+					>
+						<NumberFormat
+							value={parseFloat(pricesExtras[index]).toFixed(2)}
+							onValueChange={(value) => this.onChangePriceExtra(value, index)}
+							thousandSeparator={false}
+							disabled={appointment.status === 'PAID'}
+							style={appointment.status !== 'PAID' ? style.price : { textAlign: 'center' }}
+							type="tel"
+						/>
+						{appointment.status !== 'PAID' && (
+							<img
+								src={require('../../assets/images/edit.png')}
+								style={{
+									width: 16,
+									height: 16
+								}}
+							/>
+						)}
+					</div>
 				</td>
 			</tr>
 		);
@@ -1041,7 +1092,7 @@ class Appointment extends React.Component {
 					<thead>
 						<tr>
 							<th style={{ width: '50%' }}>Selected Extras</th>
-							<th style={{ width: appointment.status === 'PAID' ? '25%' : '30%', textAlign: 'center' }}>
+							<th style={{ width: appointment.status === 'PAID' ? '25%' : '25%', textAlign: 'center' }}>
 								Duration (min)
 							</th>
 							<th style={{ textAlign: 'center' }}>Price ($)</th>
@@ -1086,7 +1137,13 @@ class Appointment extends React.Component {
 				<NoteWrapper.Form onSubmit={(e) => this.handleSubmit(e)}>
 					<input value={this.state.noteValue} onChange={(e) => this.handleChange(e)} />
 					<button onClick={() => this.addNote()} type="button">
-						<Img src={Enter} alt="icon" />
+						{/* <Img src={Enter} alt="icon" /> */}
+						<MdSubdirectoryArrowLeft
+							style={{
+								width: 33,
+								height: 33
+							}}
+						/>
 					</button>
 				</NoteWrapper.Form>
 				{notes.map(this.renderNote)}
@@ -1227,6 +1284,81 @@ const style = {
 		height: 40,
 		objectFit: 'cover',
 		borderRadius: 30
+		// border: '1.5px solid grey',
+		// boxShadow: '0 2px #fff inset, 0 0.8px 4px grey'
+	},
+	price: {
+		fontWeight: '700',
+		color: '#1366AF',
+		width: 60,
+		textAlign: 'center'
+	},
+	price2: {
+		fontWeight: '900',
+		color: '#1366AF',
+		width: 60,
+		textAlign: 'center',
+		marginLeft: -20,
+		fontSize: 13,
+		letterSpacing: 0.06
+	},
+	row: {
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'center'
+	},
+	buttonTime: {
+		backgroundColor: '#EEEEEE',
+		borderRadius: 5,
+		padding: 10,
+		textAlign: 'center',
+		width: 120,
+		position: 'relative'
+	},
+	buttonDayChange: {
+		backgroundColor: '#EEEEEE',
+		borderRadius: 5,
+		padding: 10,
+		textAlign: 'center',
+		width: 130
+	},
+	staffService: {
+		display: 'flex',
+		flexDirection: 'row',
+		alignItems: 'center',
+		position: 'relative',
+		marginLeft: 150
+	},
+	serviceColumn: {
+		display: 'flex',
+		flexDirection: 'row',
+		alignItems: 'center'
+	},
+	staffNameColumn: {
+		marginLeft: 8
+	},
+	serviceName: {
+		width: 90,
+		whiteSpace: 'nowrap',
+		overflow: 'hidden',
+		textOverflow: 'ellipsis'
+	},
+	row2: {
+		display: 'flex',
+		flexDirection: 'row',
+		cursor: 'pointer',
+		alignItems: 'center'
+	},
+	staffName2: {
+		marginLeft: 10,
+		overflow: 'hidden',
+		textOverflow: 'ellipsis',
+		whiteSpace: 'nowrap'
+	},
+	row3: {
+		display: 'flex',
+		flexDirection: 'row',
+		alignItems: 'center'
 	}
 };
 
@@ -1278,7 +1410,7 @@ AppPopupWrapper.Body = styled.div`
 	width: 100%;
 	padding: 1rem 1rem 0 1rem;
 	height: 450px;
-	overflow-y: scroll;
+	overflow-y: ${(props) => (props.scroll ? 'scroll' : 'visible')};
 `;
 
 AppPopupWrapper.Footer = styled.div`
@@ -1335,7 +1467,7 @@ const WrapperCancelAppointment = styled.div`
 	display: flex;
 	width: 100%;
 	justify-content: row;
-	margin-top: 20px;
+	margin-top: 50px;
 `;
 
 const AdjustButton = styled.button`
@@ -1474,6 +1606,7 @@ const WrapperTimeChange = styled.div`
 const SelectDateWrapper = styled.div`
 	width: calc(100%/3);
 	float: left;
+	/* background: #fffdeb; */
 `;
 SelectDateWrapper.SelectDate = styled.div`
 	background: ${(props) => (props.NoneBackground ? '#ffffff' : '#585858')};
@@ -1505,7 +1638,7 @@ ConfirmationWrapper.Header = styled(AppPopupWrapper.Header)`
 
 ConfirmationWrapper.Body = styled(AppPopupWrapper.Body)`
 	text-align: center;
-	height: 200px;
+	height: 150px;
 	border-bottom-left-radius: 1.5rem;
 	border-bottom-right-radius: 1.5rem;
 	`;

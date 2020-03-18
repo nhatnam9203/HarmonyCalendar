@@ -23,7 +23,8 @@ import {
   renderAppointment,
   SubmitEditBlockTime,
   deleteBlockTime,
-  getTimeStaffLogin
+  getTimeStaffLogin,
+  setSlideIndex
 } from './actions';
 
 export function mapDispatchToProps(dispatch) {
@@ -38,6 +39,7 @@ export function mapDispatchToProps(dispatch) {
     SubmitEditBlockTime:(data)=>dispatch(SubmitEditBlockTime(data)),
     deleteBlockTime:(data)=>dispatch(deleteBlockTime(data)),
     getTimeStaffLogin:(staffId)=>dispatch(getTimeStaffLogin(staffId)),
+    setSlideIndex:(slideIndex)=>dispatch(setSlideIndex(slideIndex)),
   };
 }
 

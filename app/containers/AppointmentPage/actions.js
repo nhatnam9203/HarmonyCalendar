@@ -16,97 +16,98 @@
  */
 
 import {
-  ASSIGN_APPOINTMENT,
-  ASSIGN_APPOINTMENT_ERROR,
-  ASSIGN_APPOINTMENT_SUCCESS,
-  CANCEL_APPOINTMENT,
-  CANCEL_APPOINTMENT_ERROR,
-  CANCEL_APPOINTMENT_SUCCESS,
-  CLOSE_ADDING_APPOINTMENT,
-  DESELECT_APPOINTMENT,
-  LOAD_APPOINTMENTS_BY_MEMBERS,
-  LOAD_APPOINTMENTS_BY_MEMBERS_ERROR,
-  LOAD_APPOINTMENTS_BY_MEMBERS_SUCCESS,
-  LOAD_ALL_APPOINTMENTS,
-  LOAD_MEMBERS,
-  LOAD_MEMBERS_ERROR,
-  LOAD_MEMBERS_SUCCESS,
-  LOAD_WAITING_APPOINTMENT,
-  LOAD_WAITING_APPOINTMENT_ERROR,
-  LOAD_WAITING_APPOINTMENT_SUCCESS,
-  MOVE_APPOINTMENT,
-  MOVE_APPOINTMENT_ERROR,
-  MOVE_APPOINTMENT_SUCCESS,
-  OPEN_ADDING_APPOINTMENT,
-  PUT_BACK_APPOINTMENT,
-  PUT_BACK_APPOINTMENT_ERROR,
-  PUT_BACK_APPOINTMENT_SUCCESS,
-  SELECT_APPOINTMENT,
-  SELECT_DAY,
-  SELECT_DAY_CALENDAR,
-  SELECT_WEEK,
-  SET_DISPLAYED_MEMBERS,
-  UPDATE_STATUS_APPOINTMENT,
-  UPDATE_STATUS_APPOINTMENT_SUCCESS,
-  UPDATE_STATUS_APPOINTMENT_ERROR,
-  UPDATE_CALENDAR_INTERVAL,
-  CHECK_PHONE_ADD_CUSTOMER,
-  CHECK_PHONE_ADD_CUSTOMER_SUCCESS,
-  CHECK_PHONE_ADD_CUSTOMER_ERROR,
-  ADD_CUSTOMER,
-  ADD_CUSTOMER_SUCCESS,
-  ADD_CUSTOMER_ERROR,
-  UPDATE_WAITING_APPOINTMENT,
-  UPDATE_APPOINTMENT_STATUS,
-  UPDATE_APPOINTMENT_STATUS_SUCCESS,
-  UPDATE_APPOINTMENT_STATUS_ERROR,
-  DISABLE_CALENDAR,
-  LOADING_CALENDAR,
-  LOADING_WAITING,
-  TIME_STAFFID,
-  ADD_APPOINTMENT_TO_CALENDAR,
-  DELETE_EVENT_WAITINGLIST,
-  DELETE_EVENT_WAITINGLIST_SUCCESS,
-  DELETE_EVENT_WAITINGLIST_ERROR,
-  REMOVE_APPOINTMENT_WAITING,
-  DELETE_WAITING_APPPOINTMENT,
-  CHANGE_APPOINTMENT_TIME,
-  CHANGE_APPOINTMENT_TIME_SUCCESS,
-  CHANGE_APPOINTMENT_TIME_ERROR,
-  UPDATE_APPOINTMENT_OFFLINE,
-  UPDATE_APPOINTMENT_OFFLINE_SUCCESS,
-  UPDATE_APPOINTMENT_OFFLINE_ERROR,
-  LOAD_APPOINTMENT_AGAIN,
-  ADD_APPOINTMENT_TO_WAITING,
-  ADD_APPOINTMENT_RELOAD_CALENDAR,
-  ADD_APPOINTMENT_REALTIME,
-  INFO_CHECK_PHONE,
-  UPDATE_APPOINTMENT_PAID,
-  DELETE_APPOINTMENT_CALENDAR,
-  UPDATE_STAFF,
-  CHECKPINCODE,
-  OPEN_PINCODE,
-  UPDATE_NEXT_STAFF,
-  UPDATE_NEXT_STAFF_SUCCESS,
-  UPDATE_USER,
-  RENDER_APPOINTMEMT,
-  UPDATE_APPOINTMENT_CALENDAR_FRONTEND,
-  SUBMIT_EDIT_BLOCKTIME,
-  DELETE_BLOCKTIME,
-  DELETE_BLOCKTIME_SUCCESSS,
-  GET_BLOCKTIME,
-  GET_BLOCKTIME_SUCCESS,
-  GET_APPOINTMENT_OFFLINE,
-  GET_WAITINGLIST_OFFLINE,
-  GET_STAFF_OFFLINE,
-  GET_APP_BY_ID,
-  GET_APP_BY_ID_SUCCESS,
-  GROUP_APPOINTMENT,
-  CHECKOUT,
-  UPDATE_APPOINTMENT_PAID_OFFLINE,
-  GET_TIME_STAFF_LOGIN,
-  GET_TIME_STAFF_LOGIN_SUCCESS,
-  LOAD_STAFF_SORT
+	ASSIGN_APPOINTMENT,
+	ASSIGN_APPOINTMENT_ERROR,
+	ASSIGN_APPOINTMENT_SUCCESS,
+	CANCEL_APPOINTMENT,
+	CANCEL_APPOINTMENT_ERROR,
+	CANCEL_APPOINTMENT_SUCCESS,
+	CLOSE_ADDING_APPOINTMENT,
+	DESELECT_APPOINTMENT,
+	LOAD_APPOINTMENTS_BY_MEMBERS,
+	LOAD_APPOINTMENTS_BY_MEMBERS_ERROR,
+	LOAD_APPOINTMENTS_BY_MEMBERS_SUCCESS,
+	LOAD_ALL_APPOINTMENTS,
+	LOAD_MEMBERS,
+	LOAD_MEMBERS_ERROR,
+	LOAD_MEMBERS_SUCCESS,
+	LOAD_WAITING_APPOINTMENT,
+	LOAD_WAITING_APPOINTMENT_ERROR,
+	LOAD_WAITING_APPOINTMENT_SUCCESS,
+	MOVE_APPOINTMENT,
+	MOVE_APPOINTMENT_ERROR,
+	MOVE_APPOINTMENT_SUCCESS,
+	OPEN_ADDING_APPOINTMENT,
+	PUT_BACK_APPOINTMENT,
+	PUT_BACK_APPOINTMENT_ERROR,
+	PUT_BACK_APPOINTMENT_SUCCESS,
+	SELECT_APPOINTMENT,
+	SELECT_DAY,
+	SELECT_DAY_CALENDAR,
+	SELECT_WEEK,
+	SET_DISPLAYED_MEMBERS,
+	UPDATE_STATUS_APPOINTMENT,
+	UPDATE_STATUS_APPOINTMENT_SUCCESS,
+	UPDATE_STATUS_APPOINTMENT_ERROR,
+	UPDATE_CALENDAR_INTERVAL,
+	CHECK_PHONE_ADD_CUSTOMER,
+	CHECK_PHONE_ADD_CUSTOMER_SUCCESS,
+	CHECK_PHONE_ADD_CUSTOMER_ERROR,
+	ADD_CUSTOMER,
+	ADD_CUSTOMER_SUCCESS,
+	ADD_CUSTOMER_ERROR,
+	UPDATE_WAITING_APPOINTMENT,
+	UPDATE_APPOINTMENT_STATUS,
+	UPDATE_APPOINTMENT_STATUS_SUCCESS,
+	UPDATE_APPOINTMENT_STATUS_ERROR,
+	DISABLE_CALENDAR,
+	LOADING_CALENDAR,
+	LOADING_WAITING,
+	TIME_STAFFID,
+	ADD_APPOINTMENT_TO_CALENDAR,
+	DELETE_EVENT_WAITINGLIST,
+	DELETE_EVENT_WAITINGLIST_SUCCESS,
+	DELETE_EVENT_WAITINGLIST_ERROR,
+	REMOVE_APPOINTMENT_WAITING,
+	DELETE_WAITING_APPPOINTMENT,
+	CHANGE_APPOINTMENT_TIME,
+	CHANGE_APPOINTMENT_TIME_SUCCESS,
+	CHANGE_APPOINTMENT_TIME_ERROR,
+	UPDATE_APPOINTMENT_OFFLINE,
+	UPDATE_APPOINTMENT_OFFLINE_SUCCESS,
+	UPDATE_APPOINTMENT_OFFLINE_ERROR,
+	LOAD_APPOINTMENT_AGAIN,
+	ADD_APPOINTMENT_TO_WAITING,
+	ADD_APPOINTMENT_RELOAD_CALENDAR,
+	ADD_APPOINTMENT_REALTIME,
+	INFO_CHECK_PHONE,
+	UPDATE_APPOINTMENT_PAID,
+	DELETE_APPOINTMENT_CALENDAR,
+	UPDATE_STAFF,
+	CHECKPINCODE,
+	OPEN_PINCODE,
+	UPDATE_NEXT_STAFF,
+	UPDATE_NEXT_STAFF_SUCCESS,
+	UPDATE_USER,
+	RENDER_APPOINTMEMT,
+	UPDATE_APPOINTMENT_CALENDAR_FRONTEND,
+	SUBMIT_EDIT_BLOCKTIME,
+	DELETE_BLOCKTIME,
+	DELETE_BLOCKTIME_SUCCESSS,
+	GET_BLOCKTIME,
+	GET_BLOCKTIME_SUCCESS,
+	GET_APPOINTMENT_OFFLINE,
+	GET_WAITINGLIST_OFFLINE,
+	GET_STAFF_OFFLINE,
+	GET_APP_BY_ID,
+	GET_APP_BY_ID_SUCCESS,
+	GROUP_APPOINTMENT,
+	CHECKOUT,
+	UPDATE_APPOINTMENT_PAID_OFFLINE,
+	GET_TIME_STAFF_LOGIN,
+	GET_TIME_STAFF_LOGIN_SUCCESS,
+	LOAD_STAFF_SORT,
+	SET_SLIDE_INDEX
 } from './constants';
 
 /**
@@ -115,10 +116,10 @@ import {
  * @return {object}   An action object with a type of SELECT_DAY
  */
 export function selectDay(day) {
-  return {
-    type: SELECT_DAY,
-    day,
-  };
+	return {
+		type: SELECT_DAY,
+		day
+	};
 }
 
 /**
@@ -127,10 +128,10 @@ export function selectDay(day) {
  * @return {object}   An action object with a type of SELECT_DAY
  */
 export function selectWeek(dayOfWeek) {
-  return {
-    type: SELECT_WEEK,
-    dayOfWeek,
-  };
+	return {
+		type: SELECT_WEEK,
+		dayOfWeek
+	};
 }
 
 /**
@@ -139,10 +140,10 @@ export function selectWeek(dayOfWeek) {
  * @return {object}   An action object with a type of SELECT_DAY
  */
 export function selectDayOnCalendar(day) {
-  return {
-    type: SELECT_DAY_CALENDAR,
-    day,
-  };
+	return {
+		type: SELECT_DAY_CALENDAR,
+		day
+	};
 }
 
 /**
@@ -152,11 +153,11 @@ export function selectDayOnCalendar(day) {
  * @return {object}   An action object with a type of SELECT_APPOINTMENT
  */
 export function selectAppointment(appointment, fcEvent) {
-  return {
-    type: SELECT_APPOINTMENT,
-    appointment,
-    fcEvent,
-  };
+	return {
+		type: SELECT_APPOINTMENT,
+		appointment,
+		fcEvent
+	};
 }
 
 /**
@@ -164,9 +165,9 @@ export function selectAppointment(appointment, fcEvent) {
  * @return {object}   An action object with a type of DESELECT_APPOINTMENT
  */
 export function deselectAppointment() {
-  return {
-    type: DESELECT_APPOINTMENT,
-  };
+	return {
+		type: DESELECT_APPOINTMENT
+	};
 }
 
 /**
@@ -175,10 +176,10 @@ export function deselectAppointment() {
  * @return {object}   An action object with a type of OPEN_ADDING_APPOINTMENT
  */
 export function openAddingAppointment(appointment) {
-  return {
-    type: OPEN_ADDING_APPOINTMENT,
-    appointment,
-  };
+	return {
+		type: OPEN_ADDING_APPOINTMENT,
+		appointment
+	};
 }
 
 /**
@@ -186,9 +187,9 @@ export function openAddingAppointment(appointment) {
  * @return {object}   An action object with a type of CLOSE_ADDING_APPOINTMENT
  */
 export function closeAddingAppointment() {
-  return {
-    type: CLOSE_ADDING_APPOINTMENT,
-  };
+	return {
+		type: CLOSE_ADDING_APPOINTMENT
+	};
 }
 
 /**
@@ -196,9 +197,9 @@ export function closeAddingAppointment() {
  * @return {object} An action object with a type of LOAD_MEMBERS
  */
 export function loadMembers() {
-  return {
-    type: LOAD_MEMBERS,
-  };
+	return {
+		type: LOAD_MEMBERS
+	};
 }
 
 /**
@@ -207,10 +208,10 @@ export function loadMembers() {
  * @return {object} An action object with a type of LOAD_MEMBERS_SUCCESS passing the members
  */
 export function membersLoaded(members) {
-  return {
-    type: LOAD_MEMBERS_SUCCESS,
-    members,
-  };
+	return {
+		type: LOAD_MEMBERS_SUCCESS,
+		members
+	};
 }
 
 /**
@@ -219,10 +220,10 @@ export function membersLoaded(members) {
  * @return {object} An action object with a type of LOAD_MEMBERS_ERROR passing the error
  */
 export function memberLoadingError(error) {
-  return {
-    type: LOAD_MEMBERS_ERROR,
-    error,
-  };
+	return {
+		type: LOAD_MEMBERS_ERROR,
+		error
+	};
 }
 
 /**
@@ -231,10 +232,10 @@ export function memberLoadingError(error) {
  * @return {object} An action object with a type of LOAD_MEMBERS
  */
 export function setDisplayedMembers(members) {
-  return {
-    type: SET_DISPLAYED_MEMBERS,
-    members,
-  };
+	return {
+		type: SET_DISPLAYED_MEMBERS,
+		members
+	};
 }
 
 /**
@@ -243,10 +244,10 @@ export function setDisplayedMembers(members) {
  * @return {object} An action object with a type of LOAD_WAITING_APPOINTMENT
  */
 export function loadWaitingAppointments(options) {
-  return {
-    type: LOAD_WAITING_APPOINTMENT,
-    ...options,
-  };
+	return {
+		type: LOAD_WAITING_APPOINTMENT,
+		...options
+	};
 }
 
 /**
@@ -255,10 +256,10 @@ export function loadWaitingAppointments(options) {
  * @return {object} An action object with a type of LOAD_WAITING_APPOINTMENT_SUCCESS passing the appointments
  */
 export function waitingAppointmentsLoaded(appointments) {
-  return {
-    type: LOAD_WAITING_APPOINTMENT_SUCCESS,
-    appointments,
-  };
+	return {
+		type: LOAD_WAITING_APPOINTMENT_SUCCESS,
+		appointments
+	};
 }
 
 /**
@@ -267,10 +268,10 @@ export function waitingAppointmentsLoaded(appointments) {
  * @return {object} An action object with a type of LOAD_WAITING_APPOINTMENT_ERROR passing the error
  */
 export function waitingAppointmentLoadingError(error) {
-  return {
-    type: LOAD_WAITING_APPOINTMENT_ERROR,
-    error,
-  };
+	return {
+		type: LOAD_WAITING_APPOINTMENT_ERROR,
+		error
+	};
 }
 
 /**
@@ -279,9 +280,9 @@ export function waitingAppointmentLoadingError(error) {
  * @return {object} An action object with a type of LOAD_APPOINTMENTS_BY_MEMBERS
  */
 export function loadAppointmentByMembers() {
-  return {
-    type: LOAD_APPOINTMENTS_BY_MEMBERS,
-  };
+	return {
+		type: LOAD_APPOINTMENTS_BY_MEMBERS
+	};
 }
 
 /**
@@ -290,17 +291,17 @@ export function loadAppointmentByMembers() {
  * @return {object} An action object with a type of LOAD_APPOINTMENTS_BY_MEMBERS_SUCCESS passing the members
  */
 export function appointmentByMembersLoaded(appointments) {
-  return {
-    type: LOAD_APPOINTMENTS_BY_MEMBERS_SUCCESS,
-    appointments,
-  };
+	return {
+		type: LOAD_APPOINTMENTS_BY_MEMBERS_SUCCESS,
+		appointments
+	};
 }
 
 export function loadedAllAppointments(appointments) {
-  return {
-    type: LOAD_ALL_APPOINTMENTS,
-    appointments,
-  };
+	return {
+		type: LOAD_ALL_APPOINTMENTS,
+		appointments
+	};
 }
 
 /**
@@ -309,10 +310,10 @@ export function loadedAllAppointments(appointments) {
  * @return {object} An action object with a type of LOAD_APPOINTMENTS_BY_MEMBERS_ERROR passing the error
  */
 export function appointmentByMemberLoadingError(error) {
-  return {
-    type: LOAD_APPOINTMENTS_BY_MEMBERS_ERROR,
-    error,
-  };
+	return {
+		type: LOAD_APPOINTMENTS_BY_MEMBERS_ERROR,
+		error
+	};
 }
 
 /**
@@ -321,10 +322,10 @@ export function appointmentByMemberLoadingError(error) {
  * @return {object} An action object with a type of ASSIGN_APPOINTMENT
  */
 export function assignAppointment(options) {
-  return {
-    type: ASSIGN_APPOINTMENT,
-    ...options,
-  };
+	return {
+		type: ASSIGN_APPOINTMENT,
+		...options
+	};
 }
 
 /**
@@ -333,10 +334,10 @@ export function assignAppointment(options) {
  * @return {object} An action object with a type of ASSIGN_APPOINTMENT_SUCCESS passing the members
  */
 export function appointmentAssigned(appointment) {
-  return {
-    type: ASSIGN_APPOINTMENT_SUCCESS,
-    appointment,
-  };
+	return {
+		type: ASSIGN_APPOINTMENT_SUCCESS,
+		appointment
+	};
 }
 
 /**
@@ -345,10 +346,10 @@ export function appointmentAssigned(appointment) {
  * @return {object} An action object with a type of ASSIGN_APPOINTMENT_ERROR passing the error
  */
 export function appointmentAssigningError(error) {
-  return {
-    type: ASSIGN_APPOINTMENT_ERROR,
-    error,
-  };
+	return {
+		type: ASSIGN_APPOINTMENT_ERROR,
+		error
+	};
 }
 
 /**
@@ -359,19 +360,14 @@ export function appointmentAssigningError(error) {
  * @param  {object} newEndTime The url options
  * @return {object} An action object with a type of MOVE_APPOINTMENT
  */
-export function moveAppointment(
-  appointmentId,
-  newPositionIndex,
-  newTime,
-  newEndTime,
-) {
-  return {
-    type: MOVE_APPOINTMENT,
-    appointmentId,
-    newPositionIndex,
-    newTime,
-    newEndTime,
-  };
+export function moveAppointment(appointmentId, newPositionIndex, newTime, newEndTime) {
+	return {
+		type: MOVE_APPOINTMENT,
+		appointmentId,
+		newPositionIndex,
+		newTime,
+		newEndTime
+	};
 }
 
 /**
@@ -380,10 +376,10 @@ export function moveAppointment(
  * @return {object} An action object with a type of MOVE_APPOINTMENT_SUCCESS passing the members
  */
 export function appointmentMoved(appointment) {
-  return {
-    type: MOVE_APPOINTMENT_SUCCESS,
-    appointment,
-  };
+	return {
+		type: MOVE_APPOINTMENT_SUCCESS,
+		appointment
+	};
 }
 
 /**
@@ -392,10 +388,10 @@ export function appointmentMoved(appointment) {
  * @return {object} An action object with a type of MOVE_APPOINTMENT_ERROR passing the error
  */
 export function appointmentMovingError(error) {
-  return {
-    type: MOVE_APPOINTMENT_ERROR,
-    error,
-  };
+	return {
+		type: MOVE_APPOINTMENT_ERROR,
+		error
+	};
 }
 
 /**
@@ -404,10 +400,10 @@ export function appointmentMovingError(error) {
  * @return {object} An action object with a type of PUT_BACK_APPOINTMENT
  */
 export function putBackAppointment(appointment) {
-  return {
-    type: PUT_BACK_APPOINTMENT,
-    appointment,
-  };
+	return {
+		type: PUT_BACK_APPOINTMENT,
+		appointment
+	};
 }
 
 /**
@@ -416,10 +412,10 @@ export function putBackAppointment(appointment) {
  * @return {object} An action object with a type of PUT_BACK_APPOINTMENT_SUCCESS passing the members
  */
 export function appointmentPutBack(appointment) {
-  return {
-    type: PUT_BACK_APPOINTMENT_SUCCESS,
-    appointment,
-  };
+	return {
+		type: PUT_BACK_APPOINTMENT_SUCCESS,
+		appointment
+	};
 }
 
 /**
@@ -428,10 +424,10 @@ export function appointmentPutBack(appointment) {
  * @return {object} An action object with a type of PUT_BACK_APPOINTMENT_ERROR passing the error
  */
 export function appointmentPuttingBackError(error) {
-  return {
-    type: PUT_BACK_APPOINTMENT_ERROR,
-    error,
-  };
+	return {
+		type: PUT_BACK_APPOINTMENT_ERROR,
+		error
+	};
 }
 
 /**
@@ -440,10 +436,10 @@ export function appointmentPuttingBackError(error) {
  * @return {object} An action object with a type of CANCEL_APPOINTMENT
  */
 export function cancelAppointment(appointmentId) {
-  return {
-    type: CANCEL_APPOINTMENT,
-    appointmentId,
-  };
+	return {
+		type: CANCEL_APPOINTMENT,
+		appointmentId
+	};
 }
 
 /**
@@ -452,10 +448,10 @@ export function cancelAppointment(appointmentId) {
  * @return {object} An action object with a type of CANCEL_APPOINTMENT_SUCCESS passing the members
  */
 export function appointmentCanceled(appointmentId) {
-  return {
-    type: CANCEL_APPOINTMENT_SUCCESS,
-    appointmentId,
-  };
+	return {
+		type: CANCEL_APPOINTMENT_SUCCESS,
+		appointmentId
+	};
 }
 
 /**
@@ -464,10 +460,10 @@ export function appointmentCanceled(appointmentId) {
  * @return {object} An action object with a type of CANCEL_APPOINTMENT_ERROR passing the error
  */
 export function appointmentCancellingError(error) {
-  return {
-    type: CANCEL_APPOINTMENT_ERROR,
-    error,
-  };
+	return {
+		type: CANCEL_APPOINTMENT_ERROR,
+		error
+	};
 }
 
 /**
@@ -477,11 +473,11 @@ export function appointmentCancellingError(error) {
  * @return {object} An action object with a type of UPDATE_STATUS_APPOINTMENT
  */
 export function updateStatusAppointment(appointmentId, bookingServices) {
-  return {
-    type: UPDATE_STATUS_APPOINTMENT,
-    appointmentId,
-    bookingServices,
-  };
+	return {
+		type: UPDATE_STATUS_APPOINTMENT,
+		appointmentId,
+		bookingServices
+	};
 }
 
 /**
@@ -490,10 +486,10 @@ export function updateStatusAppointment(appointmentId, bookingServices) {
  * @return {object} An action object with a type of UPDATE_STATUS_APPOINTMENT_SUCCESS passing the members
  */
 export function appointmentUpdatedStatus(appointment) {
-  return {
-    type: UPDATE_STATUS_APPOINTMENT_SUCCESS,
-    appointment,
-  };
+	return {
+		type: UPDATE_STATUS_APPOINTMENT_SUCCESS,
+		appointment
+	};
 }
 
 /**
@@ -502,300 +498,295 @@ export function appointmentUpdatedStatus(appointment) {
  * @return {object} An action object with a type of UPDATE_STATUS_APPOINTMENT_ERROR passing the error
  */
 export function appointmentUpdatingStatusError(error) {
-  return {
-    type: UPDATE_STATUS_APPOINTMENT_ERROR,
-    error,
-  };
+	return {
+		type: UPDATE_STATUS_APPOINTMENT_ERROR,
+		error
+	};
 }
 
 // FIXME: This is hard code for real-time calendar
 export function updateCalendarInterval() {
-  return {
-    type: UPDATE_CALENDAR_INTERVAL,
-  };
+	return {
+		type: UPDATE_CALENDAR_INTERVAL
+	};
 }
-
 
 /* Check phone number to add customer */
 export function checkPhoneNumberCustomer(phone) {
-  return {
-    type: CHECK_PHONE_ADD_CUSTOMER,
-    phone,
-  };
+	return {
+		type: CHECK_PHONE_ADD_CUSTOMER,
+		phone
+	};
 }
 export function checkPhoneNumberCustomerSuccess(phone) {
-  return {
-    type: CHECK_PHONE_ADD_CUSTOMER_SUCCESS,
-    phone,
-  };
+	return {
+		type: CHECK_PHONE_ADD_CUSTOMER_SUCCESS,
+		phone
+	};
 }
 export function checkPhoneNumberCustomerError(error) {
-  return {
-    type: CHECK_PHONE_ADD_CUSTOMER_ERROR,
-    error,
-  };
+	return {
+		type: CHECK_PHONE_ADD_CUSTOMER_ERROR,
+		error
+	};
 }
-
 
 /* Add Customer */
 export function addCustomer(customer) {
-  return {
-    type: ADD_CUSTOMER,
-    customer,
-  };
+	return {
+		type: ADD_CUSTOMER,
+		customer
+	};
 }
 export function addCustomerSuccess(customer) {
-  return {
-    type: ADD_CUSTOMER_SUCCESS,
-    customer,
-  };
+	return {
+		type: ADD_CUSTOMER_SUCCESS,
+		customer
+	};
 }
 export function addCustomerError(error) {
-  return {
-    type: ADD_CUSTOMER_ERROR,
-    error,
-  };
+	return {
+		type: ADD_CUSTOMER_ERROR,
+		error
+	};
 }
 
 export const updateWaitingAppointment = (appointment) => ({
-  type: UPDATE_WAITING_APPOINTMENT,
-  appointment
+	type: UPDATE_WAITING_APPOINTMENT,
+	appointment
 });
 
 export const updateAppointment = (appointment) => ({
-  type: UPDATE_APPOINTMENT_STATUS,
-  appointment
+	type: UPDATE_APPOINTMENT_STATUS,
+	appointment
 });
 export const updateAppointmentSuccess = (appointment) => ({
-  type: UPDATE_APPOINTMENT_STATUS_SUCCESS,
-  appointment
+	type: UPDATE_APPOINTMENT_STATUS_SUCCESS,
+	appointment
 });
 export const updateAppointmentError = (error) => ({
-  type: UPDATE_APPOINTMENT_STATUS_ERROR,
-  error
+	type: UPDATE_APPOINTMENT_STATUS_ERROR,
+	error
 });
 
 export const disableCalendar = (status) => ({
-  type: DISABLE_CALENDAR,
-  status
+	type: DISABLE_CALENDAR,
+	status
 });
 export const loadingWaiting = (status) => ({
-  type: LOADING_WAITING,
-  status
+	type: LOADING_WAITING,
+	status
 });
 export const loadingCalendar = (status) => ({
-  type: LOADING_CALENDAR,
-  status
+	type: LOADING_CALENDAR,
+	status
 });
 
 export const TimeAndStaffID = (data) => ({
-  type: TIME_STAFFID,
-  data
+	type: TIME_STAFFID,
+	data
 });
 
 export const addAppointmentToCalendar = (appointment) => ({
-  type: ADD_APPOINTMENT_TO_CALENDAR,
-  appointment
+	type: ADD_APPOINTMENT_TO_CALENDAR,
+	appointment
 });
 
 export const deleteEventWaitingList = (appointment) => ({
-  type: DELETE_EVENT_WAITINGLIST,
-  appointment
+	type: DELETE_EVENT_WAITINGLIST,
+	appointment
 });
 export const deleteEventWaitingList_Success = (appointment) => ({
-  type: DELETE_EVENT_WAITINGLIST_SUCCESS,
-  appointment
+	type: DELETE_EVENT_WAITINGLIST_SUCCESS,
+	appointment
 });
 export const deleteEventWaitingList_Error = (appointment) => ({
-  type: DELETE_EVENT_WAITINGLIST_ERROR,
-  appointment
+	type: DELETE_EVENT_WAITINGLIST_ERROR,
+	appointment
 });
 
 export const removeAppointmentWaiting = (appointment) => ({
-  type: REMOVE_APPOINTMENT_WAITING,
-  appointment
+	type: REMOVE_APPOINTMENT_WAITING,
+	appointment
 });
 
 export const deleteWaitingAppointment = (status) => ({
-  type: DELETE_WAITING_APPPOINTMENT,
-  status
+	type: DELETE_WAITING_APPPOINTMENT,
+	status
 });
 
 export const changeAppointmentTime = (appointment) => ({
-  type: CHANGE_APPOINTMENT_TIME,
-  appointment
+	type: CHANGE_APPOINTMENT_TIME,
+	appointment
 });
 
 export const changeAppointmentTime_Success = (appointment) => ({
-  type: CHANGE_APPOINTMENT_TIME_SUCCESS,
-  appointment
+	type: CHANGE_APPOINTMENT_TIME_SUCCESS,
+	appointment
 });
 export const changeAppointmentTime_Error = (appointment) => ({
-  type: CHANGE_APPOINTMENT_TIME_ERROR,
-  appointment
+	type: CHANGE_APPOINTMENT_TIME_ERROR,
+	appointment
 });
 
 export const updateAppointmentOffline = (data) => ({
-  type: UPDATE_APPOINTMENT_OFFLINE,
-  data
+	type: UPDATE_APPOINTMENT_OFFLINE,
+	data
 });
 export const updateAppointmentOfflineSuccess = (data) => ({
-  type: UPDATE_APPOINTMENT_OFFLINE_SUCCESS,
-  data
+	type: UPDATE_APPOINTMENT_OFFLINE_SUCCESS,
+	data
 });
 export const updateAppointmentOfflineError = (data) => ({
-  type: UPDATE_APPOINTMENT_OFFLINE_ERROR,
-  data
+	type: UPDATE_APPOINTMENT_OFFLINE_ERROR,
+	data
 });
 export const loadAppointmentAgain = (data) => ({
-  type: LOAD_APPOINTMENT_AGAIN,
-  data
+	type: LOAD_APPOINTMENT_AGAIN,
+	data
 });
 
 export const addAppointmentWaiting = (data) => ({
-  type: ADD_APPOINTMENT_TO_WAITING,
-  data
+	type: ADD_APPOINTMENT_TO_WAITING,
+	data
 });
 
 export const addAppointmentReloadCalendar = (data) => ({
-  type: ADD_APPOINTMENT_RELOAD_CALENDAR,
-  data
+	type: ADD_APPOINTMENT_RELOAD_CALENDAR,
+	data
 });
 
 export const addAppointmentRealTime = (data) => ({
-  type: ADD_APPOINTMENT_REALTIME,
-  data
+	type: ADD_APPOINTMENT_REALTIME,
+	data
 });
 export const infoCheckPhone = (data) => ({
-  type: INFO_CHECK_PHONE,
-  data
+	type: INFO_CHECK_PHONE,
+	data
 });
 
 export const updateAppointmentPaid = (appointment) => ({
-  type: UPDATE_APPOINTMENT_PAID,
-  appointment
+	type: UPDATE_APPOINTMENT_PAID,
+	appointment
 });
 
 export const deleteAppointmentCalendar = (appointment) => ({
-  type: DELETE_APPOINTMENT_CALENDAR,
-  appointment
+	type: DELETE_APPOINTMENT_CALENDAR,
+	appointment
 });
 
 export const updateStaff = (staff) => ({
-  type: UPDATE_STAFF,
-  staff
+	type: UPDATE_STAFF,
+	staff
 });
 export const checkPinCode = (pincode) => ({
-  type: CHECKPINCODE,
-  pincode
+	type: CHECKPINCODE,
+	pincode
 });
-export const togglePopupPincode = (data,pincode) => ({
-  type: OPEN_PINCODE,
-  data,
-  pincode
+export const togglePopupPincode = (data, pincode) => ({
+	type: OPEN_PINCODE,
+	data,
+	pincode
 });
 
 export const updateNextStaff = () => ({
-  type: UPDATE_NEXT_STAFF,
+	type: UPDATE_NEXT_STAFF
 });
 export const renderAppointment = () => ({
-  type: RENDER_APPOINTMEMT,
+	type: RENDER_APPOINTMEMT
 });
 export const updateNextStaffSuccess = (data) => ({
-  type: UPDATE_NEXT_STAFF_SUCCESS,
-  data,
+	type: UPDATE_NEXT_STAFF_SUCCESS,
+	data
 });
 
 export const updateConsumer = (data) => ({
-  type: UPDATE_USER,
-  data,
+	type: UPDATE_USER,
+	data
 });
 export const updateAppointmentFrontend = (data) => ({
-  type: UPDATE_APPOINTMENT_CALENDAR_FRONTEND,
-  data,
+	type: UPDATE_APPOINTMENT_CALENDAR_FRONTEND,
+	data
 });
 
 export const SubmitEditBlockTime = (data) => ({
-  type: SUBMIT_EDIT_BLOCKTIME,
-  data,
+	type: SUBMIT_EDIT_BLOCKTIME,
+	data
 });
 
 export const deleteBlockTime = (data) => ({
-  type: DELETE_BLOCKTIME,
-  data,
+	type: DELETE_BLOCKTIME,
+	data
 });
 export const deleteBlockTimeSuccess = (data) => ({
-  type: DELETE_BLOCKTIME_SUCCESSS,
-  data,
+	type: DELETE_BLOCKTIME_SUCCESSS,
+	data
 });
 export const getBlockTime = (data) => ({
-  type: GET_BLOCKTIME,
-  data,
+	type: GET_BLOCKTIME,
+	data
 });
 
 export const getBlockTime_Success = (data) => ({
-  type: GET_BLOCKTIME_SUCCESS,
-  data,
+	type: GET_BLOCKTIME_SUCCESS,
+	data
 });
 
 export const getAppointmentOffline = (data) => ({
-  type: GET_APPOINTMENT_OFFLINE,
-  data,
+	type: GET_APPOINTMENT_OFFLINE,
+	data
 });
 
 export const getWaitingListOffline = (data) => ({
-  type: GET_WAITINGLIST_OFFLINE,
-  data,
+	type: GET_WAITINGLIST_OFFLINE,
+	data
 });
 export const getStaffOffline = (data) => ({
-  type: GET_STAFF_OFFLINE,
-  data,
+	type: GET_STAFF_OFFLINE,
+	data
 });
 
 export const getApppointmentById = (data) => ({
-  type: GET_APP_BY_ID,
-  data,
+	type: GET_APP_BY_ID,
+	data
 });
 
 export const getApppointmentByIdSuccess = (data) => ({
-  type: GET_APP_BY_ID_SUCCESS,
-  data,
+	type: GET_APP_BY_ID_SUCCESS,
+	data
 });
 
 export const groupAppointment = (data) => ({
-  type: GROUP_APPOINTMENT,
-  data,
+	type: GROUP_APPOINTMENT,
+	data
 });
 
 export const checkOut = (data) => ({
-  type: CHECKOUT,
-  data,
+	type: CHECKOUT,
+	data
 });
 
 export const updateAppointmentPaidOffline = (idAppointment) => ({
-  type: UPDATE_APPOINTMENT_PAID_OFFLINE,
-  idAppointment,
+	type: UPDATE_APPOINTMENT_PAID_OFFLINE,
+	idAppointment
 });
 
 export const getTimeStaffLogin = (staffId) => ({
-  type: GET_TIME_STAFF_LOGIN,
-  staffId,
+	type: GET_TIME_STAFF_LOGIN,
+	staffId
 });
 
 export const getTimeStaffLoginSuccess = (data) => ({
-  type: GET_TIME_STAFF_LOGIN_SUCCESS,
-  data,
+	type: GET_TIME_STAFF_LOGIN_SUCCESS,
+	data
 });
 
 export const loadStaffSort = (staffSort) => ({
-  type: LOAD_STAFF_SORT,
-  staffSort,
+	type: LOAD_STAFF_SORT,
+	staffSort
 });
 
-
-
-
-
-
-
-
+export const setSlideIndex = (slideIndex) => ({
+	type: SET_SLIDE_INDEX,
+	slideIndex
+});

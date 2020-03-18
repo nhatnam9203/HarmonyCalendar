@@ -96,7 +96,8 @@ import {
 	makeSelectDisplayedMembers,
 	makeSelectFCEvent,
 	makeInfoCheckPhone,
-	makeSelectAllAppointments
+	makeSelectAllAppointments,
+	makeSlideIndex
 } from './selectors';
 
 import {
@@ -288,18 +289,18 @@ export function* getMembers() {
 			const requestURL = new URL(`${GET_MEMBER}`);
 			const currentDate = yield select(makeCurrentDay());
 			const url = `${requestURL.toString()}${currentDate.format('YYYY-MM-DD')}`;
-			console.log({url})
-			const resp = yield api( url ,'', 'GET', token);
+			const resp = yield api(url, '', 'GET', token);
 			if (resp.codeStatus === 1) {
 				const members = resp.data
 					? resp.data.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0)
 					: [];
 
+				const slideIndex = yield select(makeSlideIndex());
 				// const Staffs = sorrtStaffByDate('', members);
 
 				localStorage.setItem('staffList', JSON.stringify(members));
 				yield put(membersLoaded(members));
-				yield put(setDisplayedMembers(members.slice(0, 6)));
+				yield put(setDisplayedMembers(members.slice(slideIndex * 6, slideIndex * 6 + 6)));
 				yield put(loadAppointmentByMembers());
 			}
 		} catch (err) {

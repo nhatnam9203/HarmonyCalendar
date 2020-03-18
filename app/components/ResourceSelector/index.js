@@ -8,6 +8,290 @@ import { staffId } from '../../../app-constants';
 import LoadingIndicator from 'components/LoadingIndicator';
 import Pincode from './Pincode';
 
+class ResourceSelector extends React.Component {
+	componentWillMount() {
+		const { loadMembers } = this.props;
+		loadMembers();
+	}
+
+	onPrevClick(event, previousSlide) {
+		previousSlide(event);
+	}
+
+	onNextClick(event, nextSlide) {
+		nextSlide(event);
+	}
+
+	afterSlide(index) {
+		const { resources } = this.props;
+		this.props.setDisplayedMembers(resources.slice(index * 6, index * 6 + 6));
+		this.props.renderAppointment();
+		this.props.setSlideIndex(index);
+	}
+
+	onTodayClick() {
+		this.props.onChangeToday(moment().format('DDMMYYYY'));
+	}
+
+	getWorrkingTime(staff, currentDay) {
+		switch (moment(currentDay).format('dddd')) {
+			case 'Monday':
+				if (staff.workingTimes.Monday.isCheck) {
+					return (
+						<Resource.WorkingTime>
+							{staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd}
+						</Resource.WorkingTime>
+					);
+				}
+				//  else {
+				// 	return (
+				// 		<Resource.WorkingTime notWork>
+				// 			{staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd} (Off)
+				// 		</Resource.WorkingTime>
+				// 	);
+				// }
+				// break;
+
+			case 'Tuesday':
+				if (staff.workingTimes.Tuesday.isCheck) {
+					return (
+						<Resource.WorkingTime>
+							{staff.workingTimes.Tuesday.timeStart} - {staff.workingTimes.Tuesday.timeEnd}
+						</Resource.WorkingTime>
+					);
+				}
+				//  else {
+				// 	return (
+				// 		<Resource.WorkingTime notWork>
+				// 			{staff.workingTimes.Tuesday.timeStart} - {staff.workingTimes.Tuesday.timeEnd} (Off)
+				// 		</Resource.WorkingTime>
+				// 	);
+				// }
+				// break;
+
+			case 'Wednesday':
+				if (staff.workingTimes.Wednesday.isCheck) {
+					return (
+						<Resource.WorkingTime>
+							{staff.workingTimes.Wednesday.timeStart} - {staff.workingTimes.Wednesday.timeEnd}
+						</Resource.WorkingTime>
+					);
+				}
+				//  else {
+				// 	return (
+				// 		<Resource.WorkingTime notWork>
+				// 			{staff.workingTimes.Wednesday.timeStart} - {staff.workingTimes.Wednesday.timeEnd} (Off)
+				// 		</Resource.WorkingTime>
+				// 	);
+				// }
+				// break;
+
+			case 'Thursday':
+				if (staff.workingTimes.Thursday.isCheck) {
+					return (
+						<Resource.WorkingTime>
+							{staff.workingTimes.Thursday.timeStart} - {staff.workingTimes.Thursday.timeEnd}
+						</Resource.WorkingTime>
+					);
+				} 
+				
+				// else {
+				// 	return (
+				// 		<Resource.WorkingTime notWork>
+				// 			{staff.workingTimes.Thursday.timeStart} - {staff.workingTimes.Thursday.timeEnd} (Off)
+				// 		</Resource.WorkingTime>
+				// 	);
+				// }
+				// break;
+
+			case 'Friday':
+				if (staff.workingTimes.Friday.isCheck) {
+					return (
+						<Resource.WorkingTime>
+							{staff.workingTimes.Friday.timeStart} - {staff.workingTimes.Friday.timeEnd}
+						</Resource.WorkingTime>
+					);
+				} 
+				
+				// else {
+				// 	return (
+				// 		<Resource.WorkingTime notWork>
+				// 			{staff.workingTimes.Friday.timeStart} - {staff.workingTimes.Friday.timeEnd} (Off)
+				// 		</Resource.WorkingTime>
+				// 	);
+				// }
+				// break;
+
+			case 'Saturday':
+				if (staff.workingTimes.Saturday.isCheck) {
+					return (
+						<Resource.WorkingTime>
+							{staff.workingTimes.Saturday.timeStart} - {staff.workingTimes.Saturday.timeEnd}
+						</Resource.WorkingTime>
+					);
+				} 
+				
+				// else {
+				// 	return (
+				// 		<Resource.WorkingTime notWork>
+				// 			{staff.workingTimes.Saturday.timeStart} - {staff.workingTimes.Saturday.timeEnd} (Off)
+				// 		</Resource.WorkingTime>
+				// 	);
+				// }
+				// break;
+
+			case 'Monday':
+				if (staff.workingTimes.Monday.isCheck) {
+					return (
+						<Resource.WorkingTime>
+							{staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd}
+						</Resource.WorkingTime>
+					);
+				} 
+				
+				// else {
+				// 	return (
+				// 		<Resource.WorkingTime notWork>
+				// 			{staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd} (Off)
+				// 		</Resource.WorkingTime>
+				// 	);
+				// }
+				// break;
+
+			default:
+				break;
+		}
+	}
+
+	openPincode(staff) {
+		if (navigator.onLine) {
+			this.props.togglePopupPincode(true, staff);
+			this.props.disableCalendar(true);
+			this.props.getTimeStaffLogin(staff.id);
+		} else {
+			alert('You must have an internet connection to perform this !');
+		}
+	}
+
+	renderResource(resource, index) {
+		const { calendarMembers, currentDay, togglePopupPincode } = this.props;
+		const member = calendarMembers ? calendarMembers.find((mem) => mem.memberId === resource.id) : '';
+		return (
+			<Resource
+				onClick={() => this.openPincode(resource)}
+				active={parseInt(resource.id) === parseInt(staffId) ? true : false}
+				key={index}
+			>
+				<Resource.Avatar>
+					<img src={resource.imageUrl} alt={resource.orderNumber} />
+				</Resource.Avatar>
+
+				<Resource.OrderNumber next={resource.isNextAvailableStaff === 1 ? true : false}>
+					{resource.orderNumber}
+				</Resource.OrderNumber>
+				<Resource.WorkingTime>{this.getWorrkingTime(resource, currentDay)}</Resource.WorkingTime>
+				<Resource.Title>{resource.title}</Resource.Title>
+			</Resource>
+		);
+	}
+
+	renderResources(resources, index) {
+		return (
+			<ResourceWrapper key={index}>
+				{resources.map((resource, indexS) => this.renderResource(resource, indexS))}
+			</ResourceWrapper>
+		);
+	}
+
+	renderLoadingResources(index) {
+		return (
+			<ResourceWrapper key={index}>
+				<Resource>
+					<LoadingIndicator />
+				</Resource>
+			</ResourceWrapper>
+		);
+	}
+
+	renderCarouselSlide() {
+		const { loading, resources } = this.props;
+		if (loading) {
+			return [ 1 ].map((index) => this.renderLoadingResources(index));
+		}
+		if (resources) {
+			return chunk(resources, 6).map((resource, index) => this.renderResources(resource, index));
+		}
+		return null;
+	}
+
+	render() {
+		const {
+			checkPinCode,
+			popupPincode,
+			togglePopupPincode,
+			disableCalendar,
+			PinStaff,
+			calendarMembers,
+			SubmitEditBlockTime,
+			deleteBlockTime,
+			currentDay
+		} = this.props;
+
+		return (
+			<React.Fragment>
+				<ResourceSelectorWrapper>
+					<TodayWrapper>
+						<TodayWrapper.Button onClick={() => this.onTodayClick()}>Today</TodayWrapper.Button>
+					</TodayWrapper>
+					<ResourceSliderWrapper>
+						<Carousel
+							dragging={true}
+							renderBottomCenterControls={() => ''}
+							renderCenterLeftControls={({ previousSlide }) => (
+								<PrevButton onClick={(ev) => this.onPrevClick(ev, previousSlide)}>
+									<FaCaretLeft />
+								</PrevButton>
+							)}
+							renderCenterRightControls={({ nextSlide }) => (
+								<NextButton onClick={(ev) => this.onNextClick(ev, nextSlide)}>
+									<FaCaretRight />
+								</NextButton>
+							)}
+							afterSlide={(slideIndex) => this.afterSlide(slideIndex)}
+						>
+							{this.renderCarouselSlide()}
+						</Carousel>
+					</ResourceSliderWrapper>
+					<WaitingHeader>Waiting</WaitingHeader>
+				</ResourceSelectorWrapper>
+				<Pincode
+					checkPinCode={checkPinCode}
+					popupPincode={popupPincode}
+					togglePopupPincode={togglePopupPincode}
+					disableCalendar={disableCalendar}
+					// PinStaff={PinStaff}
+					staff={PinStaff}
+					calendarMembers={calendarMembers}
+					SubmitEditBlockTime={SubmitEditBlockTime}
+					deleteBlockTime={deleteBlockTime}
+					currentDay={currentDay}
+				/>
+			</React.Fragment>
+		);
+	}
+}
+
+ResourceSelector.propTypes = {
+	resources: PropTypes.any,
+	calendarMembers: PropTypes.any,
+	onChangeToday: PropTypes.func,
+	loadMembers: PropTypes.func,
+	setDisplayedMembers: PropTypes.func,
+	loading: PropTypes.bool
+};
+
+export default ResourceSelector;
+
 const ResourceSelectorWrapper = styled.div`
 	width: 100%;
 	height: 4rem;
@@ -152,276 +436,3 @@ function chunk(array, size) {
 	}
 	return chunkedArr;
 }
-
-class ResourceSelector extends React.Component {
-	componentWillMount() {
-		const { loadMembers } = this.props;
-		loadMembers();
-	}
-
-	onPrevClick(event, previousSlide) {
-		previousSlide(event);
-	}
-
-	onNextClick(event, nextSlide) {
-		nextSlide(event);
-	}
-
-	afterSlide(index) {
-		const { resources, setDisplayedMembers, renderAppointment } = this.props;
-		setDisplayedMembers(resources.slice(index * 6, index * 6 + 6));
-		renderAppointment();
-	}
-
-	onTodayClick() {
-		const { onChangeToday } = this.props;
-		onChangeToday(moment().format('DDMMYYYY'));
-	}
-
-	getWorrkingTime(staff, currentDay) {
-		switch (moment(currentDay).format('dddd')) {
-			case 'Monday':
-				if (staff.workingTimes.Monday.isCheck) {
-					return (
-						<Resource.WorkingTime>
-							{staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd}
-						</Resource.WorkingTime>
-					);
-				} else {
-					return (
-						<Resource.WorkingTime notWork>
-							{staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd} (Off)
-						</Resource.WorkingTime>
-					);
-				}
-				break;
-
-			case 'Tuesday':
-				if (staff.workingTimes.Tuesday.isCheck) {
-					return (
-						<Resource.WorkingTime>
-							{staff.workingTimes.Tuesday.timeStart} - {staff.workingTimes.Tuesday.timeEnd}
-						</Resource.WorkingTime>
-					);
-				} else {
-					return (
-						<Resource.WorkingTime notWork>
-							{staff.workingTimes.Tuesday.timeStart} - {staff.workingTimes.Tuesday.timeEnd} (Off)
-						</Resource.WorkingTime>
-					);
-				}
-				break;
-
-			case 'Wednesday':
-				if (staff.workingTimes.Wednesday.isCheck) {
-					return (
-						<Resource.WorkingTime>
-							{staff.workingTimes.Wednesday.timeStart} - {staff.workingTimes.Wednesday.timeEnd}
-						</Resource.WorkingTime>
-					);
-				} else {
-					return (
-						<Resource.WorkingTime notWork>
-							{staff.workingTimes.Wednesday.timeStart} - {staff.workingTimes.Wednesday.timeEnd} (Off)
-						</Resource.WorkingTime>
-					);
-				}
-				break;
-
-			case 'Thursday':
-				if (staff.workingTimes.Thursday.isCheck) {
-					return (
-						<Resource.WorkingTime>
-							{staff.workingTimes.Thursday.timeStart} - {staff.workingTimes.Thursday.timeEnd}
-						</Resource.WorkingTime>
-					);
-				} else {
-					return (
-						<Resource.WorkingTime notWork>
-							{staff.workingTimes.Thursday.timeStart} - {staff.workingTimes.Thursday.timeEnd} (Off)
-						</Resource.WorkingTime>
-					);
-				}
-				break;
-
-			case 'Friday':
-				if (staff.workingTimes.Friday.isCheck) {
-					return (
-						<Resource.WorkingTime>
-							{staff.workingTimes.Friday.timeStart} - {staff.workingTimes.Friday.timeEnd}
-						</Resource.WorkingTime>
-					);
-				} else {
-					return (
-						<Resource.WorkingTime notWork>
-							{staff.workingTimes.Friday.timeStart} - {staff.workingTimes.Friday.timeEnd} (Off)
-						</Resource.WorkingTime>
-					);
-				}
-				break;
-
-			case 'Saturday':
-				if (staff.workingTimes.Saturday.isCheck) {
-					return (
-						<Resource.WorkingTime>
-							{staff.workingTimes.Saturday.timeStart} - {staff.workingTimes.Saturday.timeEnd}
-						</Resource.WorkingTime>
-					);
-				} else {
-					return (
-						<Resource.WorkingTime notWork>
-							{staff.workingTimes.Saturday.timeStart} - {staff.workingTimes.Saturday.timeEnd} (Off)
-						</Resource.WorkingTime>
-					);
-				}
-				break;
-
-			case 'Monday':
-				if (staff.workingTimes.Monday.isCheck) {
-					return (
-						<Resource.WorkingTime>
-							{staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd}
-						</Resource.WorkingTime>
-					);
-				} else {
-					return (
-						<Resource.WorkingTime notWork>
-							{staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd} (Off)
-						</Resource.WorkingTime>
-					);
-				}
-				break;
-
-			default:
-				break;
-		}
-	}
-
-	openPincode(staff) {
-		if (navigator.onLine) {
-			this.props.togglePopupPincode(true, staff);
-      this.props.disableCalendar(true);
-      this.props.getTimeStaffLogin(staff.id);
-		} else {
-			alert('You must have an internet connection to perform this !');
-		}
-	}
-
-	renderResource(resource, index) {
-		const { calendarMembers, currentDay, togglePopupPincode } = this.props;
-		const member = calendarMembers ? calendarMembers.find((mem) => mem.memberId === resource.id) : '';
-		return (
-			<Resource
-				onClick={() => this.openPincode(resource)}
-				active={parseInt(resource.id) === parseInt(staffId) ? true : false}
-				key={index}
-			>
-				<Resource.Avatar>
-					<img src={resource.imageUrl} alt={resource.orderNumber} />
-				</Resource.Avatar>
-
-				<Resource.OrderNumber next={resource.isNextAvailableStaff === 1 ? true : false}>
-					{resource.orderNumber}
-				</Resource.OrderNumber>
-				<Resource.WorkingTime>{this.getWorrkingTime(resource, currentDay)}</Resource.WorkingTime>
-				<Resource.Title>{resource.title}</Resource.Title>
-			</Resource>
-		);
-	}
-
-	renderResources(resources, index) {
-		return (
-			<ResourceWrapper key={index}>
-				{resources.map((resource, indexS) => this.renderResource(resource, indexS))}
-			</ResourceWrapper>
-		);
-	}
-
-	renderLoadingResources(index) {
-		return (
-			<ResourceWrapper key={index}>
-				<Resource>
-					<LoadingIndicator />
-				</Resource>
-			</ResourceWrapper>
-		);
-	}
-
-	renderCarouselSlide() {
-		const { loading, resources } = this.props;
-		if (loading) {
-			return [ 1 ].map((index) => this.renderLoadingResources(index));
-		}
-		if (resources) {
-			return chunk(resources, 6).map((resource, index) => this.renderResources(resource, index));
-		}
-		return null;
-	}
-
-	render() {
-		const {
-			checkPinCode,
-			popupPincode,
-			togglePopupPincode,
-			disableCalendar,
-			PinStaff,
-			calendarMembers,
-			SubmitEditBlockTime,
-			deleteBlockTime,
-			currentDay
-		} = this.props;
-
-		return (
-			<React.Fragment>
-				<ResourceSelectorWrapper>
-					<TodayWrapper>
-						<TodayWrapper.Button onClick={() => this.onTodayClick()}>Today</TodayWrapper.Button>
-					</TodayWrapper>
-					<ResourceSliderWrapper>
-						<Carousel
-							dragging={true}
-							renderBottomCenterControls={() => ''}
-							renderCenterLeftControls={({ previousSlide }) => (
-								<PrevButton onClick={(ev) => this.onPrevClick(ev, previousSlide)}>
-									<FaCaretLeft />
-								</PrevButton>
-							)}
-							renderCenterRightControls={({ nextSlide }) => (
-								<NextButton onClick={(ev) => this.onNextClick(ev, nextSlide)}>
-									<FaCaretRight />
-								</NextButton>
-							)}
-							afterSlide={(slideIndex) => this.afterSlide(slideIndex)}
-						>
-							{this.renderCarouselSlide()}
-						</Carousel>
-					</ResourceSliderWrapper>
-					<WaitingHeader>Waiting</WaitingHeader>
-				</ResourceSelectorWrapper>
-				<Pincode
-					checkPinCode={checkPinCode}
-					popupPincode={popupPincode}
-					togglePopupPincode={togglePopupPincode}
-					disableCalendar={disableCalendar}
-					// PinStaff={PinStaff}
-					staff={PinStaff}
-					calendarMembers={calendarMembers}
-					SubmitEditBlockTime={SubmitEditBlockTime}
-					deleteBlockTime={deleteBlockTime}
-					currentDay={currentDay}
-				/>
-			</React.Fragment>
-		);
-	}
-}
-
-ResourceSelector.propTypes = {
-	resources: PropTypes.any,
-	calendarMembers: PropTypes.any,
-	onChangeToday: PropTypes.func,
-	loadMembers: PropTypes.func,
-	setDisplayedMembers: PropTypes.func,
-	loading: PropTypes.bool
-};
-
-export default ResourceSelector;

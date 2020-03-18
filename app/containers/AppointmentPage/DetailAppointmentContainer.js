@@ -43,7 +43,7 @@ const mapStateToProps = createStructuredSelector({
 	currentDay: makeCurrentDay(),
 	staffList: makeSelectMembers(),
 	appointmentDetail: makeSelectAppointmentDetail(),
-	groupAppointment: makeSelectGroupAppointment()
+	groupAppointment: makeSelectGroupAppointment(),
 });
 
 const withConnect = connect(mapStateToProps, mapDispatchToProps);

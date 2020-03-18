@@ -5,8 +5,9 @@ import Popup from 'reactjs-popup';
 import { FaTimesCircle } from 'react-icons/fa';
 import Enter from '../../images/enter.png';
 import moment from 'moment';
-import { formatUsPhone, isCharNumber, checkStringNumber, checkStringNumber2 } from '../../utils/helper';
+import { formatUsPhone, checkStringNumber2 } from '../../utils/helper';
 import NumberFormat from 'react-number-format';
+import {MdSubdirectoryArrowLeft} from 'react-icons/md';
 
 const AppPopup = styled(Popup)`
   border-radius: 1.5rem;
@@ -424,13 +425,11 @@ class AddAppointment extends React.Component {
 		if (phone) {
 			if (phone.charAt(1) === '1') {
 				refPhone = '(+1) ' + formatUsPhone(phone.substring(1));
-			}else if (phone.charAt(0) === '1') {
+			} else if (phone.charAt(0) === '1') {
 				refPhone = '(+1) ' + formatUsPhone(phone.substring(1));
-			} 
-			else if (phone.charAt(1) === '8' && phone.charAt(2) === '4') {
+			} else if (phone.charAt(1) === '8' && phone.charAt(2) === '4') {
 				refPhone = '(+84) ' + formatUsPhone(phone.substring(2));
-			}
-			else if (phone.charAt(0) === '8' && phone.charAt(1) === '4') {
+			} else if (phone.charAt(0) === '8' && phone.charAt(1) === '4') {
 				refPhone = '(+84) ' + formatUsPhone(phone.substring(2));
 			} else {
 				refPhone = '(+1) ' + formatUsPhone(phone.substring(2));
@@ -480,7 +479,7 @@ class AddAppointment extends React.Component {
 									value={this.state.phoneNumber}
 									onChange={(e) => this.handleChange(e)}
 									placeholder="Enter phone number"
-									type='tel'
+									type="tel"
 								/>
 							</FormCheckPhone>
 							<Button
@@ -569,7 +568,7 @@ class AddAppointment extends React.Component {
 											mask="_"
 											value={this.state.phone}
 											onChange={(e) => this.setState({ phone: e.target.value })}
-											type='tel'
+											type="tel"
 										/>
 									</div>
 								)}
@@ -579,7 +578,7 @@ class AddAppointment extends React.Component {
 										value={this.RefPhoneExist()}
 										onChange={(e) => this.setState({ phone: e.target.value })}
 										placeholder="Phone number"
-										type='tel'
+										type="tel"
 									/>
 								)}
 							</Form>
@@ -592,7 +591,13 @@ class AddAppointment extends React.Component {
 										onChange={(e) => this.handleChangeNote(e)}
 									/>
 									<button type="submit" onClick={() => this.addNotes()}>
-										<Img src={Enter} alt="icon" />
+										{/* <Img src={Enter} alt="icon" /> */}
+										<MdSubdirectoryArrowLeft
+											style={{
+												width: 28,
+												height: 28
+											}}
+										/>
 									</button>
 								</NoteWrapper.Form>
 								{/* {notes.map((note, index) => this.renderNote(note, index))} */}

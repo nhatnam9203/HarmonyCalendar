@@ -5,36 +5,18 @@ export default class PopupStaff extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {};
-    }
-    
-    closePopupStaff(staff){
-        this.props.togglePopupStaff(staff);
-    }
+	}
 
-    renderStaffList() {
+	closePopupStaff(staff) {
+		this.props.togglePopupStaff(staff);
+	}
+
+	renderStaffList() {
 		const { staffList } = this.props;
 		return staffList.map((staff, index) => {
 			return (
-				<div
-					onClick={() => this.closePopupStaff(staff)}
-					key={index}
-					style={{
-						display: 'flex',
-						flexDirection: 'row',
-						paddingLeft: 10,
-						paddingTop: 10,
-						cursor: 'pointer',
-					}}
-				>
-					<img
-						style={{
-							width: 40,
-							height: 40,
-							objectFit: 'cover',
-							borderRadius: 30
-						}}
-						src={staff ? staff.imageUrl : ''}
-					/>
+				<div onClick={() => this.closePopupStaff(staff)} key={index} style={style.itemStaff}>
+					<img style={style.imgStaff} src={staff ? staff.imageUrl : ''} />
 					<p
 						style={{
 							marginLeft: 10
@@ -49,12 +31,9 @@ export default class PopupStaff extends Component {
 
 	render() {
 		return (
-			// <OutsideClickHandler
-			// 	onOutsideClick={this.closePopupStaff}
-			// >
-		
-            // </OutsideClickHandler>
-            <div style={style.staffList}>{this.renderStaffList()}</div>
+			<OutsideClickHandler onOutsideClick={() => this.props.closePopupStaff()}>
+				<div style={style.staffList}>{this.renderStaffList()}</div>
+			</OutsideClickHandler>
 		);
 	}
 }
@@ -67,8 +46,8 @@ const style = {
 		background: '#ffffff',
 		zIndex: 9999,
 		position: 'absolute',
-        top: '0%',
-        left : '70%',
+		top: '0%',
+		left: '70%',
 		borderRadius: 5,
 		boxShadow: '0 3px 9px rgba(0,0,0,.175)'
 	},
@@ -77,5 +56,12 @@ const style = {
 		height: 40,
 		objectFit: 'cover',
 		borderRadius: 30
+	},
+	itemStaff: {
+		display: 'flex',
+		flexDirection: 'row',
+		paddingLeft: 10,
+		paddingTop: 10,
+		cursor: 'pointer'
 	}
 };

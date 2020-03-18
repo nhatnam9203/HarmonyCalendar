@@ -64,7 +64,8 @@ import {
 	GET_APP_BY_ID_SUCCESS,
 	GROUP_APPOINTMENT,
 	UPDATE_APPOINTMENT_PAID_OFFLINE,
-	GET_TIME_STAFF_LOGIN_SUCCESS
+	GET_TIME_STAFF_LOGIN_SUCCESS,
+	SET_SLIDE_INDEX
 } from './constants';
 import { dataPutBackAppointment } from './utilSaga';
 import { store } from 'app';
@@ -118,7 +119,8 @@ export const initialState = fromJS({
 	time_staffId: '',
 	StatusDeleteWaiting: false,
 	PopupPincode: false,
-	PinStaff: ''
+	PinStaff: '',
+	slideIndex : 0,
 });
 
 function saveAppointmentOffLine(app) {
@@ -188,6 +190,8 @@ function appointmentReducer(state = initialState, action) {
 
 		case LOAD_MEMBERS_ERROR:
 			return state.set('error', action.error).set('loading', false);
+		case SET_SLIDE_INDEX:
+			return state.set('slideIndex', action.slideIndex);
 
 		case SET_DISPLAYED_MEMBERS:
 			let resourceId = 0;

@@ -85,4 +85,5 @@ export const initialState = {
 	isChange: false,
 	isPopupStaff : false,
 	indexPopupStaff : '',
+	isPopupTimePicker : false
 };

@@ -41,6 +41,7 @@ import {
   makeLoadCalendar,
   makeLoadWaiting,
   makeStatusDeleteWaiting,
+  makeSlideIndex
 } from './selectors';
 
 export function mapDispatchToProps(dispatch) {
@@ -82,6 +83,7 @@ const mapStateToProps = createStructuredSelector({
   isLoadWaiting : makeLoadWaiting(),
   isLoadCalendar : makeLoadCalendar(),
   StatusDeleteWaiting : makeStatusDeleteWaiting(),
+  slideIndex : makeSlideIndex(),
 });
 
 const withConnect = connect(
