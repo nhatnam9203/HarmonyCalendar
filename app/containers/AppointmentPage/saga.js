@@ -341,6 +341,7 @@ export function* getWaitingAppointments() {
 			const timezone = new Date().getTimezoneOffset();
 			const url = `${requestURL.toString()}&timezone=${timezone}`;
 			const response = yield api(url.toString(), '', 'GET', token);
+			console.log({response})
 			yield put(loadingWaiting(false));
 			const appointments =
 				response &&

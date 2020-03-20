@@ -81,9 +81,14 @@ export const initialState = {
 	selectedStaff: '',
 	isOpenStaffList: false,
 	cloneAppointment: '',
+
 	isPopupDay: false,
 	isChange: false,
 	isPopupStaff : false,
 	indexPopupStaff : '',
-	isPopupTimePicker : false
+	isPopupTimePicker : false,
+	isPoupPrice : false,
+	indexPrice : '',
+	valuePriceIndex : '',
+	isPopupPriceState : 'service'
 };

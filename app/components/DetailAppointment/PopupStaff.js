@@ -47,7 +47,7 @@ const style = {
 		zIndex: 9999,
 		position: 'absolute',
 		top: '0%',
-		left: '70%',
+		left: '50%',
 		borderRadius: 5,
 		boxShadow: '0 3px 9px rgba(0,0,0,.175)'
 	},

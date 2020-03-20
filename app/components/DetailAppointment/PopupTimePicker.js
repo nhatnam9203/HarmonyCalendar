@@ -2,18 +2,18 @@ import React, { Component } from 'react';
 import OutsideClickHandler from 'react-outside-click-handler';
 import styled from 'styled-components';
 import Picker from 'react-mobile-picker';
-import moment from 'moment'
+import moment from 'moment';
 
 const PopupTimePK = styled.div`
 	position: absolute;
 	top: 2.8rem;
-	left : -8rem;
+	left: 0rem;
 	background-color: #ffffff;
 	border-radius: 5px;
 	z-index: 999999999999999;
 	width: 22rem;
 	height: 18rem;
-	box-shadow: 0 3px 9px rgba(0,0,0,.175);
+	box-shadow: 0 3px 9px rgba(0, 0, 0, .175);
 `;
 
 const Header = styled.div`
@@ -30,37 +30,34 @@ const Header = styled.div`
 	font-size: 1rem;
 `;
 
-const Body = styled.div`
-    height: 12rem;
-`;
+const Body = styled.div`height: 12rem;`;
 
 const Footer = styled.div`
-    width: 100%;
-    flexDirection: row;
-    display: flex;
-    border: '4px solid #333';
-	background-color: #EAEAEA;
+	width: 100%;
+	flexDirection: row;
+	display: flex;
+	border: '4px solid #333';
+	background-color: #eaeaea;
 	border-bottom-left-radius: 5px;
 	border-bottom-right-radius: 5px;
 	border-top: 2px solid #dddddd;
 `;
 
 const Button = styled.div`
-    width: 50%;
-    height: 3rem;
-    justify-content: center;
-    align-items: center;
-    display: flex;
-    color: #1366AF;
-    background-color: #EAEAEA;
+	width: 50%;
+	height: 3rem;
+	justify-content: center;
+	align-items: center;
+	display: flex;
+	color: #1366af;
+	background-color: #eaeaea;
 	border-bottom-left-radius: 8px;
-	border-bottom-right-radius: ${props => props.borderBottomRight ? '8px' : 0};
-	border-right: ${props => props.borderRight ? '2px solid #dddddd' : 0};
+	border-bottom-right-radius: ${(props) => (props.borderBottomRight ? '8px' : 0)};
+	border-right: ${(props) => (props.borderRight ? '2px solid #dddddd' : 0)};
 	z-zIndex: 1111;
-    & > span {
+	& > span {
 		font-weight: bold;
-	}
-    
+	},
 `;
 
 export default class PopupTimePicker extends Component {
@@ -80,6 +77,28 @@ export default class PopupTimePicker extends Component {
 		};
 	}
 
+	componentDidMount() {
+		const { fromTime } = this.props;
+		this.setState({
+			valueGroups: {
+				hour: moment(fromTime).format('hh'),
+				minutes: moment(fromTime).minutes().toString(),
+				localization: moment(fromTime).format('A')
+			}
+		});
+	}
+
+	componentWillReceiveProps(nextProps) {
+		const { fromTime } = nextProps;
+		this.setState({
+			valueGroups: {
+				hour: moment(fromTime).format('hh'),
+				minutes: moment(fromTime).minutes().toString(),
+				localization: moment(fromTime).format('A')
+			}
+		});
+	}
+
 	handleChange = (name, value) => {
 		this.setState(({ valueGroups }) => ({
 			valueGroups: {
@@ -89,39 +108,42 @@ export default class PopupTimePicker extends Component {
 		}));
 	};
 
-	done(){
-		const {valueGroups} = this.state;
-		const {hour,minutes,localization} = valueGroups;
-		const {currentDay} = this.props;
-	
+	done() {
+		const { valueGroups } = this.state;
+		const { hour, minutes, localization } = valueGroups;
+		const { currentDay } = this.props;
+
 		const time = `${moment(currentDay).format('MM/DD/YYYY')} ${hour}:${minutes} ${localization}`;
-		this.props.doneTimePicker(time)
+		this.props.doneTimePicker(time);
 	}
 
-	cancel(){
+	cancel() {
 		this.props.cancelTimePicker();
 	}
 
 	render() {
-		const {} = this.props;
+		const { fromTime } = this.props;
 		const { optionGroups, valueGroups } = this.state;
-
 		return (
-			<OutsideClickHandler onOutsideClick={()=>this.cancel()}>
-			<PopupTimePK>
-				<Header>Time Picker</Header>
-				<Body>
-					<Picker
-						optionGroups={optionGroups}
-						valueGroups={valueGroups}
-						onChange={(name, value) => this.handleChange(name, value)}
-					/>
-				</Body>
-                <Footer>
-                    <Button borderRight onClick={()=>this.cancel()}><span>Cancel</span></Button>
-                    <Button borderBottomRight onClick={()=>this.done()}><span>Done</span></Button>
-                </Footer>
-			</PopupTimePK>
+			<OutsideClickHandler onOutsideClick={() => this.cancel()}>
+				<PopupTimePK>
+					<Header>Time Picker</Header>
+					<Body>
+						<Picker
+							optionGroups={optionGroups}
+							valueGroups={valueGroups}
+							onChange={(name, value) => this.handleChange(name, value)}
+						/>
+					</Body>
+					<Footer>
+						<Button borderRight onClick={() => this.cancel()}>
+							<span>Cancel</span>
+						</Button>
+						<Button borderBottomRight onClick={() => this.done()}>
+							<span>Done</span>
+						</Button>
+					</Footer>
+				</PopupTimePK>
 			</OutsideClickHandler>
 		);
 	}
