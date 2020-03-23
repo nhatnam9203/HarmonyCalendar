@@ -207,7 +207,7 @@ class ResourceSelector extends React.Component {
 		return (
 			<ResourceWrapper key={index}>
 				<Resource>
-					<LoadingIndicator />
+					{/* <LoadingIndicator /> */}
 				</Resource>
 			</ResourceWrapper>
 		);

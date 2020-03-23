@@ -28,6 +28,7 @@ const Header = styled.div`
 	border-top-right-radius: 5px;
 	font-weight: 900;
 	font-size: 1rem;
+	color : #585858;
 `;
 
 const Body = styled.div`height: 12rem;`;
@@ -56,7 +57,7 @@ const Button = styled.div`
 	border-right: ${(props) => (props.borderRight ? '2px solid #dddddd' : 0)};
 	z-zIndex: 1111;
 	& > span {
-		font-weight: bold;
+		font-weight: 500;
 	},
 `;
 

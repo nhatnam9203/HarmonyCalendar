@@ -118,7 +118,7 @@ class ConfirmDeleteWaiting extends Component {
                         </ConfirmPopupWrapper.WrapperButton>
 
                         <ConfirmPopupWrapper.WrapperButton>
-                            <ConfirmPopupWrapper.Button Color="#fff" backgroundColor={'#1FB5F4'} onClick={() => this.closeModal()}>No</ConfirmPopupWrapper.Button>
+                            <ConfirmPopupWrapper.Button Color="#fff" backgroundColor={'#1173C3'} onClick={() => this.closeModal()}>No</ConfirmPopupWrapper.Button>
                         </ConfirmPopupWrapper.WrapperButton>
                     </ConfirmPopupWrapper.Footer>
                 </ConfirmPopupWrapper>

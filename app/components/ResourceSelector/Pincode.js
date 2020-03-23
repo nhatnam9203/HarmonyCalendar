@@ -8,6 +8,127 @@ import { TiDelete } from 'react-icons/ti';
 import PopupSelectTime from './PopupSelectTime';
 import moment from 'moment';
 
+const FormPincode = styled(Popup)`
+    padding : 0 !important;
+    padding-bottom : 1rem !important;
+    background : #ffffff;
+    width : 26rem !important;
+    max-height : 30rem;
+    border : none !important;
+    border-radius : 0.8rem;    
+    position : relative;
+    box-shadow: 0 1px #fff inset, 0 0.6px 10px #1FB5F4;
+`;
+
+FormPincode.Header = styled.div`
+	height: 3.2rem;
+	width: 100%;
+	background: #1073c2;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
+	position: relative;
+`;
+const HeaderText = styled.div`
+	color: #ffffff;
+	font-size: 1.2rem;
+	font-weight: 600;
+	lettter-spacing: 0.6;
+`;
+
+const PincodeBody = styled.div`
+	max-height: 30rem;
+	padding: 1rem;
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	overflow-y: scroll;
+`;
+PincodeBody.Input = styled.input`
+	width: 100%;
+	height: 2.5rem !important;
+	text-align: left;
+	background: #ffffff;
+	border: 1px solid #dddddd;
+	padding-left: 1.3rem;
+	font-size: 1.4rem;
+	border-radius: 5px;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+`;
+PincodeBody.Button = styled.button`
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: #ffffff;
+	text-align: center;
+	width: 7.5rem;
+	align-self: center;
+	background: #1073c2;
+	padding: 0.6rem;
+	margin-top: 0.6rem;
+	border-radius: 3px;
+	cursor: pointer;
+`;
+
+const StaffHeader = styled.div`
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	height: 5rem;
+`;
+
+StaffHeader.Left = styled.div`
+	width: 5rem;
+	height: 5rem;
+`;
+StaffHeader.Right = styled.div`
+	justify-content: space-between;
+	align-items: flex-start;
+	display: flex;
+	flex-direction: column;
+	height: 50px;
+	width: 100%;
+	margin-left: 15px;
+`;
+const StaffBody = styled.div`position: relative;`;
+StaffBody.Title = styled.div`
+	color: #1b75c0;
+	font-weight: 600;
+	font-size: 1rem;
+	text-align: left;
+`;
+StaffHeader.Right.Bottom = styled.div``;
+
+const Row = styled.div`
+	display: flex;
+	flex-direction: row;
+	margin-top: 1rem;
+`;
+
+const ButtonAddBlock = styled.div`
+	display: flex;
+	flex-direction: row;
+	padding: 0.2rem;
+	background-color: #f2f2f2;
+	width: 48%;
+	font-weight: 600;
+	collor: #333;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	border-radius: 3px;
+	padding: 0.9rem;
+`;
+
+const BlockList = styled.div`
+	width: 100%;
+	height: 100% !important;
+`;
+
+
 const initialState = {
 	pincode: '',
 	note: '',
@@ -256,7 +377,7 @@ class Pincode extends Component {
 						<textarea
 							value={this.state.note}
 							onChange={(e) => this.setState({ note: e.target.value })}
-							style={styles.note}
+							style={styles.notes}
 						/>
 					</div>
 				</Row>
@@ -350,7 +471,7 @@ const styles = {
 		marginTop: 8,
 		fontSize: 16
 	},
-	note: {
+	notes: {
 		width: 270,
 		height: 120,
 		borderWidth: 1,
@@ -449,122 +570,3 @@ const styles = {
 	}
 };
 
-const FormPincode = styled(Popup)`
-    padding : 0 !important;
-    padding-bottom : 1rem !important;
-    background : #ffffff;
-    width : 26rem !important;
-    max-height : 30rem;
-    border : none !important;
-    border-radius : 0.8rem;    
-    position : relative;
-    box-shadow: 0 1px #fff inset, 0 0.6px 10px #1FB5F4;
-`;
-
-FormPincode.Header = styled.div`
-	height: 3.2rem;
-	width: 100%;
-	background: #1073c2;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	border-top-left-radius: 3px;
-	border-top-right-radius: 3px;
-	position: relative;
-`;
-const HeaderText = styled.div`
-	color: #ffffff;
-	font-size: 1.2rem;
-	font-weight: 600;
-	lettter-spacing: 0.6;
-`;
-
-const PincodeBody = styled.div`
-	max-height: 30rem;
-	padding: 1rem;
-	text-align: center;
-	display: flex;
-	flex-direction: column;
-	overflow-y: scroll;
-`;
-PincodeBody.Input = styled.input`
-	width: 100%;
-	height: 2.5rem !important;
-	text-align: left;
-	background: #ffffff;
-	border: 1px solid #dddddd;
-	padding-left: 1.3rem;
-	font-size: 1.4rem;
-	border-radius: 5px;
-	-moz-appearance: none;
-	-webkit-appearance: none;
-`;
-PincodeBody.Button = styled.button`
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	color: #ffffff;
-	text-align: center;
-	width: 7.5rem;
-	align-self: center;
-	background: #1073c2;
-	padding: 0.6rem;
-	margin-top: 0.6rem;
-	border-radius: 3px;
-	cursor: pointer;
-`;
-
-const StaffHeader = styled.div`
-	display: flex;
-	flex-direction: row;
-	width: 100%;
-	height: 5rem;
-`;
-
-StaffHeader.Left = styled.div`
-	width: 5rem;
-	height: 5rem;
-`;
-StaffHeader.Right = styled.div`
-	justify-content: space-between;
-	align-items: flex-start;
-	display: flex;
-	flex-direction: column;
-	height: 50px;
-	width: 100%;
-	margin-left: 15px;
-`;
-const StaffBody = styled.div`position: relative;`;
-StaffBody.Title = styled.div`
-	color: #1b75c0;
-	font-weight: 600;
-	font-size: 1rem;
-	text-align: left;
-`;
-StaffHeader.Right.Bottom = styled.div``;
-
-const Row = styled.div`
-	display: flex;
-	flex-direction: row;
-	margin-top: 1rem;
-`;
-
-const ButtonAddBlock = styled.div`
-	display: flex;
-	flex-direction: row;
-	padding: 0.2rem;
-	background-color: #f2f2f2;
-	width: 48%;
-	font-weight: 600;
-	collor: #333;
-	align-items: center;
-	justify-content: center;
-	cursor: pointer;
-	border-radius: 3px;
-	padding: 0.9rem;
-`;
-
-const BlockList = styled.div`
-	width: 100%;
-	height: 100% !important;
-`;

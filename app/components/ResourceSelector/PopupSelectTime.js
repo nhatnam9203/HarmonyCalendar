@@ -135,18 +135,19 @@ const styles = {
 		boxShadow: '0 0 7px rgba(0, 0, 0, 0.13)',
 		backgroundColor: '#ffffff',
 		zIndex: 999,
-		borderRadius: 20
+		borderRadius: 18,
+		height: 420
 	},
 	title: {
 		textAlign: 'center',
-		padding: 10,
+		padding: 12,
 		backgroundColor: '#1B75C0',
 		color: '#ffffff',
 		fontWeight: '600'
 	},
 	titleHour: {
 		textAlign: 'center',
-		padding: 10,
+		padding: 12,
 		backgroundColor: '#1B75C0',
 		color: '#ffffff',
 		fontWeight: '600',
@@ -154,7 +155,7 @@ const styles = {
 	},
 	titleLocal: {
 		textAlign: 'center',
-		padding: 10,
+		padding: 12,
 		backgroundColor: '#1B75C0',
 		color: '#ffffff',
 		fontWeight: '600',
@@ -178,7 +179,7 @@ const styles = {
 		justifyContent: 'center',
 		alignItems: 'center',
 		display: 'flex',
-		marginTop: -10
+		marginTop: -30
 	},
 	button: {
 		backgroundColor: '#1B75C0',
