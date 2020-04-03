@@ -152,6 +152,7 @@ class Calendar extends React.Component {
 						break;
 
 					case 'staff_change_ordernumber':
+						console.log('update next staff')
 						updateNextStaff();
 						break;
 					default:

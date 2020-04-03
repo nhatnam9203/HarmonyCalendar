@@ -342,6 +342,7 @@ export function* getWaitingAppointments() {
 			const timezone = new Date().getTimezoneOffset();
 			const url = `${requestURL.toString()}&timezone=${timezone}`;
 			const response = yield api(url.toString(), '', 'GET', token);
+
 			yield put(loadingWaiting(false));
 			const appointments =
 				response &&
@@ -1156,14 +1157,22 @@ function* checkPinCode_Saga() {
 function* updateNextStaff_Saga() {
 	yield takeLatest(UPDATE_NEXT_STAFF, function*() {
 		try {
+
 			const requestURL = new URL(`${GET_MEMBER}`);
-			const url = `${requestURL.toString()}&timezone=${timezone}`;
+			const currentDate = yield select(makeCurrentDay());
+			const url = `${requestURL.toString()}${currentDate.format('YYYY-MM-DD')}`;
+
 			const response = yield api(url, '', 'GET', token);
 			if (response.codeStatus === 1) {
 				const members = response.data
 					? response.data.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0)
 					: [];
-				yield put(updateNextStaffSuccess(members));
+					const slideIndex = yield select(makeSlideIndex());
+					// const Staffs = sorrtStaffByDate('', members);
+	
+					yield put(membersLoaded(members));
+					yield put(setDisplayedMembers(members.slice(slideIndex * 6, slideIndex * 6 + 6)));
+				// yield put(updateNextStaffSuccess(members));
 			}
 		} catch (err) {
 			// yield put(memberLoadingError(err));

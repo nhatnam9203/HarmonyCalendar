@@ -706,8 +706,6 @@ class Appointment extends React.Component {
 			action: 'checkout'
 		});
 
-		console.log({ data });
-
 		window.postMessage(data);
 	};
 
@@ -1104,7 +1102,7 @@ class Appointment extends React.Component {
 		const staff = staffList.find((s) => parseInt(s.id) === parseInt(service.staffId));
 		const { prices, isPopupStaff, indexPopupStaff } = this.state;
 		
-		let price = prices[index] ? parseFloat(prices[index]).toFixed(2) : '';
+		let price = prices[index] ? parseFloat(prices[index]).toFixed(2) : "0.00";
 
 		const duration =
 			service.duration.toString().length === 1 ? '0' + service.duration.toString() : service.duration;
@@ -1416,7 +1414,7 @@ class Appointment extends React.Component {
 		const { appointment } = this.props;
 		const { pricesExtras } = this.state;
 
-		let price = pricesExtras[index] ? parseFloat(pricesExtras[index]).toFixed(2) : ''
+		let price = pricesExtras[index] ? parseFloat(pricesExtras[index]).toFixed(2) : '0.00'
 
 		return (
 			<tr key={index}>

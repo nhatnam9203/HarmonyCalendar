@@ -79,12 +79,7 @@ class DaySlider extends React.Component {
   }
 
   onDayClick(day) {
-    /* if(navigator.onLine){
-      const { onChangeDay } = this.props;
-      onChangeDay(day.format('DDMMYYYY'));
-    }else{
-      alert('You must have an internet connection to perform this !!!')
-    } */
+
     const { onChangeDay } = this.props;
     onChangeDay(day.format('DDMMYYYY'));
   }
