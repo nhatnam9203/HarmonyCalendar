@@ -545,23 +545,6 @@ export const MAIN_CALENDAR_OPTIONS = {
 					})
 				);
 			}
-			// setTimeout(() => {
-			//   function handleDrag() {
-			//     const eventInformation = $(this).data('event-information');
-			//     $(this).data('event', {
-			//       data: eventInformation,
-			//       color: '#00b4f7',
-			//       stick: true,
-			//     });
-
-			//     $(this).draggable({
-			//       zIndex: 999,
-			//       revert: true,
-			//       revertDuration: 0,
-			//     });
-			//   }
-			//   $('#waiting-events > div').each(handleDrag);
-			// }, 1000);
 		}
 	},
 	/* eslint no-param-reassign: "error" */
