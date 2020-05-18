@@ -700,6 +700,8 @@ class Appointment extends React.Component {
 
 		const app = await convertAppointment(appointment);
 
+		console.log({appointment})
+
 		const data = await JSON.stringify({
 			appointmentId: idAppointment ? idAppointment : 'web',
 			appointment: app,

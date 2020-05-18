@@ -599,14 +599,11 @@ export function* assignAppointment(action) {
 			extras
 		};
 
-		// if (navigator.onLine === false) {
-		// yield put(renderAppointment());
 		const pushData = {
 			data: { ...data, id: appointment.id },
 			action: 'updateAppointmemtOffline'
 		};
 		window.postMessage(pushData);
-		// }
 
 		const requestURL = new URL(PUT_STATUS_APPOINTMENT_API);
 		const url = `${requestURL.toString()}/${appointment.id}`;
@@ -893,9 +890,6 @@ export function* addNewCustomer(action) {
 		const requestURL_AddAppointment = new URL(POST_ADD_APPOINTMENT);
 		const resultAddAppointment = yield api(requestURL_AddAppointment.toString(), data, 'POST', token);
 
-		console.log({ data });
-
-		console.log({ resultAddAppointment });
 		let id_appointment = '';
 		if (resultAddAppointment.codeStatus === 1) {
 			id_appointment = resultAddAppointment.data;
@@ -909,8 +903,6 @@ export function* addNewCustomer(action) {
 			'GET',
 			token
 		);
-
-		console.log({ response_DetailAppointment });
 
 		yield put(addCustomerSuccess(true));
 

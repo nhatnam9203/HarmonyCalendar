@@ -12,7 +12,7 @@ import {
 	getStaffOffline
 } from '../../containers/AppointmentPage/actions';
 import { membersData, appointmentAdapter, memberAdapter } from '../../containers/AppointmentPage/saga';
-import { merchantId } from '../../../app-constants';
+import { merchantId , deviceId } from '../../../app-constants';
 import WaitingLoading from './WaitingLoading';
 import CalendarLoading from './CalendarLoading';
 const signalR = require('@aspnet/signalr');
@@ -139,7 +139,7 @@ class Calendar extends React.Component {
 			updateNextStaff,
 			updateConsumer
 		} = this.props;
-		const url = `${PROD_API_BASE_URL}/notification/?merchantId=${merchantId}&Title=Merchant&kind=calendar`;
+		const url = `${PROD_API_BASE_URL}/notification/?merchantId=${merchantId}&Title=Merchant&kind=calendar&deviceId=${deviceId}`;
 		let connection = new signalR.HubConnectionBuilder().withUrl(url).build();
 
 		connection.on('ListWaNotification', async (data) => {

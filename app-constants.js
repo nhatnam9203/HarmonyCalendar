@@ -4,6 +4,7 @@ export const token = getURLParam('token');
 export const storeid = getURLParam('storeid');
 export const merchantId = getURLParam('merchantid');
 export const staffId = getURLParam('staffId');
+export const deviceId = getURLParam('deviceId');
 
 export const API_PORT = 8010;
 
