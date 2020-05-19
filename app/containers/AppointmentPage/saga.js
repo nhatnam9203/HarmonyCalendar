@@ -714,7 +714,7 @@ export function* changeTimeAppointment(action) {
 			totalDuration > 0
 				? moment(start_time).add(totalDuration, 'minutes').format('YYYY-MM-DD HH:mm')
 				: moment(start_time).add(15, 'minutes').format('YYYY-MM-DD HH:mm');
-		if (window.confirm('Are you sure want to change ?')) {
+		if (window.confirm('Accept changes ?')) {
 			yield* changeTime(
 				appointment,
 				fcEvent,

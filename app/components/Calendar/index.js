@@ -307,7 +307,7 @@ class Calendar extends React.Component {
 								disable_Calendar(true);
 							}}
 						>
-							Sign in
+							Check in
 						</SignInWrapper.Button>
 					</SignInWrapper>
 				</RightSideBar>

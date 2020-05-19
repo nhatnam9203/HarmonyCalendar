@@ -304,6 +304,9 @@ const GlobalStyle = createGlobalStyle`
 .popup-overlay{
 
 }
+.fc-now-indicator-arrow{
+  display : none;
+}
 
 ::-webkit-scrollbar { 
     display: none; 

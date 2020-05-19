@@ -512,7 +512,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 					? `${event.end.format('YYYY-MM-DD')}T${event.end.format('HH:mm:ss')}`
 					: moment(start_time).add(90, 'minutes').format('YYYY-MM-DD HH:mm:ss');
 			if (check === false) {
-				if (window.confirm('Do you want to move appointment to this position ?')) {
+				if (window.confirm('Accept overlapping appointments ?')) {
 					store.dispatch(moveAppointment(event.data.id, event.resourceId, start_time, endTime));
 				} else {
 					revertFunc();

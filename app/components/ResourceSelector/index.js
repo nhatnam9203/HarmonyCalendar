@@ -361,12 +361,12 @@ Resource.OrderNumber = styled.div`
 	top: 2px;
 	right: 2px;
 	background: ${(props) => (props.next ? 'red' : '#1073C2')};
-	width: 16px;
-	height: 16px;
+	width: 18px;
+	height: 18px;
 	border-radius: 50%;
 	color: #ffffff;
 	padding: 2px;
-	font-size: 9px;
+	font-size: 11px;
 	line-height: 1.3;
 `;
 
@@ -395,7 +395,7 @@ Resource.Title = styled.div`
 	opacity: 0.75;
 	text-align: center;
 	padding-bottom: 4px;
-	font-size: 12px;
+	font-size: 0.85rem;
 	line-height: 1.3;
 	font-weight: 400;
 `;
