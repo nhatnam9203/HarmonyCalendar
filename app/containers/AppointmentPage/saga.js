@@ -188,6 +188,7 @@ export const appointmentAdapter = (appointment) => {
 		subTotal: appointment.subTotal,
 		total: appointment.total,
 		tax: appointment.tax,
+		isVip : appointment.isVip,
 		discount: appointment.discount,
 		giftCard: appointment.giftCard,
 		giftCards: appointment.giftCards ? appointment.giftCards : [],
@@ -236,53 +237,6 @@ export const statusConvertData = {
 };
 
 const statusAdapter = (status) => statusConvertData[status];
-
-const sorrtStaffByDate = (date, staffList) => {
-	let staffOn = [];
-	let staffOff = [];
-
-	switch (date) {
-		case 'Monday':
-			staffOff = staffList.filter((staff) => staff.workingTimes.Monday.isCheck === false);
-			staffOn = staffList.filter((staff) => staff.workingTimes.Monday.isCheck === true);
-			break;
-
-		case 'Tuesday':
-			staffOff = staffList.filter((staff) => staff.workingTimes.Tuesday.isCheck === false);
-			staffOn = staffList.filter((staff) => staff.workingTimes.Tuesday.isCheck === true);
-			break;
-
-		case 'Wednesday':
-			staffOff = staffList.filter((staff) => staff.workingTimes.Wednesday.isCheck === false);
-			staffOn = staffList.filter((staff) => staff.workingTimes.Wednesday.isCheck === true);
-			break;
-
-		case 'Thursday':
-			staffOff = staffList.filter((staff) => staff.workingTimes.Thursday.isCheck === false);
-			staffOn = staffList.filter((staff) => staff.workingTimes.Thursday.isCheck === true);
-			break;
-
-		case 'Friday':
-			staffOff = staffList.filter((staff) => staff.workingTimes.Friday.isCheck === false);
-			staffOn = staffList.filter((staff) => staff.workingTimes.Friday.isCheck === true);
-			break;
-
-		case 'Saturday':
-			staffOff = staffList.filter((staff) => staff.workingTimes.Saturday.isCheck === false);
-			staffOn = staffList.filter((staff) => staff.workingTimes.Saturday.isCheck === true);
-			break;
-
-		case 'Sunday':
-			staffOff = staffList.filter((staff) => staff.workingTimes.Sunday.isCheck === false);
-			staffOn = staffList.filter((staff) => staff.workingTimes.SundayisCheck === true);
-			break;
-
-		default:
-			break;
-	}
-
-	return staffOn.concat(staffOff);
-};
 
 export function* getMembers() {
 	if (navigator.onLine === true) {
@@ -714,7 +668,7 @@ export function* changeTimeAppointment(action) {
 			totalDuration > 0
 				? moment(start_time).add(totalDuration, 'minutes').format('YYYY-MM-DD HH:mm')
 				: moment(start_time).add(15, 'minutes').format('YYYY-MM-DD HH:mm');
-		if (window.confirm('Accept changes ?')) {
+		if (window.confirm('Accept changes?')) {
 			yield* changeTime(
 				appointment,
 				fcEvent,

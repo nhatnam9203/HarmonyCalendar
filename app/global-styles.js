@@ -127,6 +127,7 @@ const GlobalStyle = createGlobalStyle`
     padding: 4px;
     text-align: left;
     cursor: move;
+    position : relative;
   }
   .app-event__id-number {
     font-size: 11px;
@@ -140,6 +141,16 @@ const GlobalStyle = createGlobalStyle`
     margin-bottom: 4px;
     line-height: 1.3;
   }
+
+  .app-event__full-name2 {
+    position : absolute;
+    right: 5px;
+    top : 5px;
+    background-color : #52D969;
+    border-radius : 50px;
+    padding :2px;
+  }
+
   .app-event__phone-number {
     font-size: 13px;
     margin-left: 0px;

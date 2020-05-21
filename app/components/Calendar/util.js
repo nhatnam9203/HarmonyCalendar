@@ -78,6 +78,7 @@ export function	returnAppointment(appointment) {
         tax: appointment.Tax,
         giftCard: appointment.GiftCard,
         discount: appointment.Discount,
+        isVip : appointment.IsVip,
         total: appointment.Total,
         notes: appointment.Notes
             .sort(function(a, b) {

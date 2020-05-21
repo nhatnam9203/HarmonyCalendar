@@ -12,6 +12,7 @@ import {
 	getApppointmentById
 } from '../../containers/AppointmentPage/actions';
 import { formatPhone } from '../../utils/helper';
+import vip from '../../images/vip.png'
 
 const OPTION_RENDER_TEMPLATE = (option) => `<div class="app-event__option">- ${option.serviceName}</div>`;
 const PRODUCT_RENDER_TEMPLATE = (product) => `<div class="app-event__option">- ${product.productName}</div>`;
@@ -19,7 +20,7 @@ const EXTRAS_RENDER_TEMPLATE = (extra) => `<div class="app-event__option">- ${ex
 
 const EVENT_RENDER_TEMPLATE = (event) => `
   <div class="app-event">
-    <div class="app-event__id-number">${event.code}</div>
+	<div class="app-event__id-number">${event.code}</div>
     <div class="app-event__full-name">${event.userFullName}</div>
     <div class="app-event__phone-number">&nbsp ${formatPhone(event.phoneNumber)}</div>
 	${event.options.map((option) => OPTION_RENDER_TEMPLATE(option)).join('')}
@@ -47,13 +48,13 @@ export const MAIN_CALENDAR_OPTIONS = {
 	maxTime: '23:00:00',
 	timezone: 'local',
 	longPressDelay: 200,
-	resources: [ { id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 } ],
+	resources: [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }],
 	schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
 
 	select: (start, end, event, view, resource) => {
 		let check_block_temp = false;
 
-		const displayedMembers = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
+		const displayedMembers = store.getState().getIn(['appointment', 'appointments', 'calendar']);
 		const member = displayedMembers[resource.id];
 
 		member.appointments.forEach((app) => {
@@ -66,24 +67,24 @@ export const MAIN_CALENDAR_OPTIONS = {
 			}
 		});
 
-		const mem_resource = store.getState().getIn([ 'appointment', 'members', 'displayed' ]);
+		const mem_resource = store.getState().getIn(['appointment', 'members', 'displayed']);
 
 		let timeEnd = '';
 		let timeStart = '';
 		let isCheckWorking = '';
 
-		let currentDay = store.getState().getIn([ 'appointment', 'currentDay' ]);
+		let currentDay = store.getState().getIn(['appointment', 'currentDay']);
 
 		switch (moment(currentDay).format('dddd')) {
 			case 'Monday':
 				if (mem_resource[resource.id]) {
 					timeEnd = `${moment(currentDay).day('Monday').format('YYYY-MM-DD')}T${moment(
 						mem_resource[resource.id].workingTimes.Monday.timeEnd,
-						[ 'h:mm A' ]
+						['h:mm A']
 					).format('HH:mm:ss')}`;
 					timeStart = `${moment(currentDay).day('Monday').format('YYYY-MM-DD')}T${moment(
 						mem_resource[resource.id].workingTimes.Monday.timeStart,
-						[ 'h:mm A' ]
+						['h:mm A']
 					).format('HH:mm:ss')}`;
 					isCheckWorking = mem_resource[resource.id].workingTimes.Monday.isCheck;
 				}
@@ -94,11 +95,11 @@ export const MAIN_CALENDAR_OPTIONS = {
 				if (mem_resource[resource.id]) {
 					timeEnd = `${moment(currentDay).day('Tuesday').format('YYYY-MM-DD')}T${moment(
 						mem_resource[resource.id].workingTimes.Tuesday.timeEnd,
-						[ 'h:mm A' ]
+						['h:mm A']
 					).format('HH:mm:ss')}`;
 					timeStart = `${moment(currentDay).day('Tuesday').format('YYYY-MM-DD')}T${moment(
 						mem_resource[resource.id].workingTimes.Tuesday.timeStart,
-						[ 'h:mm A' ]
+						['h:mm A']
 					).format('HH:mm:ss')}`;
 					isCheckWorking = mem_resource[resource.id].workingTimes.Tuesday.isCheck;
 				}
@@ -109,11 +110,11 @@ export const MAIN_CALENDAR_OPTIONS = {
 				if (mem_resource[resource.id]) {
 					timeEnd = `${moment(currentDay).day('Wednesday').format('YYYY-MM-DD')}T${moment(
 						mem_resource[resource.id].workingTimes.Wednesday.timeEnd,
-						[ 'h:mm A' ]
+						['h:mm A']
 					).format('HH:mm:ss')}`;
 					timeStart = `${moment(currentDay).day('Wednesday').format('YYYY-MM-DD')}T${moment(
 						mem_resource[resource.id].workingTimes.Wednesday.timeStart,
-						[ 'h:mm A' ]
+						['h:mm A']
 					).format('HH:mm:ss')}`;
 					isCheckWorking = mem_resource[resource.id].workingTimes.Wednesday.isCheck;
 				}
@@ -123,11 +124,11 @@ export const MAIN_CALENDAR_OPTIONS = {
 				if (mem_resource[resource.id]) {
 					timeEnd = `${moment(currentDay).day('Thursday').format('YYYY-MM-DD')}T${moment(
 						mem_resource[resource.id].workingTimes.Thursday.timeEnd,
-						[ 'h:mm A' ]
+						['h:mm A']
 					).format('HH:mm:ss')}`;
 					timeStart = `${moment(currentDay).day('Thursday').format('YYYY-MM-DD')}T${moment(
 						mem_resource[resource.id].workingTimes.Thursday.timeStart,
-						[ 'h:mm A' ]
+						['h:mm A']
 					).format('HH:mm:ss')}`;
 					isCheckWorking = mem_resource[resource.id].workingTimes.Thursday.isCheck;
 				}
@@ -137,11 +138,11 @@ export const MAIN_CALENDAR_OPTIONS = {
 				if (mem_resource[resource.id]) {
 					timeEnd = `${moment(currentDay).day('Friday').format('YYYY-MM-DD')}T${moment(
 						mem_resource[resource.id].workingTimes.Friday.timeEnd,
-						[ 'h:mm A' ]
+						['h:mm A']
 					).format('HH:mm:ss')}`;
 					timeStart = `${moment(currentDay).day('Friday').format('YYYY-MM-DD')}T${moment(
 						mem_resource[resource.id].workingTimes.Friday.timeStart,
-						[ 'h:mm A' ]
+						['h:mm A']
 					).format('HH:mm:ss')}`;
 					isCheckWorking = mem_resource[resource.id].workingTimes.Friday.isCheck;
 				}
@@ -151,11 +152,11 @@ export const MAIN_CALENDAR_OPTIONS = {
 				if (mem_resource[resource.id]) {
 					timeEnd = `${moment(currentDay).day('Saturday').format('YYYY-MM-DD')}T${moment(
 						mem_resource[resource.id].workingTimes.Saturday.timeEnd,
-						[ 'h:mm A' ]
+						['h:mm A']
 					).format('HH:mm:ss')}`;
 					timeStart = `${moment(currentDay).day('Saturday').format('YYYY-MM-DD')}T${moment(
 						mem_resource[resource.id].workingTimes.Saturday.timeStart,
-						[ 'h:mm A' ]
+						['h:mm A']
 					).format('HH:mm:ss')}`;
 					isCheckWorking = mem_resource[resource.id].workingTimes.Saturday.isCheck;
 				}
@@ -165,11 +166,11 @@ export const MAIN_CALENDAR_OPTIONS = {
 				if (mem_resource[resource.id]) {
 					timeEnd = `${moment(currentDay).day(0).format('YYYY-MM-DD')}T${moment(
 						mem_resource[resource.id].workingTimes.Sunday.timeEnd,
-						[ 'h:mm A' ]
+						['h:mm A']
 					).format('HH:mm:ss')}`;
 					timeStart = `${moment(currentDay).day(0).format('YYYY-MM-DD')}T${moment(
 						mem_resource[resource.id].workingTimes.Sunday.timeStart,
-						[ 'h:mm A' ]
+						['h:mm A']
 					).format('HH:mm:ss')}`;
 					isCheckWorking = mem_resource[resource.id].workingTimes.Sunday.isCheck;
 				}
@@ -190,7 +191,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 	},
 
 	eventClick: (event) => {
-		const displayedMembers = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
+		const displayedMembers = store.getState().getIn(['appointment', 'appointments', 'calendar']);
 
 		const oldPosition = displayedMembers.find((member) =>
 			member.appointments.find((appointment) => appointment.id === event.data.id)
@@ -218,7 +219,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 				? moment(start_time).add(totalDuration, 'minutes')
 				: moment(start_time).add(90, 'minutes');
 
-		const memberdisplay = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
+		const memberdisplay = store.getState().getIn(['appointment', 'appointments', 'calendar']);
 		let check = true;
 		let check2 = false;
 		let member_clone = JSON.parse(JSON.stringify(memberdisplay));
@@ -230,11 +231,11 @@ export const MAIN_CALENDAR_OPTIONS = {
 		//   check = false;
 		// }
 
-		const displayedMembers = store.getState().getIn([ 'appointment', 'members', 'displayed' ]);
+		const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
 
 		let all_appointments = [];
 		member_clone.forEach((apps) => {
-			all_appointments = [ ...all_appointments, ...apps.appointments ];
+			all_appointments = [...all_appointments, ...apps.appointments];
 		});
 
 		let check_workingStaff = '';
@@ -245,7 +246,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 		const pos = displayedMembers.findIndex((mem) => parseInt(mem.resourceId) === parseInt(resourceId));
 
 		if (pos !== -1) {
-			const currentDay = store.getState().getIn([ 'appointment', 'currentDay' ]);
+			const currentDay = store.getState().getIn(['appointment', 'currentDay']);
 
 			switch (moment(currentDay).format('dddd')) {
 				case 'Monday':
@@ -347,7 +348,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 		// }
 		if (
 			moment(checkDate).isBefore(
-				`${moment().format('YYYY-MM-DD')}T${moment(time_working_start, [ 'h:mm A' ]).format('HH:mm:ss')}`
+				`${moment().format('YYYY-MM-DD')}T${moment(time_working_start, ['h:mm A']).format('HH:mm:ss')}`
 			)
 		) {
 			check_time_block = false;
@@ -394,20 +395,20 @@ export const MAIN_CALENDAR_OPTIONS = {
 			}
 		}
 	},
-	
+
 	eventDrop: (event, delta, revertFunc, jsEvent, ui, view) => {
 		const start_time = event.start;
 		const end_time = event.end;
 		let check = true;
-		const memberdisplay = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
+		const memberdisplay = store.getState().getIn(['appointment', 'appointments', 'calendar']);
 		let member_clone = JSON.parse(JSON.stringify(memberdisplay));
 		member_clone.forEach((element) => {
 			delete element.memberId;
 		});
 
-		const displayedMembers = store.getState().getIn([ 'appointment', 'members', 'displayed' ]);
+		const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
 
-		const currentDay = store.getState().getIn([ 'appointment', 'currentDay' ]);
+		const currentDay = store.getState().getIn(['appointment', 'currentDay']);
 
 		let check_workingStaff = '';
 		if (!displayedMembers[parseInt(event.resourceId)]) {
@@ -449,7 +450,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 
 		let all_appointments = [];
 		member_clone.forEach((apps) => {
-			all_appointments = [ ...all_appointments, ...apps.appointments ];
+			all_appointments = [...all_appointments, ...apps.appointments];
 		});
 
 		if (!displayedMembers[parseInt(event.resourceId)]) {
@@ -512,7 +513,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 					? `${event.end.format('YYYY-MM-DD')}T${event.end.format('HH:mm:ss')}`
 					: moment(start_time).add(90, 'minutes').format('YYYY-MM-DD HH:mm:ss');
 			if (check === false) {
-				if (window.confirm('Accept overlapping appointments ?')) {
+				if (window.confirm('Accept overlapping appointments?')) {
 					store.dispatch(moveAppointment(event.data.id, event.resourceId, start_time, endTime));
 				} else {
 					revertFunc();
@@ -536,7 +537,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 			if (jsEvent.pageX >= x1 && jsEvent.pageX <= x2 && jsEvent.pageY >= y1 && jsEvent.pageY <= y2) {
 				/* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
 				$('#full-calendar').fullCalendar('removeEvents', event._id);
-				const displayedMembers = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
+				const displayedMembers = store.getState().getIn(['appointment', 'appointments', 'calendar']);
 				const override = displayedMembers[event.resourceId];
 				store.dispatch(
 					putBackAppointment({
@@ -550,6 +551,8 @@ export const MAIN_CALENDAR_OPTIONS = {
 	/* eslint no-param-reassign: "error" */
 	eventRender: (event, element) => {
 		element[0].innerHTML = EVENT_RENDER_TEMPLATE(event.data);
+		if(event.data.isVip === 1)
+		element.find("div.app-event").prepend("<div class='app-event__full-name2'><img src='" + vip + "' width='16' height='16'></div>");
 	},
 	resourceRender: (resourceObj, labelTds) => {
 		labelTds[0].innerHTML = '';
@@ -608,7 +611,7 @@ export const addEventsToCalendar = (currentDate, appointmentsMembers) => {
 };
 
 export const deleteEventFromCalendar = (eventId) => {
-	$('#full-calendar').fullCalendar('removeEvents', [ eventId ]);
+	$('#full-calendar').fullCalendar('removeEvents', [eventId]);
 };
 
 export const updateEventToCalendar = (fcEvent) => {
@@ -635,7 +638,7 @@ export const updateEventToCalendar = (fcEvent) => {
 		startEditable = false;
 		resourceEditable = false;
 	}
-	const displayedMembers = store.getState().getIn([ 'appointment', 'members', 'displayed' ]);
+	const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
 
 	const resourceId = displayedMembers.findIndex((mem) => mem.id === fcEvent.memberId);
 
@@ -650,5 +653,5 @@ export const updateEventToCalendar = (fcEvent) => {
 		resourceEditable
 	};
 
-	$('#full-calendar').fullCalendar('addEventSource', [ data ]);
+	$('#full-calendar').fullCalendar('addEventSource', [data]);
 };

@@ -201,7 +201,10 @@ class Calendar extends React.Component {
 						let app_update = app.data.appointment;
 						if (app_update) {
 							let appointment = JSON.parse(app_update);
+							console.log({appointment})
 							let appointment_R = returnAppointment(appointment);
+							console.log('update appointment');
+
 							const displayMember = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
 							const selectDay = store.getState().getIn([ 'appointment', 'currentDay' ]);
 

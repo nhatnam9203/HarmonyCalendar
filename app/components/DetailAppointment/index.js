@@ -100,9 +100,12 @@ AppointmentWrapper.Footer = styled(AppPopupWrapper.Footer)`
 
 const UserInformation = styled.div`
 	display: flex;
+	flex-direction : row;
+	justify-content : space-between;
+	align-items: center;
 	padding: 0.5rem;
 	& > div {
-		width: 50%;
+		width: 35%;
 		display: flex;
 		justify-content: space-between;
 	}
@@ -603,15 +606,15 @@ class Appointment extends React.Component {
 			for (let i = 0; i < appointmentDetail.options.length; i++) {
 				const price = appointmentDetail.options[i].price;
 				this.setState({
-					prices: [ ...this.state.prices, parseFloat(price) ],
-					old_prices: [ ...this.state.prices, parseFloat(price) ]
+					prices: [...this.state.prices, parseFloat(price)],
+					old_prices: [...this.state.prices, parseFloat(price)]
 				});
 			}
 			for (let i = 0; i < appointmentDetail.extras.length; i++) {
 				const price = appointmentDetail.extras[i].price;
 				this.setState({
-					pricesExtras: [ ...this.state.pricesExtras, parseFloat(price) ],
-					old_priceExtras: [ ...this.state.old_priceExtras, parseFloat(price) ]
+					pricesExtras: [...this.state.pricesExtras, parseFloat(price)],
+					old_priceExtras: [...this.state.old_priceExtras, parseFloat(price)]
 				});
 			}
 		}
@@ -933,11 +936,11 @@ class Appointment extends React.Component {
 						<div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
 							<WrapperFooterPaid>
 								<WrapperFooterPaid.ItemLeft>
-									<div style={{ fontWeight: '600' , color : '#585858' }}>Subtotal : </div>
+									<div style={{ fontWeight: '600', color: '#585858' }}>Subtotal : </div>
 									<div>$ {parseFloat(appointment.subTotal).toFixed(2)}</div>
 								</WrapperFooterPaid.ItemLeft>
 								<WrapperFooterPaid.Item>
-									<div style={{ fontWeight: '600' , color : '#585858' }}>Discount : </div>
+									<div style={{ fontWeight: '600', color: '#585858' }}>Discount : </div>
 									<div>$ {parseFloat(appointment.discount).toFixed(2)}</div>
 								</WrapperFooterPaid.Item>
 							</WrapperFooterPaid>
@@ -945,11 +948,11 @@ class Appointment extends React.Component {
 						<div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
 							<WrapperFooterPaid>
 								<WrapperFooterPaid.ItemLeft>
-									<div style={{ fontWeight: '600' , color : '#585858' }}>Tip : </div>
+									<div style={{ fontWeight: '600', color: '#585858' }}>Tip : </div>
 									<div>$ {parseFloat(appointment.tipAmount).toFixed(2)}</div>
 								</WrapperFooterPaid.ItemLeft>
 								<WrapperFooterPaid.Item>
-									<div style={{ fontWeight: '600' , color : '#585858' }}>Gift card : </div>
+									<div style={{ fontWeight: '600', color: '#585858' }}>Gift card : </div>
 									<div>$ {parseFloat(appointment.giftCard).toFixed(2)}</div>
 								</WrapperFooterPaid.Item>
 							</WrapperFooterPaid>
@@ -957,7 +960,7 @@ class Appointment extends React.Component {
 						<div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
 							<WrapperFooterPaid>
 								<WrapperFooterPaid.ItemLeft>
-									<div style={{ fontWeight: '600' , color : '#585858' }}>Tax : </div>
+									<div style={{ fontWeight: '600', color: '#585858' }}>Tax : </div>
 									<div style={{ paddingRight: 10 }}>$ {parseFloat(appointment.tax).toFixed(2)}</div>
 								</WrapperFooterPaid.ItemLeft>
 							</WrapperFooterPaid>
@@ -993,18 +996,30 @@ class Appointment extends React.Component {
 
 	renderBody() {
 		const { appointment, currentDay } = this.props;
+		const { isVip } = appointment;
 		const { isPopupTimePicker } = this.state;
 		return (
 			<AppointmentWrapper.Body scroll={isPopupTimePicker ? false : true}>
 				<UserInformation>
 					<div>
 						<span>Customer name: </span>
-						<span style={{ color : '#333' , fontWeight : '600' }}>{appointment.userFullName}</span>
+						<span style={{ color: '#333', fontWeight: '600' }}>{appointment.userFullName}</span>
 					</div>
 					<div>
 						<span>Phone number: </span>
-						<span style={{ color : '#333' , fontWeight : '600' }}>{formatPhone(appointment.phoneNumber)}</span>
+						<span style={{ color: '#333', fontWeight: '600' }}>{formatPhone(appointment.phoneNumber)}</span>
 					</div>
+					{isVip === 1 &&
+						<div style={{ width: '12%', borderRadius: 100, padding: 8, backgroundColor: '#52D969', justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
+							<img
+								src={require('../../images/vip.png')}
+								style={{
+									width: 17,
+									height: 17
+								}}
+							/>
+							<span style={{ color: 'white' , marginLeft: 5 }}>VIP</span>
+						</div>}
 				</UserInformation>
 
 				{appointment.status !== 'PAID' && this.renderChangeAppointTime()}
@@ -1101,7 +1116,7 @@ class Appointment extends React.Component {
 		const { appointment, staffList } = this.props;
 		const staff = staffList.find((s) => parseInt(s.id) === parseInt(service.staffId));
 		const { prices, isPopupStaff, indexPopupStaff } = this.state;
-		
+
 		let price = prices[index] ? parseFloat(prices[index]).toFixed(2) : "0.00";
 
 		const duration =
@@ -1118,24 +1133,24 @@ class Appointment extends React.Component {
 							<FaCaretDown style={{ color: '#1173C3' }} />
 
 							{isPopupStaff &&
-							index === indexPopupStaff && (
-								<PopupStaff
-									togglePopupStaff={(staff) => this.togglePopupStaff(staff, index)}
-									staffList={staffList}
-									closePopupStaff={() => this.closePopupStaff()}
-								/>
-							)}
+								index === indexPopupStaff && (
+									<PopupStaff
+										togglePopupStaff={(staff) => this.togglePopupStaff(staff, index)}
+										staffList={staffList}
+										closePopupStaff={() => this.closePopupStaff()}
+									/>
+								)}
 						</div>
 					</td>
 
-					<td style={{  borderLeft: 0 }}>
+					<td style={{ borderLeft: 0 }}>
 						<div style={style.serviceColumn}>
 							<div style={style.serviceName}>{service.serviceName}</div>
 						</div>
 					</td>
 
 					{appointment.status !== 'PAID' && (
-						<td style={{  textAlign: 'center' }}>
+						<td style={{ textAlign: 'center' }}>
 							<ButtonService
 								backgroundColor={this.buttonService(appointment, service, index)}
 								disabled={appointment.status === 'PAID' || service.duration <= 5}
@@ -1450,8 +1465,8 @@ class Appointment extends React.Component {
 									() =>
 										this.openPopupPrice(price, index, 'extra')
 								) : (
-									() => {}
-								)
+										() => { }
+									)
 							}
 						>
 							<div style={appointment.status !== 'PAID' ? style.priceS : {}}>{price}</div>
@@ -1512,8 +1527,8 @@ class Appointment extends React.Component {
 		};
 		if (noteValue.trim() !== '') {
 			this.setState({
-				notes: [ note, ...notes ],
-				newNotes: [ note, ...newNotes ],
+				notes: [note, ...notes],
+				newNotes: [note, ...newNotes],
 				noteValue: ''
 			});
 		}
@@ -1730,7 +1745,7 @@ const style = {
 		position: 'relative',
 		backgroundColor: '#EEEEEE',
 		borderRadius: 5,
-		maxWidth : 120,
+		maxWidth: 120,
 		whiteSpace: 'nowrap',
 		textOverflow: 'ellipsis',
 		height: 40,

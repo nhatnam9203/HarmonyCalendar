@@ -10,6 +10,8 @@ import moment from 'moment';
 import { IoIosCloseCircle } from 'react-icons/io';
 import ConfirmDeleteWaiting from './ConfirmDeleteWaiting'
 import {formatPhone} from '../../utils/helper'
+import vip from '../../images/vip.png'
+
 
 const DragZoneWrapper = styled.div`
   height: calc(100vh - 4rem - 4rem - 4rem);
@@ -165,6 +167,9 @@ class FCDragZone extends React.PureComponent {
                 <EventWrapper.buttonDelete onClick={() => this.deleteEventWaiting(event)}>
                   <IoIosCloseCircle />
                 </EventWrapper.buttonDelete>
+                <div className="app-event__full-name2">
+                  <img src={vip} width='18' height='18' />
+                </div>
                 <div className="app-event__id-number">{event.code}</div>
                 <div className="app-event__full-name">{event.userFullName}</div>
                 <div className="app-event__phone-number">
