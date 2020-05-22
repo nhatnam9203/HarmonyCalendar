@@ -146,9 +146,7 @@ const GlobalStyle = createGlobalStyle`
     position : absolute;
     right: 5px;
     top : 5px;
-    background-color : #52D969;
-    border-radius : 50px;
-    padding :2px;
+
   }
 
   .app-event__phone-number {
@@ -316,7 +314,6 @@ const GlobalStyle = createGlobalStyle`
 
 }
 .fc-now-indicator-arrow{
-  display : none;
 }
 
 ::-webkit-scrollbar { 

@@ -8,9 +8,10 @@ class FCAgenda extends React.Component {
   componentDidMount() {
     const { options } = this.props;
     $('#full-calendar').fullCalendar(options);
-    setInterval(() => {
-      $('.fc-now-indicator-arrow').html(moment().format('HH:mm'));
-    }, 500);
+    $('.fc-now-indicator-arrow').html(moment().format('hh:mm A'));
+    // setInterval(() => {
+   
+    // }, );
   }
 
   componentWillReceiveProps(nextProps){

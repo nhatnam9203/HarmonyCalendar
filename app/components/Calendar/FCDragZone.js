@@ -167,9 +167,9 @@ class FCDragZone extends React.PureComponent {
                 <EventWrapper.buttonDelete onClick={() => this.deleteEventWaiting(event)}>
                   <IoIosCloseCircle />
                 </EventWrapper.buttonDelete>
-                <div className="app-event__full-name2">
+                {/* <div className="app-event__full-name2">
                   <img src={vip} width='18' height='18' />
-                </div>
+                </div> */}
                 <div className="app-event__id-number">{event.code}</div>
                 <div className="app-event__full-name">{event.userFullName}</div>
                 <div className="app-event__phone-number">

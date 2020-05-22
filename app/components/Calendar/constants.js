@@ -13,6 +13,7 @@ import {
 } from '../../containers/AppointmentPage/actions';
 import { formatPhone } from '../../utils/helper';
 import vip from '../../images/vip.png'
+import { AiFillStar } from 'react-icons'
 
 const OPTION_RENDER_TEMPLATE = (option) => `<div class="app-event__option">- ${option.serviceName}</div>`;
 const PRODUCT_RENDER_TEMPLATE = (product) => `<div class="app-event__option">- ${product.productName}</div>`;
@@ -551,8 +552,8 @@ export const MAIN_CALENDAR_OPTIONS = {
 	/* eslint no-param-reassign: "error" */
 	eventRender: (event, element) => {
 		element[0].innerHTML = EVENT_RENDER_TEMPLATE(event.data);
-		if(event.data.isVip === 1)
-		element.find("div.app-event").prepend("<div class='app-event__full-name2'><img src='" + vip + "' width='16' height='16'></div>");
+		if (event.data.isVip === 1)
+			element.find("div.app-event").prepend("<div class='app-event__full-name2'><img src='" + vip + "' width='18' height='18'></div>");
 	},
 	resourceRender: (resourceObj, labelTds) => {
 		labelTds[0].innerHTML = '';
@@ -570,7 +571,8 @@ export const addEventsToCalendar = (currentDate, appointmentsMembers) => {
 			let eventClass = 'event-paid';
 			let bordercolor = '';
 			if (appointment.status === 'ASSIGNED') {
-				eventColor = '#FFFD71';
+				// eventColor = '#FFFD71';
+				eventColor = '#ffe559';
 				eventClass = 'event-assigned';
 			}
 			if (appointment.status === 'CONFIRMED') {
@@ -621,7 +623,8 @@ export const updateEventToCalendar = (fcEvent) => {
 	let eventClass = '';
 	const { status } = fcEvent;
 	if (status === 'ASSIGNED') {
-		eventColor = '#FFFD71';
+		// eventColor = '#FFFD71';
+		eventColor='#ffe559';
 		eventClass = 'event-assigned';
 	}
 	if (status === 'CONFIRMED') {

@@ -732,7 +732,7 @@ class Appointment extends React.Component {
 		const { appointment } = this.props;
 		if (appointment.status === 'ASSIGNED') {
 			return (
-				<AppointmentWrapper.Header color="#585858" backgroundColor="#FFFD71">
+				<AppointmentWrapper.Header color="#585858" backgroundColor="#ffe559">
 					{appointment.code} Unconfirmed Appointment
 				</AppointmentWrapper.Header>
 			);
@@ -1180,7 +1180,7 @@ class Appointment extends React.Component {
 								src={require('../../images/edit.png')}
 								style={{
 									width: 16,
-									height: 16
+									height: 16,
 								}}
 							/>
 						</div>
