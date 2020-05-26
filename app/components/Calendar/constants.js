@@ -398,6 +398,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 	},
 
 	eventDrop: (event, delta, revertFunc, jsEvent, ui, view) => {
+		console.log({ event })
 		const start_time = event.start;
 		const end_time = event.end;
 		let check = true;
@@ -406,16 +407,14 @@ export const MAIN_CALENDAR_OPTIONS = {
 		member_clone.forEach((element) => {
 			delete element.memberId;
 		});
-
 		const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
-
 		const currentDay = store.getState().getIn(['appointment', 'currentDay']);
-
 		let check_workingStaff = '';
+
 		if (!displayedMembers[parseInt(event.resourceId)]) {
 			check = false;
 		} else {
-			switch (moment(currentDay).format('dddd')) {
+			switch (moment(currentDay).format('dddd')) { // kiểm tra isCheck cuả staff ( có làm việc không ?)
 				case 'Monday':
 					check_workingStaff = displayedMembers[parseInt(event.resourceId)].workingTimes.Monday.isCheck;
 					break;
@@ -449,14 +448,14 @@ export const MAIN_CALENDAR_OPTIONS = {
 			}
 		}
 
-		let all_appointments = [];
+		let all_appointments = []; // tất cả appointment trên calendar
 		member_clone.forEach((apps) => {
 			all_appointments = [...all_appointments, ...apps.appointments];
 		});
 
 		if (!displayedMembers[parseInt(event.resourceId)]) {
 			check = false;
-		} else if (check_workingStaff) {
+		} else if (check_workingStaff) { // có làm việc
 			all_appointments.forEach((app) => {
 				if (parseInt(app.memberId) === parseInt(displayedMembers[parseInt(event.resourceId)].id)) {
 					if (
@@ -472,7 +471,8 @@ export const MAIN_CALENDAR_OPTIONS = {
 
 							// }
 							if (app.status === 'BLOCK_TEMP') {
-								check = 1;
+								if (app.appointmentId !== event.data.id)
+									check = 1;
 							} else {
 								check = false;
 							}
@@ -497,7 +497,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 					// }
 				}
 			});
-		} else {
+		} else { // không làm việc
 			check = false;
 		}
 		const resourceId = event.resourceId;
@@ -624,7 +624,7 @@ export const updateEventToCalendar = (fcEvent) => {
 	const { status } = fcEvent;
 	if (status === 'ASSIGNED') {
 		// eventColor = '#FFFD71';
-		eventColor='#ffe559';
+		eventColor = '#ffe559';
 		eventClass = 'event-assigned';
 	}
 	if (status === 'CONFIRMED') {

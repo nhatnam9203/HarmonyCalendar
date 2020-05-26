@@ -249,7 +249,7 @@ export function* getMembers() {
 				const members = resp.data
 					? resp.data.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0)
 					: [];
-
+				
 				const slideIndex = yield select(makeSlideIndex());
 				// const Staffs = sorrtStaffByDate('', members);
 
@@ -334,6 +334,7 @@ export function* getAppointmentsByMembersAndDate() {
 			const requestURL = new URL(GET_APPOINTMENT_BY_DATE);
 			const url = `${requestURL.toString()}/${apiDateQuery}`;
 			const response = yield api(url.toString(), '', 'GET', token);
+		
 			appointments =
 				response &&
 				response.data

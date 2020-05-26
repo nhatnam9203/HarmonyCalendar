@@ -329,9 +329,9 @@ class Pincode extends Component {
 						<div style={styles.note}>{obj.note}</div>
 					</div>
 
-					<div onClick={() => this.deleteBlockTime(obj)} style={styles.trashButton}>
+					{obj.editable && <div onClick={() => this.deleteBlockTime(obj)} style={styles.trashButton}>
 						<FaTrash color={'#6A6A6A'} size={20} style={styles.trash} />
-					</div>
+					</div>}
 				</div>
 			);
 		});

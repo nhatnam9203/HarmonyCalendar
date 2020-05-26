@@ -43,13 +43,13 @@ export function block(memberId, start, end) {
     }
 }
 
-export function blockTemp(memberId, start, end, note) {
+export function blockTemp(memberId, start, end, note,appointmentId) {
     return {
         status: 'BLOCK_TEMP',
         memberId,
         start,
         end,
-        id: '',
+        id: appointmentId ? appointmentId : 0,
         code: '',
         userFullName:'',
         phoneNumber: note,
@@ -64,13 +64,12 @@ export function addBlockCalendar(appointmentsMembers, displayedMembers, currentD
     appointmentsMembers.forEach(mem => {
         const memFind = displayedMembers.find(member => member.id === mem.memberId);
         const blockTimeMember = memFind.blockTime.filter(b => moment(b.workingDate).format('YYYY-MM-DD') === apiDateQuery);
-
         for (let i = 0; i < blockTimeMember.length; i++) {
             const memberId = mem.memberId;
             const start = `${moment(currentDate).format('YYYY-MM-DD')}T${moment(blockTimeMember[i].blockTimeStart, ["h:mm A"]).format("HH:mm:ss")}`;
             const end = `${moment(currentDate).format('YYYY-MM-DD')}T${moment(blockTimeMember[i].blockTimeEnd, ["h:mm A"]).format("HH:mm:ss")}`;
             const note = blockTimeMember[i].note;
-            mem.appointments.push(blockTemp(memberId, start, end, note));
+            mem.appointments.push(blockTemp(memberId, start, end, note,blockTimeMember[i].appointmentId));
         }
     });
 

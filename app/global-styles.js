@@ -314,6 +314,7 @@ const GlobalStyle = createGlobalStyle`
 
 }
 .fc-now-indicator-arrow{
+  display : none !important; 
 }
 
 ::-webkit-scrollbar { 
