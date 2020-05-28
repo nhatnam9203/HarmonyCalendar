@@ -110,11 +110,11 @@ class Calendar extends React.Component {
 
 		window.addEventListener('message', this.receiveMessage);
 
-		// this.runSignalR();
-		// setInterval(() => {
-		// 	console.log('***********************RECONNECT SignalR***********************');
-		// 	this.runSignalR();
-		// }, 60000);
+		this.runSignalR();
+		setInterval(() => {
+			console.log('***********************RECONNECT SignalR***********************');
+			this.runSignalR();
+		}, 60000);
 		const x = document.getElementsByClassName('fc-now-indicator fc-now-indicator-arrow');
 		for (let i = 0; i < x.length; i++) {
 			x[i].scrollIntoView();
@@ -144,8 +144,6 @@ class Calendar extends React.Component {
 
 		connection.on('ListWaNotification', async (data) => {
 			let app = JSON.parse(data);
-			console.log('data');
-			console.log({app})
 			if (app.type) {
 				switch (app.type) {
 					case 'staff_change_nextavailable':

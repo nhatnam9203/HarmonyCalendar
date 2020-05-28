@@ -187,7 +187,7 @@ class ResourceSelector extends React.Component {
 				</Resource.Avatar>
 
 				<Resource.OrderNumber next={resource.isNextAvailableStaff === 1 ? true : false}>
-					{resource.id}
+					{resource.orderNumber}
 				</Resource.OrderNumber>
 				<Resource.WorkingTime>{this.getWorrkingTime(resource, currentDay)}</Resource.WorkingTime>
 				<Resource.Title>{resource.title}</Resource.Title>

@@ -417,6 +417,8 @@ export function* moveAppointment(action) {
 	const calendarMembers = yield select(makeSelectCalendarAppointments());
 	const assignedMember = displayedMembers[action.newPositionIndex];
 
+	console.log({assignedMember , index : action.newPositionIndex})
+
 	const oldMemberPosition = calendarMembers.find((member) =>
 		member.appointments.find((appointment) => appointment.id === action.appointmentId)
 	);
@@ -481,6 +483,7 @@ export function* moveAppointment(action) {
 
 export function* putBackAppointment(action) {
 	try {
+		console.log('put back appointment');
 		const { appointment } = action;
 		let { memberId, start, end, options, products, extras } = appointment;
 		const requestURL = new URL(PUT_STATUS_APPOINTMENT_API);
