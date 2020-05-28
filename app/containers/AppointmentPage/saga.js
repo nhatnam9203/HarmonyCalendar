@@ -255,7 +255,7 @@ export function* getMembers() {
 
 				localStorage.setItem('staffList', JSON.stringify(members));
 				yield put(membersLoaded(members));
-				yield put(setDisplayedMembers(members.slice(slideIndex * 6, slideIndex * 6 + 6)));
+				yield put(setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
 				yield put(loadAppointmentByMembers());
 			}
 		} catch (err) {
@@ -1118,7 +1118,8 @@ function* updateNextStaff_Saga() {
 					// const Staffs = sorrtStaffByDate('', members);
 	
 					yield put(membersLoaded(members));
-					yield put(setDisplayedMembers(members.slice(slideIndex * 6, slideIndex * 6 + 6)));
+					yield put(setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
+					yield put(loadAppointmentByMembers());
 				// yield put(updateNextStaffSuccess(members));
 			}
 		} catch (err) {

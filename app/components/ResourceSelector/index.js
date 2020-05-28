@@ -24,7 +24,7 @@ class ResourceSelector extends React.Component {
 
 	afterSlide(index) {
 		const { resources } = this.props;
-		this.props.setDisplayedMembers(resources.slice(index * 6, index * 6 + 6));
+		this.props.setDisplayedMembers(resources.slice(index * 5, index * 5 + 5));
 		this.props.renderAppointment();
 		this.props.setSlideIndex(index);
 	}
@@ -43,14 +43,14 @@ class ResourceSelector extends React.Component {
 						</Resource.WorkingTime>
 					);
 				}
-				//  else {
-				// 	return (
-				// 		<Resource.WorkingTime notWork>
-				// 			{staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd} (Off)
-				// 		</Resource.WorkingTime>
-				// 	);
-				// }
-				// break;
+			//  else {
+			// 	return (
+			// 		<Resource.WorkingTime notWork>
+			// 			{staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd} (Off)
+			// 		</Resource.WorkingTime>
+			// 	);
+			// }
+			// break;
 
 			case 'Tuesday':
 				if (staff.workingTimes.Tuesday.isCheck) {
@@ -60,14 +60,14 @@ class ResourceSelector extends React.Component {
 						</Resource.WorkingTime>
 					);
 				}
-				//  else {
-				// 	return (
-				// 		<Resource.WorkingTime notWork>
-				// 			{staff.workingTimes.Tuesday.timeStart} - {staff.workingTimes.Tuesday.timeEnd} (Off)
-				// 		</Resource.WorkingTime>
-				// 	);
-				// }
-				// break;
+			//  else {
+			// 	return (
+			// 		<Resource.WorkingTime notWork>
+			// 			{staff.workingTimes.Tuesday.timeStart} - {staff.workingTimes.Tuesday.timeEnd} (Off)
+			// 		</Resource.WorkingTime>
+			// 	);
+			// }
+			// break;
 
 			case 'Wednesday':
 				if (staff.workingTimes.Wednesday.isCheck) {
@@ -77,14 +77,14 @@ class ResourceSelector extends React.Component {
 						</Resource.WorkingTime>
 					);
 				}
-				//  else {
-				// 	return (
-				// 		<Resource.WorkingTime notWork>
-				// 			{staff.workingTimes.Wednesday.timeStart} - {staff.workingTimes.Wednesday.timeEnd} (Off)
-				// 		</Resource.WorkingTime>
-				// 	);
-				// }
-				// break;
+			//  else {
+			// 	return (
+			// 		<Resource.WorkingTime notWork>
+			// 			{staff.workingTimes.Wednesday.timeStart} - {staff.workingTimes.Wednesday.timeEnd} (Off)
+			// 		</Resource.WorkingTime>
+			// 	);
+			// }
+			// break;
 
 			case 'Thursday':
 				if (staff.workingTimes.Thursday.isCheck) {
@@ -93,16 +93,16 @@ class ResourceSelector extends React.Component {
 							{staff.workingTimes.Thursday.timeStart} - {staff.workingTimes.Thursday.timeEnd}
 						</Resource.WorkingTime>
 					);
-				} 
-				
-				// else {
-				// 	return (
-				// 		<Resource.WorkingTime notWork>
-				// 			{staff.workingTimes.Thursday.timeStart} - {staff.workingTimes.Thursday.timeEnd} (Off)
-				// 		</Resource.WorkingTime>
-				// 	);
-				// }
-				// break;
+				}
+
+			// else {
+			// 	return (
+			// 		<Resource.WorkingTime notWork>
+			// 			{staff.workingTimes.Thursday.timeStart} - {staff.workingTimes.Thursday.timeEnd} (Off)
+			// 		</Resource.WorkingTime>
+			// 	);
+			// }
+			// break;
 
 			case 'Friday':
 				if (staff.workingTimes.Friday.isCheck) {
@@ -111,16 +111,16 @@ class ResourceSelector extends React.Component {
 							{staff.workingTimes.Friday.timeStart} - {staff.workingTimes.Friday.timeEnd}
 						</Resource.WorkingTime>
 					);
-				} 
-				
-				// else {
-				// 	return (
-				// 		<Resource.WorkingTime notWork>
-				// 			{staff.workingTimes.Friday.timeStart} - {staff.workingTimes.Friday.timeEnd} (Off)
-				// 		</Resource.WorkingTime>
-				// 	);
-				// }
-				// break;
+				}
+
+			// else {
+			// 	return (
+			// 		<Resource.WorkingTime notWork>
+			// 			{staff.workingTimes.Friday.timeStart} - {staff.workingTimes.Friday.timeEnd} (Off)
+			// 		</Resource.WorkingTime>
+			// 	);
+			// }
+			// break;
 
 			case 'Saturday':
 				if (staff.workingTimes.Saturday.isCheck) {
@@ -129,16 +129,16 @@ class ResourceSelector extends React.Component {
 							{staff.workingTimes.Saturday.timeStart} - {staff.workingTimes.Saturday.timeEnd}
 						</Resource.WorkingTime>
 					);
-				} 
-				
-				// else {
-				// 	return (
-				// 		<Resource.WorkingTime notWork>
-				// 			{staff.workingTimes.Saturday.timeStart} - {staff.workingTimes.Saturday.timeEnd} (Off)
-				// 		</Resource.WorkingTime>
-				// 	);
-				// }
-				// break;
+				}
+
+			// else {
+			// 	return (
+			// 		<Resource.WorkingTime notWork>
+			// 			{staff.workingTimes.Saturday.timeStart} - {staff.workingTimes.Saturday.timeEnd} (Off)
+			// 		</Resource.WorkingTime>
+			// 	);
+			// }
+			// break;
 
 			case 'Monday':
 				if (staff.workingTimes.Monday.isCheck) {
@@ -147,16 +147,16 @@ class ResourceSelector extends React.Component {
 							{staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd}
 						</Resource.WorkingTime>
 					);
-				} 
-				
-				// else {
-				// 	return (
-				// 		<Resource.WorkingTime notWork>
-				// 			{staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd} (Off)
-				// 		</Resource.WorkingTime>
-				// 	);
-				// }
-				// break;
+				}
+
+			// else {
+			// 	return (
+			// 		<Resource.WorkingTime notWork>
+			// 			{staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd} (Off)
+			// 		</Resource.WorkingTime>
+			// 	);
+			// }
+			// break;
 
 			default:
 				break;
@@ -179,7 +179,7 @@ class ResourceSelector extends React.Component {
 		return (
 			<Resource
 				onClick={() => this.openPincode(resource)}
-				active={parseInt(resource.id) === parseInt(staffId) ? true : false}
+				// active={parseInt(resource.id) === parseInt(staffId) ? true : false}
 				key={index}
 			>
 				<Resource.Avatar>
@@ -187,7 +187,7 @@ class ResourceSelector extends React.Component {
 				</Resource.Avatar>
 
 				<Resource.OrderNumber next={resource.isNextAvailableStaff === 1 ? true : false}>
-					{resource.orderNumber}
+					{resource.id}
 				</Resource.OrderNumber>
 				<Resource.WorkingTime>{this.getWorrkingTime(resource, currentDay)}</Resource.WorkingTime>
 				<Resource.Title>{resource.title}</Resource.Title>
@@ -216,10 +216,10 @@ class ResourceSelector extends React.Component {
 	renderCarouselSlide() {
 		const { loading, resources } = this.props;
 		if (loading) {
-			return [ 1 ].map((index) => this.renderLoadingResources(index));
+			return [1].map((index) => this.renderLoadingResources(index));
 		}
 		if (resources) {
-			return chunk(resources, 6).map((resource, index) => this.renderResources(resource, index));
+			return chunk(resources, 5).map((resource, index) => this.renderResources(resource, index));
 		}
 		return null;
 	}
@@ -243,6 +243,19 @@ class ResourceSelector extends React.Component {
 					<TodayWrapper>
 						<TodayWrapper.Button onClick={() => this.onTodayClick()}>Today</TodayWrapper.Button>
 					</TodayWrapper>
+					<AnyStaff>
+						<AnyStaff.Image>
+							<img
+								src={require('../../images/anystaff.png')}
+								style={{
+									width: 30,
+									height: 26
+								}}
+							/>
+							<AnyStaff.Title>Any staff</AnyStaff.Title>
+						</AnyStaff.Image>
+					</AnyStaff>
+
 					<ResourceSliderWrapper>
 						<Carousel
 							dragging={true}
@@ -324,25 +337,55 @@ TodayWrapper.Button = styled.div`
 `;
 
 const ResourceSliderWrapper = styled.div`
-	width: calc(100% - 5.05rem - (calc((100vw - 5.05rem) / 7)) + 1px);
+	width: calc(100% - 5.05rem - (calc((100vw - 5.05rem) / 7)) - (calc((100vw - 5.05rem) / 7)) + 1px);
 	position: relative;
 `;
 
 const ResourceWrapper = styled.div`
 	height: calc(4rem - 2px);
 	position: relative;
-	border-left: 1px solid #3883bb;
+	/* border-left: 1px solid #3883bb; */
 	display: flex;
 `;
 
 const Resource = styled.div`
 	cursor: pointer;
-	width: calc(100% / 6);
+	width: calc(100% / 5);
 	padding: 0.25rem;
 	position: relative;
 	border-right: 1px solid #ddd;
 	text-align: center;
 	background-color: ${(props) => (props.active ? '#1EB5F4' : '#ffffff')};
+`;
+
+const AnyStaff = styled(Resource)`
+	width : calc(100% - 5.05rem - (calc((100vw - 5.05rem) / 7)) * 6 + 4px);
+	height :7rem;
+	border-left: 1px solid #1173C3;
+	background-color : #F5F5F5;
+`;
+
+AnyStaff.Image = styled.div`
+	border-radius: 4px;
+	/* background: #0071c5; */
+	width: 100%;
+	font-size: 1rem;
+	line-height: 2.8;
+	height: 100%;
+	cursor: pointer;
+`;
+
+AnyStaff.Title = styled.div`
+	position: absolute;
+	bottom: 3rem;
+	left: 0;
+	width: 100%;
+	opacity: 0.75;
+	text-align: center;
+	padding-bottom: 4px;
+	font-size: 0.8rem;
+	line-height: 1.3;
+	font-weight: 500;
 `;
 
 Resource.Avatar = styled.div`
@@ -429,7 +472,7 @@ function chunk(array, size) {
 	for (let i = 0; i < array.length; i += 1) {
 		const last = chunkedArr[chunkedArr.length - 1];
 		if (!last || last.length === size) {
-			chunkedArr.push([ array[i] ]);
+			chunkedArr.push([array[i]]);
 		} else {
 			last.push(array[i]);
 		}

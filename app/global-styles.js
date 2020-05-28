@@ -146,7 +146,16 @@ const GlobalStyle = createGlobalStyle`
     position : absolute;
     right: 5px;
     top : 5px;
+  }
 
+  .app-event__full-name3 {
+    position : absolute;
+    right: 5px;
+    top : 5px;
+  }
+
+  .app-event__full-name3 img{
+    filter: sepia(100%) saturate(300%) brightness(20%) hue-rotate(0deg);
   }
 
   .app-event__phone-number {

@@ -55,138 +55,142 @@ export const MAIN_CALENDAR_OPTIONS = {
 	select: (start, end, event, view, resource) => {
 		let check_block_temp = false;
 
-		const displayedMembers = store.getState().getIn(['appointment', 'appointments', 'calendar']);
-		const member = displayedMembers[resource.id];
+		if (parseInt(resource.id) !== 0) {
+			const displayedAppointments = store.getState().getIn(['appointment', 'appointments', 'calendar']);
+			const member = displayedAppointments[parseInt(resource.id) - 1];
 
-		member.appointments.forEach((app) => {
-			if (
-				app.status === 'BLOCK_TEMP' &&
-				moment(app.start).isSameOrBefore(moment(start)) &&
-				moment(app.end).isAfter(moment(start))
-			) {
-				check_block_temp = true;
+			member.appointments.forEach((app) => {
+				if (
+					app.status === 'BLOCK_TEMP' &&
+					moment(app.start).isSameOrBefore(moment(start)) &&
+					moment(app.end).isAfter(moment(start))
+				) {
+					check_block_temp = true;
+				}
+			});
+
+			const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
+
+			let timeEnd = '';
+			let timeStart = '';
+			let isCheckWorking = '';
+
+			let currentDay = store.getState().getIn(['appointment', 'currentDay']);
+			const staffAvailable = displayedMembers[parseInt(resource.id) - 1] ? displayedMembers[parseInt(resource.id) - 1] : '';
+			console.log({staffAvailable})
+			switch (moment(currentDay).format('dddd')) {
+				case 'Monday':
+					if (staffAvailable) {
+						timeEnd = `${moment(currentDay).day('Monday').format('YYYY-MM-DD')}T${moment(
+							staffAvailable.workingTimes.Monday.timeEnd,
+							['h:mm A']
+						).format('HH:mm:ss')}`;
+						timeStart = `${moment(currentDay).day('Monday').format('YYYY-MM-DD')}T${moment(
+							staffAvailable.workingTimes.Monday.timeStart,
+							['h:mm A']
+						).format('HH:mm:ss')}`;
+						isCheckWorking = staffAvailable.workingTimes.Monday.isCheck;
+					}
+
+					break;
+
+				case 'Tuesday':
+					if (staffAvailable) {
+						timeEnd = `${moment(currentDay).day('Tuesday').format('YYYY-MM-DD')}T${moment(
+							staffAvailable.workingTimes.Tuesday.timeEnd,
+							['h:mm A']
+						).format('HH:mm:ss')}`;
+						timeStart = `${moment(currentDay).day('Tuesday').format('YYYY-MM-DD')}T${moment(
+							staffAvailable.workingTimes.Tuesday.timeStart,
+							['h:mm A']
+						).format('HH:mm:ss')}`;
+						isCheckWorking = staffAvailable.workingTimes.Tuesday.isCheck;
+					}
+
+					break;
+
+				case 'Wednesday':
+					if (staffAvailable) {
+						timeEnd = `${moment(currentDay).day('Wednesday').format('YYYY-MM-DD')}T${moment(
+							staffAvailable.workingTimes.Wednesday.timeEnd,
+							['h:mm A']
+						).format('HH:mm:ss')}`;
+						timeStart = `${moment(currentDay).day('Wednesday').format('YYYY-MM-DD')}T${moment(
+							staffAvailable.workingTimes.Wednesday.timeStart,
+							['h:mm A']
+						).format('HH:mm:ss')}`;
+						isCheckWorking = staffAvailable.workingTimes.Wednesday.isCheck;
+					}
+					break;
+
+				case 'Thursday':
+					if (staffAvailable) {
+						timeEnd = `${moment(currentDay).day('Thursday').format('YYYY-MM-DD')}T${moment(
+							staffAvailable.workingTimes.Thursday.timeEnd,
+							['h:mm A']
+						).format('HH:mm:ss')}`;
+						timeStart = `${moment(currentDay).day('Thursday').format('YYYY-MM-DD')}T${moment(
+							staffAvailable.workingTimes.Thursday.timeStart,
+							['h:mm A']
+						).format('HH:mm:ss')}`;
+
+						isCheckWorking = staffAvailable.workingTimes.Thursday.isCheck;
+					}
+					break;
+
+				case 'Friday':
+					if (staffAvailable) {
+						timeEnd = `${moment(currentDay).day('Friday').format('YYYY-MM-DD')}T${moment(
+							staffAvailable.workingTimes.Friday.timeEnd,
+							['h:mm A']
+						).format('HH:mm:ss')}`;
+						timeStart = `${moment(currentDay).day('Friday').format('YYYY-MM-DD')}T${moment(
+							staffAvailable.workingTimes.Friday.timeStart,
+							['h:mm A']
+						).format('HH:mm:ss')}`;
+						isCheckWorking = staffAvailable.workingTimes.Friday.isCheck;
+					}
+					break;
+
+				case 'Saturday':
+					if (staffAvailable) {
+						timeEnd = `${moment(currentDay).day('Saturday').format('YYYY-MM-DD')}T${moment(
+							staffAvailable.workingTimes.Saturday.timeEnd,
+							['h:mm A']
+						).format('HH:mm:ss')}`;
+						timeStart = `${moment(currentDay).day('Saturday').format('YYYY-MM-DD')}T${moment(
+							staffAvailable.workingTimes.Saturday.timeStart,
+							['h:mm A']
+						).format('HH:mm:ss')}`;
+						isCheckWorking = staffAvailable.workingTimes.Saturday.isCheck;
+					}
+					break;
+
+				case 'Sunday':
+					if (staffAvailable) {
+						timeEnd = `${moment(currentDay).day(0).format('YYYY-MM-DD')}T${moment(
+							staffAvailable.workingTimes.Sunday.timeEnd,
+							['h:mm A']
+						).format('HH:mm:ss')}`;
+						timeStart = `${moment(currentDay).day(0).format('YYYY-MM-DD')}T${moment(
+							staffAvailable.workingTimes.Sunday.timeStart,
+							['h:mm A']
+						).format('HH:mm:ss')}`;
+						isCheckWorking = staffAvailable.workingTimes.Sunday.isCheck;
+					}
+					break;
+				default:
+					break;
 			}
-		});
 
-		const mem_resource = store.getState().getIn(['appointment', 'members', 'displayed']);
+			const time = moment(start._d.toString().substr(0, 24));
 
-		let timeEnd = '';
-		let timeStart = '';
-		let isCheckWorking = '';
-
-		let currentDay = store.getState().getIn(['appointment', 'currentDay']);
-
-		switch (moment(currentDay).format('dddd')) {
-			case 'Monday':
-				if (mem_resource[resource.id]) {
-					timeEnd = `${moment(currentDay).day('Monday').format('YYYY-MM-DD')}T${moment(
-						mem_resource[resource.id].workingTimes.Monday.timeEnd,
-						['h:mm A']
-					).format('HH:mm:ss')}`;
-					timeStart = `${moment(currentDay).day('Monday').format('YYYY-MM-DD')}T${moment(
-						mem_resource[resource.id].workingTimes.Monday.timeStart,
-						['h:mm A']
-					).format('HH:mm:ss')}`;
-					isCheckWorking = mem_resource[resource.id].workingTimes.Monday.isCheck;
+			if (Boolean(isCheckWorking) === true && check_block_temp === false) {
+				if (moment(time).isBefore(timeEnd) && moment(time).isSameOrAfter(timeStart)) {
+					store.dispatch(disableCalendar(true));
+					store.dispatch(openAddingAppointment({}));
+					store.dispatch(TimeAndStaffID({ time: time, staffID: member.memberId }));
 				}
-
-				break;
-
-			case 'Tuesday':
-				if (mem_resource[resource.id]) {
-					timeEnd = `${moment(currentDay).day('Tuesday').format('YYYY-MM-DD')}T${moment(
-						mem_resource[resource.id].workingTimes.Tuesday.timeEnd,
-						['h:mm A']
-					).format('HH:mm:ss')}`;
-					timeStart = `${moment(currentDay).day('Tuesday').format('YYYY-MM-DD')}T${moment(
-						mem_resource[resource.id].workingTimes.Tuesday.timeStart,
-						['h:mm A']
-					).format('HH:mm:ss')}`;
-					isCheckWorking = mem_resource[resource.id].workingTimes.Tuesday.isCheck;
-				}
-
-				break;
-
-			case 'Wednesday':
-				if (mem_resource[resource.id]) {
-					timeEnd = `${moment(currentDay).day('Wednesday').format('YYYY-MM-DD')}T${moment(
-						mem_resource[resource.id].workingTimes.Wednesday.timeEnd,
-						['h:mm A']
-					).format('HH:mm:ss')}`;
-					timeStart = `${moment(currentDay).day('Wednesday').format('YYYY-MM-DD')}T${moment(
-						mem_resource[resource.id].workingTimes.Wednesday.timeStart,
-						['h:mm A']
-					).format('HH:mm:ss')}`;
-					isCheckWorking = mem_resource[resource.id].workingTimes.Wednesday.isCheck;
-				}
-				break;
-
-			case 'Thursday':
-				if (mem_resource[resource.id]) {
-					timeEnd = `${moment(currentDay).day('Thursday').format('YYYY-MM-DD')}T${moment(
-						mem_resource[resource.id].workingTimes.Thursday.timeEnd,
-						['h:mm A']
-					).format('HH:mm:ss')}`;
-					timeStart = `${moment(currentDay).day('Thursday').format('YYYY-MM-DD')}T${moment(
-						mem_resource[resource.id].workingTimes.Thursday.timeStart,
-						['h:mm A']
-					).format('HH:mm:ss')}`;
-					isCheckWorking = mem_resource[resource.id].workingTimes.Thursday.isCheck;
-				}
-				break;
-
-			case 'Friday':
-				if (mem_resource[resource.id]) {
-					timeEnd = `${moment(currentDay).day('Friday').format('YYYY-MM-DD')}T${moment(
-						mem_resource[resource.id].workingTimes.Friday.timeEnd,
-						['h:mm A']
-					).format('HH:mm:ss')}`;
-					timeStart = `${moment(currentDay).day('Friday').format('YYYY-MM-DD')}T${moment(
-						mem_resource[resource.id].workingTimes.Friday.timeStart,
-						['h:mm A']
-					).format('HH:mm:ss')}`;
-					isCheckWorking = mem_resource[resource.id].workingTimes.Friday.isCheck;
-				}
-				break;
-
-			case 'Saturday':
-				if (mem_resource[resource.id]) {
-					timeEnd = `${moment(currentDay).day('Saturday').format('YYYY-MM-DD')}T${moment(
-						mem_resource[resource.id].workingTimes.Saturday.timeEnd,
-						['h:mm A']
-					).format('HH:mm:ss')}`;
-					timeStart = `${moment(currentDay).day('Saturday').format('YYYY-MM-DD')}T${moment(
-						mem_resource[resource.id].workingTimes.Saturday.timeStart,
-						['h:mm A']
-					).format('HH:mm:ss')}`;
-					isCheckWorking = mem_resource[resource.id].workingTimes.Saturday.isCheck;
-				}
-				break;
-
-			case 'Sunday':
-				if (mem_resource[resource.id]) {
-					timeEnd = `${moment(currentDay).day(0).format('YYYY-MM-DD')}T${moment(
-						mem_resource[resource.id].workingTimes.Sunday.timeEnd,
-						['h:mm A']
-					).format('HH:mm:ss')}`;
-					timeStart = `${moment(currentDay).day(0).format('YYYY-MM-DD')}T${moment(
-						mem_resource[resource.id].workingTimes.Sunday.timeStart,
-						['h:mm A']
-					).format('HH:mm:ss')}`;
-					isCheckWorking = mem_resource[resource.id].workingTimes.Sunday.isCheck;
-				}
-				break;
-			default:
-				break;
-		}
-
-		const time = moment(start._d.toString().substr(0, 24));
-
-		if (isCheckWorking && check_block_temp === false) {
-			if (moment(time).isBefore(timeEnd) && moment(time).isSameOrAfter(timeStart)) {
-				store.dispatch(disableCalendar(true));
-				store.dispatch(openAddingAppointment({}));
-				store.dispatch(TimeAndStaffID({ time: time, staffID: member.memberId }));
 			}
 		}
 	},
@@ -222,7 +226,6 @@ export const MAIN_CALENDAR_OPTIONS = {
 
 		const memberdisplay = store.getState().getIn(['appointment', 'appointments', 'calendar']);
 		let check = true;
-		let check2 = false;
 		let member_clone = JSON.parse(JSON.stringify(memberdisplay));
 		member_clone.forEach((element) => {
 			delete element.memberId;
@@ -398,7 +401,6 @@ export const MAIN_CALENDAR_OPTIONS = {
 	},
 
 	eventDrop: (event, delta, revertFunc, jsEvent, ui, view) => {
-		console.log({ event })
 		const start_time = event.start;
 		const end_time = event.end;
 		let check = true;
@@ -553,7 +555,11 @@ export const MAIN_CALENDAR_OPTIONS = {
 	eventRender: (event, element) => {
 		element[0].innerHTML = EVENT_RENDER_TEMPLATE(event.data);
 		if (event.data.isVip === 1)
-			element.find("div.app-event").prepend("<div class='app-event__full-name2'><img src='" + vip + "' width='18' height='18'></div>");
+			if (event.data.status === 'ASSIGNED' || event.data.status === 'CONFIRMED') {
+				element.find("div.app-event").prepend("<div class='app-event__full-name3'><img src='" + vip + "' width='18' height='18'></div>");
+			} else {
+				element.find("div.app-event").prepend("<div class='app-event__full-name2'><img src='" + vip + "' width='18' height='18'></div>");
+			}
 	},
 	resourceRender: (resourceObj, labelTds) => {
 		labelTds[0].innerHTML = '';
@@ -596,7 +602,7 @@ export const addEventsToCalendar = (currentDate, appointmentsMembers) => {
 				eventClass = 'event-block-temp';
 			}
 			events.push({
-				resourceId: index,
+				resourceId: index + 1,
 				start: appointment.start,
 				end: appointment.end,
 				data: appointment,
