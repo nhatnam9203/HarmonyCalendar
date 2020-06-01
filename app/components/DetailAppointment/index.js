@@ -730,30 +730,31 @@ class Appointment extends React.Component {
 
 	renderHeader() {
 		const { appointment } = this.props;
+		const staffId = appointment.memberId;
 		if (appointment.status === 'ASSIGNED') {
 			return (
-				<AppointmentWrapper.Header color="#585858" backgroundColor="#ffe559">
+				<AppointmentWrapper.Header color="#585858" backgroundColor={staffId === 0 ? '#F4F4F5' : "#ffe559"}>
 					{appointment.code} Unconfirmed Appointment
 				</AppointmentWrapper.Header>
 			);
 		}
 		if (appointment.status === 'CONFIRMED') {
 			return (
-				<AppointmentWrapper.Header color="#585858" backgroundColor="#c2f4ff">
+				<AppointmentWrapper.Header color="#585858" backgroundColor={staffId === 0 ? '#F4F4F5' : "#c2f4ff"}>
 					{appointment.code} Confirmed Appointment
 				</AppointmentWrapper.Header>
 			);
 		}
 		if (appointment.status === 'CHECKED_IN') {
 			return (
-				<AppointmentWrapper.Header backgroundColor="#00b4f7">
+				<AppointmentWrapper.Header color={staffId === 0 ? '#333' : 'white'} backgroundColor={staffId === 0 ? '#F4F4F5' : "#00b4f7"}>
 					{appointment.code} Checked-in Appointment
 				</AppointmentWrapper.Header>
 			);
 		}
 		if (appointment.status === 'PAID') {
 			return (
-				<AppointmentWrapper.Header backgroundColor="#00dc00">
+				<AppointmentWrapper.Header color={staffId === 0 ? '#333' : 'white'} backgroundColor={staffId === 0 ? '#F4F4F5' : "#00dc00"}>
 					{appointment.code} Paid Appointment
 				</AppointmentWrapper.Header>
 			);
@@ -894,36 +895,6 @@ class Appointment extends React.Component {
 						</div>
 					</div>
 				</SelectDateWrapper>
-
-				{/* 		<SelectDateWrapper>
-					<SelectDateWrapper.SelectStaff>Staff</SelectDateWrapper.SelectStaff>
-					<div
-						style={{
-							display: 'flex',
-							flexDirection: 'row',
-							marginLeft: 20
-						}}
-					>
-						<div style={{ position: 'relative', paddingTop: 3, color: '#333', paddingLeft: 60 }}>
-							<div
-								onClick={() => this.setState({ isOpenStaffList: !this.state.isOpenStaffList })}
-								style={style.row2}
-							>
-								<img style={style.imgStaff} src={selectedStaff.imageUrl} />
-								<p style={style.staffName2}>{selectedStaff.title}</p>
-								<FaCaretDown style={{ marginLeft: 10 }} />
-							</div>
-							{isOpenStaffList && (
-								<OutsideClickHandler
-									onOutsideClick={() =>
-										this.setState({ isOpenStaffList: false, indexSelectedStaff: '' })}
-								>
-									<div style={style.staffList}>{this.renderStaffList()}</div>
-								</OutsideClickHandler>
-							)}
-						</div>
-					</div>
-				</SelectDateWrapper> */}
 			</WrapperTimeChange>
 		);
 	}
@@ -1228,10 +1199,7 @@ class Appointment extends React.Component {
 								/>
 								<img
 									src={require('../../images/edit.png')}
-									style={{
-										width: 16,
-										height: 16
-									}}
+									style={{ width: 16,	height: 16 }}
 								/>
 							</div>
 						</td>
@@ -1250,27 +1218,9 @@ class Appointment extends React.Component {
 					<table>
 						<thead>
 							<tr>
-								<th
-									width="25%"
-									style={{
-										borderRight: 0
-									}}
-								>
-									Staff
-								</th>
-
-								<th
-									width="25%"
-									style={{
-										borderLeft: 0
-									}}
-								>
-									Services
-								</th>
-
-								<th width="25%" style={{ textAlign: 'center' }}>
-									Duration (min)
-								</th>
+								<th width="25%" style={{ borderRight: 0	}}>	Staff</th>
+								<th width="25%" style={{ borderLeft: 0 }}>Services</th>
+								<th width="25%" style={{ textAlign: 'center' }}>Duration (min)</th>
 								<th style={{ textAlign: 'center' }}>Price ($)</th>
 							</tr>
 						</thead>
@@ -1281,28 +1231,10 @@ class Appointment extends React.Component {
 				<table>
 					<thead>
 						<tr>
-							<th
-								style={{
-									borderRight: 0
-								}}
-								width="25%"
-							>
-								Staff
-							</th>
-							<th
-								style={{
-									borderLeft: 0
-								}}
-								width="25%"
-							>
-								Services
-							</th>
-							<th width="25%" style={{ textAlign: 'center' }}>
-								Tip ($)
-							</th>
-							<th width="25%" style={{ textAlign: 'center' }}>
-								Price ($)
-							</th>
+							<th style={{ borderRight: 0 }} width="25%">Staff</th>
+							<th style={{ borderLeft: 0 }} width="25%">Services</th>
+							<th width="25%" style={{ textAlign: 'center' }}>Tip ($)</th>
+							<th width="25%" style={{ textAlign: 'center' }}>Price ($)</th>
 						</tr>
 					</thead>
 					<tbody>{services.map((s, i) => this.renderService(s, i))}</tbody>
@@ -1356,13 +1288,7 @@ class Appointment extends React.Component {
 					</ButtonProduct>
 				</td>
 				<td>
-					<div
-						style={{
-							display: 'flex',
-							flexDirection: 'row',
-							justifyContent: 'center'
-						}}
-					>
+					<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
 						<div style={appointment.status !== 'PAID' ? style.price2 : {}}>{parseFloat(product.price * product.quantity).toFixed(2)}</div>
 					</div>
 				</td>
@@ -1459,8 +1385,7 @@ class Appointment extends React.Component {
 							justifyContent: 'center'
 						}}
 					>
-						<div
-							onClick={
+						<div onClick={
 								appointment.status !== 'PAID' ? (
 									() =>
 										this.openPopupPrice(price, index, 'extra')
@@ -1475,10 +1400,7 @@ class Appointment extends React.Component {
 						{appointment.status !== 'PAID' && (
 							<img
 								src={require('../../images/edit.png')}
-								style={{
-									width: 16,
-									height: 16
-								}}
+								style={{ width: 16, height: 16 }}
 							/>
 						)}
 					</div>
@@ -1542,11 +1464,7 @@ class Appointment extends React.Component {
 					<input value={this.state.noteValue} onChange={(e) => this.handleChange(e)} />
 					<button onClick={() => this.addNote()} type="button">
 						{/* <Img src={Enter} alt="icon" /> */}
-						<MdSubdirectoryArrowLeft
-							style={{
-								width: 33,
-								height: 33
-							}}
+						<MdSubdirectoryArrowLeft style={{ width: 33, height: 33 }}
 						/>
 					</button>
 				</NoteWrapper.Form>
@@ -1619,8 +1537,9 @@ class Appointment extends React.Component {
 		const { isPoupPrice } = this.state;
 		if (!appointment) return '';
 		if (appointmentDetail === '') return '';
-		const colorDelete =
+		let colorDelete =
 			appointment.status === 'ASSIGNED' || appointment.status === 'CONFIRMED' ? '#585858' : 'white';
+		colorDelete = appointment.memberId === 0 ? '#585858' : colorDelete;
 		return (
 			<div>
 				<AppointmentPopup

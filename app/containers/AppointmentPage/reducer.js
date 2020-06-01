@@ -105,7 +105,7 @@ export const initialState = fromJS({
 	appointments: {
 		calendar: [],
 		waiting: [],
-		allAppoointment: [],
+		allAppointment: [],
 		appointmentDetail: '',
 		groupAppointment: ''
 	},

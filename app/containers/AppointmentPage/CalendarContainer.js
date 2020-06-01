@@ -15,7 +15,6 @@ import {
   deleteEventWaitingList,
   deleteWaitingAppointment,
   updateAppointmentOffline,
-  loadAppointmentAgain,
   addAppointmentRealTime,
   addAppointmentWaiting,
   updateAppointmentPaid,
@@ -30,7 +29,9 @@ import {
   groupAppointment,
   membersLoaded,
   setDisplayedMembers,
-  updateAppointmentPaidOffline
+  updateAppointmentPaidOffline,
+  reloadStaff,
+  reloadCalendar
 } from './actions';
 import {
   makeSelectWaitingAppointments,
@@ -56,7 +57,6 @@ export function mapDispatchToProps(dispatch) {
     deleteEventWaitingList: appointment=>dispatch(deleteEventWaitingList(appointment)),
     deleteWaitingAppointment: status=>dispatch(deleteWaitingAppointment(status)),
     updateAppointmentOffline: data=>dispatch(updateAppointmentOffline(data)),
-    loadAppointmentAgain: ()=>dispatch(loadAppointmentAgain()),
     addAppointmentRealTime: (app)=>dispatch(addAppointmentRealTime(app)),
     addAppointmentWaiting: (app)=>dispatch(addAppointmentWaiting(app)),
     updateAppointmentPaid: (app)=>dispatch(updateAppointmentPaid(app)),
@@ -64,6 +64,8 @@ export function mapDispatchToProps(dispatch) {
     deleteAppointmentCalendar: (app)=>dispatch(deleteAppointmentCalendar(app)),
     updateStaff: (staff)=>dispatch(updateStaff(staff)),
     loadMembers: ()=>dispatch(loadMembers()),
+    reloadStaff: ()=>dispatch(reloadStaff()),
+    reloadCalendar: ()=>dispatch(reloadCalendar()),
     loadAppointmentByMembers :()=>dispatch(loadAppointmentByMembers()),
     updateNextStaff:()=>dispatch(updateNextStaff()),
     updateConsumer:(data)=>dispatch(updateConsumer(data)),

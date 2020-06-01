@@ -107,7 +107,9 @@ import {
 	GET_TIME_STAFF_LOGIN,
 	GET_TIME_STAFF_LOGIN_SUCCESS,
 	LOAD_STAFF_SORT,
-	SET_SLIDE_INDEX
+	SET_SLIDE_INDEX,
+	RELOAD_CALENDAR,
+	RELOAD_STAFF
 } from './constants';
 
 /**
@@ -641,10 +643,6 @@ export const updateAppointmentOfflineError = (data) => ({
 	type: UPDATE_APPOINTMENT_OFFLINE_ERROR,
 	data
 });
-export const loadAppointmentAgain = (data) => ({
-	type: LOAD_APPOINTMENT_AGAIN,
-	data
-});
 
 export const addAppointmentWaiting = (data) => ({
 	type: ADD_APPOINTMENT_TO_WAITING,
@@ -790,3 +788,16 @@ export const setSlideIndex = (slideIndex) => ({
 	type: SET_SLIDE_INDEX,
 	slideIndex
 });
+
+export function reloadStaff(payload) {
+	return {
+		type: RELOAD_STAFF,
+		payload
+	};
+}
+export function reloadCalendar(payload) {
+	return {
+		type: RELOAD_CALENDAR,
+		payload
+	};
+}

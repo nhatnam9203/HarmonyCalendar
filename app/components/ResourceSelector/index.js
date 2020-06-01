@@ -176,23 +176,24 @@ class ResourceSelector extends React.Component {
 	renderResource(resource, index) {
 		const { calendarMembers, currentDay, togglePopupPincode } = this.props;
 		const member = calendarMembers ? calendarMembers.find((mem) => mem.memberId === resource.id) : '';
-		return (
-			<Resource
-				onClick={() => this.openPincode(resource)}
-				// active={parseInt(resource.id) === parseInt(staffId) ? true : false}
-				key={index}
-			>
-				<Resource.Avatar>
-					<img src={resource.imageUrl} alt={resource.orderNumber} />
-				</Resource.Avatar>
+		if (parseInt(resource.id) !== 0)
+			return (
+				<Resource
+					onClick={() => this.openPincode(resource)}
+					// active={parseInt(resource.id) === parseInt(staffId) ? true : false}
+					key={index}
+				>
+					<Resource.Avatar>
+						<img src={resource.imageUrl} alt={resource.orderNumber} />
+					</Resource.Avatar>
 
-				<Resource.OrderNumber next={resource.isNextAvailableStaff === 1 ? true : false}>
-					{resource.orderNumber}
-				</Resource.OrderNumber>
-				<Resource.WorkingTime>{this.getWorrkingTime(resource, currentDay)}</Resource.WorkingTime>
-				<Resource.Title>{resource.title}</Resource.Title>
-			</Resource>
-		);
+					<Resource.OrderNumber next={resource.isNextAvailableStaff === 1 ? true : false}>
+						{resource.orderNumber}
+					</Resource.OrderNumber>
+					<Resource.WorkingTime>{this.getWorrkingTime(resource, currentDay)}</Resource.WorkingTime>
+					<Resource.Title>{resource.title}</Resource.Title>
+				</Resource>
+			);
 	}
 
 	renderResources(resources, index) {
@@ -261,12 +262,12 @@ class ResourceSelector extends React.Component {
 							dragging={true}
 							renderBottomCenterControls={() => ''}
 							renderCenterLeftControls={({ previousSlide }) => (
-								<PrevButton onClick={(ev) => this.onPrevClick(ev, previousSlide)}>
+								<PrevButton className='btn-arrow' onClick={(ev) => this.onPrevClick(ev, previousSlide)}>
 									<FaCaretLeft />
 								</PrevButton>
 							)}
 							renderCenterRightControls={({ nextSlide }) => (
-								<NextButton onClick={(ev) => this.onNextClick(ev, nextSlide)}>
+								<NextButton className='btn-arrow' onClick={(ev) => this.onNextClick(ev, nextSlide)}>
 									<FaCaretRight />
 								</NextButton>
 							)}

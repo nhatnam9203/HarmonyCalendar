@@ -102,6 +102,12 @@ const GlobalStyle = createGlobalStyle`
   .event-block-temp{
     overflow : hidden;
   }
+
+  .event-anystaff{
+    font-weight : 500;
+    color : #333;
+    letter-spacing : 0.6;
+  }
   
   .fc-ltr .fc-time-grid .fc-now-indicator-arrow {
     left: 50px;
@@ -191,10 +197,37 @@ const GlobalStyle = createGlobalStyle`
   color : #333;
   letter-spacing : 0.6;
 }
-.event-checkin,.event-confirmed,.event-paid{
+.event-checkin,.event-confirmed,.event-paid,.event-anystaff{
   border : 1px solid #ffffff !important;
 }
 
+.btn-arrow{
+  color: linear-gradient(
+        to right,
+        #873f72,
+        #ed3144,
+        #f20920,
+        #b9ce2b,
+        #873f72
+      )
+      160%
+      0
+      repeat-x,
+    linear-gradient(to top, #873f72, #ed3144, #f20920, #b9ce2b, #873f72)
+      100%
+      20%
+      repeat-y,
+    linear-gradient(to left, #873f72, #ed3144, #f20920, #b9ce2b, #873f72)
+      10%
+      100%
+      repeat-x,
+    linear-gradient(to bottom, #873f72, #ed3144, #f20920, #b9ce2b, #873f72)
+      0%
+      10%
+      repeat-y;
+  background-size: 300% 2px, 2px 300%;/* increase size to show at once the bit from 2 gradient colors */
+  animation: bd 5s infinite linear;
+}
 
 .event-assigned{
   background: linear-gradient(
@@ -243,7 +276,7 @@ const GlobalStyle = createGlobalStyle`
   padding-left : 10px !important;
 }
 
-.event-assigned:hover ,.event-confirmed:hover{
+.event-assigned:hover ,.event-confirmed:hover,.event-anystaff:hover{
   font-weight : 500;
   color : #333;
 }

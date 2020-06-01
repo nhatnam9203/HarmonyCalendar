@@ -6,12 +6,6 @@ import FCAgenda from './FCAgenda';
 import FCDragZone from './FCDragZone';
 import { updateEventToCalendar } from './constants';
 import { MAIN_CALENDAR_OPTIONS } from './constants';
-import {
-	getAppointmentOffline,
-	getWaitingListOffline,
-	getStaffOffline
-} from '../../containers/AppointmentPage/actions';
-import { membersData, appointmentAdapter, memberAdapter } from '../../containers/AppointmentPage/saga';
 import { merchantId , deviceId } from '../../../app-constants';
 import WaitingLoading from './WaitingLoading';
 import CalendarLoading from './CalendarLoading';
@@ -114,7 +108,7 @@ class Calendar extends React.Component {
 		setInterval(() => {
 			console.log('***********************RECONNECT SignalR***********************');
 			this.runSignalR();
-		}, 60000);
+		}, 300000);
 		const x = document.getElementsByClassName('fc-now-indicator fc-now-indicator-arrow');
 		for (let i = 0; i < x.length; i++) {
 			x[i].scrollIntoView();
@@ -122,10 +116,10 @@ class Calendar extends React.Component {
 	}
 
 	runSignalR() {
-		this.runSignalR_Appointment();
+		this.runSignalR_Appointment(this.runSignalR);
 	}
 
-	runSignalR_Appointment() {
+	runSignalR_Appointment(callback) {
 		const {
 			addAppointmentRealTime,
 			addAppointmentWaiting,
@@ -147,11 +141,13 @@ class Calendar extends React.Component {
 			if (app.type) {
 				switch (app.type) {
 					case 'staff_change_nextavailable':
-						updateNextStaff();
+						console.log('staff_change_nextavailable');
+						// updateNextStaff();
 						break;
-
+ 
 					case 'staff_change_ordernumber':
-						updateNextStaff();
+						console.log('staff_change_ordernumber');
+						// updateNextStaff();
 						break;
 					default:
 						break;
@@ -162,6 +158,7 @@ class Calendar extends React.Component {
 				let type = app.data.Type;
 				switch (type) {
 					case 'user_update':
+						console.log('user update')
 						updateConsumer(app.data.user);
 						const displayMember = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
 						const selectDay = store.getState().getIn([ 'appointment', 'currentDay' ]);
@@ -171,6 +168,7 @@ class Calendar extends React.Component {
 						break;
 
 					case 'appointment_add':
+						console.log('appointmemt add')
 						const appointment = app.data.Appointment;
 						if (appointment) {
 							let appointment_R = returnAppointment(appointment);
@@ -235,10 +233,12 @@ class Calendar extends React.Component {
 						}
 						break;
 					case 'appointment_checkout':
+						console.log('appointmemt checkout');
 						loadAppointmentByMembers();
 						break;
 
 					case 'change_item':
+						console.log('change item');
 						loadWaitingAppointments();
 						loadAppointmentByMembers();
 						break;
@@ -250,16 +250,21 @@ class Calendar extends React.Component {
 			if (app.type) {
 				let type = app.type;
 				if (type === 'staff_update') {
+					console.log('staff update')
 					loadMembers();
-					loadAppointmentByMembers();
+					// loadAppointmentByMembers();
+					// this.props.reloadStaff();
 				}
 			}
 		});
-
-		connection.start();
-		setTimeout(() => {
-			connection.stop();
-		}, 60000);
+		try {
+			connection.start();
+			connection.onclose(function(){
+				connection.start();
+			})	
+		} catch (error) {
+			connection.start();
+		}
 	}
 
 	render() {

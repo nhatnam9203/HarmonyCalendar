@@ -55,6 +55,18 @@ export const MAIN_CALENDAR_OPTIONS = {
 	select: (start, end, event, view, resource) => {
 		let check_block_temp = false;
 
+		if(parseInt(resource.id) === 0){
+			JSON.stringify
+			const data = {
+				fromTime : start,
+				toTime : end,
+				staffId : 0,
+				action: 'addGroupAnyStaff'
+			}
+			console.log({data})
+			window.postMessage(JSON.stringify(data));
+		}
+
 		if (parseInt(resource.id) !== 0) {
 			const displayedAppointments = store.getState().getIn(['appointment', 'appointments', 'calendar']);
 			const member = displayedAppointments[parseInt(resource.id) - 1];
@@ -195,16 +207,9 @@ export const MAIN_CALENDAR_OPTIONS = {
 	},
 
 	eventClick: (event) => {
-		const displayedMembers = store.getState().getIn(['appointment', 'appointments', 'calendar']);
-
-		const oldPosition = displayedMembers.find((member) =>
-			member.appointments.find((appointment) => appointment.id === event.data.id)
-		);
-		if (!oldPosition) return;
-
-		const appointment = oldPosition.appointments.find((app) => app.id === event.data.id);
-		if (!appointment) return;
-
+		const allAppointment = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
+		const appointment = allAppointment.find(app => parseInt(app.id) === parseInt(event.data.id));
+		if(!appointment) return ;
 		store.dispatch(selectAppointment(appointment, event));
 		store.dispatch(getApppointmentById(appointment));
 		store.dispatch(disableCalendar(true));
@@ -229,10 +234,6 @@ export const MAIN_CALENDAR_OPTIONS = {
 		member_clone.forEach((element) => {
 			delete element.memberId;
 		});
-
-		// if (moment(event.start).format('YYYY-MM-DD HH:mm') !== moment(start_time).format('YYYY-MM-DD HH:mm')) {
-		//   check = false;
-		// }
 
 		const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
 
@@ -311,9 +312,6 @@ export const MAIN_CALENDAR_OPTIONS = {
 						moment(end_time).isBetween(app.start, app.end) ||
 						moment(app.start).isBetween(start_time, end_time) ||
 						moment(app.end).isBetween(start_time, end_time)
-
-						// ((moment(app.start).format('YYYY-MM-DD HH:mm') === moment(start_time).format('YYYY-MM-DD HH:mm')) ||
-						//   (moment(app.end).format('YYYY-MM-DD HH:mm') === moment(end_time).format('YYYY-MM-DD HH:mm')))
 					) {
 						if (parseInt(app.id) !== parseInt(event.id)) {
 							if (app.status === 'BLOCK_TEMP') {
@@ -323,23 +321,6 @@ export const MAIN_CALENDAR_OPTIONS = {
 							}
 						}
 					}
-
-					// if (moment(end_time).isBetween(app.start, app.end)) {
-					//   if (parseInt(app.id) !== parseInt(event.data.id)) {
-					//     if (app.status === 'CONFIRMED' || app.status === 'CHECKED_IN' || app.status === 'BLOCK') {
-					//       check = false;
-					//     }
-					//   }
-					// }
-
-					// if ((moment(app.start).format('YYYY-MM-DD HH:mm') === moment(start_time).format('YYYY-MM-DD HH:mm')) &&
-					//   (moment(app.end).format('YYYY-MM-DD HH:mm') === moment(end_time).format('YYYY-MM-DD HH:mm'))) {
-					//   if (parseInt(app.id) !== parseInt(event.data.id)) {
-					//     if (app.status === 'CONFIRMED' || app.status === 'CHECKED_IN' || app.status === 'BLOCK') {
-					//       check = false;
-					//     }
-					//   }
-					// }
 				}
 			});
 		} else {
@@ -348,9 +329,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 
 		let check_time_block = true;
 		let checkDate = `${date.format('YYYY-MM-DD')}T${date.format('HH:mm:ss')}`;
-		// if (moment(checkDate).isSameOrAfter(`${moment().format('YYYY-MM-DD')}T${moment(time_working_end, ["h:mm A"]).format("HH:mm:ss")}`)) {
-		//   check_time_block = false;
-		// }
+
 		if (
 			moment(checkDate).isBefore(
 				`${moment().format('YYYY-MM-DD')}T${moment(time_working_start, ['h:mm A']).format('HH:mm:ss')}`
@@ -416,7 +395,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 
 		const staffAvailable = displayedMembers[parseInt(event.resourceId) - 1];
 
-		if (parseInt(event.resouceId) !== 0) {
+		// if (parseInt(event.resouceId) !== 0) {
 			if (!staffAvailable) {
 				check = false;
 			} else {
@@ -469,13 +448,8 @@ export const MAIN_CALENDAR_OPTIONS = {
 							moment(end_time).isBetween(app.start, app.end) ||
 							moment(app.start).isBetween(start_time, end_time) ||
 							moment(app.end).isBetween(start_time, end_time)
-							// ((moment(app.start).format('YYYY-MM-DD HH:mm') === moment(start_time).format('YYYY-MM-DD HH:mm')) ||
-							//   (moment(app.end).format('YYYY-MM-DD HH:mm') === moment(end_time).format('YYYY-MM-DD HH:mm')))
 						) {
 							if (parseInt(app.id) !== parseInt(event.data.id)) {
-								// if (app.status === 'CONFIRMED' || app.status === 'CHECKED_IN' || app.status === 'BLOCK') {
-
-								// }
 								if (app.status === 'BLOCK_TEMP') {
 									if (app.appointmentId !== event.data.id)
 										check = 1;
@@ -484,23 +458,6 @@ export const MAIN_CALENDAR_OPTIONS = {
 								}
 							}
 						}
-
-						// if (moment(end_time).isBetween(app.start, app.end)) {
-						//   if (parseInt(app.id) !== parseInt(event.data.id)) {
-						//     if (app.status === 'CONFIRMED' || app.status === 'CHECKED_IN' || app.status === 'BLOCK') {
-						//       check = false;
-						//     }
-						//   }
-						// }
-
-						// if ((moment(app.start).format('YYYY-MM-DD HH:mm') === moment(start_time).format('YYYY-MM-DD HH:mm')) &&
-						//   (moment(app.end).format('YYYY-MM-DD HH:mm') === moment(end_time).format('YYYY-MM-DD HH:mm'))) {
-						//   if (parseInt(app.id) !== parseInt(event.data.id)) {
-						//     if (app.status === 'CONFIRMED' || app.status === 'CHECKED_IN' || app.status === 'BLOCK') {
-						//       check = false;
-						//     }
-						//   }
-						// }
 					}
 				});
 			} else { // không làm việc
@@ -532,7 +489,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 					store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId) - 1, start_time, endTime));
 				}
 			}
-		}
+		// }
 	},
 	/* eslint no-param-reassign: "error" */
 	eventDragStop: (event, jsEvent) => {
@@ -575,55 +532,73 @@ export const MAIN_CALENDAR_OPTIONS = {
 	}
 };
 
-export const addEventsToCalendar = (currentDate, appointmentsMembers) => {
+export const addEventsToCalendar = (currentDate, appointmentsMembers) => { //apointmentMember render appointment tai slide hien tai
 	$('#full-calendar').fullCalendar('gotoDate', currentDate);
 	$('#full-calendar').fullCalendar('removeEvents');
 	const events = [];
 	appointmentsMembers.forEach((member, index) => {
-		//index dùng de lay vi tri resource
-		member.appointments.forEach((appointment) => {
-			let eventColor = '#00b4f7';
-			let eventClass = 'event-paid';
-			let bordercolor = '';
-			if (appointment.status === 'ASSIGNED') {
-				// eventColor = '#FFFD71';
-				eventColor = '#ffe559';
-				eventClass = 'event-assigned';
-			}
-			if (appointment.status === 'CONFIRMED') {
-				eventColor = '#baedf7';
-				eventClass = 'event-confirmed';
-			}
-			if (appointment.status === 'CHECKED_IN') {
-				eventColor = '#00b4f7';
-				eventClass = 'event-checkin';
-			}
-			if (appointment.status === 'PAID') {
-				eventColor = '#00dc00';
-				eventClass = 'event-paid';
-			}
-			if (appointment.status === 'BLOCK') {
-				eventColor = '#DDDDDD';
-				eventClass = 'event-block';
-			}
-			if (appointment.status === 'BLOCK_TEMP') {
-				eventColor = 'yellow';
-				eventClass = 'event-block-temp';
-			}
-			events.push({
-				resourceId: index + 1,
-				start: appointment.start,
-				end: appointment.end,
-				data: appointment,
-				color: eventColor,
-				rendering: appointment.status === 'BLOCK' || appointment.status === 'BLOCK_TEMP' ? 'background' : '',
-				className: eventClass,
-				startEditable: !(appointment.status === 'PAID'),
-				resourceEditable: !(appointment.status === 'PAID')
+		if (member.memberId !== 0) {
+			member.appointments.forEach((appointment) => {
+				let eventColor = '#00b4f7';
+				let eventClass = 'event-paid';
+				let bordercolor = '';
+				if (appointment.status === 'ASSIGNED') {
+					// eventColor = '#FFFD71';
+					eventColor = '#ffe559';
+					eventClass = 'event-assigned';
+				}
+				if (appointment.status === 'CONFIRMED') {
+					eventColor = '#baedf7';
+					eventClass = 'event-confirmed';
+				}
+				if (appointment.status === 'CHECKED_IN') {
+					eventColor = '#00b4f7';
+					eventClass = 'event-checkin';
+				}
+				if (appointment.status === 'PAID') {
+					eventColor = '#00dc00';
+					eventClass = 'event-paid';
+				}
+				if (appointment.status === 'BLOCK') {
+					eventColor = '#DDDDDD';
+					eventClass = 'event-block';
+				}
+				if (appointment.status === 'BLOCK_TEMP') {
+					eventColor = 'yellow';
+					eventClass = 'event-block-temp';
+				}
+				events.push({
+					resourceId: index + 1,
+					start: appointment.start,
+					end: appointment.end,
+					data: appointment,
+					color: eventColor,
+					rendering: appointment.status === 'BLOCK' || appointment.status === 'BLOCK_TEMP' ? 'background' : '',
+					className: eventClass,
+					startEditable: !(appointment.status === 'PAID'),
+					resourceEditable: !(appointment.status === 'PAID')
+				});
 			});
-		});
+		}
 	});
 
+	const allAppointments = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
+
+	const app_in_anystaff = allAppointments ? allAppointments.filter(app => app.memberId === 0) : [];
+	app_in_anystaff.forEach(appointment => {
+		events.push({
+			resourceId: 0,
+			start: appointment.start,
+			end: appointment.end,
+			data: appointment,
+			color: '#F4F4F5',
+			rendering: appointment.status === 'BLOCK' || appointment.status === 'BLOCK_TEMP' ? 'background' : '',
+			className: 'event-anystaff',
+			startEditable: !(appointment.status === 'PAID'),
+			resourceEditable: !(appointment.status === 'PAID')
+		});
+	});
+	// viet ham render appointment cho cot any staff tai day
 	$('#full-calendar').fullCalendar('renderEvents', events);
 };
 
@@ -670,6 +645,8 @@ export const updateEventToCalendar = (fcEvent) => {
 		startEditable,
 		resourceEditable
 	};
+
+	//viet them ham update cho event o cot any staff tai day
 
 	$('#full-calendar').fullCalendar('addEventSource', [data]);
 };
