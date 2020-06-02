@@ -12,7 +12,8 @@ import {
 	makeSelectFCEvent,
 	makeInfoCheckPhone,
 	makeSelectAllAppointments,
-	makeSlideIndex
+	makeSlideIndex,
+	makeSelectMembers
 } from './selectors';
 
 import {
@@ -318,8 +319,9 @@ export function* getAppointmentAfterSlide() {
 
 export function* moveAppointment(action) {
 	const displayedMembers = yield select(makeSelectDisplayedMembers());
+	// const allMember = yield select(makeSelectMembers());
 	const allAppointment = yield select(makeSelectAllAppointments());
-	const assignedMember = displayedMembers[action.newPositionIndex];
+	const assignedMember = displayedMembers[action.newPositionIndex - 1];
 
 	const movedAppointment = allAppointment.find(app=>app.id === action.appointmentId);
 	if(!movedAppointment) return;
@@ -328,7 +330,7 @@ export function* moveAppointment(action) {
 		...movedAppointment,
 		start: action.newTime,
 		end: action.newEndTime,
-		memberId: assignedMember.id
+		memberId: assignedMember ? assignedMember.id : 0
 	};
 
 	if (appointment.status !== 'CHECKED_IN') {
@@ -359,6 +361,7 @@ export function* moveAppointment(action) {
 		const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
 		const url = `${requestURL.toString()}/${appointment.id}`;
 		const response = yield api(url, data, 'PUT', token);
+		console.log({response})
 		if (response.codeStatus !== 1) {
 			return yield* checkResponse(response);
 		}
@@ -891,6 +894,53 @@ export function* deleteEventInWaitingList(action) {
 		yield put(actions.removeAppointmentWaiting({ ...appointment, status: 'cancel' }));
 	}
 }
+
+// export function* updateAppointment_Offline(action) {
+// 	try {
+// 		const appointment = action.data;
+// 		const requestURL = new URL(api_constants.POST_STATUS_APPOINTMENT_UPDATE);
+// 		const result = yield axios
+// 			.post(requestURL.toString(), appointment, {
+// 				headers: {
+// 					Authorization: `Bearer ${token}`,
+// 					'Content-Type': 'application/json'
+// 				}
+// 			})
+// 			.then((kq) => {
+// 				return kq;
+// 			})
+// 			.catch((err) => { });
+// 		if (result) {
+// 			yield put(actions.updateAppointmentOfflineSuccess(result));
+// 		}
+// 	} catch (error) { }
+// }
+
+// function* updateNextStaff_Saga() {
+// 	yield takeLatest(api_constants.UPDATE_NEXT_STAFF, function* () {
+// 		try {
+
+// 			const requestURL = new URL(`${api_constants.GET_MEMBER}`);
+// 			const currentDate = yield select(makeCurrentDay());
+// 			const url = `${requestURL.toString()}${currentDate.format('YYYY-MM-DD')}`;
+
+// 			const response = yield api(url, '', 'GET', token);
+// 			if (response.codeStatus === 1) {
+// 				const members = response.data
+// 					? response.data.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0)
+// 					: [];
+// 				const slideIndex = yield select(makeSlideIndex());
+
+// 				yield put(actions.membersLoaded(members));
+// 				yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
+// 				yield put(actions.loadAppointmentByMembers());
+// 				// yield put(updateNextStaffSuccess(members));
+// 			}
+// 		} catch (err) {
+// 			// yield put(memberLoadingError(err));
+// 		}
+// 	});
+// }
 
 export function* SubmitEditBlockTime_Saga(action) {
 	try {

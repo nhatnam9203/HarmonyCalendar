@@ -8,6 +8,182 @@ import { staffId } from '../../../app-constants';
 import LoadingIndicator from 'components/LoadingIndicator';
 import Pincode from './Pincode';
 
+
+const ResourceSelectorWrapper = styled.div`
+	width: 100%;
+	height: 4rem;
+	border-left: 2px solid #3883bb;
+	border-right: 2px solid #3883bb;
+	border-top: 2px solid #3883bb;
+	display: flex;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+`;
+
+const TodayWrapper = styled.div`
+	width: calc(5.05rem - 2px);
+	height: 100%;
+	text-align: center;
+	padding: 0.5rem;
+`;
+
+TodayWrapper.Button = styled.div`
+	border-radius: 4px;
+	background: #0071c5;
+	color: #ffffff;
+	width: 100%;
+	font-size: 1rem;
+	line-height: 2.8;
+	height: 100%;
+	cursor: pointer;
+`;
+
+const ResourceSliderWrapper = styled.div`
+	width: calc(100% - 5.05rem - (calc((100vw - 5.05rem) / 7)) - (calc((100vw - 5.05rem) / 7)) + 1px);
+	position: relative;
+`;
+
+const ResourceWrapper = styled.div`
+	height: calc(4rem - 2px);
+	position: relative;
+	/* border-left: 1px solid #3883bb; */
+	display: flex;
+`;
+
+const Resource = styled.div`
+	cursor: pointer;
+	width: calc(100% / 5);
+	padding: 0.25rem;
+	position: relative;
+	border-right: 1px solid #ddd;
+	text-align: center;
+	background-color: ${(props) => (props.active ? '#1EB5F4' : '#ffffff')};
+`;
+
+const AnyStaff = styled(Resource)`
+	width : calc(100% - 5.05rem - (calc((100vw - 5.05rem) / 7)) * 6 + 4px);
+	height :7rem;
+	border-left: 1px solid #1173C3;
+	background-color : #F5F5F5;
+`;
+
+AnyStaff.Image = styled.div`
+	border-radius: 4px;
+	/* background: #0071c5; */
+	width: 100%;
+	font-size: 1rem;
+	line-height: 2.8;
+	height: 100%;
+	cursor: pointer;
+`;
+
+AnyStaff.Title = styled.div`
+	position: absolute;
+	bottom: 3rem;
+	left: 0;
+	width: 100%;
+	opacity: 0.75;
+	text-align: center;
+	padding-bottom: 4px;
+	font-size: 0.8rem;
+	line-height: 1.3;
+	font-weight: 500;
+`;
+
+Resource.Avatar = styled.div`
+	padding: 2px;
+	cursor: pointer;
+	& img {
+		width: 3rem;
+		height: 3rem;
+		border-radius: 50%;
+		object-fit: cover;
+	}
+`;
+
+Resource.OrderNumber = styled.div`
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	background: ${(props) => (props.next ? 'red' : '#1073C2')};
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	color: #ffffff;
+	padding: 2px;
+	font-size: 11px;
+	line-height: 1.3;
+`;
+
+Resource.WorkingTime = styled.div`
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	opacity: 0.75;
+	text-align: center;
+	padding-bottom: 4px;
+	padding-left: 5px;
+	font-size: 7px;
+	line-height: 1.3;
+	font-weight: 500;
+	color: ${(props) => (props.notWork ? '#ffffff' : '')};
+	background: ${(props) => (props.notWork ? 'red' : '#ffffff')};
+`;
+
+Resource.Title = styled.div`
+	position: absolute;
+	bottom: 13px;
+	left: 0;
+	background: #ffffff;
+	width: 100%;
+	opacity: 0.75;
+	text-align: center;
+	padding-bottom: 4px;
+	font-size: 0.85rem;
+	line-height: 1.3;
+	font-weight: 400;
+`;
+
+const PrevButton = styled.div`
+	color: #3883bb;
+	font-size: 2rem;
+	line-height: 2rem;
+	cursor: pointer;
+`;
+
+const NextButton = styled.div`
+	color: #3883bb;
+	font-size: 2rem;
+	line-height: 2rem;
+	cursor: pointer;
+`;
+
+const WaitingHeader = styled.div`
+	width: calc((100vw - 5.05rem) / 7);
+	text-align: center;
+	line-height: 64px;
+	font-size: 18px;
+	color: #333333;
+	background: #f4f4f5;
+	border-left: 1px solid #3883bb;
+`;
+
+function chunk(array, size) {
+	const chunkedArr = [];
+	for (let i = 0; i < array.length; i += 1) {
+		const last = chunkedArr[chunkedArr.length - 1];
+		if (!last || last.length === size) {
+			chunkedArr.push([array[i]]);
+		} else {
+			last.push(array[i]);
+		}
+	}
+	return chunkedArr;
+}
+
 class ResourceSelector extends React.Component {
 	componentWillMount() {
 		const { loadMembers } = this.props;
@@ -306,177 +482,3 @@ ResourceSelector.propTypes = {
 
 export default ResourceSelector;
 
-const ResourceSelectorWrapper = styled.div`
-	width: 100%;
-	height: 4rem;
-	border-left: 2px solid #3883bb;
-	border-right: 2px solid #3883bb;
-	border-top: 2px solid #3883bb;
-	display: flex;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-`;
-
-const TodayWrapper = styled.div`
-	width: calc(5.05rem - 2px);
-	height: 100%;
-	text-align: center;
-	padding: 0.5rem;
-`;
-
-TodayWrapper.Button = styled.div`
-	border-radius: 4px;
-	background: #0071c5;
-	color: #ffffff;
-	width: 100%;
-	font-size: 1rem;
-	line-height: 2.8;
-	height: 100%;
-	cursor: pointer;
-`;
-
-const ResourceSliderWrapper = styled.div`
-	width: calc(100% - 5.05rem - (calc((100vw - 5.05rem) / 7)) - (calc((100vw - 5.05rem) / 7)) + 1px);
-	position: relative;
-`;
-
-const ResourceWrapper = styled.div`
-	height: calc(4rem - 2px);
-	position: relative;
-	/* border-left: 1px solid #3883bb; */
-	display: flex;
-`;
-
-const Resource = styled.div`
-	cursor: pointer;
-	width: calc(100% / 5);
-	padding: 0.25rem;
-	position: relative;
-	border-right: 1px solid #ddd;
-	text-align: center;
-	background-color: ${(props) => (props.active ? '#1EB5F4' : '#ffffff')};
-`;
-
-const AnyStaff = styled(Resource)`
-	width : calc(100% - 5.05rem - (calc((100vw - 5.05rem) / 7)) * 6 + 4px);
-	height :7rem;
-	border-left: 1px solid #1173C3;
-	background-color : #F5F5F5;
-`;
-
-AnyStaff.Image = styled.div`
-	border-radius: 4px;
-	/* background: #0071c5; */
-	width: 100%;
-	font-size: 1rem;
-	line-height: 2.8;
-	height: 100%;
-	cursor: pointer;
-`;
-
-AnyStaff.Title = styled.div`
-	position: absolute;
-	bottom: 3rem;
-	left: 0;
-	width: 100%;
-	opacity: 0.75;
-	text-align: center;
-	padding-bottom: 4px;
-	font-size: 0.8rem;
-	line-height: 1.3;
-	font-weight: 500;
-`;
-
-Resource.Avatar = styled.div`
-	padding: 2px;
-	cursor: pointer;
-	& img {
-		width: 3rem;
-		height: 3rem;
-		border-radius: 50%;
-		object-fit: cover;
-	}
-`;
-
-Resource.OrderNumber = styled.div`
-	position: absolute;
-	top: 2px;
-	right: 2px;
-	background: ${(props) => (props.next ? 'red' : '#1073C2')};
-	width: 18px;
-	height: 18px;
-	border-radius: 50%;
-	color: #ffffff;
-	padding: 2px;
-	font-size: 11px;
-	line-height: 1.3;
-`;
-
-Resource.WorkingTime = styled.div`
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	opacity: 0.75;
-	text-align: center;
-	padding-bottom: 4px;
-	padding-left: 5px;
-	font-size: 7px;
-	line-height: 1.3;
-	font-weight: 500;
-	color: ${(props) => (props.notWork ? '#ffffff' : '')};
-	background: ${(props) => (props.notWork ? 'red' : '#ffffff')};
-`;
-
-Resource.Title = styled.div`
-	position: absolute;
-	bottom: 13px;
-	left: 0;
-	background: #ffffff;
-	width: 100%;
-	opacity: 0.75;
-	text-align: center;
-	padding-bottom: 4px;
-	font-size: 0.85rem;
-	line-height: 1.3;
-	font-weight: 400;
-`;
-
-const PrevButton = styled.div`
-	color: #3883bb;
-	font-size: 2rem;
-	line-height: 2rem;
-	cursor: pointer;
-`;
-
-const NextButton = styled.div`
-	color: #3883bb;
-	font-size: 2rem;
-	line-height: 2rem;
-	cursor: pointer;
-`;
-
-const WaitingHeader = styled.div`
-	width: calc((100vw - 5.05rem) / 7);
-	text-align: center;
-	line-height: 64px;
-	font-size: 18px;
-	color: #333333;
-	background: #f4f4f5;
-	border-left: 1px solid #3883bb;
-`;
-
-function chunk(array, size) {
-	const chunkedArr = [];
-	for (let i = 0; i < array.length; i += 1) {
-		const last = chunkedArr[chunkedArr.length - 1];
-		if (!last || last.length === size) {
-			chunkedArr.push([array[i]]);
-		} else {
-			last.push(array[i]);
-		}
-	}
-	return chunkedArr;
-}

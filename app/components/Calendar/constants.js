@@ -14,6 +14,7 @@ import {
 import { formatPhone } from '../../utils/helper';
 import vip from '../../images/vip.png'
 import vip_blue from '../../images/vip_blue.png'
+import call from '../../images/call.png'
 import { AiFillStar } from 'react-icons'
 
 const OPTION_RENDER_TEMPLATE = (option) => `<div class="app-event__option">- ${option.serviceName}</div>`;
@@ -24,7 +25,9 @@ const EVENT_RENDER_TEMPLATE = (event) => `
   <div class="app-event">
 	<div class="app-event__id-number">${event.code}</div>
     <div class="app-event__full-name">${event.userFullName}</div>
-    <div class="app-event__phone-number">&nbsp ${formatPhone(event.phoneNumber)}</div>
+	<div class="app-event__phone-number">
+	${event.status !== "BLOCK" && event.status !== "BLOCK_TEMP" ? "<img src='" + call + "' width='15' height='15'>" : ""}
+	${formatPhone(event.phoneNumber)}</div>
 	${event.options.map((option) => OPTION_RENDER_TEMPLATE(option)).join('')}
 	${event.products.map((product) => PRODUCT_RENDER_TEMPLATE(product)).join('')}
 	${event.extras.map((extra) => EXTRAS_RENDER_TEMPLATE(extra)).join('')}
@@ -209,6 +212,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 	eventClick: (event) => {
 		const allAppointment = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
 		const appointment = allAppointment.find(app => parseInt(app.id) === parseInt(event.data.id));
+		console.log({appointment})
 		if (!appointment) return;
 		store.dispatch(selectAppointment(appointment, event));
 		store.dispatch(getApppointmentById(appointment));
@@ -381,6 +385,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 	},
 
 	eventDrop: (event, delta, revertFunc, jsEvent, ui, view) => {
+		console.log({event})
 		const memberdisplay = store.getState().getIn(['appointment', 'appointments', 'calendar']);
 		const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
 
@@ -397,7 +402,21 @@ export const MAIN_CALENDAR_OPTIONS = {
 
 		const staffAvailable = displayedMembers[parseInt(event.resourceId) - 1];
 
-		if((event.resourceId === "0") || (staffAvailable.id === 0)) {
+		/* 	move appointment any staff trong cột any staff */
+		if(!staffAvailable){
+			if(event.data.memberId === 0){
+				const endTime =
+				event.end !== null
+					? `${event.end.format('YYYY-MM-DD')}T${event.end.format('HH:mm:ss')}`
+					: moment(start_time).add(90, 'minutes').format('YYYY-MM-DD HH:mm:ss');
+				const startTime = `${event.start.format('YYYY-MM-DD')}T${event.start.format('HH:mm:ss')}`;
+				store.dispatch(moveAppointment(event.data.id, 0, startTime, endTime));
+				return;
+			}
+		}
+		/* end move any staff */
+
+		if((event.resourceId === "0") && (event.data.memberId !== 0 )|| (staffAvailable.id === 0)) {
 			revertFunc();
 			return;
 		}
@@ -487,12 +506,12 @@ export const MAIN_CALENDAR_OPTIONS = {
 					: moment(start_time).add(90, 'minutes').format('YYYY-MM-DD HH:mm:ss');
 			if (check === false) {
 				if (window.confirm('Accept overlapping appointments?')) {
-					store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId) - 1, start_time, endTime));
+					store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId), start_time, endTime));
 				} else {
 					revertFunc();
 				}
 			} else {
-				store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId) - 1, start_time, endTime));
+				store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId), start_time, endTime));
 			}
 		}
 		// }
@@ -592,6 +611,7 @@ export const addEventsToCalendar = (currentDate, appointmentsMembers) => { //apo
 	const allAppointments = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
 	
 	const app_in_anystaff = allAppointments ? allAppointments.filter(app => app.memberId === 0 && app.status !== 'WAITING') : [];
+	console.log({app_in_anystaff});
 	app_in_anystaff.forEach(appointment => {
 		events.push({
 			resourceId: 0,
@@ -605,6 +625,7 @@ export const addEventsToCalendar = (currentDate, appointmentsMembers) => { //apo
 			resourceEditable: !(appointment.status === 'PAID')
 		});
 	});
+
 	// viet ham render appointment cho cot any staff tai day
 	$('#full-calendar').fullCalendar('renderEvents', events);
 };

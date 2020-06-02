@@ -167,7 +167,7 @@ const GlobalStyle = createGlobalStyle`
 
   .app-event__phone-number {
     font-size: 13px;
-    margin-left: 0px;
+    margin-left: 7px;
     margin-bottom: 8px;
     margin-top : 8px;
     line-height: 1.8;

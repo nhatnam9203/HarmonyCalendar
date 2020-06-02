@@ -1,5 +1,5 @@
 
-import { statusConvertKey } from '../../containers/AppointmentPage/saga';
+import { statusConvertKey } from '../../containers/AppointmentPage/utilSaga';
 
 const servicesAdapter = (service) => {
 	return {

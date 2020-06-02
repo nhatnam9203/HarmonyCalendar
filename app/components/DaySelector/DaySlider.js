@@ -24,7 +24,7 @@ const NormalDay = styled.div`
   overflow: hidden;
   height : 4rem ;
   padding-top : 0.6rem;
-  font-size : 1rem;
+  font-size : 0.9rem;
   line-height : 1.5;
   &:last-child {
     border-right: none;

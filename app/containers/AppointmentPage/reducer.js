@@ -11,7 +11,7 @@
  */
 import moment from 'moment';
 import { fromJS } from 'immutable';
-import { statusConvertKey, statusConvertData, appointmentAdapter } from './saga';
+import {statusConvertKey, statusConvertData, appointmentAdapter} from './utilSaga'
 import {
 	SELECT_DAY,
 	SELECT_WEEK,
