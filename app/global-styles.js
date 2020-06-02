@@ -139,10 +139,11 @@ const GlobalStyle = createGlobalStyle`
     font-size: 11px;
     font-weight: bold;
     margin-bottom: 2px;
+    letter-spacing : 0.3;
   }
   .app-event__full-name {
     font-size: 18px;
-    font-weight: 600;
+    font-weight: 900;
     margin-left: 8px;
     margin-bottom: 4px;
     line-height: 1.3;
@@ -167,17 +168,20 @@ const GlobalStyle = createGlobalStyle`
   .app-event__phone-number {
     font-size: 13px;
     margin-left: 0px;
-    margin-bottom: 4px;
+    margin-bottom: 8px;
+    margin-top : 8px;
     line-height: 1.8;
     font-style: italic;
     font-weight : 500;
     word-wrap: break-word;
   }
   .app-event__option {
-    font-size: 13px;
+    font-size: 12px;
     margin-left: 16px;
+    margin-bottom : 5px;
     line-height: 1.2;
     font-style: italic;
+    letter-spacing : 0.3;
   }
 
   .timeline {

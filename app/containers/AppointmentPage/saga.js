@@ -1,8 +1,6 @@
 import { delay } from 'redux-saga';
 import { fork, put, takeLatest, all, select } from 'redux-saga/effects';
 import moment from 'moment';
-import axios from 'axios';
-import { differenceBy } from 'lodash';
 import { api } from '../../utils/helper';
 import * as constants from './constants'
 import * as actions from './actions'
@@ -10,7 +8,6 @@ import * as api_constants from '../../../app-constants'
 
 import {
 	makeCurrentDay,
-	makeSelectCalendarAppointments,
 	makeSelectDisplayedMembers,
 	makeSelectFCEvent,
 	makeInfoCheckPhone,
@@ -19,9 +16,7 @@ import {
 } from './selectors';
 
 import {
-	BASE_URL,
 	token,
-	VAR_DEFAULT_AVATAR_PATH,
 	merchantId,
 } from '../../../app-constants';
 
@@ -33,111 +28,18 @@ import {
 	newDateUpdateAppointment,
 	dataUpdateAppointment,
 	totalDurationAssignAppointment,
-	dataAssignAppointment,
 	dataChangeTimeAppointment,
-	dataPutBackAppointment
+	dataPutBackAppointment,
+	statusConvertData,
+	appointmentAdapter,
+	memberAdapter,
 } from './utilSaga';
 
 import { assignAppointment as mockedPostAppointment } from '../../assets/mocks/assignAppointment';
 import {
 	addEventsToCalendar,
 	deleteEventFromCalendar,
-	updateEventToCalendar
 } from '../../components/Calendar/constants';
-
-export const statusConvertKey = {
-	unconfirm: 'ASSIGNED',
-	confirm: 'CONFIRMED',
-	checkin: 'CHECKED_IN',
-	paid: 'PAID',
-	waiting: 'WAITING',
-	cancel: 'CANCEL',
-	pending: 'PENDING'
-};
-
-export const appointmentAdapter = (appointment) => {
-	return {
-		id: appointment.appointmentId,
-		code: `#${appointment.code}`,
-		userFullName: appointment.firstName + ' ' + appointment.lastName,
-		firstName: appointment.firstName,
-		lastName: appointment.lastName,
-		phoneNumber: appointment.phoneNumber,
-		options: appointment.services.sort(function (a, b) {
-			var c = a.bookingServiceId;
-			var d = b.bookingServiceId;
-			return d - c;
-		}),
-		products: appointment.products.sort(function (a, b) {
-			var c = a.bookingProductId;
-			var d = b.bookingProductId;
-			return d - c;
-		}),
-		extras: appointment.extras.sort(function (a, b) {
-			var c = a.bookingExtraId;
-			var d = b.bookingExtraId;
-			return d - c;
-		}),
-		status: statusConvertKey[appointment.status],
-		memberId: appointment.staffId,
-		start: appointment.fromTime,
-		end: appointment.toTime,
-		user_id: appointment.userId,
-		createDate: appointment.createdDate,
-		tipPercent: appointment.tipPercent,
-		tipAmount: appointment.tipAmount,
-		subTotal: appointment.subTotal,
-		total: appointment.total,
-		tax: appointment.tax,
-		isVip: appointment.isVip,
-		discount: appointment.discount,
-		giftCard: appointment.giftCard,
-		giftCards: appointment.giftCards ? appointment.giftCards : [],
-		notes: appointment.notes
-			? appointment.notes.sort(function (a, b) {
-				var c = a.appointmentNoteId;
-				var d = b.appointmentNoteId;
-				return d - c;
-			})
-			: []
-	};
-};
-
-export const memberAdapter = (member) => {
-	return {
-		id: member.staffId,
-		title: `${member.displayName}`,
-		imageUrl: (member.imageUrl && `${member.imageUrl}`) || `${BASE_URL}/${VAR_DEFAULT_AVATAR_PATH}`,
-		orderNumber: member.orderNumber,
-		workingTimes: member.workingTimes,
-		isDisabled: member.isDisabled,
-		pincode: member.pin,
-		isNextAvailableStaff: member.isNextAvailableStaff,
-		blockTime: member.blockTime ? member.blockTime : [],
-		timeLogin: 0
-	};
-};
-
-export const memberAdapter_update = (member) => {
-	return {
-		id: member.StaffId,
-		title: `${member.DisplayName}`,
-		imageUrl: (member.ImageUrl && `${member.ImageUrl}`) || `${BASE_URL}/${VAR_DEFAULT_AVATAR_PATH}`,
-		orderNumber: member.OrderNumber,
-		workingTimes: JSON.parse(member.WorkingTime)
-	};
-};
-
-export const statusConvertData = {
-	ASSIGNED: 'unconfirm',
-	CONFIRMED: 'confirm',
-	CHECKED_IN: 'checkin',
-	PAID: 'paid',
-	WAITING: 'waiting',
-	CANCEL: 'cancel'
-};
-
-const statusAdapter = (status) => statusConvertData[status];
 
 export function* reloadStaffSaga() {
 	if (navigator.onLine === true) {
@@ -264,9 +166,7 @@ export function* getMembers() {
 					blockTime: [],
 					timeLogin: 0
 				}
-
 				members.push(lastStaff)
-
 				const slideIndex = yield select(makeSlideIndex());
 				// const Staffs = sorrtStaffByDate('', members);
 
@@ -418,24 +318,8 @@ export function* getAppointmentAfterSlide() {
 
 export function* moveAppointment(action) {
 	const displayedMembers = yield select(makeSelectDisplayedMembers());
-	// const calendarMembers = yield select(makeSelectCalendarAppointments());
 	const allAppointment = yield select(makeSelectAllAppointments());
 	const assignedMember = displayedMembers[action.newPositionIndex];
-	// const oldMemberPosition = calendarMembers.find((member) =>
-	// 	member.appointments.find((appointment) => appointment.id === action.appointmentId)
-	// );
-	// console.log(oldMemberPosition)
-	// if (!oldMemberPosition) { // tìm ko thấy thi tim tiếp trong cột any staff
-	// 	// yield put(actions.appointmentMovingError('Cannot find previous position.'));
-	// 	return;
-	// }
-
-	// const movedAppointment = oldMemberPosition.appointments.find(
-	// 	(appointment) => appointment.id === action.appointmentId
-	// );
-	// if (!movedAppointment) {
-	// 	yield put(actions.appointmentMovingError('Cannot find moved appointment.'));
-	// }
 
 	const movedAppointment = allAppointment.find(app=>app.id === action.appointmentId);
 	if(!movedAppointment) return;
@@ -846,10 +730,10 @@ export function* addNewCustomer(action) {
 				? moment(new Date(time)).add(15, 'minutes').format('YYYY-MM-DD HH:mm')
 				: moment(checkTimeToAddAppointmdent()).add(15, 'minutes').format('YYYY-MM-DD HH:mm')
 		};
-
+		
 		/* Add Appointment  */
-		const requestURL_AddAppointment = new URL(api_constants.POST_ADD_APPOINTMENT);
-		const rs_add = yield api(requestURL_AddAppointment.toString(), data, 'POST', token);
+		const url_add = new URL(api_constants.POST_ADD_APPOINTMENT);
+		const rs_add = yield api(url_add.toString(), data, 'POST', token);
 
 		if (rs_add.codeStatus !== 1) {
 			alert('Something went wrong');
@@ -862,8 +746,8 @@ export function* addNewCustomer(action) {
 		}
 
 		/* get appointment by id after add, add appointment to  waiting list */
-		const requestURL_DeailAppointment = new URL(api_constants.GET_APPOINTMENT_ID).toString();
-		const detailAppointment = yield api(`${requestURL_DeailAppointment}/${id_appointment}`, '', 'GET', token);
+		const url_detail = new URL(api_constants.GET_APPOINTMENT_ID).toString();
+		const detailAppointment = yield api(`${url_detail}/${id_appointment}`, '', 'GET', token);
 
 		yield put(actions.addCustomerSuccess(true));
 
@@ -1007,53 +891,6 @@ export function* deleteEventInWaitingList(action) {
 		yield put(actions.removeAppointmentWaiting({ ...appointment, status: 'cancel' }));
 	}
 }
-
-// export function* updateAppointment_Offline(action) {
-// 	try {
-// 		const appointment = action.data;
-// 		const requestURL = new URL(api_constants.POST_STATUS_APPOINTMENT_UPDATE);
-// 		const result = yield axios
-// 			.post(requestURL.toString(), appointment, {
-// 				headers: {
-// 					Authorization: `Bearer ${token}`,
-// 					'Content-Type': 'application/json'
-// 				}
-// 			})
-// 			.then((kq) => {
-// 				return kq;
-// 			})
-// 			.catch((err) => { });
-// 		if (result) {
-// 			yield put(actions.updateAppointmentOfflineSuccess(result));
-// 		}
-// 	} catch (error) { }
-// }
-
-// function* updateNextStaff_Saga() {
-// 	yield takeLatest(api_constants.UPDATE_NEXT_STAFF, function* () {
-// 		try {
-
-// 			const requestURL = new URL(`${api_constants.GET_MEMBER}`);
-// 			const currentDate = yield select(makeCurrentDay());
-// 			const url = `${requestURL.toString()}${currentDate.format('YYYY-MM-DD')}`;
-
-// 			const response = yield api(url, '', 'GET', token);
-// 			if (response.codeStatus === 1) {
-// 				const members = response.data
-// 					? response.data.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0)
-// 					: [];
-// 				const slideIndex = yield select(makeSlideIndex());
-
-// 				yield put(actions.membersLoaded(members));
-// 				yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
-// 				yield put(actions.loadAppointmentByMembers());
-// 				// yield put(updateNextStaffSuccess(members));
-// 			}
-// 		} catch (err) {
-// 			// yield put(memberLoadingError(err));
-// 		}
-// 	});
-// }
 
 export function* SubmitEditBlockTime_Saga(action) {
 	try {

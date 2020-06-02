@@ -9,6 +9,89 @@ export const statusConvertData = {
     CANCEL: 'cancel',
   };
 
+export const statusConvertKey = {
+	unconfirm: 'ASSIGNED',
+	confirm: 'CONFIRMED',
+	checkin: 'CHECKED_IN',
+	paid: 'PAID',
+	waiting: 'WAITING',
+	cancel: 'CANCEL',
+	pending: 'PENDING'
+};
+
+export const appointmentAdapter = (appointment) => {
+	return {
+		id: appointment.appointmentId,
+		code: `#${appointment.code}`,
+		userFullName: appointment.firstName + ' ' + appointment.lastName,
+		firstName: appointment.firstName,
+		lastName: appointment.lastName,
+		phoneNumber: appointment.phoneNumber,
+		options: appointment.services.sort(function (a, b) {
+			var c = a.bookingServiceId;
+			var d = b.bookingServiceId;
+			return d - c;
+		}),
+		products: appointment.products.sort(function (a, b) {
+			var c = a.bookingProductId;
+			var d = b.bookingProductId;
+			return d - c;
+		}),
+		extras: appointment.extras.sort(function (a, b) {
+			var c = a.bookingExtraId;
+			var d = b.bookingExtraId;
+			return d - c;
+		}),
+		status: statusConvertKey[appointment.status],
+		memberId: appointment.staffId,
+		start: appointment.fromTime,
+		end: appointment.toTime,
+		user_id: appointment.userId,
+		createDate: appointment.createdDate,
+		tipPercent: appointment.tipPercent,
+		tipAmount: appointment.tipAmount,
+		subTotal: appointment.subTotal,
+		total: appointment.total,
+		tax: appointment.tax,
+		isVip: appointment.isVip,
+		discount: appointment.discount,
+		giftCard: appointment.giftCard,
+		giftCards: appointment.giftCards ? appointment.giftCards : [],
+		notes: appointment.notes
+			? appointment.notes.sort(function (a, b) {
+				var c = a.appointmentNoteId;
+				var d = b.appointmentNoteId;
+				return d - c;
+			})
+			: []
+	};
+};
+
+export const memberAdapter = (member) => {
+	return {
+		id: member.staffId,
+		title: `${member.displayName}`,
+		imageUrl: (member.imageUrl && `${member.imageUrl}`) || `${BASE_URL}/${VAR_DEFAULT_AVATAR_PATH}`,
+		orderNumber: member.orderNumber,
+		workingTimes: member.workingTimes,
+		isDisabled: member.isDisabled,
+		pincode: member.pin,
+		isNextAvailableStaff: member.isNextAvailableStaff,
+		blockTime: member.blockTime ? member.blockTime : [],
+		timeLogin: 0
+	};
+};
+
+export const memberAdapter_update = (member) => {
+	return {
+		id: member.StaffId,
+		title: `${member.DisplayName}`,
+		imageUrl: (member.ImageUrl && `${member.ImageUrl}`) || `${BASE_URL}/${VAR_DEFAULT_AVATAR_PATH}`,
+		orderNumber: member.OrderNumber,
+		workingTimes: JSON.parse(member.WorkingTime)
+	};
+};
+
 export function addFullBlock(memberId, currentDate, day) {
     return {
         status: 'BLOCK',

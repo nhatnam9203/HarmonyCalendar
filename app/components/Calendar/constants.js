@@ -13,6 +13,7 @@ import {
 } from '../../containers/AppointmentPage/actions';
 import { formatPhone } from '../../utils/helper';
 import vip from '../../images/vip.png'
+import vip_blue from '../../images/vip_blue.png'
 import { AiFillStar } from 'react-icons'
 
 const OPTION_RENDER_TEMPLATE = (option) => `<div class="app-event__option">- ${option.serviceName}</div>`;
@@ -55,15 +56,14 @@ export const MAIN_CALENDAR_OPTIONS = {
 	select: (start, end, event, view, resource) => {
 		let check_block_temp = false;
 
-		if(parseInt(resource.id) === 0){
+		if (parseInt(resource.id) === 0) {
 			JSON.stringify
 			const data = {
-				fromTime : start,
-				toTime : end,
-				staffId : 0,
+				fromTime: start,
+				toTime: end,
+				staffId: 0,
 				action: 'addGroupAnyStaff'
 			}
-			console.log({data})
 			window.postMessage(JSON.stringify(data));
 		}
 
@@ -209,7 +209,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 	eventClick: (event) => {
 		const allAppointment = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
 		const appointment = allAppointment.find(app => parseInt(app.id) === parseInt(event.data.id));
-		if(!appointment) return ;
+		if (!appointment) return;
 		store.dispatch(selectAppointment(appointment, event));
 		store.dispatch(getApppointmentById(appointment));
 		store.dispatch(disableCalendar(true));
@@ -381,114 +381,120 @@ export const MAIN_CALENDAR_OPTIONS = {
 	},
 
 	eventDrop: (event, delta, revertFunc, jsEvent, ui, view) => {
+		const memberdisplay = store.getState().getIn(['appointment', 'appointments', 'calendar']);
+		const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
+
 		const start_time = event.start;
 		const end_time = event.end;
 		let check = true;
-		const memberdisplay = store.getState().getIn(['appointment', 'appointments', 'calendar']);
 		let member_clone = JSON.parse(JSON.stringify(memberdisplay));
 		member_clone.forEach((element) => {
 			delete element.memberId;
 		});
-		const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
+
 		const currentDay = store.getState().getIn(['appointment', 'currentDay']);
 		let check_workingStaff = '';
 
 		const staffAvailable = displayedMembers[parseInt(event.resourceId) - 1];
 
+		if((event.resourceId === "0") || (staffAvailable.id === 0)) {
+			revertFunc();
+			return;
+		}
 		// if (parseInt(event.resouceId) !== 0) {
-			if (!staffAvailable) {
-				check = false;
-			} else {
-				switch (moment(currentDay).format('dddd')) { // kiểm tra isCheck cuả staff ( có làm việc không ?)
-					case 'Monday':
-						check_workingStaff = staffAvailable.workingTimes.Monday.isCheck;
-						break;
+		if (!staffAvailable) {
+			check = false;
+		} else {
+			switch (moment(currentDay).format('dddd')) { // kiểm tra isCheck cuả staff ( có làm việc không ?)
+				case 'Monday':
+					check_workingStaff = staffAvailable.workingTimes.Monday.isCheck;
+					break;
 
-					case 'Tuesday':
-						check_workingStaff = staffAvailable.workingTimes.Tuesday.isCheck;
-						break;
+				case 'Tuesday':
+					check_workingStaff = staffAvailable.workingTimes.Tuesday.isCheck;
+					break;
 
-					case 'Wednesday':
-						check_workingStaff = staffAvailable.workingTimes.Wednesday.isCheck;
-						break;
+				case 'Wednesday':
+					check_workingStaff = staffAvailable.workingTimes.Wednesday.isCheck;
+					break;
 
-					case 'Thursday':
-						check_workingStaff = staffAvailable.workingTimes.Thursday.isCheck;
-						break;
+				case 'Thursday':
+					check_workingStaff = staffAvailable.workingTimes.Thursday.isCheck;
+					break;
 
-					case 'Friday':
-						check_workingStaff = staffAvailable.workingTimes.Friday.isCheck;
-						break;
+				case 'Friday':
+					check_workingStaff = staffAvailable.workingTimes.Friday.isCheck;
+					break;
 
-					case 'Saturday':
-						check_workingStaff = staffAvailable.workingTimes.Saturday.isCheck;
-						break;
+				case 'Saturday':
+					check_workingStaff = staffAvailable.workingTimes.Saturday.isCheck;
+					break;
 
-					case 'Sunday':
-						check_workingStaff = staffAvailable.workingTimes.Sunday.isCheck;
-						break;
+				case 'Sunday':
+					check_workingStaff = staffAvailable.workingTimes.Sunday.isCheck;
+					break;
 
-					default:
-						break;
-				}
+				default:
+					break;
 			}
+		}
 
-			let all_appointments = []; // tất cả appointment trên calendar
-			member_clone.forEach((apps) => {
-				all_appointments = [...all_appointments, ...apps.appointments];
-			});
+		let all_appointments = []; // tất cả appointment trên calendar
+		member_clone.forEach((apps) => {
+			all_appointments = [...all_appointments, ...apps.appointments];
+		});
 
-			if (!staffAvailable) {
-				check = false;
-			} else if (check_workingStaff) { // có làm việc
-				all_appointments.forEach((app) => {
-					if (parseInt(app.memberId) === parseInt(staffAvailable.id)) {
-						if (
-							moment(start_time).isBetween(app.start, app.end) ||
-							moment(end_time).isBetween(app.start, app.end) ||
-							moment(app.start).isBetween(start_time, end_time) ||
-							moment(app.end).isBetween(start_time, end_time)
-						) {
-							if (parseInt(app.id) !== parseInt(event.data.id)) {
-								if (app.status === 'BLOCK_TEMP') {
-									if (app.appointmentId !== event.data.id)
-										check = 1;
-								} else {
-									check = false;
-								}
+		if (!staffAvailable) {
+			check = false;
+		} else if (check_workingStaff) { // có làm việc
+			all_appointments.forEach((app) => {
+				if (parseInt(app.memberId) === parseInt(staffAvailable.id)) {
+					if (
+						moment(start_time).isBetween(app.start, app.end) ||
+						moment(end_time).isBetween(app.start, app.end) ||
+						moment(app.start).isBetween(start_time, end_time) ||
+						moment(app.end).isBetween(start_time, end_time)
+					) {
+						if (parseInt(app.id) !== parseInt(event.data.id)) {
+							if (app.status === 'BLOCK_TEMP') {
+								if (app.appointmentId !== event.data.id)
+									check = 1;
+							} else {
+								check = false;
 							}
 						}
 					}
-				});
-			} else { // không làm việc
-				check = false;
-			}
-			const resourceId = parseInt(event.resourceId) - 1;
-
-			const pos = displayedMembers.findIndex((mem) => parseInt(mem.resourceId) === parseInt(resourceId));
-
-			//pos : dùng để check vị trí appointment có nằm ngoài staff không ?
-			//check : dùng để check appointment có bị overlap hay không , check = false là bị overlap ,  check = 1 là bị block temp
-
-			if (pos === -1 || event.data.status === 'PAID' || check === 1) {
-				revertFunc();
-			} else {
-				const start_time = `${event.start.format('YYYY-MM-DD')}T${event.start.format('HH:mm:ss')}`;
-
-				const endTime =
-					event.end !== null
-						? `${event.end.format('YYYY-MM-DD')}T${event.end.format('HH:mm:ss')}`
-						: moment(start_time).add(90, 'minutes').format('YYYY-MM-DD HH:mm:ss');
-				if (check === false) {
-					if (window.confirm('Accept overlapping appointments?')) {
-						store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId) - 1, start_time, endTime));
-					} else {
-						revertFunc();
-					}
-				} else {
-					store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId) - 1, start_time, endTime));
 				}
+			});
+		} else { // không làm việc
+			check = false;
+		}
+		const resourceId = parseInt(event.resourceId) - 1;
+
+		const pos = displayedMembers.findIndex((mem) => parseInt(mem.resourceId) === parseInt(resourceId));
+
+		//pos : dùng để check vị trí appointment có nằm ngoài staff không ?
+		//check : dùng để check appointment có bị overlap hay không , check = false là bị overlap ,  check = 1 là bị block temp
+
+		if (pos === -1 || event.data.status === 'PAID' || check === 1) {
+			revertFunc();
+		} else {
+			const start_time = `${event.start.format('YYYY-MM-DD')}T${event.start.format('HH:mm:ss')}`;
+
+			const endTime =
+				event.end !== null
+					? `${event.end.format('YYYY-MM-DD')}T${event.end.format('HH:mm:ss')}`
+					: moment(start_time).add(90, 'minutes').format('YYYY-MM-DD HH:mm:ss');
+			if (check === false) {
+				if (window.confirm('Accept overlapping appointments?')) {
+					store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId) - 1, start_time, endTime));
+				} else {
+					revertFunc();
+				}
+			} else {
+				store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId) - 1, start_time, endTime));
 			}
+		}
 		// }
 	},
 	/* eslint no-param-reassign: "error" */
@@ -520,12 +526,13 @@ export const MAIN_CALENDAR_OPTIONS = {
 	/* eslint no-param-reassign: "error" */
 	eventRender: (event, element) => {
 		element[0].innerHTML = EVENT_RENDER_TEMPLATE(event.data);
-		if (event.data.isVip === 1)
-			if (event.data.status === 'ASSIGNED' || event.data.status === 'CONFIRMED') {
-				element.find("div.app-event").prepend("<div class='app-event__full-name3'><img src='" + vip + "' width='18' height='18'></div>");
+		if (event.data.isVip === 1) {
+			if (event.data.memberId === 0) {
+				element.find("div.app-event").prepend("<div class='app-event__full-name2'><img src='" + vip_blue + "' width='18' height='18'></div>");
 			} else {
 				element.find("div.app-event").prepend("<div class='app-event__full-name2'><img src='" + vip + "' width='18' height='18'></div>");
 			}
+		}
 	},
 	resourceRender: (resourceObj, labelTds) => {
 		labelTds[0].innerHTML = '';
@@ -583,8 +590,8 @@ export const addEventsToCalendar = (currentDate, appointmentsMembers) => { //apo
 	});
 
 	const allAppointments = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
-
-	const app_in_anystaff = allAppointments ? allAppointments.filter(app => app.memberId === 0) : [];
+	
+	const app_in_anystaff = allAppointments ? allAppointments.filter(app => app.memberId === 0 && app.status !== 'WAITING') : [];
 	app_in_anystaff.forEach(appointment => {
 		events.push({
 			resourceId: 0,
@@ -636,12 +643,12 @@ export const updateEventToCalendar = (fcEvent) => {
 	const resourceId = displayedMembers.findIndex((mem) => mem.id === fcEvent.memberId);
 
 	const data = {
-		resourceId: resourceId + 1,
+		resourceId: (fcEvent.memberId === 0 && fcEvent.status !== 'WAITING') ? 0 : resourceId + 1,
 		start: fcEvent.start,
 		end: fcEvent.end,
 		data: fcEvent,
-		color: eventColor,
-		className: eventClass,
+		color: fcEvent.memberId === 0 ? '#F4F4F5' : eventColor,
+		className: fcEvent.memberId === 0 ? 'event-anystaff' : eventClass,
 		startEditable,
 		resourceEditable
 	};

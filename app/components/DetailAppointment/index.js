@@ -708,7 +708,7 @@ class Appointment extends React.Component {
 			appointment: app,
 			action: 'checkout'
 		});
-
+		
 		window.postMessage(data);
 	};
 
@@ -1025,19 +1025,14 @@ class Appointment extends React.Component {
 	};
 
 	buttonService(appointment, service, index) {
-		const { old_service } = this.state;
 		let backgroundColor = '#dddddd';
 		if (appointment.status !== 'PAID' && service.duration > 5) backgroundColor = '#0071c5';
-		// if (parseInt(old_service[index].duration) > parseInt(service.duration) && service.duration > 5)
-		// 	backgroundColor = '#C3447A';
 		return backgroundColor;
 	}
 
 	buttonService2(appointment, service, index) {
-		const { old_service } = this.state;
 		let backgroundColor = '#dddddd';
 		if (appointment.status !== 'PAID') backgroundColor = '#0071c5';
-		// if (parseInt(old_service[index].duration) < parseInt(service.duration)) backgroundColor = '#C3447A';
 		return backgroundColor;
 	}
 
@@ -1244,25 +1239,19 @@ class Appointment extends React.Component {
 	}
 
 	buttonProduct(appointment, product, index) {
-		const { old_product } = this.state;
 		let backgroundColor = '#dddddd';
 		if (appointment.status !== 'PAID' && product.quantity > 1) backgroundColor = '#0071c5';
-		// if (parseInt(old_product[index].quantity) > parseInt(product.quantity) && product.quantity > 1)
-		// 	backgroundColor = '#C3447A';
 		return backgroundColor;
 	}
 
 	buttonProduct2(appointment, product, index) {
-		const { old_product } = this.state;
 		let backgroundColor = '#dddddd';
 		if (appointment.status !== 'PAID') backgroundColor = '#0071c5';
-		// if (parseInt(old_product[index].quantity) < parseInt(product.quantity)) backgroundColor = '#C3447A';
 		return backgroundColor;
 	}
 
 	renderProduct(product, index) {
 		const { appointment } = this.props;
-		const { old_product } = this.state;
 
 		const quantity =
 			product.quantity.toString().length === 1 ? '0' + product.quantity.toString() : product.quantity;
@@ -1334,20 +1323,14 @@ class Appointment extends React.Component {
 	}
 
 	buttonExtra(appointment, extra, index) {
-
-		const { old_extra } = this.state;
 		let backgroundColor = '#dddddd';
 		if (appointment.status !== 'PAID' && extra.duration > 5) backgroundColor = '#0071c5';
-		// if (parseInt(old_extra[index].duration) > parseInt(extra.duration) && extra.duration > 5)
-		// 	backgroundColor = '#C3447A';
 		return backgroundColor;
 	}
 
 	buttonExtra2(appointment, extra, index) {
-		const { old_extra } = this.state;
 		let backgroundColor = '#dddddd';
 		if (appointment.status !== 'PAID') backgroundColor = '#0071c5';
-		// if (parseInt(old_extra[index].duration) < parseInt(extra.duration)) backgroundColor = '#C3447A';
 		return backgroundColor;
 	}
 

@@ -105,10 +105,10 @@ class Calendar extends React.Component {
 		window.addEventListener('message', this.receiveMessage);
 
 		this.runSignalR();
-		setInterval(() => {
-			console.log('***********************RECONNECT SignalR***********************');
-			this.runSignalR();
-		}, 300000);
+		// setInterval(() => {
+		// 	console.log('***********************RECONNECT SignalR***********************');
+		// 	this.runSignalR();
+		// }, 300000);
 		const x = document.getElementsByClassName('fc-now-indicator fc-now-indicator-arrow');
 		for (let i = 0; i < x.length; i++) {
 			x[i].scrollIntoView();
@@ -257,14 +257,10 @@ class Calendar extends React.Component {
 				}
 			}
 		});
-		try {
+		connection.start();
+		connection.onclose(function(){
 			connection.start();
-			connection.onclose(function(){
-				connection.start();
-			})	
-		} catch (error) {
-			connection.start();
-		}
+		});
 	}
 
 	render() {
