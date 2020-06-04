@@ -15,7 +15,6 @@ import { formatPhone } from '../../utils/helper';
 import vip from '../../images/vip.png'
 import vip_blue from '../../images/vip_blue.png'
 import call from '../../images/call.png'
-import { AiFillStar } from 'react-icons'
 
 const OPTION_RENDER_TEMPLATE = (option) => `<div class="app-event__option">- ${option.serviceName}</div>`;
 const PRODUCT_RENDER_TEMPLATE = (product) => `<div class="app-event__option">- ${product.productName}</div>`;
@@ -26,7 +25,6 @@ const EVENT_RENDER_TEMPLATE = (event) => `
 	<div class="app-event__id-number">${event.code}</div>
     <div class="app-event__full-name">${event.userFullName}</div>
 	<div class="app-event__phone-number">
-	${event.status !== "BLOCK" && event.status !== "BLOCK_TEMP" ? "<img src='" + call + "' width='15' height='15'>" : ""}
 	${formatPhone(event.phoneNumber)}</div>
 	${event.options.map((option) => OPTION_RENDER_TEMPLATE(option)).join('')}
 	${event.products.map((product) => PRODUCT_RENDER_TEMPLATE(product)).join('')}
@@ -72,7 +70,9 @@ export const MAIN_CALENDAR_OPTIONS = {
 
 		if (parseInt(resource.id) !== 0) {
 			const displayedAppointments = store.getState().getIn(['appointment', 'appointments', 'calendar']);
+
 			const member = displayedAppointments[parseInt(resource.id) - 1];
+			if(!member || member.memberId === 0) return;
 
 			member.appointments.forEach((app) => {
 				if (
@@ -212,7 +212,6 @@ export const MAIN_CALENDAR_OPTIONS = {
 	eventClick: (event) => {
 		const allAppointment = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
 		const appointment = allAppointment.find(app => parseInt(app.id) === parseInt(event.data.id));
-		console.log({appointment})
 		if (!appointment) return;
 		store.dispatch(selectAppointment(appointment, event));
 		store.dispatch(getApppointmentById(appointment));
@@ -385,7 +384,6 @@ export const MAIN_CALENDAR_OPTIONS = {
 	},
 
 	eventDrop: (event, delta, revertFunc, jsEvent, ui, view) => {
-		console.log({event})
 		const memberdisplay = store.getState().getIn(['appointment', 'appointments', 'calendar']);
 		const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
 
@@ -494,7 +492,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 
 		//pos : dùng để check vị trí appointment có nằm ngoài staff không ?
 		//check : dùng để check appointment có bị overlap hay không , check = false là bị overlap ,  check = 1 là bị block temp
-
+		console.log({check})
 		if (pos === -1 || event.data.status === 'PAID' || check === 1) {
 			revertFunc();
 		} else {
@@ -611,7 +609,6 @@ export const addEventsToCalendar = (currentDate, appointmentsMembers) => { //apo
 	const allAppointments = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
 	
 	const app_in_anystaff = allAppointments ? allAppointments.filter(app => app.memberId === 0 && app.status !== 'WAITING') : [];
-	console.log({app_in_anystaff});
 	app_in_anystaff.forEach(appointment => {
 		events.push({
 			resourceId: 0,

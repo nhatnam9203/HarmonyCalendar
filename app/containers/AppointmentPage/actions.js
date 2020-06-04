@@ -102,7 +102,6 @@ import {
 	GET_APP_BY_ID,
 	GET_APP_BY_ID_SUCCESS,
 	GROUP_APPOINTMENT,
-	CHECKOUT,
 	UPDATE_APPOINTMENT_PAID_OFFLINE,
 	GET_TIME_STAFF_LOGIN,
 	GET_TIME_STAFF_LOGIN_SUCCESS,
@@ -756,11 +755,6 @@ export const getApppointmentByIdSuccess = (data) => ({
 
 export const groupAppointment = (data) => ({
 	type: GROUP_APPOINTMENT,
-	data
-});
-
-export const checkOut = (data) => ({
-	type: CHECKOUT,
 	data
 });
 

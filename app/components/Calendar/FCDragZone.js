@@ -168,13 +168,10 @@ class FCDragZone extends React.PureComponent {
                 <EventWrapper.buttonDelete onClick={() => this.deleteEventWaiting(event)}>
                   <IoIosCloseCircle />
                 </EventWrapper.buttonDelete>
-                {/* <div className="app-event__full-name2">
-                  <img src={vip} width='18' height='18' />
-                </div> */}
                 <div className="app-event__id-number">{event.code}</div>
                 <div className="app-event__full-name">{event.userFullName}</div>
                 <div className="app-event__phone-number">
-                <img src={call} width='15' height='15' />
+                <img className='icon-phone2' src={call} width='15' height='15' />
                   {` ${formatPhone(event.phoneNumber)}`}</div>
                 {event.options.map((option, index) => (
                   <div className="app-event__option" key={index}>

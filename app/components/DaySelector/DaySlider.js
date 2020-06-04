@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Carousel from 'nuka-carousel';
 import { FaCaretLeft, FaCaretRight } from 'react-icons/fa';
+import SplashButton from '../ResourceSelector/SplashButton'
 
 const DateSliderWrapper = styled.div`
   width: calc(100% - 5.05rem);
@@ -52,6 +53,7 @@ const PrevButton = styled.div`
   font-size: 2rem;
   line-height: 2rem;
   cursor: pointer;
+  padding-left: 0.5rem;
 `;
 
 const NextButton = styled.div`
@@ -59,6 +61,7 @@ const NextButton = styled.div`
   font-size: 2rem;
   line-height: 2rem;
   cursor: pointer;
+  padding-right : 0.5rem;
 `;
 
 class DaySlider extends React.Component {
@@ -149,14 +152,14 @@ class DaySlider extends React.Component {
           dragging={true}
           renderBottomCenterControls={() => ''}
           renderCenterLeftControls={({ previousSlide }) => (
-            <PrevButton onClick={ev => this.onPrevClick(ev, previousSlide)}>
+            <SplashButton onClick={ev => this.onPrevClick(ev, previousSlide)}>
               <FaCaretLeft />
-            </PrevButton>
+            </SplashButton>
           )}
           renderCenterRightControls={({ nextSlide }) => (
-            <NextButton onClick={ev => this.onNextClick(ev, nextSlide)}>
+            <SplashButton onClick={ev => this.onNextClick(ev, nextSlide)}>
               <FaCaretRight />
-            </NextButton>
+            </SplashButton>
           )}
           afterSlide={slideIndex => this.afterSlide(slideIndex)}
         >

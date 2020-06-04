@@ -50,7 +50,7 @@ SignInWrapper.Button = styled.div`
 	background: #0071c5;
 	color: #ffffff;
 	width: 100%;
-	font-size: 1.1rem;
+	font-size: 1.05rem;
 	font-weight: bold;
 	line-height: 2.8;
 	height: 100%;
@@ -251,9 +251,18 @@ class Calendar extends React.Component {
 				let type = app.type;
 				if (type === 'staff_update') {
 					console.log('staff update')
-					// loadMembers();
-					// loadAppointmentByMembers();
-					this.props.reloadStaff();
+					const { deselectAppointment, disable_Calendar } = this.props;
+					deselectAppointment();
+					disable_Calendar(false);
+					loadMembers();
+				}
+
+				if (type === 'update_blocktime') {
+					console.log('update blocktime');
+					const { deselectAppointment, disable_Calendar } = this.props;
+					deselectAppointment();
+					disable_Calendar(false);
+					this.props.updateNextStaff();
 				}
 			}
 		});

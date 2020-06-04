@@ -20,7 +20,6 @@ import {
 	changeAppointmentTime,
 	getApppointmentById,
 	groupAppointment,
-	checkOut,
 } from './actions';
 
 export function mapDispatchToProps(dispatch) {
@@ -34,7 +33,6 @@ export function mapDispatchToProps(dispatch) {
 		disableCalendar: (status) => dispatch(disableCalendar(status)),
 		changeAppointmentTime: (appointment) => dispatch(changeAppointmentTime(appointment)),
 		groupIdAppointment: (idAppointment) => dispatch(groupAppointment(idAppointment)),
-		checkOut: (data) => dispatch(checkOut(data)),
 	};
 }
 

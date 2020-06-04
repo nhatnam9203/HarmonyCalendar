@@ -132,7 +132,7 @@ export function blockTemp(memberId, start, end, note,appointmentId) {
         memberId,
         start,
         end,
-        id: '',
+        id:  appointmentId ? appointmentId : 0,
         // appointmentId : appointmentId ? appointmentId : 0,
         code: '',
         userFullName:'',

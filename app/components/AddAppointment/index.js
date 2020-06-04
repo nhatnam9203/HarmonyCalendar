@@ -7,7 +7,7 @@ import Enter from '../../images/enter.png';
 import moment from 'moment';
 import { formatUsPhone, checkStringNumber2 } from '../../utils/helper';
 import NumberFormat from 'react-number-format';
-import {MdSubdirectoryArrowLeft} from 'react-icons/md';
+import { MdSubdirectoryArrowLeft } from 'react-icons/md';
 
 const AppPopup = styled(Popup)`
   border-radius: 1.5rem;
@@ -306,6 +306,7 @@ class AddAppointment extends React.Component {
 		const { time, staffID } = this.props.TimeAndStaffID;
 		const { first_name, last_name, phoneNumber, phone, notes, email, phoneCheck, refPhoneHeader } = this.state;
 		const refFone = phone ? phone : '';
+		// return;
 		if (first_name.trim() !== '' && last_name.trim() !== '') {
 			this.props.addCustomer({
 				first_name,
@@ -424,7 +425,7 @@ class AddAppointment extends React.Component {
 		let refPhone = '';
 		if (phone) {
 			if (phone.charAt(1) === '1') {
-				refPhone = '(+1) ' + formatUsPhone(phone.substring(1));
+				refPhone = '(+1) ' + formatUsPhone(phone.substring(2));
 			} else if (phone.charAt(0) === '1') {
 				refPhone = '(+1) ' + formatUsPhone(phone.substring(1));
 			} else if (phone.charAt(1) === '8' && phone.charAt(2) === '4') {

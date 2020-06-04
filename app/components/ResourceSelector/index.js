@@ -7,6 +7,7 @@ import { FaCaretLeft, FaCaretRight } from 'react-icons/fa';
 import { staffId } from '../../../app-constants';
 import LoadingIndicator from 'components/LoadingIndicator';
 import Pincode from './Pincode';
+import SplashButton from './SplashButton'
 
 
 const ResourceSelectorWrapper = styled.div`
@@ -59,7 +60,7 @@ const Resource = styled.div`
 	position: relative;
 	border-right: 1px solid #ddd;
 	text-align: center;
-	background-color: ${(props) => (props.active ? '#1EB5F4' : '#ffffff')};
+	background-color: ${(props) => (props.active ? '#1EB5F4' : '#FFFFFF')};
 `;
 
 const AnyStaff = styled(Resource)`
@@ -135,14 +136,15 @@ Resource.WorkingTime = styled.div`
 
 Resource.Title = styled.div`
 	position: absolute;
-	bottom: 13px;
+	bottom: 0px;
 	left: 0;
-	background: #ffffff;
+	background: rgba(255,255,255,1);
+	border-top : 2px solid white;
 	width: 100%;
 	opacity: 0.75;
 	text-align: center;
 	padding-bottom: 4px;
-	font-size: 0.85rem;
+	font-size: 0.8rem;
 	line-height: 1.3;
 	font-weight: 400;
 `;
@@ -152,6 +154,7 @@ const PrevButton = styled.div`
 	font-size: 2rem;
 	line-height: 2rem;
 	cursor: pointer;
+	padding-left : 0.5rem;
 `;
 
 const NextButton = styled.div`
@@ -159,6 +162,7 @@ const NextButton = styled.div`
 	font-size: 2rem;
 	line-height: 2rem;
 	cursor: pointer;
+	padding-right: 0.5rem;
 `;
 
 const WaitingHeader = styled.div`
@@ -366,7 +370,7 @@ class ResourceSelector extends React.Component {
 					<Resource.OrderNumber next={resource.isNextAvailableStaff === 1 ? true : false}>
 						{resource.orderNumber}
 					</Resource.OrderNumber>
-					<Resource.WorkingTime>{this.getWorrkingTime(resource, currentDay)}</Resource.WorkingTime>
+					{/* <Resource.WorkingTime>{this.getWorrkingTime(resource, currentDay)}</Resource.WorkingTime> */}
 					<Resource.Title>{resource.title}</Resource.Title>
 				</Resource>
 			);
@@ -438,14 +442,23 @@ class ResourceSelector extends React.Component {
 							dragging={true}
 							renderBottomCenterControls={() => ''}
 							renderCenterLeftControls={({ previousSlide }) => (
-								<PrevButton className='btn-arrow' onClick={(ev) => this.onPrevClick(ev, previousSlide)}>
+								// <PrevButton className='btn-arrow' onClick={(ev) => this.onPrevClick(ev, previousSlide)}>
+								// 	<FaCaretLeft />
+								
+								// </PrevButton>
+								<SplashButton onClick={(ev) => this.onPrevClick(ev, previousSlide)}>
 									<FaCaretLeft />
-								</PrevButton>
+								</SplashButton>
 							)}
 							renderCenterRightControls={({ nextSlide }) => (
-								<NextButton className='btn-arrow' onClick={(ev) => this.onNextClick(ev, nextSlide)}>
+								// <NextButton className='btn-arrow' onClick={(ev) => this.onNextClick(ev, nextSlide)}>
+								// 	<FaCaretRight />
+						
+								// </NextButton>
+
+								<SplashButton onClick={(ev) => this.onNextClick(ev, nextSlide)}>
 									<FaCaretRight />
-								</NextButton>
+								</SplashButton>
 							)}
 							afterSlide={(slideIndex) => this.afterSlide(slideIndex)}
 						>

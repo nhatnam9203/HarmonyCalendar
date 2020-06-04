@@ -592,7 +592,6 @@ function appointmentReducer(state = initialState, action) {
 				})
 				.updateIn([ 'appointments', 'allAppointment' ], (arr) => {
 					const pos = arr.findIndex((app) => app.id === action.appointment.appointment.id);
-					console.log({ pos, appointment: action.appointment.appointment, appointmentPOS: arr[pos] });
 					action.appointment.appointment.end = action.appointment.new_end_time;
 					if (pos === -1) {
 						//add

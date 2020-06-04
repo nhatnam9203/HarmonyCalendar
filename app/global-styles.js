@@ -165,6 +165,11 @@ const GlobalStyle = createGlobalStyle`
     filter: sepia(100%) saturate(300%) brightness(20%) hue-rotate(0deg);
   }
 
+  .img-call{
+    margin-top : -4px;
+    margin-right : 2px;
+  }
+
   .app-event__phone-number {
     font-size: 13px;
     margin-left: 7px;
@@ -175,6 +180,16 @@ const GlobalStyle = createGlobalStyle`
     font-weight : 500;
     word-wrap: break-word;
   }
+
+  .icon-phone{
+    filter: invert(95%) sepia(68%) saturate(24%) hue-rotate(173deg) brightness(114%) contrast(89%);
+    margin-top: -3px;
+  }
+
+  .icon-phone2{
+    margin-top: -3px;
+  }
+
   .app-event__option {
     font-size: 12px;
     margin-left: 16px;
@@ -206,31 +221,7 @@ const GlobalStyle = createGlobalStyle`
 }
 
 .btn-arrow{
-  color: linear-gradient(
-        to right,
-        #873f72,
-        #ed3144,
-        #f20920,
-        #b9ce2b,
-        #873f72
-      )
-      160%
-      0
-      repeat-x,
-    linear-gradient(to top, #873f72, #ed3144, #f20920, #b9ce2b, #873f72)
-      100%
-      20%
-      repeat-y,
-    linear-gradient(to left, #873f72, #ed3144, #f20920, #b9ce2b, #873f72)
-      10%
-      100%
-      repeat-x,
-    linear-gradient(to bottom, #873f72, #ed3144, #f20920, #b9ce2b, #873f72)
-      0%
-      10%
-      repeat-y;
-  background-size: 300% 2px, 2px 300%;/* increase size to show at once the bit from 2 gradient colors */
-  animation: bd 5s infinite linear;
+
 }
 
 .event-assigned{
@@ -339,6 +330,23 @@ const GlobalStyle = createGlobalStyle`
 #full-calendar{
 
 }
+.test-arrow {
+  background: linear-gradient(to right, #FFF 20%, #FF0 40%, #FF0 60%, #FFF 80%);
+  background-size: 200% auto;
+  
+  color: #000;
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  
+  animation: shine 1s linear infinite;
+  @keyframes shine {
+    to {
+      background-position: 200% center;
+    }
+  }
+}
 .App-pages {
     height: 100%;
     width: calc(((100vw - 5.05rem) / 7) * 6 + 4.75rem);
@@ -359,6 +367,7 @@ const GlobalStyle = createGlobalStyle`
 .popup-overlay{
 
 }
+
 .fc-now-indicator-arrow{
   display : none !important; 
 }
