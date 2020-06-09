@@ -2,9 +2,9 @@ import { delay } from 'redux-saga';
 import { fork, put, takeLatest, all, select } from 'redux-saga/effects';
 import moment from 'moment';
 import { api } from '../../utils/helper';
-import * as constants from './constants'
-import * as actions from './actions'
-import * as api_constants from '../../../app-constants'
+import * as constants from './constants';
+import * as actions from './actions';
+import * as api_constants from '../../../app-constants';
 
 import {
 	makeCurrentDay,
@@ -16,10 +16,7 @@ import {
 	makeSelectMembers
 } from './selectors';
 
-import {
-	token,
-	merchantId,
-} from '../../../app-constants';
+import { token, merchantId } from '../../../app-constants';
 
 import {
 	addBlockCalendar,
@@ -33,14 +30,11 @@ import {
 	dataPutBackAppointment,
 	statusConvertData,
 	appointmentAdapter,
-	memberAdapter,
+	memberAdapter
 } from './utilSaga';
 
 import { assignAppointment as mockedPostAppointment } from '../../assets/mocks/assignAppointment';
-import {
-	addEventsToCalendar,
-	deleteEventFromCalendar,
-} from '../../components/Calendar/constants';
+import { addEventsToCalendar, deleteEventFromCalendar } from '../../components/Calendar/constants';
 
 export function* reloadStaffSaga() {
 	if (navigator.onLine === true) {
@@ -69,13 +63,15 @@ export function* reloadStaffSaga() {
 					isNextAvailableStaff: false,
 					blockTime: [],
 					timeLogin: 0
-				}
+				};
 
 				members.push(lastStaff);
 				const slideIndex = yield select(makeSlideIndex());
 
 				localStorage.setItem('staffList', JSON.stringify(members));
 				yield put(actions.membersLoaded(members));
+				const isDeskTop = api_constants.isDesktopOrLaptop;
+				const num = isDeskTop ? 7 : 5;
 				yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
 				yield put(actions.reloadCalendar());
 			}
@@ -85,6 +81,8 @@ export function* reloadStaffSaga() {
 	} else {
 		const members = JSON.parse(localStorage.getItem('staffList'));
 		yield put(actions.membersLoaded(members));
+		const isDeskTop = api_constants.isDesktopOrLaptop;
+		const num = isDeskTop ? 7 : 5;
 		yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
 		yield put(actions.reloadCalendar());
 	}
@@ -106,19 +104,21 @@ export function* reloadCalendarSaga() {
 				console.log('error from api ' + requestURL);
 				return;
 			}
-			appointments = response && response.data.map((appointment) => appointmentAdapter(appointment))
-				.filter(
-					(app) =>
-						moment(app.start).format('YYYY-MM-DD hh:mm A') !==
-						moment(app.end).format('YYYY-MM-DD hh:mm A')
-				);
+			appointments =
+				response &&
+				response.data
+					.map((appointment) => appointmentAdapter(appointment))
+					.filter(
+						(app) =>
+							moment(app.start).format('YYYY-MM-DD hh:mm A') !==
+							moment(app.end).format('YYYY-MM-DD hh:mm A')
+					);
 
 			if (apiDateQuery === moment().format('YYYY-MM-DD')) {
 				localStorage.setItem('AppointmentCalendar', JSON.stringify(appointments));
 			}
 
 			yield put(actions.loadingCalendar(false));
-
 		} else {
 			appointments = JSON.parse(localStorage.getItem('AppointmentCalendar')); // chưa filter lọc ngày cho chức năng offline
 		}
@@ -178,13 +178,15 @@ export function* getMembers() {
 					isNextAvailableStaff: false,
 					blockTime: [],
 					timeLogin: 0
-				}
-				members.push(lastStaff)
+				};
+				members.push(lastStaff);
 				const slideIndex = yield select(makeSlideIndex());
 				// const Staffs = sorrtStaffByDate('', members);
 
 				localStorage.setItem('staffList', JSON.stringify(members));
 				yield put(actions.membersLoaded(members));
+				const isDeskTop = api_constants.isDesktopOrLaptop;
+				const num = isDeskTop ? 7 : 5;
 				yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
 				yield put(actions.reloadCalendar());
 			}
@@ -194,6 +196,8 @@ export function* getMembers() {
 	} else {
 		const members = JSON.parse(localStorage.getItem('staffList'));
 		yield put(actions.membersLoaded(members));
+		const isDeskTop = api_constants.isDesktopOrLaptop;
+		const num = isDeskTop ? 7 : 5;
 		yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
 		yield put(actions.reloadCalendar());
 	}
@@ -341,7 +345,7 @@ export function* moveAppointment(action) {
 	const allAppointment = yield select(makeSelectAllAppointments());
 	const assignedMember = displayedMembers[action.newPositionIndex - 1];
 
-	const movedAppointment = allAppointment.find(app => app.id === action.appointmentId);
+	const movedAppointment = allAppointment.find((app) => app.id === action.appointmentId);
 	if (!movedAppointment) return;
 
 	let appointment = {
@@ -405,7 +409,7 @@ export function* putBackAppointment(action) {
 			if (response.codeStatus !== 1) return yield* checkResponse(response);
 			if (response.codeStatus === 1) {
 			}
-		} catch (err) { }
+		} catch (err) {}
 	} catch (err) {
 		yield put(actions.appointmentPuttingBackError(err));
 	}
@@ -438,8 +442,7 @@ export function* assignAppointment(action) {
 		...action.eventData,
 		memberId: assignedMember.id
 	};
-	console.log('assign appointment');
-	console.log({appointment});
+
 	try {
 		yield put(actions.removeAppointmentWaiting(appointment));
 		const { memberId, start, status, options, products, extras } = appointment;
@@ -448,18 +451,21 @@ export function* assignAppointment(action) {
 		yield put(
 			actions.addAppointmentToCalendar({
 				appointment: appointment,
-				new_end_time: duration_total > 0
-					? moment(start).add(duration_total, 'minutes').format().substr(0, 19)
-					: moment(start).add(15, 'minutes').format().substr(0, 19),
+				new_end_time:
+					duration_total > 0
+						? moment(start).add(duration_total, 'minutes').format().substr(0, 19)
+						: moment(start).add(15, 'minutes').format().substr(0, 19),
 				memberId: appointment.memberId
-			}));
+			})
+		);
 
 		let data = {
 			staffId: memberId,
 			fromTime: start,
-			toTime: duration_total > 0
-				? moment(start).add(duration_total, 'minutes').format().substr(0, 19)
-				: moment(start).add(15, 'minutes').format().substr(0, 19),
+			toTime:
+				duration_total > 0
+					? moment(start).add(duration_total, 'minutes').format().substr(0, 19)
+					: moment(start).add(15, 'minutes').format().substr(0, 19),
 			status: statusConvertData[status],
 			services: options,
 			products,
@@ -518,6 +524,7 @@ export function* upddateAppointment(action) {
 			const kq = yield api(url, { status }, 'PUT', token);
 			if (kq.codeStatus !== 1) return yield* checkResponse(kq);
 			if (kq.codeStatus === 1) {
+				return;
 			}
 		}
 
@@ -941,7 +948,7 @@ export function* SubmitEditBlockTime_Saga(action) {
 			yield put(actions.loadMembers());
 			return;
 		}
-	} catch (error) { }
+	} catch (error) {}
 }
 
 export function* deleteBlockTime_Saga(action) {
@@ -953,7 +960,7 @@ export function* deleteBlockTime_Saga(action) {
 			yield put(actions.loadMembers());
 			yield put(actions.deleteBlockTimeSuccess({ staff, block }));
 		}
-	} catch (error) { }
+	} catch (error) {}
 }
 
 export function* getBlockTimeSaga() {
@@ -967,7 +974,7 @@ export function* getBlockTimeSaga() {
 			yield put(actions.renderAppointment());
 			return;
 		}
-	} catch (error) { }
+	} catch (error) {}
 }
 
 export function* getAppointmentByIdSaga(action) {
@@ -981,7 +988,7 @@ export function* getAppointmentByIdSaga(action) {
 				return;
 			}
 			if (response.codeStatus !== 1) {
-				alert('error from get app id : ' + api_constants.GET_APPOINTMENT_ID)
+				alert('error from get app id : ' + api_constants.GET_APPOINTMENT_ID);
 				// alert(response.data);
 				return;
 			}
@@ -1006,10 +1013,10 @@ export function* getTimeStaffLoginSaga(action) {
 			yield put({ type: 'GET_TIME_STAFF_LOGIN_SUCCESS', data: { timeLogin: response.data, staffId } });
 		}
 		if (response.codeStatus !== 1) {
-			alert('error from ' + api_constants.API_GET_TIME_STAFF_LOGIN)
+			alert('error from ' + api_constants.API_GET_TIME_STAFF_LOGIN);
 			return;
 		}
-	} catch (err) { }
+	} catch (err) {}
 }
 
 function* updateNextStaff_Saga() {
@@ -1024,12 +1031,14 @@ function* updateNextStaff_Saga() {
 				const members = response.data
 					? response.data.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0)
 					: [];
-					const slideIndex = yield select(makeSlideIndex());
-					// const Staffs = sorrtStaffByDate('', members);
-					yield put(actions.membersLoaded(members));
-					yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
-					yield put(actions.getBlockTime());
-					// yield put(actions.loadAppointmentByMembers());
+				const slideIndex = yield select(makeSlideIndex());
+				// const Staffs = sorrtStaffByDate('', members);
+				yield put(actions.membersLoaded(members));
+				const isDeskTop = api_constants.isDesktopOrLaptop;
+				const num = isDeskTop ? 7 : 5;
+				yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
+				yield put(actions.getBlockTime());
+				// yield put(actions.loadAppointmentByMembers());
 				// yield put(updateNextStaffSuccess(members));
 			}
 		} catch (err) {
@@ -1137,7 +1146,6 @@ export function* getBlockTime_() {
 export function* watch_getAppointmentById() {
 	yield takeLatest(constants.GET_APP_BY_ID, getAppointmentByIdSaga);
 }
-
 
 export function* watch_getTimeStaffLogin() {
 	yield takeLatest(constants.GET_TIME_STAFF_LOGIN, getTimeStaffLoginSaga);

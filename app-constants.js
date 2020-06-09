@@ -17,6 +17,8 @@ const API_PORT = 8010;
  const DEV_API_BASE_URL = `https://staging.harmonypayment.com`;
  const PROD_API_BASE_URL = `https://staging.harmonypayment.com`;
 
+const isDesktopOrLaptop = window.innerWidth > 1000 ? true : false;
+
 
 const API_BASE_URL =
   process.env.NODE_ENV === 'production' ? `${PROD_API_BASE_URL}/api` : `${DEV_API_BASE_URL}/api`;
@@ -70,6 +72,7 @@ export {
   PUT_CHECKOUT,
   API_GET_TIME_STAFF_LOGIN,
   VAR_DEFAULT_AVATAR_PATH,
+  isDesktopOrLaptop
 }
 
 

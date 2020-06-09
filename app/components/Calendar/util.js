@@ -44,12 +44,13 @@ const notesAdapter = (notes) => {
 	};
 };
 
-
 export function	returnAppointment(appointment) {
     return {
         id: appointment.AppointmentId,
         code: `#${appointment.Code}`,
-        userFullName: appointment.FirstName + ' ' + appointment.LastName,
+        userFullName: appointment.FirstName,
+        firstName: appointment.FirstName,
+		lastName: appointment.LastName,
         phoneNumber: appointment.PhoneNumber,
         options: appointment.Services.map((sv) => servicesAdapter(sv)).sort(function(a, b) {
             var c = a.bookingServiceId;

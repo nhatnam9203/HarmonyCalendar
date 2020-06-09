@@ -11,7 +11,7 @@ export const convertAppointment = (appointment) => {
 	return {
 		id: appointment.id,
 		code: appointment.code,
-		userFullName: appointment.firstName + ' ' + appointment.lastName,
+		userFullName: appointment.firstName,
 		firstName: appointment.firstName,
 		lastName: appointment.lastName,
 		phoneNumber: appointment.phoneNumber,
@@ -77,8 +77,12 @@ export const initialState = {
 	notes: [],
 	newNotes: [],
 	time: new Date(),
-	old_selectedStaff: '',
-	selectedStaff: '',
+	old_selectedStaff: {
+		id : 75876786678,
+	},
+	selectedStaff: {
+		id : 544564564564
+	},
 	isOpenStaffList: false,
 	cloneAppointment: '',
 

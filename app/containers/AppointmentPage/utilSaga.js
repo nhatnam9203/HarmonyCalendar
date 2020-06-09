@@ -23,7 +23,7 @@ export const appointmentAdapter = (appointment) => {
 	return {
 		id: appointment.appointmentId,
 		code: `#${appointment.code}`,
-		userFullName: appointment.firstName + ' ' + appointment.lastName,
+		userFullName: appointment.firstName,
 		firstName: appointment.firstName,
 		lastName: appointment.lastName,
 		phoneNumber: appointment.phoneNumber,

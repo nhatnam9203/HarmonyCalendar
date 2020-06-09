@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Carousel from 'nuka-carousel';
 import { FaCaretLeft, FaCaretRight } from 'react-icons/fa';
-import { staffId } from '../../../app-constants';
+import { staffId , isDesktopOrLaptop } from '../../../app-constants';
 import LoadingIndicator from 'components/LoadingIndicator';
 import Pincode from './Pincode';
 import SplashButton from './SplashButton'
@@ -60,11 +60,11 @@ const Resource = styled.div`
 	position: relative;
 	border-right: 1px solid #ddd;
 	text-align: center;
-	background-color: ${(props) => (props.active ? '#1EB5F4' : '#FFFFFF')};
+	background-color: ${(props) => (props.active ? '#1EB5F4' : '#ffffff')};
 `;
 
 const AnyStaff = styled(Resource)`
-	width : calc(100% - 5.05rem - (calc((100vw - 5.05rem) / 7)) * 6 + 4px);
+	width : calc(100% - 5.05rem - ((calc((100vw - 5.05rem) / 7)) * 6) + 4px);
 	height :7rem;
 	border-left: 1px solid #1173C3;
 	background-color : #F5F5F5;
@@ -204,6 +204,8 @@ class ResourceSelector extends React.Component {
 
 	afterSlide(index) {
 		const { resources } = this.props;
+		const isDeskTop = isDesktopOrLaptop;
+		const num = isDeskTop ? 7 : 5;
 		this.props.setDisplayedMembers(resources.slice(index * 5, index * 5 + 5));
 		this.props.renderAppointment();
 		this.props.setSlideIndex(index);
@@ -396,6 +398,7 @@ class ResourceSelector extends React.Component {
 
 	renderCarouselSlide() {
 		const { loading, resources } = this.props;
+		console.log({resources})
 		if (loading) {
 			return [1].map((index) => this.renderLoadingResources(index));
 		}

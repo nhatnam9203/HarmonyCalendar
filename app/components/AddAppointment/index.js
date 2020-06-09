@@ -19,13 +19,15 @@ const AppPopup = styled(Popup)`
 const AppPopupWrapper = styled.div`position: relative;`;
 
 AppPopupWrapper.Header = styled.div`
-	height: 3rem;
+	height: 3.5rem;
+	justify-content : center;
+	align-items: center;
 	font-size: 20px;
 	font-weight: bold;
 	background: ${(props) => props.backgroundColor};
 	color: #ffffff;
 	width: 100%;
-	padding: 0.5rem 1rem;
+	padding: 0.7rem 1rem;
 	line-height: 1.5;
 	text-align: center;
 `;
@@ -75,7 +77,7 @@ const SearchingWrapper = styled(AppPopupWrapper)`
 `;
 
 SearchingWrapper.Header = styled(AppPopupWrapper.Header)`
-  //
+  height : 3rem;
 `;
 
 SearchingWrapper.Body = styled(AppPopupWrapper.Body)`
@@ -104,7 +106,9 @@ const AddingWrapper = styled(AppPopupWrapper)`
 `;
 
 AddingWrapper.Header = styled(AppPopupWrapper.Header)`
-  //
+	height : 3.5rem;
+	padding: 0.8rem 1rem;
+	font-size : 22px;
 `;
 
 AddingWrapper.Body = styled(AppPopupWrapper.Body)`
@@ -130,6 +134,7 @@ const Img = styled.img`filter: invert(100%);`;
 const Label = styled.div`
 	margin-bottom: 0.3rem;
 	text-align: left;
+	font-size : 1rem;
 `;
 
 const FooterChekPhone = styled.div`
@@ -177,12 +182,12 @@ const Form = styled.form`
     width: 100%;
     background: #ffffff;
     border: 1px solid #dddddd;
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
-    padding: 0.5rem 1rem;
+    border-radius : 4px;
+    padding: 0.7rem 1rem;
     margin-bottom: 1rem;
     text-align: left;
     -moz-appearance: none;
+	font-size : 1rem;
   /* for Chrome */
   -webkit-appearance: none;
 
@@ -202,7 +207,7 @@ const Button = styled.button`
 	height: 100%;
 	cursor: pointer;
 	text-align: center;
-	padding: 0 2rem;
+	padding: 0rem 3rem;
 `;
 
 const NoteWrapper = styled.div`
@@ -506,15 +511,15 @@ class AddAppointment extends React.Component {
 						<AddingWrapper.Close onClick={() => this.closeAllModal()}>
 							<FaTimesCircle />
 						</AddingWrapper.Close>
-						<AddingWrapper.Header backgroundColor="#00b4f7">Add Appointment</AddingWrapper.Header>
+						<AddingWrapper.Header backgroundColor="#1173C3">Add Appointment</AddingWrapper.Header>
 						<AddingWrapper.Body>
 							<Form onSubmit={(e) => e.preventDefault()}>
 								{success_addApointment && <p style={{ color: '#8D9440' }}>{success_addApointment}</p>}
-								{!checkPhoneError && (
+								{/* {!checkPhoneError && (
 									<Label style={{ textAlign: 'center' }}>
 										Phone number is not exist ! Get information !
 									</Label>
-								)}
+								)} */}
 								{checkPhoneError && <Label style={{ textAlign: 'center' }}>Phone number</Label>}
 								<input style={{ textAlign: 'center' }} value={PhoneShow} type="text" disabled />
 							</Form>
@@ -554,9 +559,9 @@ class AddAppointment extends React.Component {
 								{InfoAfterCheckPhone === '' && (
 									<div style={{ display: 'flex', flexDirection: 'row' }}>
 										<select
+											className="selectRef"
 											value={this.state.refPhoneHeader}
 											onChange={(e) => this.setState({ refPhoneHeader: e.target.value })}
-											className="headerRefPhone"
 											name=""
 											id=""
 										>

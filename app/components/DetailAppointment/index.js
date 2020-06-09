@@ -100,8 +100,8 @@ AppointmentWrapper.Footer = styled(AppPopupWrapper.Footer)`
 
 const UserInformation = styled.div`
 	display: flex;
-	flex-direction : row;
-	justify-content : space-between;
+	flex-direction: row;
+	justify-content: space-between;
 	align-items: center;
 	padding: 0.5rem;
 	& > div {
@@ -294,6 +294,7 @@ ConfirmationWrapper.Body = styled(AppPopupWrapper.Body)`
 	height: 150px;
 	border-bottom-left-radius: 1.5rem;
 	border-bottom-right-radius: 1.5rem;
+	font-size : 1rem;
 	`;
 
 ConfirmationWrapper.Close = styled(AppPopupWrapper.Close)`
@@ -554,6 +555,28 @@ class Appointment extends React.Component {
 		this.setState({ isChange: false });
 	}
 
+	reMakeStaffList(staffList) {
+		let staff0 = staffList.find((s) => s.id === 0);
+		let _staffList = staffList;
+		if (!staff0) {
+			const lastStaff = {
+				id: 0,
+				title: `Any staff`,
+				imageUrl: '',
+				orderNumber: 0,
+				workingTimes: _staffList[_staffList.length - 2].workingTimes,
+				isDisabled: false,
+				pincode: 0,
+				isNextAvailableStaff: false,
+				blockTime: [],
+				timeLogin: 0
+			};
+
+			_staffList.push(lastStaff);
+		}
+		return _staffList;
+	}
+
 	async componentWillReceiveProps(nextProps) {
 		const { currentDay, staffList, appointmentDetail } = nextProps;
 		if (appointmentDetail) {
@@ -566,19 +589,22 @@ class Appointment extends React.Component {
 				element.price = parseFloat(element.price);
 			});
 
+			let _staffList = this.reMakeStaffList(staffList);
+
 			const selectedStaff = appointmentDetail
-				? staffList.find((staff) => staff.id === appointmentDetail.memberId)
+				? _staffList.find((staff) => staff.id === appointmentDetail.memberId)
 				: '';
+
 			await this.resetState();
 			const app_ = JSON.parse(JSON.stringify(appointmentDetail));
-			const { options, userFullName, products, start, extras, notes } = app_;
+			const { options, userFullName, products, start, extras, notes , firstName, lastName } = app_;
 
 			await this.setState({
 				old_service: _services,
 				old_product: appointmentDetail.products,
 				old_extra: _extras,
 				services: options,
-				userFullName: userFullName,
+				userFullName: firstName + ' ' + lastName,
 				products: products,
 				dayChange: currentDay,
 				old_dayChange: currentDay,
@@ -606,15 +632,15 @@ class Appointment extends React.Component {
 			for (let i = 0; i < appointmentDetail.options.length; i++) {
 				const price = appointmentDetail.options[i].price;
 				this.setState({
-					prices: [...this.state.prices, parseFloat(price)],
-					old_prices: [...this.state.prices, parseFloat(price)]
+					prices: [ ...this.state.prices, parseFloat(price) ],
+					old_prices: [ ...this.state.prices, parseFloat(price) ]
 				});
 			}
 			for (let i = 0; i < appointmentDetail.extras.length; i++) {
 				const price = appointmentDetail.extras[i].price;
 				this.setState({
-					pricesExtras: [...this.state.pricesExtras, parseFloat(price)],
-					old_priceExtras: [...this.state.old_priceExtras, parseFloat(price)]
+					pricesExtras: [ ...this.state.pricesExtras, parseFloat(price) ],
+					old_priceExtras: [ ...this.state.old_priceExtras, parseFloat(price) ]
 				});
 			}
 		}
@@ -708,7 +734,7 @@ class Appointment extends React.Component {
 			appointment: app,
 			action: 'checkout'
 		});
-		
+
 		window.postMessage(data);
 	};
 
@@ -733,28 +759,34 @@ class Appointment extends React.Component {
 		const staffId = appointment.memberId;
 		if (appointment.status === 'ASSIGNED') {
 			return (
-				<AppointmentWrapper.Header color="#585858" backgroundColor={staffId === 0 ? '#F4F4F5' : "#ffe559"}>
+				<AppointmentWrapper.Header color="#585858" backgroundColor={staffId === 0 ? '#F4F4F5' : '#ffe559'}>
 					{appointment.code} Unconfirmed Appointment
 				</AppointmentWrapper.Header>
 			);
 		}
 		if (appointment.status === 'CONFIRMED') {
 			return (
-				<AppointmentWrapper.Header color="#585858" backgroundColor={staffId === 0 ? '#F4F4F5' : "#c2f4ff"}>
+				<AppointmentWrapper.Header color="#585858" backgroundColor={staffId === 0 ? '#F4F4F5' : '#c2f4ff'}>
 					{appointment.code} Confirmed Appointment
 				</AppointmentWrapper.Header>
 			);
 		}
 		if (appointment.status === 'CHECKED_IN') {
 			return (
-				<AppointmentWrapper.Header color={staffId === 0 ? '#333' : 'white'} backgroundColor={staffId === 0 ? '#F4F4F5' : "#00b4f7"}>
+				<AppointmentWrapper.Header
+					color={staffId === 0 ? '#333' : 'white'}
+					backgroundColor={staffId === 0 ? '#F4F4F5' : '#00b4f7'}
+				>
 					{appointment.code} Checked-in Appointment
 				</AppointmentWrapper.Header>
 			);
 		}
 		if (appointment.status === 'PAID') {
 			return (
-				<AppointmentWrapper.Header color={staffId === 0 ? '#333' : 'white'} backgroundColor={staffId === 0 ? '#F4F4F5' : "#00dc00"}>
+				<AppointmentWrapper.Header
+					color={staffId === 0 ? '#333' : 'white'}
+					backgroundColor={staffId === 0 ? '#F4F4F5' : '#00dc00'}
+				>
 					{appointment.code} Paid Appointment
 				</AppointmentWrapper.Header>
 			);
@@ -809,7 +841,7 @@ class Appointment extends React.Component {
 			<div
 				style={{
 					position: 'relative',
-					paddingTop: 3,
+					paddingTop: 3
 				}}
 			>
 				<div onClick={() => this.setState({ isPopupDay: !isPopupDay })} style={style.buttonDayChange}>
@@ -874,7 +906,7 @@ class Appointment extends React.Component {
 					<SelectDateWrapper.SelectDate>
 						<div>Time</div>
 					</SelectDateWrapper.SelectDate>
-					<div style={{ paddingTop: 3, height: 42, }}>
+					<div style={{ paddingTop: 3, height: 42 }}>
 						<div
 							style={{
 								position: 'relative'
@@ -974,14 +1006,24 @@ class Appointment extends React.Component {
 				<UserInformation>
 					<div>
 						<span>Customer name: </span>
-						<span style={{ color: '#333', fontWeight: '600' }}>{appointment.userFullName}</span>
+						<span style={{ color: '#333', fontWeight: '600' }}>{`${appointment.firstName} ${appointment.lastName}`}</span>
 					</div>
 					<div>
 						<span>Phone number: </span>
 						<span style={{ color: '#333', fontWeight: '600' }}>{formatPhone(appointment.phoneNumber)}</span>
 					</div>
-					{isVip === 1 &&
-						<div style={{ width: '12%', borderRadius: 100, padding: 8, backgroundColor: '#52D969', justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
+					{isVip === 1 && (
+						<div
+							style={{
+								width: '12%',
+								borderRadius: 100,
+								padding: 8,
+								backgroundColor: '#52D969',
+								justifyContent: 'center',
+								alignItems: 'center',
+								display: 'flex'
+							}}
+						>
 							<img
 								src={require('../../images/vip.png')}
 								style={{
@@ -989,8 +1031,9 @@ class Appointment extends React.Component {
 									height: 17
 								}}
 							/>
-							<span style={{ color: 'white' , marginLeft: 5 }}>VIP</span>
-						</div>}
+							<span style={{ color: 'white', marginLeft: 5 }}>VIP</span>
+						</div>
+					)}
 				</UserInformation>
 
 				{appointment.status !== 'PAID' && this.renderChangeAppointTime()}
@@ -1088,7 +1131,7 @@ class Appointment extends React.Component {
 		const staff = staffList.find((s) => parseInt(s.id) === parseInt(service.staffId));
 		const { prices, isPopupStaff, indexPopupStaff } = this.state;
 
-		let price = prices[index] ? parseFloat(prices[index]).toFixed(2) : "0.00";
+		let price = prices[index] ? parseFloat(prices[index]).toFixed(2) : '0.00';
 
 		const duration =
 			service.duration.toString().length === 1 ? '0' + service.duration.toString() : service.duration;
@@ -1104,13 +1147,13 @@ class Appointment extends React.Component {
 							<FaCaretDown style={{ color: '#1173C3' }} />
 
 							{isPopupStaff &&
-								index === indexPopupStaff && (
-									<PopupStaff
-										togglePopupStaff={(staff) => this.togglePopupStaff(staff, index)}
-										staffList={staffList.filter(s=>s.id !== 0)}
-										closePopupStaff={() => this.closePopupStaff()}
-									/>
-								)}
+							index === indexPopupStaff && (
+								<PopupStaff
+									togglePopupStaff={(staff) => this.togglePopupStaff(staff, index)}
+									staffList={staffList.filter((s) => s.id !== 0)}
+									closePopupStaff={() => this.closePopupStaff()}
+								/>
+							)}
 						</div>
 					</td>
 
@@ -1142,16 +1185,13 @@ class Appointment extends React.Component {
 						</td>
 					)}
 					<td>
-						<div
-							onClick={() => this.openPopupPrice(price, index, 'service')}
-							style={style.row}
-						>
+						<div onClick={() => this.openPopupPrice(price, index, 'service')} style={style.row}>
 							<div style={style.priceS}>{price}</div>
 							<img
 								src={require('../../images/edit.png')}
 								style={{
 									width: 16,
-									height: 16,
+									height: 16
 								}}
 							/>
 						</div>
@@ -1197,10 +1237,7 @@ class Appointment extends React.Component {
 									style={style.price}
 									type="tel"
 								/>
-								<img
-									src={require('../../images/edit.png')}
-									style={{ width: 16,	height: 16 }}
-								/>
+								<img src={require('../../images/edit.png')} style={{ width: 16, height: 16 }} />
 							</div>
 						</td>
 					</tr>
@@ -1218,9 +1255,16 @@ class Appointment extends React.Component {
 					<table>
 						<thead>
 							<tr>
-								<th width="25%" style={{ borderRight: 0	}}>	Staff</th>
-								<th width="25%" style={{ borderLeft: 0 }}>Services</th>
-								<th width="25%" style={{ textAlign: 'center' }}>Duration (min)</th>
+								<th width="25%" style={{ borderRight: 0 }}>
+									{' '}
+									Staff
+								</th>
+								<th width="25%" style={{ borderLeft: 0 }}>
+									Services
+								</th>
+								<th width="25%" style={{ textAlign: 'center' }}>
+									Duration (min)
+								</th>
 								<th style={{ textAlign: 'center' }}>Price ($)</th>
 							</tr>
 						</thead>
@@ -1231,10 +1275,18 @@ class Appointment extends React.Component {
 				<table>
 					<thead>
 						<tr>
-							<th style={{ borderRight: 0 }} width="25%">Staff</th>
-							<th style={{ borderLeft: 0 }} width="25%">Services</th>
-							<th width="25%" style={{ textAlign: 'center' }}>Tip ($)</th>
-							<th width="25%" style={{ textAlign: 'center' }}>Price ($)</th>
+							<th style={{ borderRight: 0 }} width="25%">
+								Staff
+							</th>
+							<th style={{ borderLeft: 0 }} width="25%">
+								Services
+							</th>
+							<th width="25%" style={{ textAlign: 'center' }}>
+								Tip ($)
+							</th>
+							<th width="25%" style={{ textAlign: 'center' }}>
+								Price ($)
+							</th>
 						</tr>
 					</thead>
 					<tbody>{services.map((s, i) => this.renderService(s, i))}</tbody>
@@ -1289,7 +1341,9 @@ class Appointment extends React.Component {
 				</td>
 				<td>
 					<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-						<div style={appointment.status !== 'PAID' ? style.price2 : {}}>{parseFloat(product.price * product.quantity).toFixed(2)}</div>
+						<div style={appointment.status !== 'PAID' ? style.price2 : {}}>
+							{parseFloat(product.price * product.quantity).toFixed(2)}
+						</div>
 					</div>
 				</td>
 			</tr>
@@ -1334,7 +1388,6 @@ class Appointment extends React.Component {
 	}
 
 	buttonExtra(appointment, extra, index) {
-
 		const { old_extra } = this.state;
 		let backgroundColor = '#dddddd';
 		if (appointment.status !== 'PAID' && extra.duration > 5) backgroundColor = '#0071c5';
@@ -1355,7 +1408,7 @@ class Appointment extends React.Component {
 		const { appointment } = this.props;
 		const { pricesExtras } = this.state;
 
-		let price = pricesExtras[index] ? parseFloat(pricesExtras[index]).toFixed(2) : '0.00'
+		let price = pricesExtras[index] ? parseFloat(pricesExtras[index]).toFixed(2) : '0.00';
 
 		return (
 			<tr key={index}>
@@ -1385,23 +1438,20 @@ class Appointment extends React.Component {
 							justifyContent: 'center'
 						}}
 					>
-						<div onClick={
+						<div
+							onClick={
 								appointment.status !== 'PAID' ? (
-									() =>
-										this.openPopupPrice(price, index, 'extra')
+									() => this.openPopupPrice(price, index, 'extra')
 								) : (
-										() => { }
-									)
+									() => {}
+								)
 							}
 						>
 							<div style={appointment.status !== 'PAID' ? style.priceS : {}}>{price}</div>
 						</div>
 
 						{appointment.status !== 'PAID' && (
-							<img
-								src={require('../../images/edit.png')}
-								style={{ width: 16, height: 16 }}
-							/>
+							<img src={require('../../images/edit.png')} style={{ width: 16, height: 16 }} />
 						)}
 					</div>
 				</td>
@@ -1449,8 +1499,8 @@ class Appointment extends React.Component {
 		};
 		if (noteValue.trim() !== '') {
 			this.setState({
-				notes: [note, ...notes],
-				newNotes: [note, ...newNotes],
+				notes: [ note, ...notes ],
+				newNotes: [ note, ...newNotes ],
 				noteValue: ''
 			});
 		}
@@ -1464,8 +1514,7 @@ class Appointment extends React.Component {
 					<input value={this.state.noteValue} onChange={(e) => this.handleChange(e)} />
 					<button onClick={() => this.addNote()} type="button">
 						{/* <Img src={Enter} alt="icon" /> */}
-						<MdSubdirectoryArrowLeft style={{ width: 33, height: 33 }}
-						/>
+						<MdSubdirectoryArrowLeft style={{ width: 33, height: 33 }} />
 					</button>
 				</NoteWrapper.Form>
 				{notes.map(this.renderNote)}
@@ -1489,15 +1538,17 @@ class Appointment extends React.Component {
 			old_selectedStaff
 		} = this.state;
 
-		if (
-			_.isEqual(old_service.sort(), services.sort()) &&
-			_.isEqual(old_product.sort(), products.sort()) &&
-			_.isEqual(old_extra.sort(), extras.sort()) &&
-			moment(old_fromTime).format('hh:mm A') === moment(fromTime).format('hh:mm A') &&
-			moment(dayChange).format('MM/DD/YYYY') === moment(old_dayChange).format('MM/DD/YYYY') &&
-			selectedStaff.id === old_selectedStaff.id
-		) {
-			return true;
+		if (selectedStaff && old_selectedStaff) {
+			if (
+				_.isEqual(old_service.sort(), services.sort()) &&
+				_.isEqual(old_product.sort(), products.sort()) &&
+				_.isEqual(old_extra.sort(), extras.sort()) &&
+				moment(old_fromTime).format('hh:mm A') === moment(fromTime).format('hh:mm A') &&
+				moment(dayChange).format('MM/DD/YYYY') === moment(old_dayChange).format('MM/DD/YYYY') &&
+				selectedStaff.id === old_selectedStaff.id
+			) {
+				return true;
+			}
 		}
 		return false;
 	};
@@ -1537,8 +1588,7 @@ class Appointment extends React.Component {
 		const { isPoupPrice } = this.state;
 		if (!appointment) return '';
 		if (appointmentDetail === '') return '';
-		let colorDelete =
-			appointment.status === 'ASSIGNED' || appointment.status === 'CONFIRMED' ? '#585858' : 'white';
+		let colorDelete = appointment.status === 'ASSIGNED' || appointment.status === 'CONFIRMED' ? '#585858' : 'white';
 		colorDelete = appointment.memberId === 0 ? '#585858' : colorDelete;
 		return (
 			<div>
@@ -1570,17 +1620,17 @@ class Appointment extends React.Component {
 						<ConfirmationWrapper.Close onClick={() => this.closeConfirmationModal()}>
 							<FaTimesCircle color={'white'} />
 						</ConfirmationWrapper.Close>
-						<ConfirmationWrapper.Header backgroundColor="#00b4f7">Confirmation</ConfirmationWrapper.Header>
+						<ConfirmationWrapper.Header backgroundColor="#1173C3">Confirmation</ConfirmationWrapper.Header>
 						<ConfirmationWrapper.Body>
 							Do you want to Cancel this Appointment?
 							<WrapperCancelAppointment>
 								<div style={{ width: '50%', textAlign: 'center' }}>
-									<Button onClick={() => this.confirmCancelAppointment()}>Yes</Button>
-								</div>
-								<div style={{ width: '50%', textAlign: 'center' }}>
-									<Button primary onClick={() => this.closeConfirmationModal()}>
+									<Button onClick={() => this.closeConfirmationModal()}>
 										No
 									</Button>
+								</div>
+								<div style={{ width: '50%', textAlign: 'center' }}>
+									<Button primary onClick={() => this.confirmCancelAppointment()}>Yes</Button>
 								</div>
 							</WrapperCancelAppointment>
 						</ConfirmationWrapper.Body>
@@ -1668,7 +1718,7 @@ const style = {
 		whiteSpace: 'nowrap',
 		textOverflow: 'ellipsis',
 		height: 40,
-		paddingRight: 10,
+		paddingRight: 10
 	},
 	serviceColumn: {
 		display: 'flex',
@@ -1676,7 +1726,7 @@ const style = {
 		alignItems: 'center'
 	},
 	staffNameColumn: {
-		marginLeft: 8,
+		marginLeft: 8
 	},
 	serviceName: {
 		width: 150,

@@ -9,7 +9,7 @@ import { MAIN_CALENDAR_OPTIONS } from './constants';
 import { merchantId, deviceId } from '../../../app-constants';
 import WaitingLoading from './WaitingLoading';
 import CalendarLoading from './CalendarLoading';
-const signalR = require('@aspnet/signalr');
+const signalR = require('@microsoft/signalr');
 import { store } from 'app';
 import { addEventsToCalendar } from './constants';
 import { PROD_API_BASE_URL } from '../../../app-constants';
@@ -133,7 +133,7 @@ class Calendar extends React.Component {
 			updateConsumer
 		} = this.props;
 		const url = `${PROD_API_BASE_URL}/notification/?merchantId=${merchantId}&Title=Merchant&kind=calendar&deviceId=${deviceId}`;
-		let connection = new signalR.HubConnectionBuilder().withUrl(url).build();
+		let connection = new signalR.HubConnectionBuilder().withUrl(url).withAutomaticReconnect().build();
 		connection.serverTimeoutInMilliseconds = 6000000;
 
 		connection.on('ListWaNotification', async (data) => {
@@ -199,6 +199,9 @@ class Calendar extends React.Component {
 							let appointment = JSON.parse(app_update);
 							let appointment_R = returnAppointment(appointment);
 							console.log('update appointment');
+							const { deselectAppointment, disable_Calendar } = this.props;
+							deselectAppointment();
+							disable_Calendar(false);
 
 							const displayMember = store.getState().getIn(['appointment', 'appointments', 'calendar']);
 							const selectDay = store.getState().getIn(['appointment', 'currentDay']);

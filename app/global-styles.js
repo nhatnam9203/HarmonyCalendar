@@ -130,22 +130,35 @@ const GlobalStyle = createGlobalStyle`
   .app-event {
     border-radius: 4px;
     margin: 1px 1px 4px 1px;
-    padding: 4px;
+    ${'' /* padding: 4px; */}
     text-align: left;
     cursor: move;
     position : relative;
+    margin-top : -3px;
   }
   .app-event__id-number {
     font-size: 11px;
     font-weight: bold;
     margin-bottom: 2px;
+    margin-left : 5px;
     letter-spacing : 0.3;
   }
+
+   .app-event__id-number2 {
+    font-size: 11px;
+    font-weight: bold;
+    margin-bottom: 2px;
+    margin-left : 5px;
+    margin-top : 8px;
+    letter-spacing : 0.3;
+  }
+
   .app-event__full-name {
     font-size: 18px;
     font-weight: 900;
     margin-left: 8px;
-    margin-bottom: 4px;
+    margin-top : 5px;
+    ${'' /* margin-bottom: 4px; */}
     line-height: 1.3;
   }
 
@@ -173,6 +186,19 @@ const GlobalStyle = createGlobalStyle`
   .app-event__phone-number {
     font-size: 13px;
     margin-left: 7px;
+    ${'' /* margin-bottom: 8px;
+    margin-top : 8px; */}
+    margin-top : -7px;
+    margin-bottom: -6px;
+    line-height: 1.8;
+    font-style: italic;
+    font-weight : 500;
+    word-wrap: break-word;
+  }
+
+  .app-event__phone-number4{
+    font-size: 13px;
+    margin-left: 7px;
     margin-bottom: 8px;
     margin-top : 8px;
     line-height: 1.8;
@@ -184,15 +210,19 @@ const GlobalStyle = createGlobalStyle`
   .icon-phone{
     filter: invert(95%) sepia(68%) saturate(24%) hue-rotate(173deg) brightness(114%) contrast(89%);
     margin-top: -3px;
+    margin-right : -11px;
+    margin-left : -12px;
   }
 
   .icon-phone2{
     margin-top: -3px;
+    margin-right : -11px;
+    margin-left : -12px;
   }
 
   .app-event__option {
     font-size: 12px;
-    margin-left: 16px;
+    margin-left: 8px;
     margin-bottom : 5px;
     line-height: 1.2;
     font-style: italic;
@@ -366,6 +396,20 @@ const GlobalStyle = createGlobalStyle`
 }
 .popup-overlay{
 
+}
+
+.selectRef{
+    width : 4rem;
+    height : 2.8rem;
+    background: #ffffff;
+		border: 1px solid #dddddd;
+		border-radius: 4px;
+    font-size : 1rem;
+		padding: 0.8rem 1rem;
+		-moz-appearance: none;
+		/* for Chrome */
+		-webkit-appearance: none;
+    margin-right : 0.3rem;
 }
 
 .fc-now-indicator-arrow{
