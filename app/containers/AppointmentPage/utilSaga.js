@@ -7,89 +7,89 @@ export const statusConvertData = {
     PAID: 'paid',
     WAITING: 'waiting',
     CANCEL: 'cancel',
-  };
+};
 
 export const statusConvertKey = {
-	unconfirm: 'ASSIGNED',
-	confirm: 'CONFIRMED',
-	checkin: 'CHECKED_IN',
-	paid: 'PAID',
-	waiting: 'WAITING',
-	cancel: 'CANCEL',
-	pending: 'PENDING'
+    unconfirm: 'ASSIGNED',
+    confirm: 'CONFIRMED',
+    checkin: 'CHECKED_IN',
+    paid: 'PAID',
+    waiting: 'WAITING',
+    cancel: 'CANCEL',
+    pending: 'PENDING'
 };
 
 export const appointmentAdapter = (appointment) => {
-	return {
-		id: appointment.appointmentId,
-		code: `#${appointment.code}`,
-		userFullName: appointment.firstName,
-		firstName: appointment.firstName,
-		lastName: appointment.lastName,
-		phoneNumber: appointment.phoneNumber,
-		options: appointment.services.sort(function (a, b) {
-			var c = a.bookingServiceId;
-			var d = b.bookingServiceId;
-			return d - c;
-		}),
-		products: appointment.products.sort(function (a, b) {
-			var c = a.bookingProductId;
-			var d = b.bookingProductId;
-			return d - c;
-		}),
-		extras: appointment.extras.sort(function (a, b) {
-			var c = a.bookingExtraId;
-			var d = b.bookingExtraId;
-			return d - c;
-		}),
-		status: statusConvertKey[appointment.status],
-		memberId: appointment.staffId,
-		start: appointment.fromTime,
-		end: appointment.toTime,
-		user_id: appointment.userId,
-		createDate: appointment.createdDate,
-		tipPercent: appointment.tipPercent,
-		tipAmount: appointment.tipAmount,
-		subTotal: appointment.subTotal,
-		total: appointment.total,
-		tax: appointment.tax,
-		isVip: appointment.isVip,
-		discount: appointment.discount,
-		giftCard: appointment.giftCard,
-		giftCards: appointment.giftCards ? appointment.giftCards : [],
-		notes: appointment.notes
-			? appointment.notes.sort(function (a, b) {
-				var c = a.appointmentNoteId;
-				var d = b.appointmentNoteId;
-				return d - c;
-			})
-			: []
-	};
+    return {
+        id: appointment.appointmentId,
+        code: `#${appointment.code}`,
+        userFullName: appointment.firstName,
+        firstName: appointment.firstName,
+        lastName: appointment.lastName,
+        phoneNumber: appointment.phoneNumber,
+        options: appointment.services.sort(function (a, b) {
+            var c = a.bookingServiceId;
+            var d = b.bookingServiceId;
+            return d - c;
+        }),
+        products: appointment.products.sort(function (a, b) {
+            var c = a.bookingProductId;
+            var d = b.bookingProductId;
+            return d - c;
+        }),
+        extras: appointment.extras.sort(function (a, b) {
+            var c = a.bookingExtraId;
+            var d = b.bookingExtraId;
+            return d - c;
+        }),
+        status: statusConvertKey[appointment.status],
+        memberId: appointment.staffId,
+        start: appointment.fromTime,
+        end: appointment.toTime,
+        user_id: appointment.userId,
+        createDate: appointment.createdDate,
+        tipPercent: appointment.tipPercent,
+        tipAmount: appointment.tipAmount,
+        subTotal: appointment.subTotal,
+        total: appointment.total,
+        tax: appointment.tax,
+        isVip: appointment.isVip,
+        discount: appointment.discount,
+        giftCard: appointment.giftCard,
+        giftCards: appointment.giftCards ? appointment.giftCards : [],
+        notes: appointment.notes
+            ? appointment.notes.sort(function (a, b) {
+                var c = a.appointmentNoteId;
+                var d = b.appointmentNoteId;
+                return d - c;
+            })
+            : []
+    };
 };
 
 export const memberAdapter = (member) => {
-	return {
-		id: member.staffId,
-		title: `${member.displayName}`,
-		imageUrl: (member.imageUrl && `${member.imageUrl}`) || `${BASE_URL}/${VAR_DEFAULT_AVATAR_PATH}`,
-		orderNumber: member.orderNumber,
-		workingTimes: member.workingTimes,
-		isDisabled: member.isDisabled,
-		pincode: member.pin,
-		isNextAvailableStaff: member.isNextAvailableStaff,
-		blockTime: member.blockTime ? member.blockTime : [],
-		timeLogin: 0
-	};
+    return {
+        id: member.staffId,
+        title: `${member.displayName}`,
+        imageUrl: (member.imageUrl && `${member.imageUrl}`) || `${BASE_URL}/${VAR_DEFAULT_AVATAR_PATH}`,
+        orderNumber: member.orderNumber,
+        workingTimes: member.workingTimes,
+        isDisabled: member.isDisabled,
+        pincode: member.pin,
+        isNextAvailableStaff: member.isNextAvailableStaff,
+        blockTime: member.blockTime ? member.blockTime : [],
+        timeLogin: 0
+    };
 };
 
 export const memberAdapter_update = (member) => {
-	return {
-		id: member.StaffId,
-		title: `${member.DisplayName}`,
-		imageUrl: (member.ImageUrl && `${member.ImageUrl}`) || `${BASE_URL}/${VAR_DEFAULT_AVATAR_PATH}`,
-		orderNumber: member.OrderNumber,
-		workingTimes: JSON.parse(member.WorkingTime)
-	};
+    return {
+        id: member.StaffId,
+        title: `${member.DisplayName}`,
+        imageUrl: (member.ImageUrl && `${member.ImageUrl}`) || `${BASE_URL}/${VAR_DEFAULT_AVATAR_PATH}`,
+        orderNumber: member.OrderNumber,
+        workingTimes: JSON.parse(member.WorkingTime)
+    };
 };
 
 export function addFullBlock(memberId, currentDate, day) {
@@ -126,16 +126,16 @@ export function block(memberId, start, end) {
     }
 }
 
-export function blockTemp(memberId, start, end, note,appointmentId) {
+export function blockTemp(memberId, start, end, note, appointmentId) {
     return {
         status: 'BLOCK_TEMP',
         memberId,
         start,
         end,
-        id:  appointmentId ? appointmentId : 0,
+        id: appointmentId ? appointmentId : 0,
         // appointmentId : appointmentId ? appointmentId : 0,
         code: '',
-        userFullName:'',
+        userFullName: '',
         phoneNumber: note,
         options: [],
         products: [],
@@ -153,7 +153,7 @@ export function addBlockCalendar(appointmentsMembers, displayedMembers, currentD
             const start = `${moment(currentDate).format('YYYY-MM-DD')}T${moment(blockTimeMember[i].blockTimeStart, ["h:mm A"]).format("HH:mm:ss")}`;
             const end = `${moment(currentDate).format('YYYY-MM-DD')}T${moment(blockTimeMember[i].blockTimeEnd, ["h:mm A"]).format("HH:mm:ss")}`;
             const note = blockTimeMember[i].note;
-            mem.appointments.push(blockTemp(memberId, start, end, note,blockTimeMember[i].appointmentId));
+            mem.appointments.push(blockTemp(memberId, start, end, note, blockTimeMember[i].appointmentId));
         }
     });
 
@@ -339,21 +339,26 @@ export function checkTimeToAddAppointmdent() {
 export function totalDuationChangeTime(appointment, extras) {
     let totalDuration = 0;
     appointment.options.forEach(app => {
-        totalDuration += app.duration;
+        if (appointment.memberId === app.staffId)
+            totalDuration += app.duration;
     });
     extras.forEach(ext => {
-        totalDuration += ext.duration;
+        if (appointment.memberId === ext.staffId)
+            totalDuration += ext.duration;
     });
     return totalDuration;
 }
 
-export function totalDuartionUpdateAppointment(servicesUpdate, extras) {
+export function totalDuartionUpdateAppointment(servicesUpdate, extras, appointment) {
+    console.log({servicesUpdate,extras,appointment})
     let new_total_duration = 0;
     servicesUpdate.forEach(sv => {
-        new_total_duration += parseInt(sv.duration);
+        if (sv.staffId === appointment.memberId)
+            new_total_duration += parseInt(sv.duration);
     });
     extras.forEach(ext => {
-        new_total_duration += parseInt(ext.duration);
+        if (ext.staffId === appointment.memberId)
+            new_total_duration += parseInt(ext.duration);
     });
     return new_total_duration;
 }
@@ -408,10 +413,12 @@ export function dataUpdateAppointment(old_status, memberId, old_appointment, sta
 export function totalDurationAssignAppointment(extras, appointment) {
     let duration_total = 0;
     appointment.options.forEach(el => {
-        duration_total += parseInt(el.duration);
+        if (appointment.memberId === el.staffId)
+            duration_total += parseInt(el.duration);
     });
     extras.forEach(ext => {
-        duration_total += parseInt(ext.duration);
+        if (appointment.memberId === ext.staffId)
+            duration_total += parseInt(ext.duration);
     });
     return duration_total;
 }
@@ -455,12 +462,12 @@ export function dataPutBackAppointment(memberId, start, end, options, products, 
 
 export function dataMoveAppoinment(memberId, start, end, status, options, products, extras) {
     return {
-      staffId: memberId,
-      fromTime: start,
-      toTime: end,
-      status: statusConvertData[status],
-      services: options,
-      products,
-      extras
+        staffId: memberId,
+        fromTime: start,
+        toTime: end,
+        status: statusConvertData[status],
+        services: options,
+        products,
+        extras
     };
-  }
+}

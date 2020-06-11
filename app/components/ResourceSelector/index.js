@@ -398,7 +398,6 @@ class ResourceSelector extends React.Component {
 
 	renderCarouselSlide() {
 		const { loading, resources } = this.props;
-		console.log({resources})
 		if (loading) {
 			return [1].map((index) => this.renderLoadingResources(index));
 		}

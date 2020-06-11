@@ -491,6 +491,8 @@ export function* assignAppointment(action) {
 
 export function* upddateAppointment(action) {
 	try {
+		console.log('update saga app')
+
 		const fcEvent = yield select(makeSelectFCEvent());
 		if (!fcEvent) {
 			yield put(actions.appointmentUpdatingStatusError('Cannot find selected fcEvent'));
@@ -507,9 +509,10 @@ export function* upddateAppointment(action) {
 			extrasUpdate
 		} = action.appointment;
 
+
 		let { end, start, extras, memberId } = appointment;
 
-		let new_total_duration = totalDuartionUpdateAppointment(servicesUpdate, extras);
+		let new_total_duration = totalDuartionUpdateAppointment(servicesUpdate, extras, appointment);
 		let newDate = newDateUpdateAppointment(status, old_duration, new_total_duration, end);
 
 		if (status === 'cancel') {
@@ -583,11 +586,14 @@ export function* changeTimeAppointment(action) {
 
 		let totalDuration = totalDuationChangeTime(appointment, extras);
 
+		console.log({totalDuration})
+
 		const start_time = `${moment(dayPicker).format('YYYY-MM-DD')}T${moment(fromTime).format('HH:mm')}`;
 		const end_time =
 			totalDuration > 0
 				? moment(start_time).add(totalDuration, 'minutes').format('YYYY-MM-DD HH:mm')
 				: moment(start_time).add(15, 'minutes').format('YYYY-MM-DD HH:mm');
+		console.log({end_time})
 		if (window.confirm('Accept changes?')) {
 			yield* changeTime(
 				appointment,

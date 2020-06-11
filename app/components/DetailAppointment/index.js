@@ -1568,7 +1568,7 @@ class Appointment extends React.Component {
 						Check In
 					</Button>
 				);
-			if (appointment.status === 'CHECKED_IN')
+			if (appointment.status === 'CHECKED_IN'  && appointment.memberId !== 0)
 				return (
 					<Button onClick={() => this.nextStatus()} primary="true">
 						Check out
