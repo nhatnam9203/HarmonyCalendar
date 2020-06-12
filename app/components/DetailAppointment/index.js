@@ -431,7 +431,7 @@ class Appointment extends React.Component {
 
 	subtractService(index) {
 		this.setState((state) => {
-			const { services, prices } = state;
+			const { services } = state;
 			if (services[index].duration >= 5) {
 				services[index].duration -= 5;
 			}
@@ -440,19 +440,16 @@ class Appointment extends React.Component {
 			}
 			return {
 				services
-				//  prices
 			};
 		});
 	}
 
 	addService(index) {
 		this.setState((state) => {
-			const { services, prices } = state;
+			const { services } = state;
 			services[index].duration += 5;
-			// prices[index] = (services[index].price * (services[index].duration / 10))
 			return {
 				services
-				// prices
 			};
 		});
 	}
@@ -691,6 +688,7 @@ class Appointment extends React.Component {
 	updateChangeAppointment(status, servicesUpdate) {
 		const { products, fromTime, toTime, services, newNotes, selectedStaff, extras } = this.state;
 		const { appointment, changeAppointmentTime } = this.props;
+		
 		changeAppointmentTime({
 			appointment,
 			total: this.getTotalPrice(),
@@ -1068,19 +1066,14 @@ class Appointment extends React.Component {
 	};
 
 	buttonService(appointment, service, index) {
-		const { old_service } = this.state;
 		let backgroundColor = '#dddddd';
 		if (appointment.status !== 'PAID' && service.duration > 5) backgroundColor = '#0071c5';
-		// if (parseInt(old_service[index].duration) > parseInt(service.duration) && service.duration > 5)
-		// 	backgroundColor = '#C3447A';
 		return backgroundColor;
 	}
 
 	buttonService2(appointment, service, index) {
-		const { old_service } = this.state;
 		let backgroundColor = '#dddddd';
 		if (appointment.status !== 'PAID') backgroundColor = '#0071c5';
-		// if (parseInt(old_service[index].duration) < parseInt(service.duration)) backgroundColor = '#C3447A';
 		return backgroundColor;
 	}
 
@@ -1142,7 +1135,7 @@ class Appointment extends React.Component {
 				<tr key={index}>
 					<td style={{ borderRight: 0 }}>
 						<div onClick={() => this.togglePopupStaff('', index)} style={style.staffService}>
-							{/* <img src={staff.imageUrl ? staff.imageUrl : ''} style={style.imgStaff} /> */}
+
 							<p style={style.staffNameColumn}>{title}</p>
 							<FaCaretDown style={{ color: '#1173C3' }} />
 
@@ -1296,25 +1289,20 @@ class Appointment extends React.Component {
 	}
 
 	buttonProduct(appointment, product, index) {
-		const { old_product } = this.state;
 		let backgroundColor = '#dddddd';
 		if (appointment.status !== 'PAID' && product.quantity > 1) backgroundColor = '#0071c5';
-		// if (parseInt(old_product[index].quantity) > parseInt(product.quantity) && product.quantity > 1)
-		// 	backgroundColor = '#C3447A';
+
 		return backgroundColor;
 	}
 
 	buttonProduct2(appointment, product, index) {
-		const { old_product } = this.state;
 		let backgroundColor = '#dddddd';
 		if (appointment.status !== 'PAID') backgroundColor = '#0071c5';
-		// if (parseInt(old_product[index].quantity) < parseInt(product.quantity)) backgroundColor = '#C3447A';
 		return backgroundColor;
 	}
 
 	renderProduct(product, index) {
 		const { appointment } = this.props;
-		const { old_product } = this.state;
 
 		const quantity =
 			product.quantity.toString().length === 1 ? '0' + product.quantity.toString() : product.quantity;
@@ -1388,19 +1376,14 @@ class Appointment extends React.Component {
 	}
 
 	buttonExtra(appointment, extra, index) {
-		const { old_extra } = this.state;
 		let backgroundColor = '#dddddd';
 		if (appointment.status !== 'PAID' && extra.duration > 5) backgroundColor = '#0071c5';
-		// if (parseInt(old_extra[index].duration) > parseInt(extra.duration) && extra.duration > 5)
-		// 	backgroundColor = '#C3447A';
 		return backgroundColor;
 	}
 
 	buttonExtra2(appointment, extra, index) {
-		const { old_extra } = this.state;
 		let backgroundColor = '#dddddd';
 		if (appointment.status !== 'PAID') backgroundColor = '#0071c5';
-		// if (parseInt(old_extra[index].duration) < parseInt(extra.duration)) backgroundColor = '#C3447A';
 		return backgroundColor;
 	}
 
@@ -1562,7 +1545,7 @@ class Appointment extends React.Component {
 						Confirm
 					</Button>
 				);
-			if (appointment.status === 'CONFIRMED')
+			if (appointment.status === 'CONFIRMED' && appointment.memberId !== 0)
 				return (
 					<Button onClick={() => this.nextStatus()} primary="true">
 						Check In
@@ -1667,8 +1650,6 @@ const style = {
 		height: 40,
 		objectFit: 'cover',
 		borderRadius: 30
-		// border: '1.5px solid grey',
-		// boxShadow: '0 2px #fff inset, 0 0.8px 4px grey'
 	},
 	price: {
 		fontWeight: '700',
@@ -1764,8 +1745,6 @@ Appointment.propTypes = {
 	deselectAppointment: PropTypes.func,
 	cancelAppointment: PropTypes.func,
 	nextStatus: PropTypes.func
-	// services: PropTypes.any,
-	// products: PropTypes.any,
 };
 
 export default Appointment;

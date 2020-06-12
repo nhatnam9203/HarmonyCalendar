@@ -30,7 +30,10 @@ import {
 	dataPutBackAppointment,
 	statusConvertData,
 	appointmentAdapter,
-	memberAdapter
+	memberAdapter,
+	findLastIndex,
+	findLastIndexChangeTime,
+	totalDurationMoveAppointment
 } from './utilSaga';
 
 import { assignAppointment as mockedPostAppointment } from '../../assets/mocks/assignAppointment';
@@ -104,6 +107,7 @@ export function* reloadCalendarSaga() {
 				console.log('error from api ' + requestURL);
 				return;
 			}
+
 			appointments =
 				response &&
 				response.data
@@ -348,10 +352,13 @@ export function* moveAppointment(action) {
 	const movedAppointment = allAppointment.find((app) => app.id === action.appointmentId);
 	if (!movedAppointment) return;
 
+	let new_endTime = moment(action.newTime)
+	.add(totalDurationMoveAppointment(movedAppointment.options, movedAppointment.extras), 'minutes');
+
 	let appointment = {
 		...movedAppointment,
 		start: action.newTime,
-		end: action.newEndTime,
+		end: `${new_endTime.format('YYYY-MM-DD')}T${new_endTime.format('HH:mm:ss')}`,
 		memberId: assignedMember ? assignedMember.id : 0
 	};
 
@@ -359,8 +366,8 @@ export function* moveAppointment(action) {
 		appointment.status = 'ASSIGNED';
 	}
 	if (appointment.status === 'CHECKED_IN') {
-		let test = moment(appointment.start).diff(moment(movedAppointment.start), 'minutes');
-		if ((test < 45 && test >= 0) || (test < 0 && test > -45)) {
+		let diff_time = moment(appointment.start).diff(moment(movedAppointment.start), 'minutes');
+		if ((diff_time < 45 && diff_time >= 0) || (diff_time < 0 && diff_time > -45)) {
 			appointment.status = 'CHECKED_IN';
 		} else {
 			appointment.status = 'CONFIRMED';
@@ -368,6 +375,10 @@ export function* moveAppointment(action) {
 	}
 
 	const { memberId, start, end, status, options, products, extras } = appointment;
+
+	options.forEach((sv) => {
+		sv.staffId = assignedMember ? assignedMember.id : 0;
+	});
 
 	const data = {
 		staffId: memberId,
@@ -379,6 +390,11 @@ export function* moveAppointment(action) {
 		extras
 	};
 
+	// delay(1000)
+
+	yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
+	yield put(actions.renderAppointment());
+
 	try {
 		const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
 		const url = `${requestURL.toString()}/${appointment.id}`;
@@ -387,8 +403,8 @@ export function* moveAppointment(action) {
 			return yield* checkResponse(response);
 		}
 		if (response.codeStatus === 1) {
-			yield put(actions.appointmentMoved(appointment));
-			yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
+		
+			// yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
 		}
 	} catch (err) {
 		yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
@@ -446,6 +462,9 @@ export function* assignAppointment(action) {
 	try {
 		yield put(actions.removeAppointmentWaiting(appointment));
 		const { memberId, start, status, options, products, extras } = appointment;
+		options.forEach((sv) => {
+			sv.staffId = assignedMember ? assignedMember.id : 0;
+		});
 		let duration_total = totalDurationAssignAppointment(extras, appointment);
 
 		yield put(
@@ -491,8 +510,6 @@ export function* assignAppointment(action) {
 
 export function* upddateAppointment(action) {
 	try {
-		console.log('update saga app')
-
 		const fcEvent = yield select(makeSelectFCEvent());
 		if (!fcEvent) {
 			yield put(actions.appointmentUpdatingStatusError('Cannot find selected fcEvent'));
@@ -509,11 +526,12 @@ export function* upddateAppointment(action) {
 			extrasUpdate
 		} = action.appointment;
 
-
 		let { end, start, extras, memberId } = appointment;
 
-		let new_total_duration = totalDuartionUpdateAppointment(servicesUpdate, extras, appointment);
-		let newDate = newDateUpdateAppointment(status, old_duration, new_total_duration, end);
+		let _totalDuration = totalDuartionUpdateAppointment(servicesUpdate, extras, appointment);
+		// let _endTime =  moment(start).add(_totalDuration, 'minutes');
+		// let newDate = `${_endTime.format('YYYY-MM-DD')}T${_endTime.format('HH:mm:ss')}`;
+		let newDate = end;
 
 		if (status === 'cancel') {
 			yield put(actions.appointmentCanceled(appointment.id));
@@ -550,15 +568,21 @@ export function* upddateAppointment(action) {
 			productsUpdate,
 			extrasUpdate
 		);
-
 		yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
 		yield put(actions.renderAppointment());
+		
 
 		const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
 		const url = `${requestURL}/${appointment.id}`;
-		const kq = yield api(url, data, 'PUT', token);
-		if (kq.codeStatus !== 1) return yield* checkResponse(kq);
-		if (kq.codeStatus === 1) {
+		try{
+			const kq = yield api(url, data, 'PUT', token);
+			if (kq.codeStatus !== 1) return yield* checkResponse(kq);
+			if (kq.codeStatus === 1) {
+				return;
+			}
+		}catch (error) {
+			yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
+			yield put(actions.renderAppointment());
 		}
 	} catch (error) {
 		yield put(actions.updateAppointmentError(error));
@@ -582,18 +606,17 @@ export function* changeTimeAppointment(action) {
 			productsUpdate,
 			extrasUpdate
 		} = action.appointment;
+
 		let { memberId, options, products, extras, id, start } = appointment;
 
 		let totalDuration = totalDuationChangeTime(appointment, extras);
-
-		console.log({totalDuration})
 
 		const start_time = `${moment(dayPicker).format('YYYY-MM-DD')}T${moment(fromTime).format('HH:mm')}`;
 		const end_time =
 			totalDuration > 0
 				? moment(start_time).add(totalDuration, 'minutes').format('YYYY-MM-DD HH:mm')
 				: moment(start_time).add(15, 'minutes').format('YYYY-MM-DD HH:mm');
-		console.log({end_time})
+
 		if (window.confirm('Accept changes?')) {
 			yield* changeTime(
 				appointment,
@@ -613,14 +636,23 @@ export function* changeTimeAppointment(action) {
 		yield put(actions.updateAppointmentError(error));
 	}
 
-	function totalDuarion(services, extras) {
+	function totalDuarion(services, extras, appointment) {
 		let total = 0;
-		services.forEach((sv) => {
-			total += sv.duration;
-		});
-		extras.forEach((ex) => {
-			total += ex.duration;
-		});
+		const lastIndex = findLastIndexChangeTime(services, services[0]);
+		if(lastIndex !== - 1){
+			for (let i = 0; i < services.length; i++) {
+				total += services[i].duration;
+				const findExtra = extras.find(ex=> ex.serviceId && (ex.serviceId === services[i].serviceId));
+				if (findExtra) {
+					total += findExtra.duration;
+				}
+				if (i === lastIndex) {
+					break;
+				}
+			}
+		}else{
+			total = 15;
+		}
 		return total;
 	}
 
@@ -642,7 +674,7 @@ export function* changeTimeAppointment(action) {
 		yield put(actions.deselectAppointment());
 		let appointment = {
 			...appointmentEdit,
-			memberId: selectedStaff.id
+			memberId: options.length > 0 ? options[0].staffId :0
 		};
 
 		let notesUpdate = [];
@@ -654,8 +686,8 @@ export function* changeTimeAppointment(action) {
 
 		/* check status của appointment check in > 45 mins */
 		let statusChange = 'confirm';
-		let test = moment(start_time).diff(moment(start), 'minutes');
-		if ((test < 45 && test >= 0) || (test < 0 && test > -45)) {
+		let diff_time = moment(start_time).diff(moment(start), 'minutes');
+		if ((diff_time < 45 && diff_time >= 0) || (diff_time < 0 && diff_time > -45)) {
 			statusChange = 'checkin';
 		}
 
@@ -677,7 +709,8 @@ export function* changeTimeAppointment(action) {
 			actions.updateAppointmentFrontend({
 				appointment: {
 					...data,
-					toTime: moment(data.fromTime).add(totalDuarion(data.services, data.extras), 'minutes')
+					staffId : options.length > 0 ? options[0].staffId : 0,
+					toTime: moment(data.fromTime).add(totalDuarion(data.services, data.extras, appointment), 'minutes')
 				},
 				id: appointment.id
 			})
@@ -697,7 +730,10 @@ export function* changeTimeAppointment(action) {
 				actions.updateAppointmentFrontend({
 					appointment: {
 						...data,
-						toTime: moment(data.fromTime).add(totalDuarion(data.services, data.extras), 'minutes')
+						toTime: moment(data.fromTime).add(
+							totalDuarion(data.services, data.extras, appointment),
+							'minutes'
+						)
 					},
 					id: appointment.id
 				})
@@ -929,6 +965,7 @@ export function* deleteEventInWaitingList(action) {
 		const response = yield api(url, data, 'PUT', token);
 		if (response.codeStatus !== 1) return yield* checkResponse(response);
 		if (response.codeStatus === 1) {
+			return;
 		}
 	} catch (error) {
 		yield put(actions.removeAppointmentWaiting({ ...appointment, status: 'cancel' }));

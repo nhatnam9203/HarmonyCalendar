@@ -165,7 +165,7 @@ const GlobalStyle = createGlobalStyle`
   .app-event__full-name2 {
     position : absolute;
     right: 5px;
-    top : 5px;
+    top : 10px;
   }
 
   .app-event__full-name3 {

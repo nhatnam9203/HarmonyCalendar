@@ -15,7 +15,6 @@ import { formatPhone } from '../../utils/helper';
 import vip from '../../images/vip.png';
 import vip_blue from '../../images/vip_blue.png';
 import call from '../../images/call.png';
-import {isDesktopOrLaptop} from '../../../app-constants'
 
 const OPTION_RENDER_TEMPLATE = (option) => `<div class="app-event__option">- ${option.serviceName}</div>`;
 const PRODUCT_RENDER_TEMPLATE = (product) => `<div class="app-event__option">- ${product.productName}</div>`;
@@ -54,7 +53,6 @@ export const MAIN_CALENDAR_OPTIONS = {
 	selectable: true,
 	slotLabelFormat: 'hh:mm A',
 	slotDuration: '00:15:00',
-	// defaultTimedEventDuration: '01:30:00',
 	eventOverlap: true,
 	minTime: '06:00:00',
 	maxTime: '23:00:00',
