@@ -417,7 +417,8 @@ class ResourceSelector extends React.Component {
 			calendarMembers,
 			SubmitEditBlockTime,
 			deleteBlockTime,
-			currentDay
+			currentDay,
+			editBlockTime
 		} = this.props;
 
 		return (
@@ -480,6 +481,7 @@ class ResourceSelector extends React.Component {
 					SubmitEditBlockTime={SubmitEditBlockTime}
 					deleteBlockTime={deleteBlockTime}
 					currentDay={currentDay}
+					editBlockTime={editBlockTime}
 				/>
 			</React.Fragment>
 		);

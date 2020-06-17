@@ -108,7 +108,8 @@ import {
 	LOAD_STAFF_SORT,
 	SET_SLIDE_INDEX,
 	RELOAD_CALENDAR,
-	RELOAD_STAFF
+	RELOAD_STAFF,
+	EDIT_BLOCKTIME
 } from './constants';
 
 /**
@@ -792,6 +793,13 @@ export function reloadStaff(payload) {
 export function reloadCalendar(payload) {
 	return {
 		type: RELOAD_CALENDAR,
+		payload
+	};
+}
+
+export function editBlockTime(payload) {
+	return {
+		type: EDIT_BLOCKTIME,
 		payload
 	};
 }

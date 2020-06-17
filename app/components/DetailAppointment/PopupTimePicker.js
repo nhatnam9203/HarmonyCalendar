@@ -123,11 +123,11 @@ export default class PopupTimePicker extends Component {
 	}
 
 	render() {
-		const { fromTime } = this.props;
+		const { fromTime , style } = this.props;
 		const { optionGroups, valueGroups } = this.state;
 		return (
 			<OutsideClickHandler onOutsideClick={() => this.cancel()}>
-				<PopupTimePK>
+				<PopupTimePK style={style}>
 					<Header>Select time</Header>
 					<Body>
 						<Picker

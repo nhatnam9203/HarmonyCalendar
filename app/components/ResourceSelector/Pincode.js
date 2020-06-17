@@ -7,6 +7,7 @@ import { FaTrash, FaCaretDown } from 'react-icons/fa';
 import { TiDelete } from 'react-icons/ti';
 import PopupTimePicker from '../DetailAppointment/PopupTimePicker'
 import moment from 'moment';
+import { View } from 'fullcalendar';
 
 const FormPincode = styled(Popup)`
     padding : 0 !important;
@@ -137,7 +138,8 @@ const initialState = {
 	isEnd: false,
 	start: '02:00 PM',
 	end: '02:00 PM',
-	isPopupSelectTime: false
+	isPopupSelectTime: false,
+	blockTimeEdit: null
 };
 
 class Pincode extends Component {
@@ -206,7 +208,7 @@ class Pincode extends Component {
 	}
 
 	closePopupSelectTime(time) {
-		this.setState({ isPopupSelectTime: false , isStart : false,isEnd : false })
+		this.setState({ isPopupSelectTime: false, isStart: false, isEnd: false })
 	}
 
 	findAppointment() {
@@ -218,21 +220,38 @@ class Pincode extends Component {
 		return count.toString();
 	}
 
+	editBlockTime() {
+		const { blockTimeEdit, start, end, note } = this.state;
+		if (blockTimeEdit) {
+			const data = {
+				start, end, note,
+				id: blockTimeEdit.blockTimeId
+			}
+			this.props.editBlockTime(data);
+			this.closeModal();
+		}
+	}
+
 	submitEditBlock() {
-		const { SubmitEditBlockTime, staff } = this.props;
-		const { start, end, note } = this.state;
+		const { staff } = this.props;
+		const { start, end, note, blockTimeEdit } = this.state;
 		const beginningTime = moment(start, 'h:mma');
 		const endTime = moment(end, 'h:mma');
 		if (endTime.isSameOrBefore(beginningTime)) {
 			alert('End time must be after Start time');
 		} else {
-			SubmitEditBlockTime({
-				staff,
-				start,
-				end,
-				note
-			});
-			this.closeModal();
+			if (!blockTimeEdit) {
+				this.props.SubmitEditBlockTime({
+					staff,
+					start,
+					end,
+					note
+				});
+				this.closeModal();
+			} else {
+				this.editBlockTime()
+			}
+
 		}
 	}
 
@@ -289,7 +308,7 @@ class Pincode extends Component {
 		const { blockTime } = this.props.staff;
 		return blockTime.filter((b) => b.isDisabled === 0).map((obj) => {
 			return (
-				<div key={obj.blockTimeId} style={styles.blockTime}>
+				<div onClick={() => this.openBlockTime(obj)} key={obj.blockTimeId} style={styles.blockTime}>
 					<div style={{ width: '10%' }}>
 						<FaClock color={'#1266AE'} size={18} />
 					</div>
@@ -313,13 +332,14 @@ class Pincode extends Component {
 	}
 
 	renderStaffBody() {
-		const { isAddBlock, start, end } = this.state;
+		const { isAddBlock, start, end, blockTimeEdit } = this.state;
+		console.log({ blockTimeEdit })
 		if (!isAddBlock) {
 			return (
 				<React.Fragment>
 					<ButtonAddBlock onClick={() => this.setState({ isAddBlock: true })}>
 						<GiAlarmClock size={20} color={'#4B4B4B'} />
-						<div style={{ marginLeft: 8, color: '#4B4B4B' }}>Add block time</div>
+						<div style={{ marginLeft: 8, color: '#4B4B4B' }}>Add Blocked Time</div>
 					</ButtonAddBlock>
 					<BlockList>{this.renderBlockTimeList()}</BlockList>
 				</React.Fragment>
@@ -356,20 +376,35 @@ class Pincode extends Component {
 						/>
 					</div>
 				</Row>
-				<div onClick={() => this.submitEditBlock()} style={styles.bottom}>
+				{!blockTimeEdit && <div onClick={() => this.submitEditBlock()} style={styles.bottom}>
 					<div style={styles.btnSubmit}>Submit</div>
-				</div>
+				</div>}
+				{blockTimeEdit && <div onClick={() => this.submitEditBlock()} style={styles.bottom}>
+					<div style={styles.btnSubmit}>Edit</div>
+				</div>}
 			</StaffBody>
 		);
 	}
 
-	doneTimePicker(time) {
-		const {isStart,isEnd} = this.state;
+	openBlockTime(blockTime) {
+		if (blockTime.editable) {
+			this.setState({
+				isAddBlock: true,
+				blockTimeEdit: blockTime,
+				note: blockTime.note,
+				start: blockTime.blockTimeStart,
+				end: blockTime.blockTimeEnd
+			});
+		}
+	}
 
-		if(isStart){
-			this.setState({ isPopupSelectTime: false , start : time.substring(11) ,isStart : false, isEnd : false })
-		}else if(isEnd){
-			this.setState({ isPopupSelectTime : false , end : time.substring(11), isStart : false, isEnd : false })
+	doneTimePicker(time) {
+		const { isStart, isEnd } = this.state;
+
+		if (isStart) {
+			this.setState({ isPopupSelectTime: false, start: time.substring(11), isStart: false, isEnd: false })
+		} else if (isEnd) {
+			this.setState({ isPopupSelectTime: false, end: time.substring(11), isStart: false, isEnd: false })
 		}
 	}
 
@@ -382,6 +417,10 @@ class Pincode extends Component {
 					doneTimePicker={(time) => this.doneTimePicker(time)}
 					currentDay={this.props.currentDay}
 					fromTime={moment()}
+					style={{
+						left: 35,
+						top: 100
+					}}
 				/>
 			);
 		}
@@ -395,23 +434,24 @@ class Pincode extends Component {
 		if (popupPincode === false) return '';
 		return (
 			<FormPincode open closeOnDocumentClick={false}>
-				<TiDelete
-					onClick={isPopupSelectTime ? () => { } : () => this.closeModal()}
-					color="#6A6A6A"
-					size={38}
-					style={styles.closeModal}
-				/>
+				<React.Fragment>
+					<TiDelete
+						onClick={isPopupSelectTime ? () => { } : () => this.closeModal()}
+						color="#6A6A6A"
+						size={38}
+						style={styles.closeModal}
+					/>
 
-				<PincodeBody>
-					<StaffHeader>
-						<StaffHeader.Left>
-							<img style={styles.imgStaff} src={staff.imageUrl} atl="" />
-						</StaffHeader.Left>
-						{this.renderHeaderRight()}
-					</StaffHeader>
-					{this.renderStaffBody()}
-				</PincodeBody>
-
+					<PincodeBody>
+						<StaffHeader>
+							<StaffHeader.Left>
+								<img style={styles.imgStaff} src={staff.imageUrl} atl="" />
+							</StaffHeader.Left>
+							{this.renderHeaderRight()}
+						</StaffHeader>
+						{this.renderStaffBody()}
+					</PincodeBody>
+				</React.Fragment>
 				{this.renderPopupSelectTime()}
 			</FormPincode>
 		);

@@ -38,6 +38,7 @@ const GET_APPOINTMENT_ID = `${API_BASE_URL}/appointment`;
 const GET_CHECKPINCODE = `${API_BASE_URL}/staff/signin`;
 const POST_ADD_BLOCK_TIME = `${API_BASE_URL}/blocktime`;
 const DELETE_BLOCKTIME_API = `${API_BASE_URL}/blocktime`;
+const EDIT_BLOCKTIME_API = `${API_BASE_URL}/blocktime`;
 const GET_BLOCK_TIME_BY_STAFFID_API = `${API_BASE_URL}/blocktime`;
 const GET_WORKINGTIME_MERCHANT = `${API_BASE_URL}/blocktime?workingdate=`;
 const PUT_CHECKOUT = `${API_BASE_URL}/appointment/checkout`;
@@ -66,6 +67,7 @@ export {
   GET_APPOINTMENT_ID,
   GET_CHECKPINCODE,
   POST_ADD_BLOCK_TIME,
+  EDIT_BLOCKTIME_API,
   DELETE_BLOCKTIME_API,
   GET_BLOCK_TIME_BY_STAFFID_API,
   GET_WORKINGTIME_MERCHANT,

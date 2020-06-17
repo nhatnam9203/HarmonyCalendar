@@ -24,7 +24,8 @@ import {
   SubmitEditBlockTime,
   deleteBlockTime,
   getTimeStaffLogin,
-  setSlideIndex
+  setSlideIndex,
+  editBlockTime
 } from './actions';
 
 export function mapDispatchToProps(dispatch) {
@@ -40,6 +41,7 @@ export function mapDispatchToProps(dispatch) {
     deleteBlockTime:(data)=>dispatch(deleteBlockTime(data)),
     getTimeStaffLogin:(staffId)=>dispatch(getTimeStaffLogin(staffId)),
     setSlideIndex:(slideIndex)=>dispatch(setSlideIndex(slideIndex)),
+    editBlockTime:(data)=>dispatch(editBlockTime(data)),
   };
 }
 

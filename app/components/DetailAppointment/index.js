@@ -775,7 +775,7 @@ class Appointment extends React.Component {
 					color={staffId === 0 ? '#333' : 'white'}
 					backgroundColor={'#00b4f7'}
 				>
-					{appointment.code} Checked-in Appointment
+					{appointment.code} Check-In Appointment
 				</AppointmentWrapper.Header>
 			);
 		}
@@ -1003,11 +1003,11 @@ class Appointment extends React.Component {
 			<AppointmentWrapper.Body scroll={isPopupTimePicker ? false : true}>
 				<UserInformation>
 					<div>
-						<span>Customer name: </span>
+						<span>Customer Name: </span>
 						<span style={{ color: '#333', fontWeight: '600' }}>{`${appointment.firstName} ${appointment.lastName}`}</span>
 					</div>
 					<div>
-						<span>Phone number: </span>
+						<span>Phone Number: </span>
 						<span style={{ color: '#333', fontWeight: '600' }}>{formatPhone(appointment.phoneNumber)}</span>
 					</div>
 					{isVip === 1 && (
@@ -1548,13 +1548,13 @@ class Appointment extends React.Component {
 			if (appointment.status === 'CONFIRMED' && appointment.memberId !== 0)
 				return (
 					<Button onClick={() => this.nextStatus()} primary="true">
-						Check In
+						Check-In
 					</Button>
 				);
 			if (appointment.status === 'CHECKED_IN' && appointment.memberId !== 0)
 				return (
 					<Button onClick={() => this.nextStatus()} primary="true">
-						Check out
+						Check-Out
 					</Button>
 				);
 		} else {

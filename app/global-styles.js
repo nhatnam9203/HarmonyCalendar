@@ -137,7 +137,8 @@ const GlobalStyle = createGlobalStyle`
     margin-top : -3px;
   }
   .app-event__id-number {
-    font-size: 11px;
+    font-size: 12px;
+    line-height : 1.5;
     font-weight: bold;
     margin-bottom: 2px;
     margin-left : 5px;

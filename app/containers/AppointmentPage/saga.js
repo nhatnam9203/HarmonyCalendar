@@ -47,6 +47,7 @@ export function* reloadStaffSaga() {
 			const url = `${requestURL.toString()}${currentDate.format('YYYY-MM-DD')}`;
 			const resp = yield api(url, '', 'GET', token);
 			if (resp.codeStatus !== 1) {
+				console.log(response.message)
 				console.log('error from api ' + url);
 				return;
 			}
@@ -104,7 +105,9 @@ export function* reloadCalendarSaga() {
 			const url = `${requestURL.toString()}/${apiDateQuery}`;
 			const response = yield api(url.toString(), '', 'GET', token);
 			if (response.codeStatus !== 1) {
+				console.log(response.message)
 				console.log('error from api ' + requestURL);
+				yield put(actions.loadingCalendar(false));
 				return;
 			}
 
@@ -163,6 +166,7 @@ export function* getMembers() {
 			const url = `${requestURL.toString()}${currentDate.format('YYYY-MM-DD')}`;
 			const resp = yield api(url, '', 'GET', token);
 			if (resp.codeStatus !== 1) {
+				console.log(response.message)
 				console.log('error from api ' + url);
 				return;
 			}
@@ -224,6 +228,8 @@ export function* getWaitingAppointments() {
 			const url = `${requestURL.toString()}&timezone=${timezone}&waitingTime=${false}`;
 			const response = yield api(url.toString(), '', 'GET', token);
 			if (response.codeStatus !== 1) {
+				console.log(response.message);
+				yield put(actions.loadingWaiting(false));
 				console.log('error from api ' + url);
 				return;
 			}
@@ -998,6 +1004,27 @@ export function* SubmitEditBlockTime_Saga(action) {
 	} catch (error) {}
 }
 
+export function* editBlockTimeSaga(action) {
+	try {
+		const { payload } = action;
+		const { staff, start, end, note , id,  } = payload;
+		const currentDate = yield select(makeCurrentDay());
+		let apiDateQuery = currentDate.format('YYYY-MM-DD') || moment().format('YYYY-MM-DD');
+		const requestURL = new URL(`${api_constants.EDIT_BLOCKTIME_API}/${id}`);
+		const dataSubmit = {
+ 			workingDate: apiDateQuery,
+			blockTimeStart: start,
+			blockTimeEnd: end,
+			note: note
+		};
+		const response = yield api(requestURL.toString(), dataSubmit, 'PUT', token);
+		if (response.codeStatus === 1) {
+			yield put(actions.loadMembers());
+			return;
+		}
+	} catch (error) {}
+}
+
 export function* deleteBlockTime_Saga(action) {
 	try {
 		const { block, staff } = action.data;
@@ -1123,6 +1150,10 @@ export function* EditBlockTime() {
 	yield takeLatest(constants.SUBMIT_EDIT_BLOCKTIME, SubmitEditBlockTime_Saga);
 }
 
+export function* _editBlockTime() {
+	yield takeLatest(constants.EDIT_BLOCKTIME, editBlockTimeSaga);
+}
+
 export function* membersData() {
 	yield takeLatest(constants.LOAD_MEMBERS, getMembers);
 }
@@ -1224,6 +1255,7 @@ export default function* root() {
 		fork(watch_getTimeStaffLogin),
 		fork(reloadStaffWatch),
 		fork(reloadCalendarWatch),
-		fork(updateNextStaff_Saga)
+		fork(updateNextStaff_Saga),
+		fork(_editBlockTime)
 	]);
 }
