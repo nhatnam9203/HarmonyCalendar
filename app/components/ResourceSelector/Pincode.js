@@ -5,7 +5,7 @@ import { FaClock } from 'react-icons/fa';
 import { GiAlarmClock } from 'react-icons/gi';
 import { FaTrash, FaCaretDown } from 'react-icons/fa';
 import { TiDelete } from 'react-icons/ti';
-import PopupSelectTime from './PopupSelectTime';
+import PopupTimePicker from '../DetailAppointment/PopupTimePicker'
 import moment from 'moment';
 
 const FormPincode = styled(Popup)`
@@ -206,34 +206,7 @@ class Pincode extends Component {
 	}
 
 	closePopupSelectTime(time) {
-		if (time.isStart) {
-			this.setState({
-				start: time.data,
-				isPopupSelectTime: false,
-				isStart: false,
-				isEnd: false
-			});
-		} else if (time.isEnd) {
-			const { start } = this.state;
-			const beginningTime = moment(start, 'h:mma');
-			const endTime = moment(time.data, 'h:mma');
-			if (endTime.isSameOrBefore(beginningTime)) {
-				alert('End time must be after Start time');
-			} else {
-				this.setState({
-					end: time.data,
-					isPopupSelectTime: false,
-					isStart: false,
-					isEnd: false
-				});
-			}
-		} else {
-			this.setState({
-				isPopupSelectTime: false,
-				isStart: false,
-				isEnd: false
-			});
-		}
+		this.setState({ isPopupSelectTime: false , isStart : false,isEnd : false })
 	}
 
 	findAppointment() {
@@ -264,9 +237,11 @@ class Pincode extends Component {
 	}
 
 	deleteBlockTime(block) {
-		const { staff, deleteBlockTime } = this.props;
-		deleteBlockTime({ block, staff });
-		this.closeModal();
+		if (window.confirm('Do you want to Cancel this Blocked Time?')) {
+			const { staff, deleteBlockTime } = this.props;
+			deleteBlockTime({ block, staff });
+			this.closeModal();
+		}
 	}
 
 	renderTimeLogin(timeLogin) {
@@ -388,14 +363,25 @@ class Pincode extends Component {
 		);
 	}
 
+	doneTimePicker(time) {
+		const {isStart,isEnd} = this.state;
+
+		if(isStart){
+			this.setState({ isPopupSelectTime: false , start : time.substring(11) ,isStart : false, isEnd : false })
+		}else if(isEnd){
+			this.setState({ isPopupSelectTime : false , end : time.substring(11), isStart : false, isEnd : false })
+		}
+	}
+
 	renderPopupSelectTime() {
 		const { isPopupSelectTime, isStart, isEnd } = this.state;
 		if (isPopupSelectTime) {
 			return (
-				<PopupSelectTime
-					closePopupSelectTime={(time) => this.closePopupSelectTime(time)}
-					isStart={isStart}
-					isEnd={isEnd}
+				<PopupTimePicker
+					cancelTimePicker={() => this.closePopupSelectTime()}
+					doneTimePicker={(time) => this.doneTimePicker(time)}
+					currentDay={this.props.currentDay}
+					fromTime={moment()}
 				/>
 			);
 		}
@@ -410,7 +396,7 @@ class Pincode extends Component {
 		return (
 			<FormPincode open closeOnDocumentClick={false}>
 				<TiDelete
-					onClick={isPopupSelectTime ? () => {} : () => this.closeModal()}
+					onClick={isPopupSelectTime ? () => { } : () => this.closeModal()}
 					color="#6A6A6A"
 					size={38}
 					style={styles.closeModal}

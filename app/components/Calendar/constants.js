@@ -26,10 +26,10 @@ const EVENT_RENDER_TEMPLATE = (event) => `
     <div class="app-event__full-name">${event.userFullName}</div>
     <div class="app-event__phone-number">
     ${event.status !== 'BLOCK' && event.status !== 'BLOCK_TEMP'
-	? event.status === 'CHECKED_IN' || event.status === 'PAID' || event.status === 'WAITING'
-		? "<img class='icon-phone' src='" + call + "' width='17' height='17'>"
-		: "<img class='icon-phone2' src='" + call + "' width='17' height='17'>"
-	: ''}
+		? event.status === 'CHECKED_IN' || event.status === 'PAID' || event.status === 'WAITING'
+			? "<img class='icon-phone' src='" + call + "' width='17' height='17'>"
+			: "<img class='icon-phone2' src='" + call + "' width='17' height='17'>"
+		: ''}
     ${formatPhone(event.phoneNumber)}</div>
     ${event.options.map((option) => OPTION_RENDER_TEMPLATE(option)).join('')}
     ${event.products.map((product) => PRODUCT_RENDER_TEMPLATE(product)).join('')}
@@ -37,8 +37,8 @@ const EVENT_RENDER_TEMPLATE = (event) => `
   </div>
 `;
 
-const resouceDesktop = [ { id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }, { id: 6 }, { id: 7 } ];
-const resource = [ { id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 } ];
+const resouceDesktop = [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }, { id: 6 }, { id: 7 }];
+const resource = [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }];
 
 export const MAIN_CALENDAR_OPTIONS = {
 	header: false,
@@ -76,7 +76,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 		}
 
 		if (parseInt(resource.id) !== 0) {
-			const displayedAppointments = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
+			const displayedAppointments = store.getState().getIn(['appointment', 'appointments', 'calendar']);
 
 			const member = displayedAppointments[parseInt(resource.id) - 1];
 			if (!member || member.memberId === 0) return;
@@ -91,13 +91,13 @@ export const MAIN_CALENDAR_OPTIONS = {
 				}
 			});
 
-			const displayedMembers = store.getState().getIn([ 'appointment', 'members', 'displayed' ]);
+			const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
 
 			let timeEnd = '';
 			let timeStart = '';
 			let isCheckWorking = '';
 
-			let currentDay = store.getState().getIn([ 'appointment', 'currentDay' ]);
+			let currentDay = store.getState().getIn(['appointment', 'currentDay']);
 			const staffAvailable = displayedMembers[parseInt(resource.id) - 1]
 				? displayedMembers[parseInt(resource.id) - 1]
 				: '';
@@ -106,11 +106,11 @@ export const MAIN_CALENDAR_OPTIONS = {
 					if (staffAvailable) {
 						timeEnd = `${moment(currentDay).day('Monday').format('YYYY-MM-DD')}T${moment(
 							staffAvailable.workingTimes.Monday.timeEnd,
-							[ 'h:mm A' ]
+							['h:mm A']
 						).format('HH:mm:ss')}`;
 						timeStart = `${moment(currentDay).day('Monday').format('YYYY-MM-DD')}T${moment(
 							staffAvailable.workingTimes.Monday.timeStart,
-							[ 'h:mm A' ]
+							['h:mm A']
 						).format('HH:mm:ss')}`;
 						isCheckWorking = staffAvailable.workingTimes.Monday.isCheck;
 					}
@@ -121,11 +121,11 @@ export const MAIN_CALENDAR_OPTIONS = {
 					if (staffAvailable) {
 						timeEnd = `${moment(currentDay).day('Tuesday').format('YYYY-MM-DD')}T${moment(
 							staffAvailable.workingTimes.Tuesday.timeEnd,
-							[ 'h:mm A' ]
+							['h:mm A']
 						).format('HH:mm:ss')}`;
 						timeStart = `${moment(currentDay).day('Tuesday').format('YYYY-MM-DD')}T${moment(
 							staffAvailable.workingTimes.Tuesday.timeStart,
-							[ 'h:mm A' ]
+							['h:mm A']
 						).format('HH:mm:ss')}`;
 						isCheckWorking = staffAvailable.workingTimes.Tuesday.isCheck;
 					}
@@ -136,11 +136,11 @@ export const MAIN_CALENDAR_OPTIONS = {
 					if (staffAvailable) {
 						timeEnd = `${moment(currentDay).day('Wednesday').format('YYYY-MM-DD')}T${moment(
 							staffAvailable.workingTimes.Wednesday.timeEnd,
-							[ 'h:mm A' ]
+							['h:mm A']
 						).format('HH:mm:ss')}`;
 						timeStart = `${moment(currentDay).day('Wednesday').format('YYYY-MM-DD')}T${moment(
 							staffAvailable.workingTimes.Wednesday.timeStart,
-							[ 'h:mm A' ]
+							['h:mm A']
 						).format('HH:mm:ss')}`;
 						isCheckWorking = staffAvailable.workingTimes.Wednesday.isCheck;
 					}
@@ -150,11 +150,11 @@ export const MAIN_CALENDAR_OPTIONS = {
 					if (staffAvailable) {
 						timeEnd = `${moment(currentDay).day('Thursday').format('YYYY-MM-DD')}T${moment(
 							staffAvailable.workingTimes.Thursday.timeEnd,
-							[ 'h:mm A' ]
+							['h:mm A']
 						).format('HH:mm:ss')}`;
 						timeStart = `${moment(currentDay).day('Thursday').format('YYYY-MM-DD')}T${moment(
 							staffAvailable.workingTimes.Thursday.timeStart,
-							[ 'h:mm A' ]
+							['h:mm A']
 						).format('HH:mm:ss')}`;
 
 						isCheckWorking = staffAvailable.workingTimes.Thursday.isCheck;
@@ -165,11 +165,11 @@ export const MAIN_CALENDAR_OPTIONS = {
 					if (staffAvailable) {
 						timeEnd = `${moment(currentDay).day('Friday').format('YYYY-MM-DD')}T${moment(
 							staffAvailable.workingTimes.Friday.timeEnd,
-							[ 'h:mm A' ]
+							['h:mm A']
 						).format('HH:mm:ss')}`;
 						timeStart = `${moment(currentDay).day('Friday').format('YYYY-MM-DD')}T${moment(
 							staffAvailable.workingTimes.Friday.timeStart,
-							[ 'h:mm A' ]
+							['h:mm A']
 						).format('HH:mm:ss')}`;
 						isCheckWorking = staffAvailable.workingTimes.Friday.isCheck;
 					}
@@ -179,11 +179,11 @@ export const MAIN_CALENDAR_OPTIONS = {
 					if (staffAvailable) {
 						timeEnd = `${moment(currentDay).day('Saturday').format('YYYY-MM-DD')}T${moment(
 							staffAvailable.workingTimes.Saturday.timeEnd,
-							[ 'h:mm A' ]
+							['h:mm A']
 						).format('HH:mm:ss')}`;
 						timeStart = `${moment(currentDay).day('Saturday').format('YYYY-MM-DD')}T${moment(
 							staffAvailable.workingTimes.Saturday.timeStart,
-							[ 'h:mm A' ]
+							['h:mm A']
 						).format('HH:mm:ss')}`;
 						isCheckWorking = staffAvailable.workingTimes.Saturday.isCheck;
 					}
@@ -193,11 +193,11 @@ export const MAIN_CALENDAR_OPTIONS = {
 					if (staffAvailable) {
 						timeEnd = `${moment(currentDay).day(0).format('YYYY-MM-DD')}T${moment(
 							staffAvailable.workingTimes.Sunday.timeEnd,
-							[ 'h:mm A' ]
+							['h:mm A']
 						).format('HH:mm:ss')}`;
 						timeStart = `${moment(currentDay).day(0).format('YYYY-MM-DD')}T${moment(
 							staffAvailable.workingTimes.Sunday.timeStart,
-							[ 'h:mm A' ]
+							['h:mm A']
 						).format('HH:mm:ss')}`;
 						isCheckWorking = staffAvailable.workingTimes.Sunday.isCheck;
 					}
@@ -219,7 +219,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 	},
 
 	eventClick: (event) => {
-		const allAppointment = store.getState().getIn([ 'appointment', 'appointments', 'allAppointment' ]);
+		const allAppointment = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
 		const appointment = allAppointment.find((app) => parseInt(app.id) === parseInt(event.data.id));
 		if (!appointment) return;
 		store.dispatch(selectAppointment(appointment, event));
@@ -240,18 +240,18 @@ export const MAIN_CALENDAR_OPTIONS = {
 				? moment(start_time).add(totalDuration, 'minutes')
 				: moment(start_time).add(90, 'minutes');
 
-		const memberdisplay = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
+		const memberdisplay = store.getState().getIn(['appointment', 'appointments', 'calendar']);
 		let check = true;
 		let member_clone = JSON.parse(JSON.stringify(memberdisplay));
 		member_clone.forEach((element) => {
 			delete element.memberId;
 		});
 
-		const displayedMembers = store.getState().getIn([ 'appointment', 'members', 'displayed' ]);
+		const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
 
 		let all_appointments = [];
 		member_clone.forEach((apps) => {
-			all_appointments = [ ...all_appointments, ...apps.appointments ];
+			all_appointments = [...all_appointments, ...apps.appointments];
 		});
 
 		let check_workingStaff = '';
@@ -264,7 +264,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 		const pos = displayedMembers.findIndex((mem) => parseInt(mem.resourceId) === parseInt(resourceId));
 
 		if (pos !== -1) {
-			const currentDay = store.getState().getIn([ 'appointment', 'currentDay' ]);
+			const currentDay = store.getState().getIn(['appointment', 'currentDay']);
 
 			switch (moment(currentDay).format('dddd')) {
 				case 'Monday':
@@ -344,7 +344,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 
 		if (
 			moment(checkDate).isBefore(
-				`${moment().format('YYYY-MM-DD')}T${moment(time_working_start, [ 'h:mm A' ]).format('HH:mm:ss')}`
+				`${moment().format('YYYY-MM-DD')}T${moment(time_working_start, ['h:mm A']).format('HH:mm:ss')}`
 			)
 		) {
 			check_time_block = false;
@@ -393,8 +393,8 @@ export const MAIN_CALENDAR_OPTIONS = {
 	},
 
 	eventDrop: (event, delta, revertFunc, jsEvent, ui, view) => {
-		const memberdisplay = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
-		const displayedMembers = store.getState().getIn([ 'appointment', 'members', 'displayed' ]);
+		const memberdisplay = store.getState().getIn(['appointment', 'appointments', 'calendar']);
+		const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
 
 		const start_time = event.start;
 		const end_time = event.end;
@@ -404,7 +404,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 			delete element.memberId;
 		});
 
-		const currentDay = store.getState().getIn([ 'appointment', 'currentDay' ]);
+		const currentDay = store.getState().getIn(['appointment', 'currentDay']);
 		let check_workingStaff = '';
 
 		const staffAvailable = displayedMembers[parseInt(event.resourceId) - 1];
@@ -467,7 +467,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 
 		let all_appointments = []; // tất cả appointment trên calendar
 		member_clone.forEach((apps) => {
-			all_appointments = [ ...all_appointments, ...apps.appointments ];
+			all_appointments = [...all_appointments, ...apps.appointments];
 		});
 
 		if (!staffAvailable) {
@@ -537,7 +537,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 				if (jsEvent.pageX >= x1 && jsEvent.pageX <= x2 && jsEvent.pageY >= y1 && jsEvent.pageY <= y2) {
 					/* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
 					$('#full-calendar').fullCalendar('removeEvents', event._id);
-					const displayedMembers = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
+					const displayedMembers = store.getState().getIn(['appointment', 'appointments', 'calendar']);
 					const override = displayedMembers[parseInt(event.resourceId) - 1];
 					store.dispatch(
 						putBackAppointment({
@@ -553,17 +553,9 @@ export const MAIN_CALENDAR_OPTIONS = {
 	eventRender: (event, element) => {
 		element[0].innerHTML = EVENT_RENDER_TEMPLATE(event.data);
 		if (event.data.isVip === 1) {
-			if (event.data.memberId === 0) {
-				element
-					.find('div.app-event')
-					.prepend(
-						"<div class='app-event__full-name2'><img src='" + vip_blue + "' width='18' height='18'></div>"
-					);
-			} else {
-				element
-					.find('div.app-event')
-					.prepend("<div class='app-event__full-name2'><img src='" + vip + "' width='18' height='18'></div>");
-			}
+			element
+				.find('div.app-event')
+				.prepend("<div class='app-event__full-name2'><img src='" + vip + "' width='18' height='18'></div>");
 		}
 	},
 	resourceRender: (resourceObj, labelTds) => {
@@ -579,43 +571,15 @@ export const addEventsToCalendar = (currentDate, appointmentsMembers) => {
 	appointmentsMembers.forEach((member, index) => {
 		if (member.memberId !== 0) {
 			member.appointments.forEach((appointment) => {
-				let eventColor = '#00b4f7';
-				let eventClass = 'event-paid';
-				let bordercolor = '';
-				if (appointment.status === 'ASSIGNED') {
-					// eventColor = '#FFFD71';
-					eventColor = '#ffe559';
-					eventClass = 'event-assigned';
-				}
-				if (appointment.status === 'CONFIRMED') {
-					eventColor = '#baedf7';
-					eventClass = 'event-confirmed';
-				}
-				if (appointment.status === 'CHECKED_IN') {
-					eventColor = '#00b4f7';
-					eventClass = 'event-checkin';
-				}
-				if (appointment.status === 'PAID') {
-					eventColor = '#00dc00';
-					eventClass = 'event-paid';
-				}
-				if (appointment.status === 'BLOCK') {
-					eventColor = '#DDDDDD';
-					eventClass = 'event-block';
-				}
-				if (appointment.status === 'BLOCK_TEMP') {
-					eventColor = 'yellow';
-					eventClass = 'event-block-temp';
-				}
 				events.push({
 					resourceId: index + 1,
 					start: appointment.start,
 					end: appointment.end,
 					data: appointment,
-					color: eventColor,
+					color: getAtrributeByStatus(appointment).eventColor,
 					rendering:
 						appointment.status === 'BLOCK' || appointment.status === 'BLOCK_TEMP' ? 'background' : '',
-					className: eventClass,
+					className: getAtrributeByStatus(appointment).eventClass,
 					startEditable: !(appointment.status === 'PAID'),
 					resourceEditable: !(appointment.status === 'PAID')
 				});
@@ -623,7 +587,7 @@ export const addEventsToCalendar = (currentDate, appointmentsMembers) => {
 		}
 	});
 
-	const allAppointments = store.getState().getIn([ 'appointment', 'appointments', 'allAppointment' ]);
+	const allAppointments = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
 
 	const app_in_anystaff = allAppointments
 		? allAppointments.filter((app) => app.memberId === 0 && app.status !== 'WAITING')
@@ -634,9 +598,9 @@ export const addEventsToCalendar = (currentDate, appointmentsMembers) => {
 			start: appointment.start,
 			end: appointment.end,
 			data: appointment,
-			color: '#F4F4F5',
+			color: getAtrributeByStatus(appointment).eventColor,
 			rendering: appointment.status === 'BLOCK' || appointment.status === 'BLOCK_TEMP' ? 'background' : '',
-			className: 'event-anystaff',
+			className: getAtrributeByStatus(appointment).eventClass,
 			startEditable: !(appointment.status === 'PAID'),
 			resourceEditable: !(appointment.status === 'PAID')
 		});
@@ -647,7 +611,7 @@ export const addEventsToCalendar = (currentDate, appointmentsMembers) => {
 };
 
 export const deleteEventFromCalendar = (eventId) => {
-	$('#full-calendar').fullCalendar('removeEvents', [ eventId ]);
+	$('#full-calendar').fullCalendar('removeEvents', [eventId]);
 };
 
 export const updateEventToCalendar = (fcEvent) => {
@@ -675,7 +639,7 @@ export const updateEventToCalendar = (fcEvent) => {
 		startEditable = false;
 		resourceEditable = false;
 	}
-	const displayedMembers = store.getState().getIn([ 'appointment', 'members', 'displayed' ]);
+	const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
 
 	const resourceId = displayedMembers.findIndex((mem) => mem.id === fcEvent.memberId);
 
@@ -684,13 +648,47 @@ export const updateEventToCalendar = (fcEvent) => {
 		start: fcEvent.start,
 		end: fcEvent.end,
 		data: fcEvent,
-		color: fcEvent.memberId === 0 ? '#F4F4F5' : eventColor,
-		className: fcEvent.memberId === 0 ? 'event-anystaff' : eventClass,
+		color: eventColor,
+		className: eventClass,
 		startEditable,
 		resourceEditable
 	};
 
 	//viet them ham update cho event o cot any staff tai day
 
-	$('#full-calendar').fullCalendar('addEventSource', [ data ]);
+	$('#full-calendar').fullCalendar('addEventSource', [data]);
 };
+
+
+function getAtrributeByStatus(appointment) {
+	let eventColor = '#00b4f7';
+	let eventClass = 'event-paid';
+	if (appointment.status === 'ASSIGNED') {
+		// eventColor = '#FFFD71';
+		eventColor = '#ffe559';
+		eventClass = 'event-assigned';
+	}
+	if (appointment.status === 'CONFIRMED') {
+		eventColor = '#baedf7';
+		eventClass = 'event-confirmed';
+	}
+	if (appointment.status === 'CHECKED_IN') {
+		eventColor = '#00b4f7';
+		eventClass = 'event-checkin';
+	}
+	if (appointment.status === 'PAID') {
+		eventColor = '#00dc00';
+		eventClass = 'event-paid';
+	}
+	if (appointment.status === 'BLOCK') {
+		eventColor = '#DDDDDD';
+		eventClass = 'event-block';
+	}
+	if (appointment.status === 'BLOCK_TEMP') {
+		eventColor = 'yellow';
+		eventClass = 'event-block-temp';
+	}
+	return {
+		eventColor, eventClass
+	}
+}

@@ -355,6 +355,8 @@ export function* moveAppointment(action) {
 	let new_endTime = moment(action.newTime)
 	.add(totalDurationMoveAppointment(movedAppointment.options, movedAppointment.extras), 'minutes');
 
+	const previousMemberId = movedAppointment.memberId;
+
 	let appointment = {
 		...movedAppointment,
 		start: action.newTime,
@@ -362,15 +364,17 @@ export function* moveAppointment(action) {
 		memberId: assignedMember ? assignedMember.id : 0
 	};
 
-	if (appointment.status !== 'CHECKED_IN') {
-		appointment.status = 'ASSIGNED';
-	}
-	if (appointment.status === 'CHECKED_IN') {
-		let diff_time = moment(appointment.start).diff(moment(movedAppointment.start), 'minutes');
-		if ((diff_time < 45 && diff_time >= 0) || (diff_time < 0 && diff_time > -45)) {
-			appointment.status = 'CHECKED_IN';
-		} else {
-			appointment.status = 'CONFIRMED';
+	if(assignedMember && previousMemberId !== 0){
+		if (appointment.status !== 'CHECKED_IN') {
+			appointment.status = 'ASSIGNED';
+		}
+		if (appointment.status === 'CHECKED_IN') {
+			let diff_time = moment(appointment.start).diff(moment(movedAppointment.start), 'minutes');
+			if ((diff_time < 45 && diff_time >= 0) || (diff_time < 0 && diff_time > -45)) {
+				appointment.status = 'CHECKED_IN';
+			} else {
+				appointment.status = 'CONFIRMED';
+			}
 		}
 	}
 
@@ -528,7 +532,7 @@ export function* upddateAppointment(action) {
 
 		let { end, start, extras, memberId } = appointment;
 
-		let _totalDuration = totalDuartionUpdateAppointment(servicesUpdate, extras, appointment);
+		// let _totalDuration = totalDuartionUpdateAppointment(servicesUpdate, extras, appointment);
 		// let _endTime =  moment(start).add(_totalDuration, 'minutes');
 		// let newDate = `${_endTime.format('YYYY-MM-DD')}T${_endTime.format('HH:mm:ss')}`;
 		let newDate = end;
@@ -568,10 +572,10 @@ export function* upddateAppointment(action) {
 			productsUpdate,
 			extrasUpdate
 		);
+
 		yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
 		yield put(actions.renderAppointment());
 		
-
 		const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
 		const url = `${requestURL}/${appointment.id}`;
 		try{

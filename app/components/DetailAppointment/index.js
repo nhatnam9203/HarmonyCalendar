@@ -594,7 +594,7 @@ class Appointment extends React.Component {
 
 			await this.resetState();
 			const app_ = JSON.parse(JSON.stringify(appointmentDetail));
-			const { options, userFullName, products, start, extras, notes , firstName, lastName } = app_;
+			const { options, userFullName, products, start, extras, notes, firstName, lastName } = app_;
 
 			await this.setState({
 				old_service: _services,
@@ -629,15 +629,15 @@ class Appointment extends React.Component {
 			for (let i = 0; i < appointmentDetail.options.length; i++) {
 				const price = appointmentDetail.options[i].price;
 				this.setState({
-					prices: [ ...this.state.prices, parseFloat(price) ],
-					old_prices: [ ...this.state.prices, parseFloat(price) ]
+					prices: [...this.state.prices, parseFloat(price)],
+					old_prices: [...this.state.prices, parseFloat(price)]
 				});
 			}
 			for (let i = 0; i < appointmentDetail.extras.length; i++) {
 				const price = appointmentDetail.extras[i].price;
 				this.setState({
-					pricesExtras: [ ...this.state.pricesExtras, parseFloat(price) ],
-					old_priceExtras: [ ...this.state.old_priceExtras, parseFloat(price) ]
+					pricesExtras: [...this.state.pricesExtras, parseFloat(price)],
+					old_priceExtras: [...this.state.old_priceExtras, parseFloat(price)]
 				});
 			}
 		}
@@ -688,7 +688,7 @@ class Appointment extends React.Component {
 	updateChangeAppointment(status, servicesUpdate) {
 		const { products, fromTime, toTime, services, newNotes, selectedStaff, extras } = this.state;
 		const { appointment, changeAppointmentTime } = this.props;
-		
+
 		changeAppointmentTime({
 			appointment,
 			total: this.getTotalPrice(),
@@ -757,14 +757,14 @@ class Appointment extends React.Component {
 		const staffId = appointment.memberId;
 		if (appointment.status === 'ASSIGNED') {
 			return (
-				<AppointmentWrapper.Header color="#585858" backgroundColor={staffId === 0 ? '#F4F4F5' : '#ffe559'}>
+				<AppointmentWrapper.Header color="#585858" backgroundColor={'#ffe559'}>
 					{appointment.code} Unconfirmed Appointment
 				</AppointmentWrapper.Header>
 			);
 		}
 		if (appointment.status === 'CONFIRMED') {
 			return (
-				<AppointmentWrapper.Header color="#585858" backgroundColor={staffId === 0 ? '#F4F4F5' : '#c2f4ff'}>
+				<AppointmentWrapper.Header color="#585858" backgroundColor={'#c2f4ff'}>
 					{appointment.code} Confirmed Appointment
 				</AppointmentWrapper.Header>
 			);
@@ -773,7 +773,7 @@ class Appointment extends React.Component {
 			return (
 				<AppointmentWrapper.Header
 					color={staffId === 0 ? '#333' : 'white'}
-					backgroundColor={staffId === 0 ? '#F4F4F5' : '#00b4f7'}
+					backgroundColor={'#00b4f7'}
 				>
 					{appointment.code} Checked-in Appointment
 				</AppointmentWrapper.Header>
@@ -783,7 +783,7 @@ class Appointment extends React.Component {
 			return (
 				<AppointmentWrapper.Header
 					color={staffId === 0 ? '#333' : 'white'}
-					backgroundColor={staffId === 0 ? '#F4F4F5' : '#00dc00'}
+					backgroundColor={'#00dc00'}
 				>
 					{appointment.code} Paid Appointment
 				</AppointmentWrapper.Header>
@@ -1140,13 +1140,13 @@ class Appointment extends React.Component {
 							<FaCaretDown style={{ color: '#1173C3' }} />
 
 							{isPopupStaff &&
-							index === indexPopupStaff && (
-								<PopupStaff
-									togglePopupStaff={(staff) => this.togglePopupStaff(staff, index)}
-									staffList={staffList.filter((s) => s.id !== 0)}
-									closePopupStaff={() => this.closePopupStaff()}
-								/>
-							)}
+								index === indexPopupStaff && (
+									<PopupStaff
+										togglePopupStaff={(staff) => this.togglePopupStaff(staff, index)}
+										staffList={staffList.filter((s) => s.id !== 0)}
+										closePopupStaff={() => this.closePopupStaff()}
+									/>
+								)}
 						</div>
 					</td>
 
@@ -1426,8 +1426,8 @@ class Appointment extends React.Component {
 								appointment.status !== 'PAID' ? (
 									() => this.openPopupPrice(price, index, 'extra')
 								) : (
-									() => {}
-								)
+										() => { }
+									)
 							}
 						>
 							<div style={appointment.status !== 'PAID' ? style.priceS : {}}>{price}</div>
@@ -1482,8 +1482,8 @@ class Appointment extends React.Component {
 		};
 		if (noteValue.trim() !== '') {
 			this.setState({
-				notes: [ note, ...notes ],
-				newNotes: [ note, ...newNotes ],
+				notes: [note, ...notes],
+				newNotes: [note, ...newNotes],
 				noteValue: ''
 			});
 		}
@@ -1551,18 +1551,20 @@ class Appointment extends React.Component {
 						Check In
 					</Button>
 				);
-			if (appointment.status === 'CHECKED_IN'  && appointment.memberId !== 0)
+			if (appointment.status === 'CHECKED_IN' && appointment.memberId !== 0)
 				return (
 					<Button onClick={() => this.nextStatus()} primary="true">
 						Check out
 					</Button>
 				);
 		} else {
-			return (
-				<ButtonChange onClick={() => this.ChangeAppointmentTime()} primary="true">
-					<strong>Change</strong>
-				</ButtonChange>
-			);
+			// if (appointment.memberId !== 0) {
+				return (
+					<ButtonChange onClick={() => this.ChangeAppointmentTime()} primary="true">
+						<strong>Change</strong>
+					</ButtonChange>
+				);
+			//}
 		}
 	}
 
@@ -1572,7 +1574,7 @@ class Appointment extends React.Component {
 		if (!appointment) return '';
 		if (appointmentDetail === '') return '';
 		let colorDelete = appointment.status === 'ASSIGNED' || appointment.status === 'CONFIRMED' ? '#585858' : 'white';
-		colorDelete = appointment.memberId === 0 ? '#585858' : colorDelete;
+		// colorDelete = appointment.memberId === 0 ? '#585858' : colorDelete;
 		return (
 			<div>
 				<AppointmentPopup

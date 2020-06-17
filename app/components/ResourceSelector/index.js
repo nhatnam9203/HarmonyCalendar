@@ -362,7 +362,7 @@ class ResourceSelector extends React.Component {
 			return (
 				<Resource
 					onClick={() => this.openPincode(resource)}
-					// active={parseInt(resource.id) === parseInt(staffId) ? true : false}
+					active={parseInt(resource.id) === parseInt(staffId) ? true : false}
 					key={index}
 				>
 					<Resource.Avatar>
