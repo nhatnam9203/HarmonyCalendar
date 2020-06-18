@@ -303,10 +303,10 @@ function appointmentReducer(state = initialState, action) {
 					arr.splice(pos, 1);
 					// if (navigator.onLine === false) {
 					const data = dataPutBackAppointment(memberId, start, end, options, products, extras);
-					window.postMessage({
-						data: { ...data, id },
-						action: 'updateAppointmemtOffline'
-					});
+					// window.postMessage({
+					// 	data: { ...data, id },
+					// 	action: 'updateAppointmemtOffline'
+					// });
 					// }
 					localStorage.setItem('AppointmentCalendar', JSON.stringify(arr));
 					return [ ...arr ];
@@ -438,10 +438,10 @@ function appointmentReducer(state = initialState, action) {
 		case REMOVE_APPOINTMENT_WAITING:
 			return state.updateIn([ 'appointments', 'waiting' ], (arr) => {
 				// if (navigator.onLine === false) {
-				window.postMessage({
-					data: { ...action.appointment },
-					action: 'updateAppointmemtOffline'
-				});
+				// window.postMessage({
+				// 	data: { ...action.appointment },
+				// 	action: 'updateAppointmemtOffline'
+				// });
 				// }
 
 				for (let i = 0; i < arr.length; i++) {
@@ -646,10 +646,10 @@ function appointmentReducer(state = initialState, action) {
 				saveAppointmentOffLine(appointment);
 				localStorage.setItem('AppointmentCalendar', JSON.stringify(arr));
 				// if (navigator.onLine === false) {
-				window.postMessage({
-					data: { ...appointment, id },
-					action: 'updateAppointmemtOffline'
-				});
+				// window.postMessage({
+				// 	data: { ...appointment, id },
+				// 	action: 'updateAppointmemtOffline'
+				// });
 				// }
 				return [ ...arr ];
 			});
@@ -703,10 +703,10 @@ function appointmentReducer(state = initialState, action) {
 					});
 
 					if (moment(state.getIn([ 'currentDay' ])).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD')) {
-						window.postMessage({
-							action: 'dataStaffList',
-							staffList: arr
-						});
+						// window.postMessage({
+						// 	action: 'dataStaffList',
+						// 	staffList: arr
+						// });
 					}
 
 					localStorage.setItem('staffList', JSON.stringify(arr));

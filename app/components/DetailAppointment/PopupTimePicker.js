@@ -13,7 +13,7 @@ const PopupTimePK = styled.div`
 	z-index: 999999999999999;
 	width: 22rem;
 	height: 18rem;
-	box-shadow: 0 3px 9px rgba(0, 0, 0, .175);
+	box-shadow: 0 3px 9px rgba(0, 0, 0, 0.15);
 `;
 
 const Header = styled.div`

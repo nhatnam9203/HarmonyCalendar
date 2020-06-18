@@ -170,23 +170,25 @@ class Calendar extends React.Component {
 						const appointment = app.data.Appointment;
 						if (appointment) {
 							let appointment_R = returnAppointment(appointment);
-							if (appointment_R.status === 'CHECKED_IN' && parseInt(appointment_R.memberId) === 0) {
-								return;
-							}
-							if (appointment_R.status === 'ASSIGNED' || appointment_R.status === 'CHECKED_IN') {
-								const displayMember = store
-									.getState()
-									.getIn(['appointment', 'appointments', 'calendar']);
-
-								const member = displayMember.find((mem) =>
-									mem.appointments.find((app) => parseInt(app.id) === parseInt(appointment_R.id))
-								);
-								if (!member) {
-									updateEventToCalendar(appointment_R);
-									addAppointmentRealTime(appointment_R);
+							if(appointment_R.options.length > 0){
+								if (appointment_R.status === 'CHECKED_IN' && parseInt(appointment_R.memberId) === 0) {
+									return;
 								}
-							} else if (appointment_R.status === 'WAITING') {
-								addAppointmentWaiting(appointment_R);
+								if (appointment_R.status === 'ASSIGNED' || appointment_R.status === 'CHECKED_IN') {
+									const displayMember = store
+										.getState()
+										.getIn(['appointment', 'appointments', 'calendar']);
+	
+									const member = displayMember.find((mem) =>
+										mem.appointments.find((app) => parseInt(app.id) === parseInt(appointment_R.id))
+									);
+									if (!member) {
+										updateEventToCalendar(appointment_R);
+										addAppointmentRealTime(appointment_R);
+									}
+								} else if (appointment_R.status === 'WAITING') {
+									addAppointmentWaiting(appointment_R);
+								}	
 							}
 						}
 						break;

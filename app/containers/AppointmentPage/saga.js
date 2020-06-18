@@ -212,7 +212,7 @@ export function* getMembers() {
 }
 
 function* checkResponse(response) {
-	alert(response.data.message);
+	alert(response.message);
 	yield put(actions.loadMembers());
 	yield put(actions.loadWaitingAppointments());
 	yield put(actions.loadAppointmentByMembers());
@@ -583,7 +583,7 @@ export function* upddateAppointment(action) {
 		yield put(actions.renderAppointment());
 		
 		const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
-		const url = `${requestURL}/${appointment.id}`;
+		const url = `${requestURL}/${appointment.id}`;	
 		try{
 			const kq = yield api(url, data, 'PUT', token);
 			if (kq.codeStatus !== 1) return yield* checkResponse(kq);
@@ -715,17 +715,17 @@ export function* changeTimeAppointment(action) {
 		);
 
 		/* cập nhật appointment trên frontend */
-		yield put(
-			actions.updateAppointmentFrontend({
-				appointment: {
-					...data,
-					staffId : options.length > 0 ? options[0].staffId : 0,
-					toTime: moment(data.fromTime).add(totalDuarion(data.services, data.extras, appointment), 'minutes')
-				},
-				id: appointment.id
-			})
-		);
-		yield put(actions.renderAppointment());
+		// yield put(
+		// 	actions.updateAppointmentFrontend({
+		// 		appointment: {
+		// 			...data,
+		// 			staffId : options.length > 0 ? options[0].staffId : 0,
+		// 			toTime: moment(data.fromTime).add(totalDuarion(data.services, data.extras, appointment), 'minutes')
+		// 		},
+		// 		id: appointment.id
+		// 	})
+		// );
+		// yield put(actions.renderAppointment());
 
 		/* Gọi api submit data lên server, nếu lỗi ko có internet => cập nhật frontend , lưu local */
 		try {

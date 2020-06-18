@@ -5,20 +5,29 @@ import { FaClock } from 'react-icons/fa';
 import { GiAlarmClock } from 'react-icons/gi';
 import { FaTrash, FaCaretDown } from 'react-icons/fa';
 import { TiDelete } from 'react-icons/ti';
-import PopupTimePicker from '../DetailAppointment/PopupTimePicker'
+import PopupTimePicker from '../DetailAppointment/PopupTimePicker';
 import moment from 'moment';
 import { View } from 'fullcalendar';
 
 const FormPincode = styled(Popup)`
     padding : 0 !important;
     padding-bottom : 1rem !important;
-    background : #ffffff;
-    width : 26rem !important;
+    width : 26rem !important;	
     max-height : 30rem;
     border : none !important;
     border-radius : 0.8rem;    
     position : relative;
-    box-shadow: 0 1px #fff inset, 0 0.6px 10px #1FB5F4;
+	box-shadow:  ${(props) => (props.active ? 'none' : '0 1px #fff inset, 0 0.6px 10px #1FB5F4')};
+`;
+
+const OverLay = styled.div`
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	border-radius: 0.8rem;
+	background-color: rgba(0, 0, 0, 0.3);
 `;
 
 FormPincode.Header = styled.div`
@@ -129,7 +138,6 @@ const BlockList = styled.div`
 	height: 100% !important;
 `;
 
-
 const initialState = {
 	pincode: '',
 	note: '',
@@ -208,7 +216,7 @@ class Pincode extends Component {
 	}
 
 	closePopupSelectTime(time) {
-		this.setState({ isPopupSelectTime: false, isStart: false, isEnd: false })
+		this.setState({ isPopupSelectTime: false, isStart: false, isEnd: false });
 	}
 
 	findAppointment() {
@@ -224,9 +232,11 @@ class Pincode extends Component {
 		const { blockTimeEdit, start, end, note } = this.state;
 		if (blockTimeEdit) {
 			const data = {
-				start, end, note,
+				start,
+				end,
+				note,
 				id: blockTimeEdit.blockTimeId
-			}
+			};
 			this.props.editBlockTime(data);
 			this.closeModal();
 		}
@@ -249,9 +259,8 @@ class Pincode extends Component {
 				});
 				this.closeModal();
 			} else {
-				this.editBlockTime()
+				this.editBlockTime();
 			}
-
 		}
 	}
 
@@ -323,9 +332,11 @@ class Pincode extends Component {
 						<div style={styles.note}>{obj.note}</div>
 					</div>
 
-					{obj.editable && <div onClick={() => this.deleteBlockTime(obj)} style={styles.trashButton}>
-						<FaTrash color={'#6A6A6A'} size={20} style={styles.trash} />
-					</div>}
+					{obj.editable && (
+						<div onClick={() => this.deleteBlockTime(obj)} style={styles.trashButton}>
+							<FaTrash color={'#6A6A6A'} size={20} style={styles.trash} />
+						</div>
+					)}
 				</div>
 			);
 		});
@@ -333,7 +344,7 @@ class Pincode extends Component {
 
 	renderStaffBody() {
 		const { isAddBlock, start, end, blockTimeEdit } = this.state;
-		console.log({ blockTimeEdit })
+		console.log({ blockTimeEdit });
 		if (!isAddBlock) {
 			return (
 				<React.Fragment>
@@ -376,12 +387,16 @@ class Pincode extends Component {
 						/>
 					</div>
 				</Row>
-				{!blockTimeEdit && <div onClick={() => this.submitEditBlock()} style={styles.bottom}>
-					<div style={styles.btnSubmit}>Submit</div>
-				</div>}
-				{blockTimeEdit && <div onClick={() => this.submitEditBlock()} style={styles.bottom}>
-					<div style={styles.btnSubmit}>Edit</div>
-				</div>}
+				{!blockTimeEdit && (
+					<div onClick={() => this.submitEditBlock()} style={styles.bottom}>
+						<div style={styles.btnSubmit}>Submit</div>
+					</div>
+				)}
+				{blockTimeEdit && (
+					<div onClick={() => this.submitEditBlock()} style={styles.bottom}>
+						<div style={styles.btnSubmit}>Edit</div>
+					</div>
+				)}
 			</StaffBody>
 		);
 	}
@@ -402,9 +417,9 @@ class Pincode extends Component {
 		const { isStart, isEnd } = this.state;
 
 		if (isStart) {
-			this.setState({ isPopupSelectTime: false, start: time.substring(11), isStart: false, isEnd: false })
+			this.setState({ isPopupSelectTime: false, start: time.substring(11), isStart: false, isEnd: false });
 		} else if (isEnd) {
-			this.setState({ isPopupSelectTime: false, end: time.substring(11), isStart: false, isEnd: false })
+			this.setState({ isPopupSelectTime: false, end: time.substring(11), isStart: false, isEnd: false });
 		}
 	}
 
@@ -433,10 +448,10 @@ class Pincode extends Component {
 
 		if (popupPincode === false) return '';
 		return (
-			<FormPincode open closeOnDocumentClick={false}>
+			<FormPincode active={isPopupSelectTime} open closeOnDocumentClick={false}>
 				<React.Fragment>
 					<TiDelete
-						onClick={isPopupSelectTime ? () => { } : () => this.closeModal()}
+						onClick={isPopupSelectTime ? () => {} : () => this.closeModal()}
 						color="#6A6A6A"
 						size={38}
 						style={styles.closeModal}
@@ -452,6 +467,7 @@ class Pincode extends Component {
 						{this.renderStaffBody()}
 					</PincodeBody>
 				</React.Fragment>
+				{isPopupSelectTime && <OverLay />}
 				{this.renderPopupSelectTime()}
 			</FormPincode>
 		);
@@ -595,4 +611,3 @@ const styles = {
 		letterSpacing: 0.3
 	}
 };
-

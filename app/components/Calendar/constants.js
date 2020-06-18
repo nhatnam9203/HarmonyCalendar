@@ -484,7 +484,10 @@ export const MAIN_CALENDAR_OPTIONS = {
 					) {
 						if (parseInt(app.id) !== parseInt(event.data.id)) {
 							if (app.status === 'BLOCK_TEMP') {
-								if (app.appointmentId !== event.data.id) check = 1;
+								// if (app.appointmentId !== event.data.id) {
+								// 	alert('The Staff is not available on your time selected.')
+								// 	check = 1;
+								// }
 							} else {
 								check = false;
 							}
