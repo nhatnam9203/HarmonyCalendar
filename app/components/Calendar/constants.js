@@ -327,6 +327,8 @@ export const MAIN_CALENDAR_OPTIONS = {
 					) {
 						if (parseInt(app.id) !== parseInt(event.id)) {
 							if (app.status === 'BLOCK_TEMP') {
+								console.log('hihihihihih')
+
 								check = 1;
 							} else {
 								check = false;
@@ -474,7 +476,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 			check = false;
 		} else if (check_workingStaff) {
 			// có làm việc
-			all_appointments.forEach((app) => {
+			all_appointments.forEach((app) => { // check khi thả appointment overlap
 				if (parseInt(app.memberId) === parseInt(staffAvailable.id)) {
 					if (
 						moment(start_time).isBetween(app.start, app.end) ||
@@ -484,12 +486,24 @@ export const MAIN_CALENDAR_OPTIONS = {
 					) {
 						if (parseInt(app.id) !== parseInt(event.data.id)) {
 							if (app.status === 'BLOCK_TEMP') {
-								// if (app.appointmentId !== event.data.id) {
-								// 	alert('The Staff is not available on your time selected.')
-								// 	check = 1;
-								// }
+								console.log({apointmentblocktemp : app})
+								console.log('check true')
+
+								if (app.appointmentId !== event.data.id) {
+									// alert('The Staff is not available on your time selected.')
+									// check = 1;
+								}
 							} else {
+								console.log('check false')
 								check = false;
+							}
+						}else{
+							if (app.status === 'BLOCK_TEMP'){
+								if (window.confirm('Accept appointment outside working hours')){
+									check = true;
+								}else{
+									check = 1;
+								}
 							}
 						}
 					}

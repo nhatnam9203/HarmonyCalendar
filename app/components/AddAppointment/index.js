@@ -3,8 +3,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import Popup from 'reactjs-popup';
 import { FaTimesCircle } from 'react-icons/fa';
-import Enter from '../../images/enter.png';
-import moment from 'moment';
+import {IoIosCloseCircle} from 'react-icons/io'
 import { formatUsPhone, checkStringNumber2 } from '../../utils/helper';
 import NumberFormat from 'react-number-format';
 import { MdSubdirectoryArrowLeft } from 'react-icons/md';
@@ -311,7 +310,6 @@ class AddAppointment extends React.Component {
 		const { time, staffID } = this.props.TimeAndStaffID;
 		const { first_name, last_name, phoneNumber, phone, notes, email, phoneCheck, refPhoneHeader } = this.state;
 		const refFone = phone ? phone : '';
-		// return;
 		if (first_name.trim() !== '' && last_name.trim() !== '') {
 			this.props.addCustomer({
 				first_name,
@@ -453,7 +451,9 @@ class AddAppointment extends React.Component {
 			success_addApointment,
 			phone
 		} = this.state;
+		
 		const { appointment, InfoAfterCheckPhone, StateAddCustomerSuccess, checkPhoneError } = this.props;
+
 		const PhoneShow = `+(${this.state.phoneCheck}) ${formatUsPhone(this.state.phoneNumber)}`;
 
 		if (!appointment) return '';
@@ -462,10 +462,11 @@ class AddAppointment extends React.Component {
 				<SearchingPopup open={isOpenSearchingPopup} closeOnDocumentClick={false} lockScroll={true}>
 					<SearchingWrapper>
 						<SearchingWrapper.Close onClick={() => this.closeAllModal()}>
-							<FaTimesCircle />
+							<IoIosCloseCircle style={{ height: 38, width: 38 }} />
 						</SearchingWrapper.Close>
 						<SearchingWrapper.Header backgroundColor="#0071C5">Add Appointment</SearchingWrapper.Header>
 						<SearchingWrapper.Body>Enter phone number</SearchingWrapper.Body>
+
 						<FooterChekPhone>
 							<FormCheckPhone>
 								<select
@@ -499,30 +500,28 @@ class AddAppointment extends React.Component {
 						</FooterChekPhone>
 					</SearchingWrapper>
 				</SearchingPopup>
+
 				<AddingPopup
 					open={isOpenAddingPopup}
 					onClose={() => this.closeAllModal()}
 					closeOnDocumentClick={false}
 					modal={true}
 					position={'left center'}
-					// lockScroll={true}
 				>
 					<AddingWrapper>
-						<AddingWrapper.Close onClick={() => this.closeAllModal()}>
-							<FaTimesCircle />
+						<AddingWrapper.Close style={{ top : 10, }} onClick={() => this.closeAllModal()}>
+							<IoIosCloseCircle style={{ height: 38, width: 38 }} />
 						</AddingWrapper.Close>
+
 						<AddingWrapper.Header backgroundColor="#1173C3">Add Appointment</AddingWrapper.Header>
+						
 						<AddingWrapper.Body>
 							<Form onSubmit={(e) => e.preventDefault()}>
 								{success_addApointment && <p style={{ color: '#8D9440' }}>{success_addApointment}</p>}
-								{/* {!checkPhoneError && (
-									<Label style={{ textAlign: 'center' }}>
-										Phone number is not exist ! Get information !
-									</Label>
-								)} */}
 								{checkPhoneError && <Label style={{ textAlign: 'center' }}>Phone number</Label>}
 								<input style={{ textAlign: 'center' }} value={PhoneShow} type="text" disabled />
 							</Form>
+
 							<Form className="left" onSubmit={(e) => e.preventDefault()}>
 								<Label>Customer Name *</Label>
 								<div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -554,8 +553,9 @@ class AddAppointment extends React.Component {
 									/>
 								</div>
 							</Form>
+
 							<Form className="left" onSubmit={(e) => e.preventDefault()}>
-								<Label>Referrer Phone Number</Label>
+								<Label>Referral Phone</Label>
 								{InfoAfterCheckPhone === '' && (
 									<div style={{ display: 'flex', flexDirection: 'row' }}>
 										<select
@@ -588,7 +588,8 @@ class AddAppointment extends React.Component {
 									/>
 								)}
 							</Form>
-							<NoteWrapper>
+
+							{InfoAfterCheckPhone.favourite !== '' && <NoteWrapper>
 								<Label>Note:</Label>
 								<NoteWrapper.Form onSubmit={(e) => e.preventDefault()}>
 									<input
@@ -597,7 +598,6 @@ class AddAppointment extends React.Component {
 										onChange={(e) => this.handleChangeNote(e)}
 									/>
 									<button type="submit" onClick={() => this.addNotes()}>
-										{/* <Img src={Enter} alt="icon" /> */}
 										<MdSubdirectoryArrowLeft
 											style={{
 												width: 28,
@@ -608,9 +608,10 @@ class AddAppointment extends React.Component {
 								</NoteWrapper.Form>
 								{/* {notes.map((note, index) => this.renderNote(note, index))} */}
 								{this.renderNotes()}
-							</NoteWrapper>
+							</NoteWrapper>}
 							<div style={{ height: 70 }} />
 						</AddingWrapper.Body>
+
 						<AddingWrapper.Footer>
 							<div>
 								<Button

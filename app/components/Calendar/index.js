@@ -132,6 +132,7 @@ class Calendar extends React.Component {
 			updateNextStaff,
 			updateConsumer
 		} = this.props;
+
 		const url = `${PROD_API_BASE_URL}/notification/?merchantId=${merchantId}&Title=Merchant&kind=calendar&deviceId=${deviceId}`;
 		let connection = new signalR.HubConnectionBuilder().withUrl(url).withAutomaticReconnect().build();
 		connection.serverTimeoutInMilliseconds = 6000000;
@@ -228,9 +229,11 @@ class Calendar extends React.Component {
 								default:
 									updateAppointmentPaid(appointment_R);
 									addEventsToCalendar(selectDay, displayMember);
-									if (appointment_R.status === 'CHECKED_IN') {
-										removeAppointmentWaiting(appointment_R);
-									}
+									removeAppointmentWaiting(appointment_R);
+
+									// if (appointment_R.status === 'CHECKED_IN') {
+										
+									// }
 									break;
 							}
 						}
@@ -323,7 +326,7 @@ class Calendar extends React.Component {
 								disable_Calendar(true);
 							}}
 						>
-							Check-in
+							Check-In
 						</SignInWrapper.Button>
 					</SignInWrapper>
 				</RightSideBar>

@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import Popup from 'reactjs-popup';
 import styled from 'styled-components';
 import { FaTimesCircle } from 'react-icons/fa';
+import {IoIosCloseCircle} from 'react-icons/io';
+
 const ConfirmPopup = styled(Popup)`
   border-radius: 1.5rem;
   padding: 0 !important;
@@ -16,7 +18,7 @@ ConfirmPopupWrapper.Header = styled.div`
 	height: 3rem;
 	font-size: 1.6rem;
 	font-weight: bold;
-	background: #1fb5f4;
+	background: #1B75C1;
 	color: #ffffff;
 	padding: 0.5rem 1rem;
 	line-height: 1.5;
@@ -97,7 +99,7 @@ class ConfirmDeleteWaiting extends Component {
 					<ConfirmPopupWrapper.Header>
 						Confirmation
 						<ConfirmPopupWrapper.ButtonX onClick={() => this.closeModal()}>
-							<FaTimesCircle />
+						<IoIosCloseCircle style={{ width : 38, height : 38 }} />
 						</ConfirmPopupWrapper.ButtonX>
 					</ConfirmPopupWrapper.Header>
 

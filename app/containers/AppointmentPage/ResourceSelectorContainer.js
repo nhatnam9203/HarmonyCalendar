@@ -12,6 +12,7 @@ import {
   makeCurrentDay,
   makeSelectPinCode,
   makeSelectPinStaff,
+  makeSlideIndex
 } from './selectors';
 import {
   selectDayOnCalendar,
@@ -53,6 +54,7 @@ const mapStateToProps = createStructuredSelector({
   currentDay : makeCurrentDay(),
   popupPincode : makeSelectPinCode(),
   PinStaff : makeSelectPinStaff(),
+  slideIndex : makeSlideIndex()
 });
 
 const withConnect = connect(

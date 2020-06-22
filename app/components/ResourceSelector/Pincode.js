@@ -6,8 +6,9 @@ import { GiAlarmClock } from 'react-icons/gi';
 import { FaTrash, FaCaretDown } from 'react-icons/fa';
 import { TiDelete } from 'react-icons/ti';
 import PopupTimePicker from '../DetailAppointment/PopupTimePicker';
+import ConfirmDelete from './ConfirmDelete';
 import moment from 'moment';
-import { View } from 'fullcalendar';
+import { setTimeout } from 'timers';
 
 const FormPincode = styled(Popup)`
     padding : 0 !important;
@@ -123,7 +124,7 @@ const ButtonAddBlock = styled.div`
 	flex-direction: row;
 	padding: 0.2rem;
 	background-color: #f2f2f2;
-	width: 48%;
+	width: 55%;
 	font-weight: 600;
 	collor: #333;
 	align-items: center;
@@ -141,13 +142,16 @@ const BlockList = styled.div`
 const initialState = {
 	pincode: '',
 	note: '',
+	noteSubmit: '',
 	isAddBlock: false,
 	isStart: false,
 	isEnd: false,
 	start: '02:00 PM',
 	end: '02:00 PM',
 	isPopupSelectTime: false,
-	blockTimeEdit: null
+	blockTimeEdit: null,
+	isPopupDelete: false,
+	blockDelete : null
 };
 
 class Pincode extends Component {
@@ -160,59 +164,12 @@ class Pincode extends Component {
 		this.setState(initialState);
 	}
 
-	async checkPincode() {
-		const { pincode } = this.state;
-		const { checkPinCode } = this.props;
-		await checkPinCode(pincode);
-		this.closeModal();
-		this.setState({ pincode: '' });
-	}
-
-	async onChangePincode(e) {
-		const val = e.target.value;
-		if (e.target.validity.valid) this.setState({ pincode: e.target.value.replace(/^0+/, '') });
-		else if (val === '' || val === '-') this.setState({ pincode: val });
-	}
-
 	closeModal() {
 		const { togglePopupPincode, disableCalendar } = this.props;
 		togglePopupPincode(false, '');
 		this.resetState();
+		this.setState({ isAddBlock: false });
 		disableCalendar(false);
-	}
-
-	getTimeLogin() {
-		const { staff, currentDay } = this.props;
-		let timeLogin = 0;
-		switch (moment(currentDay).format('dddd')) {
-			case 'Monday':
-				timeLogin = staff.workingTimes.Monday.timeStart;
-				break;
-
-			case 'Tuesday':
-				timeLogin = staff.workingTimes.Tuesday.timeStart;
-				break;
-
-			case 'Wednesday':
-				timeLogin = staff.workingTimes.Wednesday.timeStart;
-				break;
-
-			case 'Thursday':
-				timeLogin = staff.workingTimes.Thursday.timeStart;
-				break;
-
-			case 'Friday':
-				timeLogin = staff.workingTimes.Friday.timeStart;
-				break;
-
-			case 'Saturday':
-				timeLogin = staff.workingTimes.Saturday.timeStart;
-				break;
-
-			default:
-				break;
-		}
-		return timeLogin;
 	}
 
 	closePopupSelectTime(time) {
@@ -231,12 +188,8 @@ class Pincode extends Component {
 	editBlockTime() {
 		const { blockTimeEdit, start, end, note } = this.state;
 		if (blockTimeEdit) {
-			const data = {
-				start,
-				end,
-				note,
-				id: blockTimeEdit.blockTimeId
-			};
+			const noteSubmit = note.replace(/(\r\n|\n|\r)/gm, '<br>');
+			const data = { start, end, note: noteSubmit, id: blockTimeEdit.blockTimeId };
 			this.props.editBlockTime(data);
 			this.closeModal();
 		}
@@ -245,18 +198,16 @@ class Pincode extends Component {
 	submitEditBlock() {
 		const { staff } = this.props;
 		const { start, end, note, blockTimeEdit } = this.state;
+		const noteSubmit = note.replace(/(\r\n|\n|\r)/gm, '<br>');
 		const beginningTime = moment(start, 'h:mma');
 		const endTime = moment(end, 'h:mma');
+
 		if (endTime.isSameOrBefore(beginningTime)) {
 			alert('End time must be after Start time');
 		} else {
 			if (!blockTimeEdit) {
-				this.props.SubmitEditBlockTime({
-					staff,
-					start,
-					end,
-					note
-				});
+				const data = { staff, start, end, note: noteSubmit };
+				this.props.SubmitEditBlockTime(data);
 				this.closeModal();
 			} else {
 				this.editBlockTime();
@@ -264,12 +215,11 @@ class Pincode extends Component {
 		}
 	}
 
-	deleteBlockTime(block) {
-		if (window.confirm('Do you want to Cancel this Blocked Time?')) {
-			const { staff, deleteBlockTime } = this.props;
-			deleteBlockTime({ block, staff });
-			this.closeModal();
-		}
+	deleteBlockTime() {
+		const {blockDelete} = this.state;
+		const { staff, deleteBlockTime } = this.props;
+		deleteBlockTime({ block : blockDelete, staff });
+		this.closeModal();
 	}
 
 	renderTimeLogin(timeLogin) {
@@ -299,14 +249,8 @@ class Pincode extends Component {
 						{this.renderTimeLogin(staff.timeLogin)}
 					</div>
 					<div style={styles.appointmentQuantity}>
-						<div>Appointments :</div>
-						<div
-							style={{
-								fontWeight: 600
-							}}
-						>
-							{this.findAppointment()}
-						</div>
+						<div>Appointments : </div>
+						<div style={{ fontWeight: 600 }}>&nbsp;{`${this.findAppointment()}`}</div>
 					</div>
 				</div>
 			</StaffHeader.Right>
@@ -316,8 +260,13 @@ class Pincode extends Component {
 	renderBlockTimeList() {
 		const { blockTime } = this.props.staff;
 		return blockTime.filter((b) => b.isDisabled === 0).map((obj) => {
+			const notes_array = obj.note.split('<br>');
 			return (
-				<div onClick={() => this.openBlockTime(obj)} key={obj.blockTimeId} style={styles.blockTime}>
+				<div
+					onClick={() => this.openBlockTime(obj)}
+					key={'blockTime' + obj.blockTimeId + Math.random()}
+					style={styles.blockTime}
+				>
 					<div style={{ width: '10%' }}>
 						<FaClock color={'#1266AE'} size={18} />
 					</div>
@@ -329,11 +278,25 @@ class Pincode extends Component {
 								{obj.blockTimeStart} - {obj.blockTimeEnd}
 							</div>
 						</div>
-						<div style={styles.note}>{obj.note}</div>
+						{notes_array.map((_note, index) => {
+							return (
+								<div key={'note' + index} style={styles.note}>
+									{_note}
+								</div>
+							);
+						})}
 					</div>
 
 					{obj.editable && (
-						<div onClick={() => this.deleteBlockTime(obj)} style={styles.trashButton}>
+						<div
+							onClick={() => {
+								this.setState({ isPopupDelete: true, blockDelete : obj },()=>{
+									this.setState({ isAddBlock : false })
+								});
+			
+							}}
+							style={styles.trashButton}
+						>
 							<FaTrash color={'#6A6A6A'} size={20} style={styles.trash} />
 						</div>
 					)}
@@ -342,9 +305,16 @@ class Pincode extends Component {
 		});
 	}
 
+	async handleNoteChange(e) {
+		await this.setState({ note: e.target.value });
+	}
+
+	reverse(str) {
+		return str.split('').reverse().join('');
+	}
+
 	renderStaffBody() {
 		const { isAddBlock, start, end, blockTimeEdit } = this.state;
-		console.log({ blockTimeEdit });
 		if (!isAddBlock) {
 			return (
 				<React.Fragment>
@@ -359,7 +329,7 @@ class Pincode extends Component {
 
 		return (
 			<StaffBody>
-				<StaffBody.Title>Add block time</StaffBody.Title>
+				<StaffBody.Title>Add Blocked Time</StaffBody.Title>
 				<Row>
 					<div style={styles.titleBody}>Time</div>
 					<div onClick={() => this.setState({ isPopupSelectTime: true, isStart: true })}>
@@ -382,8 +352,9 @@ class Pincode extends Component {
 					<div>
 						<textarea
 							value={this.state.note}
-							onChange={(e) => this.setState({ note: e.target.value })}
+							onChange={(e) => this.handleNoteChange(e)}
 							style={styles.notes}
+							// onKeyDown={(e) => this.keyPress(e)}
 						/>
 					</div>
 				</Row>
@@ -406,7 +377,7 @@ class Pincode extends Component {
 			this.setState({
 				isAddBlock: true,
 				blockTimeEdit: blockTime,
-				note: blockTime.note,
+				note: blockTime.note.replace(/<br>/gm, '\n'),
 				start: blockTime.blockTimeStart,
 				end: blockTime.blockTimeEnd
 			});
@@ -442,9 +413,22 @@ class Pincode extends Component {
 		return null;
 	}
 
+	renderPopupDelete() {
+		const { isPopupDelete } = this.state;
+		if (isPopupDelete) {
+			return (
+				<ConfirmDelete
+					onPressNo={() => this.setState({ isPopupDelete: false })}
+					onPressYes={() => this.deleteBlockTime()}
+				/>
+			);
+		}
+		return null;
+	}
+
 	render() {
 		const { popupPincode, staff } = this.props;
-		const { isPopupSelectTime } = this.state;
+		const { isPopupSelectTime, isAddBlock } = this.state;
 
 		if (popupPincode === false) return '';
 		return (
@@ -466,9 +450,10 @@ class Pincode extends Component {
 						</StaffHeader>
 						{this.renderStaffBody()}
 					</PincodeBody>
+					{isPopupSelectTime && <OverLay />}
+					{this.renderPopupSelectTime()}
+					{this.renderPopupDelete()}
 				</React.Fragment>
-				{isPopupSelectTime && <OverLay />}
-				{this.renderPopupSelectTime()}
 			</FormPincode>
 		);
 	}

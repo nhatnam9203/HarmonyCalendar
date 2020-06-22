@@ -17,6 +17,7 @@ import PopupStaff from './PopupStaff';
 import { FaCaretDown } from 'react-icons/fa';
 import PopupTimePicker from './PopupTimePicker';
 import { MdSubdirectoryArrowLeft } from 'react-icons/md';
+import {IoIosCloseCircle} from 'react-icons/io'
 import PopupPrice from './PopupPrice';
 
 const AppPopup = styled(Popup)`
@@ -772,7 +773,7 @@ class Appointment extends React.Component {
 		if (appointment.status === 'CHECKED_IN') {
 			return (
 				<AppointmentWrapper.Header
-					color={staffId === 0 ? '#333' : 'white'}
+					color={'white'}
 					backgroundColor={'#00b4f7'}
 				>
 					{appointment.code} Check-In Appointment
@@ -782,7 +783,7 @@ class Appointment extends React.Component {
 		if (appointment.status === 'PAID') {
 			return (
 				<AppointmentWrapper.Header
-					color={staffId === 0 ? '#333' : 'white'}
+					color={'white'}
 					backgroundColor={'#00dc00'}
 				>
 					{appointment.code} Paid Appointment
@@ -1585,7 +1586,7 @@ class Appointment extends React.Component {
 				>
 					<AppointmentWrapper>
 						<AppointmentWrapper.Close onClick={() => this.closeModal()}>
-							<FaTimesCircle color={colorDelete} />
+							<IoIosCloseCircle style={{ width : 38,height : 38 }} color={colorDelete} />
 						</AppointmentWrapper.Close>
 						{this.renderHeader()}
 						{this.renderBody()}
@@ -1603,7 +1604,7 @@ class Appointment extends React.Component {
 				<ConfirmationPopup open={this.state.confirmationModal}>
 					<ConfirmationWrapper>
 						<ConfirmationWrapper.Close onClick={() => this.closeConfirmationModal()}>
-							<FaTimesCircle color={'white'} />
+							<IoIosCloseCircle style={{ width : 36,height : 36 }} color={'white'} />
 						</ConfirmationWrapper.Close>
 						<ConfirmationWrapper.Header backgroundColor="#1173C3">Confirmation</ConfirmationWrapper.Header>
 						<ConfirmationWrapper.Body>

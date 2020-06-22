@@ -65,7 +65,7 @@ const Resource = styled.div`
 
 const AnyStaff = styled(Resource)`
 	width : calc(100% - 5.05rem - ((calc((100vw - 5.05rem) / 7)) * 6) + 4px);
-	height :7rem;
+	height : 4.4rem;
 	border-left: 1px solid #1173C3;
 	background-color : #F5F5F5;
 `;
@@ -81,9 +81,9 @@ AnyStaff.Image = styled.div`
 `;
 
 AnyStaff.Title = styled.div`
-	position: absolute;
-	bottom: 3rem;
-	left: 0;
+	/* position: absolute;
+	bottom: 3rem; */
+	margin-top: -0.25rem !important;
 	width: 100%;
 	opacity: 0.75;
 	text-align: center;
@@ -203,6 +203,7 @@ class ResourceSelector extends React.Component {
 	}
 
 	afterSlide(index) {
+		
 		const { resources } = this.props;
 		const isDeskTop = isDesktopOrLaptop;
 		const num = isDeskTop ? 7 : 5;
@@ -407,6 +408,30 @@ class ResourceSelector extends React.Component {
 		return null;
 	}
 
+	getActiveArrow(){
+		const {slideIndex,resources} = this.props;
+		let isActiveLeft = false, isActiveRight = false;
+		const totalSlide = resourse / 5;
+		if((totalSlide) <= 1){
+			isActiveLeft = false;
+			isActiveRight = false;
+		}
+		if(totalSlide > 1){
+			if(slideIndex > 0){
+				if(slideIndex < totalSlide){
+					isActiveRight = true
+				}
+				isActiveLeft = true;
+			}else{
+				isActiveLeft = false
+			}
+		}
+
+		return {
+			isActiveLeft , isActiveRight
+		}
+	}
+
 	render() {
 		const {
 			checkPinCode,
@@ -418,8 +443,14 @@ class ResourceSelector extends React.Component {
 			SubmitEditBlockTime,
 			deleteBlockTime,
 			currentDay,
-			editBlockTime
+			editBlockTime,
+			slideIndex,
+			resources
 		} = this.props;
+
+		const isActiveLett = false;
+		const isActiveRight = false;
+
 
 		return (
 			<React.Fragment>
@@ -444,25 +475,20 @@ class ResourceSelector extends React.Component {
 						<Carousel
 							dragging={true}
 							renderBottomCenterControls={() => ''}
-							renderCenterLeftControls={({ previousSlide }) => (
-								// <PrevButton className='btn-arrow' onClick={(ev) => this.onPrevClick(ev, previousSlide)}>
-								// 	<FaCaretLeft />
-								
-								// </PrevButton>
-								<SplashButton onClick={(ev) => this.onPrevClick(ev, previousSlide)}>
+							renderCenterLeftControls={({ previousSlide }) =>{
+								return(
+									<SplashButton onClick={(ev) => this.onPrevClick(ev, previousSlide)}>
 									<FaCaretLeft />
 								</SplashButton>
-							)}
-							renderCenterRightControls={({ nextSlide }) => (
-								// <NextButton className='btn-arrow' onClick={(ev) => this.onNextClick(ev, nextSlide)}>
-								// 	<FaCaretRight />
-						
-								// </NextButton>
-
-								<SplashButton onClick={(ev) => this.onNextClick(ev, nextSlide)}>
+								)
+							}}
+							renderCenterRightControls={({ nextSlide }) => {
+								return(
+									<SplashButton onClick={(ev) => this.onNextClick(ev, nextSlide)}>
 									<FaCaretRight />
 								</SplashButton>
-							)}
+								)
+							}}
 							afterSlide={(slideIndex) => this.afterSlide(slideIndex)}
 						>
 							{this.renderCarouselSlide()}

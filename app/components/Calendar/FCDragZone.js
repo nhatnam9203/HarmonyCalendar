@@ -166,7 +166,7 @@ class FCDragZone extends React.PureComponent {
                 data-event-information={JSON.stringify(event)}
               >
                 <EventWrapper.buttonDelete onClick={() => this.deleteEventWaiting(event)}>
-                  <IoIosCloseCircle />
+                  <IoIosCloseCircle style={{ width : 20, height : 20 }} />
                 </EventWrapper.buttonDelete>
                 <div className="app-event__id-number2">{event.code}</div>
                 <div className="app-event__full-name">{event.userFullName}</div>

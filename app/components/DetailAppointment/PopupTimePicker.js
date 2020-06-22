@@ -128,7 +128,7 @@ export default class PopupTimePicker extends Component {
 		return (
 			<OutsideClickHandler onOutsideClick={() => this.cancel()}>
 				<PopupTimePK style={style}>
-					<Header>Select time</Header>
+					<Header>Select Time</Header>
 					<Body>
 						<Picker
 							optionGroups={optionGroups}

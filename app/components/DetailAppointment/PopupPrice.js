@@ -116,7 +116,7 @@ export default class PopupPrice extends Component {
     }
     
     onChangePrice(value){
-        const { floatValue } = value;
+		let { floatValue } = value;
 		if (floatValue) {
 			this.setState({
                 price : floatValue

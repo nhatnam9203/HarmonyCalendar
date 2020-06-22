@@ -1,7 +1,6 @@
 /**
  * Get Query String Params from URL
  */
-import { PROD_API_BASE_URL } from '../../app-constants';
 
 export default function getURLParam(name, url) {
 	if (!url) url = window.location.href;
