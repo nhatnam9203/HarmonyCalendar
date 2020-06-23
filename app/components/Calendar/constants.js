@@ -65,14 +65,47 @@ export const MAIN_CALENDAR_OPTIONS = {
 		let check_block_temp = false;
 
 		if (parseInt(resource.id) === 0) {
-			JSON.stringify;
-			const data = {
-				fromTime: start,
-				toTime: end,
-				staffId: 0,
-				action: 'addGroupAnyStaff'
-			};
-			window.postMessage(JSON.stringify(data));
+
+			const allAppointment = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
+			let count = 0;
+			let countAppAnyStaff = 0;
+
+			/* check staff available để add appointment any staff */
+			allAppointment.forEach(app => {
+				if (
+					moment(start).isBefore(moment(app.end)) &&
+					moment(start).isSameOrAfter(moment(app.start)) &&
+					(app.status === "CHECKED_IN" || app.status === "CONFIRMED" || app.status === "BLOCK_TEMP")
+				) {
+					count = count + 1
+				}
+
+				if (
+					moment(start).isBefore(moment(app.end)) &&
+					moment(start).isSameOrAfter(moment(app.start)) && (app.memberId === 0)
+				) {
+					countAppAnyStaff = countAppAnyStaff + 1
+				}
+			});
+
+			const allMember = store.getState().getIn(['appointment', 'members', 'all']);
+			if(count === allMember.length - 1){
+				alert('There is no staff available at this time.')
+				return;
+			}
+			
+
+			if (countAppAnyStaff > 0 && countAppAnyStaff >= count && count > 0) {
+				alert('There is no staff available at this time.')
+			} else {
+				const data = {
+					fromTime: start,
+					toTime: end,
+					staffId: 0,
+					action: 'addGroupAnyStaff'
+				};
+				window.postMessage(JSON.stringify(data));
+			}
 		}
 
 		if (parseInt(resource.id) !== 0) {
@@ -327,8 +360,6 @@ export const MAIN_CALENDAR_OPTIONS = {
 					) {
 						if (parseInt(app.id) !== parseInt(event.id)) {
 							if (app.status === 'BLOCK_TEMP') {
-								console.log('hihihihihih')
-
 								check = 1;
 							} else {
 								check = false;
@@ -486,22 +517,19 @@ export const MAIN_CALENDAR_OPTIONS = {
 					) {
 						if (parseInt(app.id) !== parseInt(event.data.id)) {
 							if (app.status === 'BLOCK_TEMP') {
-								console.log({apointmentblocktemp : app})
-								console.log('check true')
 
 								if (app.appointmentId !== event.data.id) {
 									// alert('The Staff is not available on your time selected.')
 									// check = 1;
 								}
 							} else {
-								console.log('check false')
 								check = false;
 							}
-						}else{
-							if (app.status === 'BLOCK_TEMP'){
-								if (window.confirm('Accept appointment outside working hours')){
+						} else {
+							if (app.status === 'BLOCK_TEMP') {
+								if (window.confirm('Accept appointment outside working hours')) {
 									check = true;
-								}else{
+								} else {
 									check = 1;
 								}
 							}
@@ -580,7 +608,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 	}
 };
 
-export const addEventsToCalendar = (currentDate, appointmentsMembers) => {
+export const addEventsToCalendar = async (currentDate, appointmentsMembers) => {
 	//apointmentMember render appointment tai slide hien tai
 	$('#full-calendar').fullCalendar('gotoDate', currentDate);
 	$('#full-calendar').fullCalendar('removeEvents');
@@ -622,7 +650,6 @@ export const addEventsToCalendar = (currentDate, appointmentsMembers) => {
 			resourceEditable: !(appointment.status === 'PAID')
 		});
 	});
-
 	// viet ham render appointment cho cot any staff tai day
 	$('#full-calendar').fullCalendar('renderEvents', events);
 };

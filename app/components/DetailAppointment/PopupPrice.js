@@ -77,29 +77,48 @@ const Input = styled(NumberFormat)`
     border-radius: 3px;
     height: 2.3rem;
     width: 85%;
-    text-align: right;
+    text-align: left;
     padding-right: 1rem;
     color: #1173C3;
     font-weight: 600;
+	text-align : right;
+	::placeholder,
+  	::-webkit-input-placeholder {
+		color: #1173C3;
+		opacity : 1;
+  	}
+`;
+
+const InputPrice = styled.div`
+	border : 1px solid #dddddd;
+    border-radius: 3px;
+    height: 2.3rem;
+    width: 85%;
+	display : flex; 
+	flex-direction : row;
 `;
 
 export default class PopupPrice extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			price: ''
+			price: '',
+			isZero: false
 		};
 	}
 
 	closePopup() {
 		this.props.closePopupPrice();
-    }
-    
-    donePopup(){
-        const {price} = this.state;
-        const {indexPrice} = this.props;
-        this.props.donePopupPrice(price,indexPrice);
-    }
+	}
+
+	donePopup() {
+		let { price } = this.state;
+		if(!price) {
+			price = "0.00"
+		}
+		const { indexPrice } = this.props;
+		this.props.donePopupPrice(price, indexPrice);
+	}
 
 	componentDidMount() {
 		const { valuePriceIndex } = this.props;
@@ -113,20 +132,18 @@ export default class PopupPrice extends Component {
 		this.setState({
 			price: valuePriceIndex
 		});
-    }
-    
-    onChangePrice(value){
-		let { floatValue } = value;
-		if (floatValue) {
+	}
+
+	onChangePrice(value) {
+		let { floatValue,formattedValue } = value;
 			this.setState({
-                price : floatValue
-            })
-		}
-    }
+				price: formattedValue
+			})
+	}
 
 	render() {
-        const { isPoupPrice, valuePriceIndex, indexPrice } = this.props;
-        const {price} = this.state;
+		const { isPoupPrice, valuePriceIndex, indexPrice } = this.props;
+		const { price } = this.state;
 		return (
 			<PricePopup closeOnDocumentClick={false} open={isPoupPrice} position="right center">
 				<Container>
@@ -140,17 +157,19 @@ export default class PopupPrice extends Component {
 							}}
 						/>
 						<Input
-							value={parseFloat(price).toFixed(2)}
-							thousandSeparator={false}
+							value={price}
 							onValueChange={(value) => this.onChangePrice(value)}
 							type="tel"
+							placeHolder="0.00"
+							placeHolderText
+							format="##.##"
 						/>
 					</Body>
 					<Footer>
 						<Button onClick={() => this.closePopup()} borderRight>
 							Cancel
 						</Button>
-						<Button onClick={()=>this.donePopup()} borderBottomRight>Done</Button>
+						<Button onClick={() => this.donePopup()} borderBottomRight>Done</Button>
 					</Footer>
 				</Container>
 			</PricePopup>

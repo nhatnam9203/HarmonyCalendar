@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import Popup from 'reactjs-popup';
 import { FaTimesCircle } from 'react-icons/fa';
-import {IoIosCloseCircle} from 'react-icons/io'
+import { IoIosCloseCircle } from 'react-icons/io'
 import { formatUsPhone, checkStringNumber2 } from '../../utils/helper';
 import NumberFormat from 'react-number-format';
 import { MdSubdirectoryArrowLeft } from 'react-icons/md';
@@ -217,7 +217,7 @@ const NoteWrapper = styled.div`
 	text-align: left;
 	display: flex;
 	flex-direction: column;
-	justify-content: space-between;
+	/* justify-content: space-between; */
 	word-wrap: break-word;
 `;
 
@@ -269,7 +269,8 @@ const initialState = {
 	email: '',
 	error_phone: '',
 	success_addApointment: '',
-	error_addApointment: ''
+	error_addApointment: '',
+	referedBy: '',
 };
 
 class AddAppointment extends React.Component {
@@ -308,7 +309,7 @@ class AddAppointment extends React.Component {
 
 	handleSubmitAppointment = () => {
 		const { time, staffID } = this.props.TimeAndStaffID;
-		const { first_name, last_name, phoneNumber, phone, notes, email, phoneCheck, refPhoneHeader } = this.state;
+		const { first_name, last_name, phoneNumber, phone, notes, email, phoneCheck, refPhoneHeader, referedBy } = this.state;
 		const refFone = phone ? phone : '';
 		if (first_name.trim() !== '' && last_name.trim() !== '') {
 			this.props.addCustomer({
@@ -319,7 +320,8 @@ class AddAppointment extends React.Component {
 				note: notes.toString(),
 				time,
 				staffID,
-				email
+				email,
+				referedBy
 			});
 			this.props.infoCheckPhone('');
 			this.closeAllModal();
@@ -336,6 +338,10 @@ class AddAppointment extends React.Component {
 		this.setState({ noteValue: e.target.value });
 	}
 
+	handleChangeReferedBy(e) {
+		this.setState({ referedBy: e.target.value })
+	}
+
 	renderNote = (note, index) => (
 		<NoteInformation key={index}>
 			<div>{note}</div>
@@ -343,14 +349,20 @@ class AddAppointment extends React.Component {
 	);
 
 	renderNotes() {
+		const { notes } = this.state;
+		console.log({ notes });
 		return (
-			<div
-				style={{
+			<div style={{
 					height: 60,
-					overflowY: 'scroll'
+					overflowY: 'scroll',
+					marginTop : 15
 				}}
 			>
-				{this.state.notes.toString()}
+				{notes.map((note, index) => {
+					return (
+						<div style={{ marginBottom : 5 }} key={index + "note"} >{note}</div>
+					)
+				})}
 			</div>
 		);
 	}
@@ -397,14 +409,15 @@ class AddAppointment extends React.Component {
 		}
 		if (nextProps.checkPhoneError === true) {
 			// phone is not exist
-			const { firstName, lastName, email, phone, referrerPhone, favourite } = nextProps.InfoAfterCheckPhone;
+			const { firstName, lastName, email, phone, referrerPhone, favourite, referrerBy } = nextProps.InfoAfterCheckPhone;
 			this.setState({
 				first_name: firstName,
 				last_name: lastName,
 				email: email,
 				phoneNumber: phone === undefined ? ' ' : phone.slice(2),
 				phone: referrerPhone,
-				notes: favourite ? favourite : ''
+				notes: favourite ? favourite.split(',') : [],
+				referedBy: referrerBy
 			});
 			this.openFormInsertAfterCheckPhone();
 		}
@@ -419,7 +432,7 @@ class AddAppointment extends React.Component {
 	addNotes() {
 		const { notes, noteValue } = this.state;
 		if (noteValue !== '') {
-			this.setState({ notes: [ ...notes, noteValue ], noteValue: '' });
+			this.setState({ notes: [...notes, noteValue], noteValue: '' });
 		}
 	}
 
@@ -451,12 +464,13 @@ class AddAppointment extends React.Component {
 			success_addApointment,
 			phone
 		} = this.state;
-		
+
 		const { appointment, InfoAfterCheckPhone, StateAddCustomerSuccess, checkPhoneError } = this.props;
 
 		const PhoneShow = `+(${this.state.phoneCheck}) ${formatUsPhone(this.state.phoneNumber)}`;
 
 		if (!appointment) return '';
+
 		return (
 			<div>
 				<SearchingPopup open={isOpenSearchingPopup} closeOnDocumentClick={false} lockScroll={true}>
@@ -509,12 +523,12 @@ class AddAppointment extends React.Component {
 					position={'left center'}
 				>
 					<AddingWrapper>
-						<AddingWrapper.Close style={{ top : 10, }} onClick={() => this.closeAllModal()}>
+						<AddingWrapper.Close style={{ top: 10, }} onClick={() => this.closeAllModal()}>
 							<IoIosCloseCircle style={{ height: 38, width: 38 }} />
 						</AddingWrapper.Close>
 
 						<AddingWrapper.Header backgroundColor="#1173C3">Add Appointment</AddingWrapper.Header>
-						
+
 						<AddingWrapper.Body>
 							<Form onSubmit={(e) => e.preventDefault()}>
 								{success_addApointment && <p style={{ color: '#8D9440' }}>{success_addApointment}</p>}
@@ -589,15 +603,26 @@ class AddAppointment extends React.Component {
 								)}
 							</Form>
 
-							{InfoAfterCheckPhone.favourite !== '' && <NoteWrapper>
+							<Form className="left" onSubmit={(e) => e.preventDefault()}>
+								<Label>Referred by</Label>
+								<input
+									disabled={InfoAfterCheckPhone !== ''}
+									value={this.state.referedBy}
+									onChange={(e) => this.handleChangeReferedBy(e)}
+									placeholder="Referred by"
+								/>
+							</Form>
+
+
+							<NoteWrapper>
 								<Label>Note:</Label>
-								<NoteWrapper.Form onSubmit={(e) => e.preventDefault()}>
+								{!InfoAfterCheckPhone.favourite && <NoteWrapper.Form onSubmit={(e) => e.preventDefault()}>
 									<input
 										value={this.state.noteValue}
 										disabled={InfoAfterCheckPhone !== ''}
 										onChange={(e) => this.handleChangeNote(e)}
 									/>
-									<button type="submit" onClick={() => this.addNotes()}>
+									<button disabled={InfoAfterCheckPhone.favourite ? true : false} type="submit" onClick={() => this.addNotes()}>
 										<MdSubdirectoryArrowLeft
 											style={{
 												width: 28,
@@ -605,10 +630,13 @@ class AddAppointment extends React.Component {
 											}}
 										/>
 									</button>
-								</NoteWrapper.Form>
+								</NoteWrapper.Form>}
 								{/* {notes.map((note, index) => this.renderNote(note, index))} */}
 								{this.renderNotes()}
-							</NoteWrapper>}
+							</NoteWrapper>
+
+							
+
 							<div style={{ height: 70 }} />
 						</AddingWrapper.Body>
 

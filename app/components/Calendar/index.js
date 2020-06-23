@@ -227,6 +227,24 @@ class Calendar extends React.Component {
 									break;
 
 								default:
+
+									if (appointment_R.status === 'ASSIGNED') {
+										const displayMember = store
+											.getState()
+											.getIn(['appointment', 'appointments', 'calendar']);
+		
+										const member = displayMember.find((mem) =>
+											mem.appointments.find((app) => parseInt(app.id) === parseInt(appointment_R.id))
+										);
+
+										console.log({member})
+
+										if (!member) {
+											updateEventToCalendar(appointment_R);
+											addAppointmentRealTime(appointment_R);
+										}
+									}
+									
 									updateAppointmentPaid(appointment_R);
 									addEventsToCalendar(selectDay, displayMember);
 									removeAppointmentWaiting(appointment_R);
@@ -245,8 +263,10 @@ class Calendar extends React.Component {
 
 					case 'change_item':
 						console.log('change item');
-						loadWaitingAppointments();
-						loadAppointmentByMembers();
+						setTimeout(() => {
+							loadWaitingAppointments();
+							loadAppointmentByMembers();
+						}, 500);
 						break;
 					default:
 						break;

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Carousel from 'nuka-carousel';
 import { FaCaretLeft, FaCaretRight } from 'react-icons/fa';
-import { staffId , isDesktopOrLaptop } from '../../../app-constants';
+import { staffId, isDesktopOrLaptop } from '../../../app-constants';
 import LoadingIndicator from 'components/LoadingIndicator';
 import Pincode from './Pincode';
 import SplashButton from './SplashButton'
@@ -203,7 +203,7 @@ class ResourceSelector extends React.Component {
 	}
 
 	afterSlide(index) {
-		
+
 		const { resources } = this.props;
 		const isDeskTop = isDesktopOrLaptop;
 		const num = isDeskTop ? 7 : 5;
@@ -408,27 +408,34 @@ class ResourceSelector extends React.Component {
 		return null;
 	}
 
-	getActiveArrow(){
-		const {slideIndex,resources} = this.props;
+	getActiveArrow() {
+		const { slideIndex, resources } = this.props;
 		let isActiveLeft = false, isActiveRight = false;
-		const totalSlide = resourse / 5;
-		if((totalSlide) <= 1){
+		const totalSlide = (resources.length - 1) / 5;
+		
+		if ((totalSlide) <= 1) {
 			isActiveLeft = false;
 			isActiveRight = false;
 		}
-		if(totalSlide > 1){
-			if(slideIndex > 0){
-				if(slideIndex < totalSlide){
-					isActiveRight = true
+		if (totalSlide > 1) {
+			if (slideIndex > 0) {
+				if (slideIndex < totalSlide) {
+					if(totalSlide - slideIndex <= 1){
+						isActiveRight = false;
+						isActiveLeft = true;
+					}else{
+						isActiveRight = true;
+						isActiveLeft = true
+					}
 				}
-				isActiveLeft = true;
-			}else{
-				isActiveLeft = false
+			} else {
+				isActiveLeft = false;
+				isActiveRight = true;
 			}
 		}
 
 		return {
-			isActiveLeft , isActiveRight
+			isActiveLeft, isActiveRight
 		}
 	}
 
@@ -448,8 +455,8 @@ class ResourceSelector extends React.Component {
 			resources
 		} = this.props;
 
-		const isActiveLett = false;
-		const isActiveRight = false;
+		const isActiveLett = this.getActiveArrow().isActiveLeft;
+		const isActiveRight = this.getActiveArrow().isActiveRight;
 
 
 		return (
@@ -475,19 +482,33 @@ class ResourceSelector extends React.Component {
 						<Carousel
 							dragging={true}
 							renderBottomCenterControls={() => ''}
-							renderCenterLeftControls={({ previousSlide }) =>{
-								return(
-									<SplashButton onClick={(ev) => this.onPrevClick(ev, previousSlide)}>
-									<FaCaretLeft />
-								</SplashButton>
-								)
+							renderCenterLeftControls={({ previousSlide }) => {
+								if (!isActiveLett) {
+									return (
+										<PrevButton onClick={()=>{}}>
+											<FaCaretLeft />
+										</PrevButton>
+									)
+								} else
+									return (
+										<SplashButton isLeft onClick={(ev) => this.onPrevClick(ev, previousSlide)}>
+											<FaCaretLeft />
+										</SplashButton>
+									)
 							}}
 							renderCenterRightControls={({ nextSlide }) => {
-								return(
-									<SplashButton onClick={(ev) => this.onNextClick(ev, nextSlide)}>
-									<FaCaretRight />
-								</SplashButton>
-								)
+								if (!isActiveRight) {
+									return ( 
+										<NextButton onClick={()=>{}}>
+											<FaCaretRight />
+										</NextButton>
+									)
+								} else
+									return (
+										<SplashButton isRight onClick={(ev) => this.onNextClick(ev, nextSlide)}>
+											<FaCaretRight />
+										</SplashButton>
+									)
 							}}
 							afterSlide={(slideIndex) => this.afterSlide(slideIndex)}
 						>

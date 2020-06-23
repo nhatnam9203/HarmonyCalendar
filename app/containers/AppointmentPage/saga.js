@@ -343,7 +343,9 @@ export function* getAppointmentAfterSlide() {
 
 		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery);
 		yield put(actions.appointmentByMembersLoaded(appointmentsMembers));
-		addEventsToCalendar(currentDate, appointmentsMembers);
+		setTimeout(() => {
+			addEventsToCalendar(currentDate, appointmentsMembers);			
+		}, 200);
 	} catch (err) {
 		yield put(actions.appointmentByMemberLoadingError(err));
 	}
@@ -715,24 +717,26 @@ export function* changeTimeAppointment(action) {
 		);
 
 		/* cập nhật appointment trên frontend */
-		// yield put(
-		// 	actions.updateAppointmentFrontend({
-		// 		appointment: {
-		// 			...data,
-		// 			staffId : options.length > 0 ? options[0].staffId : 0,
-		// 			toTime: moment(data.fromTime).add(totalDuarion(data.services, data.extras, appointment), 'minutes')
-		// 		},
-		// 		id: appointment.id
-		// 	})
-		// );
-		// yield put(actions.renderAppointment());
+		yield put(
+			actions.updateAppointmentFrontend({
+				appointment: {
+					...data,
+					staffId : options.length > 0 ? options[0].staffId : 0,
+					toTime: moment(data.fromTime).add(totalDuarion(data.services, data.extras, appointment), 'minutes')
+				},
+				id: appointment.id
+			})
+		);
+		yield put(actions.renderAppointment());
 
 		/* Gọi api submit data lên server, nếu lỗi ko có internet => cập nhật frontend , lưu local */
 		try {
 			const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
 			const url = `${requestURL.toString()}/${appointment.id}`;
 			const response = yield api(url, data, 'PUT', token);
-			if (response.codeStatus !== 1) return yield* checkResponse(kq);
+			if (response.codeStatus !== 1) {
+				return yield* checkResponse(response);
+			}
 			if (response.codeStatus === 1) {
 			}
 		} catch (err) {
@@ -755,7 +759,9 @@ export function* changeTimeAppointment(action) {
 
 export function* addNewCustomer(action) {
 	try {
-		const { first_name, last_name, phone, staffID, time, refPhone, note, email } = action.customer;
+		const { first_name, last_name, phone, staffID, time, refPhone, note, email,referedBy } = action.customer;
+
+		console.log(action.customer)
 
 		if (navigator.onLine === false) {
 			window.postMessage(
@@ -785,7 +791,8 @@ export function* addNewCustomer(action) {
 				Email: email,
 				Phone: phone,
 				referrerPhone: '+' + refPhone,
-				favourite: note
+				favourite: note,
+				ReferrerBy : referedBy
 			};
 
 			const result = yield api(requestURL.toString(), data, 'POST', token);
@@ -922,6 +929,7 @@ export function* checkPhoneCustomer(action) {
 		const { phone, staffID, time } = action.phone;
 		const requestURL = new URL(api_constants.GET_BY_PHONE);
 		const url = `${requestURL.toString()}/${phone}`;
+		console.log({url})
 		if (navigator.onLine) {
 			const result = yield api(url, '', 'GET', token);
 			if (result.codeStatus === 2) {
@@ -1082,6 +1090,8 @@ export function* getTimeStaffLoginSaga(action) {
 		const timeZone = new Date().getTimezoneOffset();
 		const requestURL = new URL(`${api_constants.API_GET_TIME_STAFF_LOGIN}/${staffId}?timezone=${timeZone}`);
 		const response = yield api(requestURL.toString(), '', 'GET', token);
+
+		console.log({response,requestURL})
 
 		if (response.codeStatus === 1) {
 			yield put({ type: 'GET_TIME_STAFF_LOGIN_SUCCESS', data: { timeLogin: response.data, staffId } });

@@ -365,7 +365,7 @@ class Pincode extends Component {
 				)}
 				{blockTimeEdit && (
 					<div onClick={() => this.submitEditBlock()} style={styles.bottom}>
-						<div style={styles.btnSubmit}>Edit</div>
+						<div style={styles.btnSubmit}>Save</div>
 					</div>
 				)}
 			</StaffBody>

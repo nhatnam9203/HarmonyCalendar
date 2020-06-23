@@ -18,8 +18,9 @@ export default class Button extends Component {
 	}
 
 	render() {
+		const { isLeft = false, isRight = false } = this.props;
 		return (
-			<SplashButton onClick={this.props.onClick} Opacity={this.state.isSplash ? 0.5 : 1}>
+			<SplashButton isLeft={isLeft} isRight={isRight} onClick={this.props.onClick} Opacity={this.state.isSplash ? 0.5 : 1}>
 				{this.props.children}
 			</SplashButton>
 		);
@@ -34,4 +35,5 @@ const SplashButton = styled.div`
 	padding-left: ${(props) => (props.isLeft ? '0.5rem' : '0')};
 	padding-right: ${(props) => (props.isRight ? '0.5rem' : '0')};
 	opacity: ${(props) => props.Opacity};
+	cursor: pointer;
 `;

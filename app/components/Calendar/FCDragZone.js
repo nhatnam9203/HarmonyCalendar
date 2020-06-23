@@ -109,7 +109,7 @@ class FCDragZone extends React.PureComponent {
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', () => this.updateDimensions());
+    // window.removeEventListener('resize', () => this.updateDimensions());
   }
 
   prevSlide() {
