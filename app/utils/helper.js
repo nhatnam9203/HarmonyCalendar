@@ -73,6 +73,7 @@ export function formatPhone(phone) {
 }
 
 export function api(path, params, method, token) {
+
 	let options;
 	options = {
 		headers: {

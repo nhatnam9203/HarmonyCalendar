@@ -1475,18 +1475,23 @@ class Appointment extends React.Component {
 		</NoteInformation>
 	);
 
-	addNote() {
-		const { newNotes, notes, noteValue } = this.state;
-		const note = {
-			createDate: new Date(),
-			note: noteValue
-		};
-		if (noteValue.trim() !== '') {
-			this.setState({
-				notes: [note, ...notes],
-				newNotes: [note, ...newNotes],
-				noteValue: ''
-			});
+	async addNote() {
+		const { newNotes, notes, noteValue } = await this.state;
+		if(noteValue.trim() !== ''){
+			const {appointment} = this.props;
+			const note = await {
+				createDate: new Date(),
+				note: noteValue
+			};
+			if (noteValue.trim() !== '') {
+				await this.setState({
+					notes: [note, ...notes],
+					newNotes: [note, ...newNotes],
+					noteValue: ''
+				});
+			}
+	
+			this.props.updateNote({notes : noteValue , idAppointment : appointment.id});
 		}
 	}
 

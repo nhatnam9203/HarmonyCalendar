@@ -87,6 +87,7 @@
     "rc-time-picker": "^3.7.1",
     "react": "16.6.0",
     "react-alice-carousel": "^1.13.1",
+    "react-currency-masked-input": "^2.5.0",
     "react-day-picker": "^7.3.0",
     "react-dom": "16.6.0",
     "react-helmet": "5.2.0",

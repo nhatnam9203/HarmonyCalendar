@@ -109,7 +109,8 @@ import {
 	SET_SLIDE_INDEX,
 	RELOAD_CALENDAR,
 	RELOAD_STAFF,
-	EDIT_BLOCKTIME
+	EDIT_BLOCKTIME,
+	UPDATE_NOTE
 } from './constants';
 
 /**
@@ -800,6 +801,13 @@ export function reloadCalendar(payload) {
 export function editBlockTime(payload) {
 	return {
 		type: EDIT_BLOCKTIME,
+		payload
+	};
+}
+
+export function updateNote(payload) {
+	return {
+		type: UPDATE_NOTE,
 		payload
 	};
 }

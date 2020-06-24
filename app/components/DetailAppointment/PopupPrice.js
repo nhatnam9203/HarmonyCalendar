@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import NumberFormat from 'react-number-format';
-import OutsideClickHandler from 'react-outside-click-handler';
 import styled from 'styled-components';
 import Popup from 'reactjs-popup';
 import { FaDollarSign } from 'react-icons/fa';
+import CurrencyInput from 'react-currency-masked-input';
 
 const PricePopup = styled(Popup)`
     	width: 22rem !important;
@@ -72,30 +71,16 @@ const Button = styled.div`
 	}
 `;
 
-const Input = styled(NumberFormat)`
-    border : 1px solid #dddddd;
-    border-radius: 3px;
-    height: 2.3rem;
-    width: 85%;
-    text-align: left;
-    padding-right: 1rem;
-    color: #1173C3;
-    font-weight: 600;
-	text-align : right;
-	::placeholder,
-  	::-webkit-input-placeholder {
-		color: #1173C3;
-		opacity : 1;
-  	}
-`;
-
 const InputPrice = styled.div`
-	border : 1px solid #dddddd;
-    border-radius: 3px;
-    height: 2.3rem;
-    width: 85%;
-	display : flex; 
-	flex-direction : row;
+	border: 1px solid #dddddd;
+	border-radius: 3px;
+	height: 2.3rem;
+	width: 85%;
+	padding: 0.8rem;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
 `;
 
 export default class PopupPrice extends Component {
@@ -103,7 +88,8 @@ export default class PopupPrice extends Component {
 		super(props);
 		this.state = {
 			price: '',
-			isZero: false
+			isZero: false,
+			isFocus : false
 		};
 	}
 
@@ -112,64 +98,83 @@ export default class PopupPrice extends Component {
 	}
 
 	donePopup() {
-		let { price } = this.state;
-		if(!price) {
-			price = "0.00"
-		}
 		const { indexPrice } = this.props;
+		const price = (this.refinput && this.refinput.value )? this.refinput.value : "0.00"
 		this.props.donePopupPrice(price, indexPrice);
 	}
 
 	componentDidMount() {
 		const { valuePriceIndex } = this.props;
 		this.setState({
-			price: valuePriceIndex
+			price: valuePriceIndex , isFocus : false
 		});
 	}
 
 	componentWillReceiveProps(nextProps) {
 		const { valuePriceIndex } = nextProps;
 		this.setState({
-			price: valuePriceIndex
+			price: valuePriceIndex, isFocus : false
 		});
 	}
 
-	onChangePrice(value) {
-		let { floatValue,formattedValue } = value;
-			this.setState({
-				price: formattedValue
-			})
+	onChangePrice(e) {
+		const value = e.target.value;
+		this.setState({price : value})
+	}
+
+	getWidthInput(){
+		let width = 32;
+		const {price} = this.state;
+		if(price){
+			if(parseInt(price) === 0){
+				width = 32
+			}else{
+				width = price.length * 8
+			}
+		}
+		return width;
+	}
+
+	handleFocus(){
+		document.getElementById("myInput").focus();
 	}
 
 	render() {
 		const { isPoupPrice, valuePriceIndex, indexPrice } = this.props;
-		const { price } = this.state;
+		const { price , isFocus } = this.state;
+		const width = this.getWidthInput();
 		return (
 			<PricePopup closeOnDocumentClick={false} open={isPoupPrice} position="right center">
 				<Container>
 					<Header>Edit Price</Header>
 					<Body>
-						<FaDollarSign
-							style={{
-								position: 'absolute',
-								left: 40,
-								color: '#585858'
-							}}
-						/>
-						<Input
-							value={price}
-							onValueChange={(value) => this.onChangePrice(value)}
-							type="tel"
-							placeHolder="0.00"
-							placeHolderText
-							format="##.##"
-						/>
+						<InputPrice onClick={() => this.handleFocus()}>
+							<FaDollarSign style={{ color: '#585858' }} />
+							<CurrencyInput
+								name="myInput"
+								id="myInput"
+								onChange={e=>this.onChangePrice(e)}
+								type="tel"
+								// value={this.state.isFocus ? this.state.price : null}
+								defaultValue={price}
+								placeholder="0.00"
+								style={{
+									width,
+									color: '#1173c3',
+									fontWeight: 600,
+								}}
+								autoFocus
+								ref={ref=>this.refinput = ref}
+							/>
+						</InputPrice>
 					</Body>
 					<Footer>
 						<Button onClick={() => this.closePopup()} borderRight>
 							Cancel
 						</Button>
-						<Button onClick={() => this.donePopup()} borderBottomRight>Done</Button>
+						<Button onClick={() => this.donePopup()} borderBottomRight>
+							Done
+						</Button>
 					</Footer>
 				</Container>
 			</PricePopup>

@@ -43,6 +43,7 @@ const GET_BLOCK_TIME_BY_STAFFID_API = `${API_BASE_URL}/blocktime`;
 const GET_WORKINGTIME_MERCHANT = `${API_BASE_URL}/blocktime?workingdate=`;
 const PUT_CHECKOUT = `${API_BASE_URL}/appointment/checkout`;
 const API_GET_TIME_STAFF_LOGIN = `${API_BASE_URL}/staff/loginTime`;
+const PUT_UPDATE_NOTE = `${API_BASE_URL}/appointment/note`;
 const VAR_DEFAULT_AVATAR_PATH = `/upload/staff/avatar.svg`;
 
 export {
@@ -73,6 +74,7 @@ export {
   GET_WORKINGTIME_MERCHANT,
   PUT_CHECKOUT,
   API_GET_TIME_STAFF_LOGIN,
+  PUT_UPDATE_NOTE,
   VAR_DEFAULT_AVATAR_PATH,
   isDesktopOrLaptop
 }
