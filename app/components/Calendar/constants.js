@@ -13,7 +13,6 @@ import {
 } from '../../containers/AppointmentPage/actions';
 import { formatPhone } from '../../utils/helper';
 import vip from '../../images/vip.png';
-import vip_blue from '../../images/vip_blue.png';
 import call from '../../images/call.png';
 
 const OPTION_RENDER_TEMPLATE = (option) => `<div class="app-event__option">- ${option.serviceName}</div>`;
@@ -54,8 +53,8 @@ export const MAIN_CALENDAR_OPTIONS = {
 	slotLabelFormat: 'hh:mm A',
 	slotDuration: '00:15:00',
 	eventOverlap: true,
-	minTime: '06:00:00',
-	maxTime: '23:00:00',
+	minTime: '00:00:00',
+	maxTime: '24:00:00',
 	timezone: 'local',
 	longPressDelay: 200,
 	resources: resource,
@@ -63,40 +62,74 @@ export const MAIN_CALENDAR_OPTIONS = {
 
 	select: (start, end, event, view, resource) => {
 		let check_block_temp = false;
+		let timeEnd, timeStart, isCheckWorking;
 
+		/* book any staff */
 		if (parseInt(resource.id) === 0) {
-
 			const allAppointment = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
+			let allMember = store.getState().getIn(['appointment', 'members', 'all']);
 			let count = 0;
 			let countAppAnyStaff = 0;
 
-			/* check staff available để add appointment any staff */
-			allAppointment.forEach(app => {
-				if (
-					moment(start).isBefore(moment(app.end)) &&
-					moment(start).isSameOrAfter(moment(app.start)) &&
-					(app.status === "CHECKED_IN" || app.status === "CONFIRMED" || app.status === "BLOCK_TEMP")
-				) {
-					count = count + 1
-				}
+			let displayAllMember = allMember.map((mem) => {
+				return {
+					member: mem,
+					appointments: allAppointment.filter((app) => app.memberId === mem.id)
+				};
+			});
 
-				if (
-					moment(start).isBefore(moment(app.end)) &&
-					moment(start).isSameOrAfter(moment(app.start)) && (app.memberId === 0)
-				) {
-					countAppAnyStaff = countAppAnyStaff + 1
+			displayAllMember.forEach((el) => {
+				if (el.member.id !== 0) { // bỏ duyệt cột any staff
+					if (el.member.orderNumber === 0) { // đếm staff chưa login
+						count = count + 1;
+					}
+					else {
+						el.member.blockTime.forEach(b => {
+
+							const timeStart = `${moment(b.workingDate).format('YYYY-MM-DD')}T${moment(b.blockTimeStart, ['h:mm A']).format('HH:mm:ss')}`;
+							const timeEnd = `${moment(b.workingDate).format('YYYY-MM-DD')}T${moment(b.blockTimeEnd, ['h:mm A']).format('HH:mm:ss')}`;
+							if (
+								// check block time 
+								moment(start).isBefore(moment(timeEnd)) &&
+								moment(start).isSameOrAfter(moment(timeStart))
+
+							) {
+
+								count = count + 1;
+							}
+						});
+
+						el.appointments.forEach((app) => {
+							if (
+								// check appointment available ở các cột staff
+								moment(start).isBefore(moment(app.end)) &&
+								moment(start).isSameOrAfter(moment(app.start)) &&
+								(app.status === 'CHECKED_IN' || app.status === 'CONFIRMED' || app.status === 'BLOCK_TEMP')
+								// (app.memberId !== 0)
+							) {
+								count = count + 1;
+							}
+
+							if (
+								// check appointment available ở cột any staff
+								moment(start).isBefore(moment(app.end)) &&
+								moment(start).isSameOrAfter(moment(app.start)) &&
+								app.memberId === 0
+							) {
+								countAppAnyStaff = countAppAnyStaff + 1;
+							}
+						});
+					}
 				}
 			});
 
-			const allMember = store.getState().getIn(['appointment', 'members', 'all']);
-			if(count === allMember.length - 1){
-				alert('There is no staff available at this time.')
+			if (count >= allMember.length - 1) {
+				alert('There is no staff available at this time.');
 				return;
 			}
-			
 
 			if (countAppAnyStaff > 0 && countAppAnyStaff >= count && count > 0) {
-				alert('There is no staff available at this time.')
+				alert('There is no staff available at this time.');
 			} else {
 				const data = {
 					fromTime: start,
@@ -104,9 +137,16 @@ export const MAIN_CALENDAR_OPTIONS = {
 					staffId: 0,
 					action: 'addGroupAnyStaff'
 				};
+				const time = moment(start._d.toString().substr(0, 24));
+
 				window.postMessage(JSON.stringify(data));
+				// store.dispatch(disableCalendar(true));
+				// store.dispatch(openAddingAppointment({}));
+				// store.dispatch(TimeAndStaffID({ time: time, staffID: 0, dataAnyStaff : data }));
 			}
 		}
+		/* end book any staff */
+
 
 		if (parseInt(resource.id) !== 0) {
 			const displayedAppointments = store.getState().getIn(['appointment', 'appointments', 'calendar']);
@@ -126,117 +166,24 @@ export const MAIN_CALENDAR_OPTIONS = {
 
 			const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
 
-			let timeEnd = '';
-			let timeStart = '';
-			let isCheckWorking = '';
-
 			let currentDay = store.getState().getIn(['appointment', 'currentDay']);
+
 			const staffAvailable = displayedMembers[parseInt(resource.id) - 1]
 				? displayedMembers[parseInt(resource.id) - 1]
 				: '';
-			switch (moment(currentDay).format('dddd')) {
-				case 'Monday':
-					if (staffAvailable) {
-						timeEnd = `${moment(currentDay).day('Monday').format('YYYY-MM-DD')}T${moment(
-							staffAvailable.workingTimes.Monday.timeEnd,
-							['h:mm A']
-						).format('HH:mm:ss')}`;
-						timeStart = `${moment(currentDay).day('Monday').format('YYYY-MM-DD')}T${moment(
-							staffAvailable.workingTimes.Monday.timeStart,
-							['h:mm A']
-						).format('HH:mm:ss')}`;
-						isCheckWorking = staffAvailable.workingTimes.Monday.isCheck;
-					}
 
-					break;
-
-				case 'Tuesday':
-					if (staffAvailable) {
-						timeEnd = `${moment(currentDay).day('Tuesday').format('YYYY-MM-DD')}T${moment(
-							staffAvailable.workingTimes.Tuesday.timeEnd,
-							['h:mm A']
-						).format('HH:mm:ss')}`;
-						timeStart = `${moment(currentDay).day('Tuesday').format('YYYY-MM-DD')}T${moment(
-							staffAvailable.workingTimes.Tuesday.timeStart,
-							['h:mm A']
-						).format('HH:mm:ss')}`;
-						isCheckWorking = staffAvailable.workingTimes.Tuesday.isCheck;
-					}
-
-					break;
-
-				case 'Wednesday':
-					if (staffAvailable) {
-						timeEnd = `${moment(currentDay).day('Wednesday').format('YYYY-MM-DD')}T${moment(
-							staffAvailable.workingTimes.Wednesday.timeEnd,
-							['h:mm A']
-						).format('HH:mm:ss')}`;
-						timeStart = `${moment(currentDay).day('Wednesday').format('YYYY-MM-DD')}T${moment(
-							staffAvailable.workingTimes.Wednesday.timeStart,
-							['h:mm A']
-						).format('HH:mm:ss')}`;
-						isCheckWorking = staffAvailable.workingTimes.Wednesday.isCheck;
-					}
-					break;
-
-				case 'Thursday':
-					if (staffAvailable) {
-						timeEnd = `${moment(currentDay).day('Thursday').format('YYYY-MM-DD')}T${moment(
-							staffAvailable.workingTimes.Thursday.timeEnd,
-							['h:mm A']
-						).format('HH:mm:ss')}`;
-						timeStart = `${moment(currentDay).day('Thursday').format('YYYY-MM-DD')}T${moment(
-							staffAvailable.workingTimes.Thursday.timeStart,
-							['h:mm A']
-						).format('HH:mm:ss')}`;
-
-						isCheckWorking = staffAvailable.workingTimes.Thursday.isCheck;
-					}
-					break;
-
-				case 'Friday':
-					if (staffAvailable) {
-						timeEnd = `${moment(currentDay).day('Friday').format('YYYY-MM-DD')}T${moment(
-							staffAvailable.workingTimes.Friday.timeEnd,
-							['h:mm A']
-						).format('HH:mm:ss')}`;
-						timeStart = `${moment(currentDay).day('Friday').format('YYYY-MM-DD')}T${moment(
-							staffAvailable.workingTimes.Friday.timeStart,
-							['h:mm A']
-						).format('HH:mm:ss')}`;
-						isCheckWorking = staffAvailable.workingTimes.Friday.isCheck;
-					}
-					break;
-
-				case 'Saturday':
-					if (staffAvailable) {
-						timeEnd = `${moment(currentDay).day('Saturday').format('YYYY-MM-DD')}T${moment(
-							staffAvailable.workingTimes.Saturday.timeEnd,
-							['h:mm A']
-						).format('HH:mm:ss')}`;
-						timeStart = `${moment(currentDay).day('Saturday').format('YYYY-MM-DD')}T${moment(
-							staffAvailable.workingTimes.Saturday.timeStart,
-							['h:mm A']
-						).format('HH:mm:ss')}`;
-						isCheckWorking = staffAvailable.workingTimes.Saturday.isCheck;
-					}
-					break;
-
-				case 'Sunday':
-					if (staffAvailable) {
-						timeEnd = `${moment(currentDay).day(0).format('YYYY-MM-DD')}T${moment(
-							staffAvailable.workingTimes.Sunday.timeEnd,
-							['h:mm A']
-						).format('HH:mm:ss')}`;
-						timeStart = `${moment(currentDay).day(0).format('YYYY-MM-DD')}T${moment(
-							staffAvailable.workingTimes.Sunday.timeStart,
-							['h:mm A']
-						).format('HH:mm:ss')}`;
-						isCheckWorking = staffAvailable.workingTimes.Sunday.isCheck;
-					}
-					break;
-				default:
-					break;
+			if (staffAvailable) {
+				const currentDayName = moment(currentDay).format('dddd');
+				const checkWorkingTime = Object.entries(staffAvailable.workingTimes).find(b => b[0] === currentDayName);
+				timeEnd = `${moment(currentDay).day(currentDayName).format('YYYY-MM-DD')}T${moment(
+					checkWorkingTime[1].timeEnd,
+					['h:mm A']
+				).format('HH:mm:ss')}`;
+				timeStart = `${moment(currentDay).day(currentDayName).format('YYYY-MM-DD')}T${moment(
+					checkWorkingTime[1].timeStart,
+					['h:mm A']
+				).format('HH:mm:ss')}`;
+				isCheckWorking = checkWorkingTime[1].isCheck;
 			}
 
 			const time = moment(start._d.toString().substr(0, 24));
@@ -262,7 +209,14 @@ export const MAIN_CALENDAR_OPTIONS = {
 
 	drop(date, jsEvent, ui, idResource) {
 		const event = $(this).data().event.data;
+
+		let check_workingStaff = '';
+		let check_staff_drop = false;
+		let time_working_start = '';
+		let time_working_end = '';
 		let totalDuration = 0;
+		let check_workingTime = false
+
 		event.options.forEach((evt) => {
 			totalDuration += evt.duration;
 		});
@@ -287,11 +241,6 @@ export const MAIN_CALENDAR_OPTIONS = {
 			all_appointments = [...all_appointments, ...apps.appointments];
 		});
 
-		let check_workingStaff = '';
-		let check_staff_drop = false;
-		let time_working_start = '';
-		let time_working_end = '';
-
 		const resourceId = parseInt(idResource) - 1;
 
 		const pos = displayedMembers.findIndex((mem) => parseInt(mem.resourceId) === parseInt(resourceId));
@@ -299,52 +248,12 @@ export const MAIN_CALENDAR_OPTIONS = {
 		if (pos !== -1) {
 			const currentDay = store.getState().getIn(['appointment', 'currentDay']);
 
-			switch (moment(currentDay).format('dddd')) {
-				case 'Monday':
-					check_workingStaff = displayedMembers[parseInt(resourceId)].workingTimes.Monday.isCheck;
-					time_working_start = displayedMembers[parseInt(resourceId)].workingTimes.Monday.timeStart;
-					time_working_end = displayedMembers[parseInt(resourceId)].workingTimes.Monday.timeEnd;
-					break;
+			const currentDayName = moment(currentDay).format('dddd');
+			const checkWorkingTime = Object.entries(displayedMembers[parseInt(resourceId)].workingTimes).find(b => b[0] === currentDayName)
+			check_workingStaff = checkWorkingTime[1].isCheck;
+			time_working_start = checkWorkingTime[1].timeStart;
+			time_working_end = checkWorkingTime[1].timeEnd;
 
-				case 'Tuesday':
-					check_workingStaff = displayedMembers[parseInt(resourceId)].workingTimes.Tuesday.isCheck;
-					time_working_start = displayedMembers[parseInt(resourceId)].workingTimes.Tuesday.timeStart;
-					time_working_end = displayedMembers[parseInt(resourceId)].workingTimes.Tuesday.timeEnd;
-					break;
-
-				case 'Wednesday':
-					check_workingStaff = displayedMembers[parseInt(resourceId)].workingTimes.Wednesday.isCheck;
-					time_working_start = displayedMembers[parseInt(resourceId)].workingTimes.Wednesday.timeStart;
-					time_working_end = displayedMembers[parseInt(resourceId)].workingTimes.Wednesday.timeEnd;
-					break;
-
-				case 'Thursday':
-					check_workingStaff = displayedMembers[parseInt(resourceId)].workingTimes.Thursday.isCheck;
-					time_working_start = displayedMembers[parseInt(resourceId)].workingTimes.Thursday.timeStart;
-					time_working_end = displayedMembers[parseInt(resourceId)].workingTimes.Thursday.timeEnd;
-					break;
-
-				case 'Friday':
-					check_workingStaff = displayedMembers[parseInt(resourceId)].workingTimes.Friday.isCheck;
-					time_working_start = displayedMembers[parseInt(resourceId)].workingTimes.Friday.timeStart;
-					time_working_end = displayedMembers[parseInt(resourceId)].workingTimes.Friday.timeEnd;
-					break;
-
-				case 'Saturday':
-					check_workingStaff = displayedMembers[parseInt(resourceId)].workingTimes.Saturday.isCheck;
-					time_working_start = displayedMembers[parseInt(resourceId)].workingTimes.Saturday.timeStart;
-					time_working_end = displayedMembers[parseInt(resourceId)].workingTimes.Saturday.timeEnd;
-					break;
-
-				case 'Sunday':
-					check_workingStaff = displayedMembers[parseInt(resourceId)].workingTimes.Sunday.isCheck;
-					time_working_start = displayedMembers[parseInt(resourceId)].workingTimes.Sunday.timeStart;
-					time_working_end = displayedMembers[parseInt(resourceId)].workingTimes.Sunday.timeEnd;
-					break;
-
-				default:
-					break;
-			}
 		}
 
 		if (!displayedMembers[parseInt(resourceId)]) {
@@ -362,6 +271,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 							if (app.status === 'BLOCK_TEMP') {
 								check = 1;
 							} else {
+								if(app.status === 'BLOCK') check_workingTime = true;
 								check = false;
 							}
 						}
@@ -372,26 +282,20 @@ export const MAIN_CALENDAR_OPTIONS = {
 			check = false;
 		}
 
-		let check_time_block = true;
-		let checkDate = `${date.format('YYYY-MM-DD')}T${date.format('HH:mm:ss')}`;
-
-		if (
-			moment(checkDate).isBefore(
-				`${moment().format('YYYY-MM-DD')}T${moment(time_working_start, ['h:mm A']).format('HH:mm:ss')}`
-			)
-		) {
-			check_time_block = false;
-		}
-
 		if (check_workingStaff) {
 			check_staff_drop = true;
 		}
 
-		if (pos === -1 || check_staff_drop === false || check_time_block === false || check === 1) {
+		if (pos === -1 || check_staff_drop === false || check === 1 ) {
 			$('#full-calendar').fullCalendar('removeEvents', (event) => event.data.id === $(this).data().event.data.id);
 		} else {
-			if (check === false && displayedMembers[parseInt(resourceId)].orderNumber !== 0) {
-				if (window.confirm('Are you sure want to assign appointment at this position ?')) {
+			/* check appointment assign overlap */
+			// if (check === false && displayedMembers[parseInt(resourceId)].orderNumber !== 0) {
+			if (check === false) {
+				// const text =  "Are you sure want to assign appointment at this position ?";
+
+				const text = check_workingTime ? "Accept appointment outside working hours?" : "Are you sure want to assign appointment at this position ?";
+				if (window.confirm(text)) {
 					store.dispatch(
 						assignAppointment({
 							eventData: {
@@ -410,6 +314,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 					);
 				}
 			} else {
+				/* assign appointment */
 				store.dispatch(
 					assignAppointment({
 						eventData: {
@@ -432,6 +337,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 		const start_time = event.start;
 		const end_time = event.end;
 		let check = true;
+		let check_block_grey = false;
 		let member_clone = JSON.parse(JSON.stringify(memberdisplay));
 		member_clone.forEach((element) => {
 			delete element.memberId;
@@ -507,7 +413,8 @@ export const MAIN_CALENDAR_OPTIONS = {
 			check = false;
 		} else if (check_workingStaff) {
 			// có làm việc
-			all_appointments.forEach((app) => { // check khi thả appointment overlap
+			all_appointments.forEach((app) => {
+				// check khi thả appointment overlap
 				if (parseInt(app.memberId) === parseInt(staffAvailable.id)) {
 					if (
 						moment(start_time).isBetween(app.start, app.end) ||
@@ -517,22 +424,24 @@ export const MAIN_CALENDAR_OPTIONS = {
 					) {
 						if (parseInt(app.id) !== parseInt(event.data.id)) {
 							if (app.status === 'BLOCK_TEMP') {
-
 								if (app.appointmentId !== event.data.id) {
 									// alert('The Staff is not available on your time selected.')
 									// check = 1;
 								}
 							} else {
+								if (app.status === 'BLOCK') {
+									check_block_grey = true
+								}
 								check = false;
 							}
 						} else {
-							if (app.status === 'BLOCK_TEMP') {
-								if (window.confirm('Accept appointment outside working hours')) {
-									check = true;
-								} else {
-									check = 1;
-								}
-							}
+							// if (app.status === 'BLOCK_TEMP') {
+							// 	if (window.confirm('Accept appointment outside working hours?')) {
+							// 		check = true;
+							// 	} else {
+							// 		check = 1;
+							// 	}
+							// }
 						}
 					}
 				}
@@ -557,7 +466,8 @@ export const MAIN_CALENDAR_OPTIONS = {
 					? `${event.end.format('YYYY-MM-DD')}T${event.end.format('HH:mm:ss')}`
 					: moment(start_time).add(90, 'minutes').format('YYYY-MM-DD HH:mm:ss');
 			if (check === false) {
-				if (window.confirm('Accept overlapping appointments?')) {
+				const text = check_block_grey ? 'Accept appointment outside working hours?' : 'Accept overlapping appointments?';
+				if (window.confirm(text)) {
 					store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId), start_time, endTime));
 				} else {
 					revertFunc();
@@ -665,7 +575,6 @@ export const updateEventToCalendar = (fcEvent) => {
 	let eventClass = '';
 	const { status } = fcEvent;
 	if (status === 'ASSIGNED') {
-		// eventColor = '#FFFD71';
 		eventColor = '#ffe559';
 		eventClass = 'event-assigned';
 	}
@@ -682,6 +591,10 @@ export const updateEventToCalendar = (fcEvent) => {
 		eventClass = 'event-paid';
 		startEditable = false;
 		resourceEditable = false;
+	}
+	if (!status) {
+		eventColor = 'red';
+		eventClass = 'event-checkin';
 	}
 	const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
 
@@ -703,12 +616,10 @@ export const updateEventToCalendar = (fcEvent) => {
 	$('#full-calendar').fullCalendar('addEventSource', [data]);
 };
 
-
 function getAtrributeByStatus(appointment) {
 	let eventColor = '#00b4f7';
 	let eventClass = 'event-paid';
 	if (appointment.status === 'ASSIGNED') {
-		// eventColor = '#FFFD71';
 		eventColor = '#ffe559';
 		eventClass = 'event-assigned';
 	}
@@ -732,7 +643,12 @@ function getAtrributeByStatus(appointment) {
 		eventColor = 'yellow';
 		eventClass = 'event-block-temp';
 	}
-	return {
-		eventColor, eventClass
+	if (!appointment.status) {
+		eventColor = 'red';
+		eventClass = 'event-paid';
 	}
+	return {
+		eventColor,
+		eventClass
+	};
 }

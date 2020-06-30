@@ -9,9 +9,10 @@ import 'jquery-ui';
 import moment from 'moment';
 import { IoIosCloseCircle } from 'react-icons/io';
 import ConfirmDeleteWaiting from './ConfirmDeleteWaiting'
-import {formatPhone} from '../../utils/helper'
+import { formatPhone } from '../../utils/helper'
 import vip from '../../images/vip.png'
 import call from '../../images/call.png'
+import SplashButton from './SplashButton'
 
 
 const DragZoneWrapper = styled.div`
@@ -137,6 +138,40 @@ class FCDragZone extends React.PureComponent {
     deleteWaitingAppointment(true);
   }
 
+  getActiveArrow() {
+
+    let isActiveLeft = false, isActiveRight = false;
+    let { slideIndex } = this.state;
+    const { events } = this.props;
+    const totalSlide = (events.length) / 4;
+
+    if ((totalSlide) <= 1) {
+      isActiveLeft = false;
+      isActiveRight = false;
+    }
+
+    if (totalSlide > 1) {
+      if (slideIndex > 0) {
+        if (slideIndex < totalSlide) {
+          if (totalSlide - slideIndex <= 1) {
+            isActiveRight = false;
+            isActiveLeft = true;
+          } else {
+            isActiveRight = true;
+            isActiveLeft = true
+          }
+        }
+      } else {
+        isActiveLeft = false;
+        isActiveRight = true;
+      }
+    }
+
+    return {
+      isActiveLeft, isActiveRight
+    }
+  }
+
   render() {
     const { events, StatusDeleteWaiting, deleteWaitingAppointment, deleteEventWaitingList } = this.props;
     const { slideIndex, slidesToShow } = this.state;
@@ -149,15 +184,29 @@ class FCDragZone extends React.PureComponent {
       slideIndex * slidesToShow + slidesToShow,
     );
 
+    const isActiveLeft = this.getActiveArrow().isActiveLeft;
+    const isActiveRight = this.getActiveArrow().isActiveRight;
+
     return (
       <React.Fragment>
         <DragZoneWrapper>
-          <PrevButton onClick={() => this.prevSlide()}>
+          {/* Prev Button  */}
+          {isActiveLeft && <SplashButton onClick={() => this.prevSlide()}>
             <FaCaretUp />
-          </PrevButton>
-          <NextButton onClick={() => this.nextSlide()}>
+          </SplashButton>}
+          {!isActiveLeft &&
+            <PrevButton onClick={() => { }}>
+              <FaCaretUp />
+            </PrevButton>}
+
+            {/* Next Button */}
+          {isActiveRight && <SplashButton isBottom onClick={() => this.nextSlide()}>
             <FaCaretDown />
-          </NextButton>
+          </SplashButton>}
+          {!isActiveRight && <NextButton onClick={() => {}}>
+            <FaCaretDown />
+          </NextButton>}
+
           <div id="waiting-events">
             {displayedEvents.map((event) => (
               <EventWrapper
@@ -166,12 +215,12 @@ class FCDragZone extends React.PureComponent {
                 data-event-information={JSON.stringify(event)}
               >
                 <EventWrapper.buttonDelete onClick={() => this.deleteEventWaiting(event)}>
-                  <IoIosCloseCircle style={{ width : 20, height : 20 }} />
+                  <IoIosCloseCircle style={{ width: 20, height: 20 }} />
                 </EventWrapper.buttonDelete>
                 <div className="app-event__id-number2">{event.code}</div>
-                <div className="app-event__full-name">{event.userFullName}</div>
+                <div className="app-event__full-name">{event.firstName}</div>
                 <div className="app-event__phone-number4">
-                <img className='icon-phone3' src={call} width='15' height='15' />
+                  <img className='icon-phone3' src={call} width='15' height='15' />
                   {` ${formatPhone(event.phoneNumber)}`}</div>
                 {event.options.map((option, index) => (
                   <div className="app-event__option" key={index}>

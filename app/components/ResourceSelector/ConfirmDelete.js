@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Popup from 'reactjs-popup';
 import styled from 'styled-components';
-import { FaTimesCircle } from 'react-icons/fa';
 import {IoIosCloseCircle} from 'react-icons/io';
 
 const ConfirmPopup = styled(Popup)`

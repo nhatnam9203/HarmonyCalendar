@@ -32,7 +32,8 @@ import {
   updateAppointmentPaidOffline,
   reloadStaff,
   reloadCalendar,
-  deselectAppointment
+  deselectAppointment,
+  renderAppointment
 } from './actions';
 import {
   makeSelectWaitingAppointments,
@@ -75,6 +76,7 @@ export function mapDispatchToProps(dispatch) {
     setDisplayedMembers:(members)=>dispatch(setDisplayedMembers(members)),
     updateAppointmentPaidOffline:(idAppointment)=>dispatch(updateAppointmentPaidOffline(idAppointment)),
     deselectAppointment: () => dispatch(deselectAppointment()),
+    renderAppointment: () => dispatch(renderAppointment()),
   };
 }
 

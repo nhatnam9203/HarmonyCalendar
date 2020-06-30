@@ -7,61 +7,45 @@ import { FaCaretLeft, FaCaretRight } from 'react-icons/fa';
 import SplashButton from '../ResourceSelector/SplashButton'
 
 const DateSliderWrapper = styled.div`
-  width: calc(100% - 5.05rem);
-  position: relative;
-  height : 4rem !important;
+    width: calc(100% - 5.05rem);
+    position: relative;
+    height : 4rem !important;
 `;
 
 const CarouselItem = styled.div`
-  display: flex;
-  flex : 1;
+    display: flex;
+    flex : 1;
 `;
 
 const NormalDay = styled.div`
-  flex: 1;
-  border-right: 1px solid #3883bb;
-  text-align: center;
-  padding: 0.5rem;
-  overflow: hidden;
-  height : 4rem ;
-  padding-top : 0.6rem;
-  font-size : 0.9rem;
-  line-height : 1.5;
-  &:last-child {
-    border-right: none;
-  }
-
-  & div {
-    white-space: normal;
-    text-overflow: ellipsis;
+    flex: 1;
+    border-right: 1px solid #3883bb;
+    text-align: center;
+    padding: 0.5rem;
     overflow: hidden;
-  }
+    height : 4rem ;
+    padding-top : 0.6rem;
+    font-size : 0.9rem;
+    line-height : 1.5;
+    &:last-child {
+      border-right: none;
+    }
+
+    & div {
+      white-space: normal;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
 `;
 
 const ActiveDay = styled(NormalDay)`
-  background: #0071c5;
-  color: #ffffff;
+    background: #0071c5;
+    color: #ffffff;
 `;
 
 const TodayDay = styled(NormalDay)`
-  background: #00e260;
-  color: #ffffff;
-`;
-
-const PrevButton = styled.div`
-  color: #3883bb;
-  font-size: 2rem;
-  line-height: 2rem;
-  cursor: pointer;
-  padding-left: 0.5rem;
-`;
-
-const NextButton = styled.div`
-  color: #3883bb;
-  font-size: 2rem;
-  line-height: 2rem;
-  cursor: pointer;
-  padding-right : 0.5rem;
+    background: #00e260;
+    color: #ffffff;
 `;
 
 class DaySlider extends React.Component {
@@ -69,7 +53,7 @@ class DaySlider extends React.Component {
   constructor() {
     super();
     this.state = {
-      currentSlide : 0
+      currentSlide: 0
     }
   }
 
@@ -96,6 +80,28 @@ class DaySlider extends React.Component {
     );
   }
 
+  afterSlide(index) {
+    const { days, onChangeWeek } = this.props;
+    const { currentSlide } = this.state;
+    if (
+      (currentSlide === 0 && index === 1)
+      || (currentSlide === 1 && index === 2)
+      ||
+      (currentSlide === 2 && index === 0)
+    ) {
+      onChangeWeek(days[0].add(1, 'w').format('DDMMYYYY'));
+    }
+    if (
+      (currentSlide === 1 && index === 0)
+      || (currentSlide === 0 && index === 2)
+      ||
+      (currentSlide === 2 && index === 1)
+    ) {
+      onChangeWeek(days[0].subtract(1, 'w').format('DDMMYYYY'));
+    }
+    this.setState({ currentSlide: index })
+  }
+
   renderItems(day, index) {
     const { selectedDay } = this.props;
     if (day.format('DDMMYYYY') === selectedDay.format('DDMMYYYY')) {
@@ -117,30 +123,6 @@ class DaySlider extends React.Component {
         {this.renderDay(day)}
       </NormalDay>
     );
-  }
-
-  afterSlide(index) {
-    const { days, onChangeWeek } = this.props;
-    const { currentSlide } = this.state;
-    if (
-      (currentSlide === 0 && index === 1)
-      || (currentSlide === 1 && index === 2)
-      ||
-      (currentSlide === 2 && index === 0)
-    ) {
-      onChangeWeek(days[0].add(1, 'w').format('DDMMYYYY'));
-    }
-    if (
-      (currentSlide === 1 && index === 0)
-      || (currentSlide === 0 && index === 2)
-      ||
-      (currentSlide === 2 && index === 1)
-    ) {
-      onChangeWeek(days[0].subtract(1, 'w').format('DDMMYYYY'));
-    }
-
-
-    this.setState({currentSlide : index})
   }
 
   render() {

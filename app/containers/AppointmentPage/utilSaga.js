@@ -55,6 +55,7 @@ export const appointmentAdapter = (appointment) => {
 		tax: appointment.tax,
 		isVip: appointment.isVip,
 		discount: appointment.discount,
+		customerId : appointment.customerId,
 		giftCard: appointment.giftCard,
 		giftCards: appointment.giftCards ? appointment.giftCards : [],
 		notes: appointment.notes
@@ -145,6 +146,7 @@ export function blockTemp(memberId, start, end, note, appointmentId) {
 }
 
 export function addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery) {
+	/* ADD BLOCK TEMP ( YELLOW BLOCK ) */
 	appointmentsMembers.forEach((mem) => {
 		const memFind = displayedMembers.find((member) => member.id === mem.memberId);
 		const blockTimeMember = memFind.blockTime.filter(
@@ -163,246 +165,43 @@ export function addBlockCalendar(appointmentsMembers, displayedMembers, currentD
 		}
 	});
 
-	switch (moment(currentDate).format('dddd')) {
-		case 'Monday':
-			appointmentsMembers.forEach((mem) => {
-				const memFind = displayedMembers.find((member) => member.id === mem.memberId);
-				if (memFind.workingTimes.Monday.isCheck === false) {
-					mem.appointments.push(addFullBlock(mem.memberId, currentDate, 'Monday'));
-				} else {
-					const blockStart = block(
-						mem.memberId,
-						`${moment(currentDate).day('Monday').format('YYYY-MM-DD')}T${moment(
-							memFind.workingTimes.Monday.timeEnd,
-							[ 'h:mm A' ]
-						).format('HH:mm:ss')}`,
-						`${moment(currentDate).day('Monday').endOf('days').format('YYYY-MM-DD')}T${moment()
-							.endOf('days')
-							.subtract(1, 'hours')
-							.add(1, 'seconds')
-							.format('HH:mm:ss')}`
-					);
-					const blockEnd = block(
-						mem.memberId,
-						`${moment(currentDate).day('Monday').format('YYYY-MM-DD')}T${moment()
-							.startOf('days')
-							.add(6, 'hours')
-							.format('HH:mm:ss')}`,
-						`${moment(currentDate).day('Monday').format('YYYY-MM-DD')}T${moment(
-							memFind.workingTimes.Monday.timeStart,
-							[ 'h:mm A' ]
-						).format('HH:mm:ss')}`
-					);
-					mem.appointments.push(blockStart, blockEnd);
-				}
-			});
-			break;
-		case 'Tuesday':
-			appointmentsMembers.forEach((mem) => {
-				const memFind = displayedMembers.find((member) => member.id === mem.memberId);
-				if (memFind.workingTimes.Tuesday.isCheck === false) {
-					mem.appointments.push(addFullBlock(mem.memberId, currentDate, 'Tuesday'));
-				} else {
-					const blockStart = block(
-						mem.memberId,
-						`${moment(currentDate).day('Tuesday').format('YYYY-MM-DD')}T${moment(
-							memFind.workingTimes.Tuesday.timeEnd,
-							[ 'h:mm A' ]
-						).format('HH:mm:ss')}`,
-						`${moment(currentDate).day('Tuesday').endOf('days').format('YYYY-MM-DD')}T${moment()
-							.endOf('days')
-							.subtract(1, 'hours')
-							.add(1, 'seconds')
-							.format('HH:mm:ss')}`
-					);
-					const blockEnd = block(
-						mem.memberId,
-						`${moment(currentDate).day('Tuesday').format('YYYY-MM-DD')}T${moment()
-							.startOf('days')
-							.add(6, 'hours')
-							.format('HH:mm:ss')}`,
-						`${moment(currentDate).day('Tuesday').format('YYYY-MM-DD')}T${moment(
-							memFind.workingTimes.Tuesday.timeStart,
-							[ 'h:mm A' ]
-						).format('HH:mm:ss')}`
-					);
-					mem.appointments.push(blockStart, blockEnd);
-				}
-			});
-			break;
-		case 'Wednesday':
-			appointmentsMembers.forEach((mem) => {
-				const memFind = displayedMembers.find((member) => member.id === mem.memberId);
-				if (memFind.workingTimes.Wednesday.isCheck === false) {
-					mem.appointments.push(addFullBlock(mem.memberId, currentDate, 'Wednesday'));
-				} else {
-					const blockStart = block(
-						mem.memberId,
-						`${moment(currentDate).day('Wednesday').format('YYYY-MM-DD')}T${moment(
-							memFind.workingTimes.Wednesday.timeEnd,
-							[ 'h:mm A' ]
-						).format('HH:mm:ss')}`,
-						`${moment(currentDate).day('Wednesday').endOf('days').format('YYYY-MM-DD')}T${moment()
-							.endOf('days')
-							.subtract(1, 'hours')
-							.add(1, 'seconds')
-							.format('HH:mm:ss')}`
-					);
-					const blockEnd = block(
-						mem.memberId,
-						`${moment(currentDate).day('Wednesday').format('YYYY-MM-DD')}T${moment()
-							.startOf('days')
-							.add(6, 'hours')
-							.format('HH:mm:ss')}`,
-						`${moment(currentDate).day('Wednesday').format('YYYY-MM-DD')}T${moment(
-							memFind.workingTimes.Wednesday.timeStart,
-							[ 'h:mm A' ]
-						).format('HH:mm:ss')}`
-					);
-					mem.appointments.push(blockStart, blockEnd);
-				}
-			});
-			break;
+	/* ADD BLOCK ( GREY BLOCK ) */
+	const currentDayName = moment(currentDate).format('dddd');
+	appointmentsMembers.forEach((mem) => {
+		const memFind = displayedMembers.find((member) => member.id === mem.memberId);
+		const checkWorkingTime = Object.entries(memFind.workingTimes).find(b=>b[0] === currentDayName);
 
-		case 'Thursday':
-			appointmentsMembers.forEach((mem) => {
-				const memFind = displayedMembers.find((member) => member.id === mem.memberId);
-				if (memFind.workingTimes.Thursday.isCheck === false) {
-					mem.appointments.push(addFullBlock(mem.memberId, currentDate, 'Thursday'));
-				} else {
-					const blockStart = block(
-						mem.memberId,
-						`${moment(currentDate).day('Thursday').format('YYYY-MM-DD')}T${moment(
-							memFind.workingTimes.Thursday.timeEnd,
-							[ 'h:mm A' ]
-						).format('HH:mm:ss')}`,
-						`${moment(currentDate).day('Thursday').endOf('days').format('YYYY-MM-DD')}T${moment()
-							.endOf('days')
-							.subtract(1, 'hours')
-							.add(1, 'seconds')
-							.format('HH:mm:ss')}`
-					);
-					const blockEnd = block(
-						mem.memberId,
-						`${moment(currentDate).day('Thursday').format('YYYY-MM-DD')}T${moment()
-							.startOf('days')
-							.add(6, 'hours')
-							.format('HH:mm:ss')}`,
-						`${moment(currentDate).day('Thursday').format('YYYY-MM-DD')}T${moment(
-							memFind.workingTimes.Thursday.timeStart,
-							[ 'h:mm A' ]
-						).format('HH:mm:ss')}`
-					);
-					mem.appointments.push(blockStart, blockEnd);
-				}
-			});
-			break;
+		if (checkWorkingTime[1].isCheck === false) {
+			mem.appointments.push(addFullBlock(mem.memberId, currentDate, currentDayName));
+		} else {
+			const blockStart = block(
+				mem.memberId,
+				`${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(
+					checkWorkingTime[1].timeEnd,
+					[ 'h:mm A' ]
+				).format('HH:mm:ss')}`,
+				`${moment(currentDate).day(currentDayName).endOf('days').format('YYYY-MM-DD')}T${moment()
+					.endOf('days')
+					// .subtract(1, 'hours')
+					.subtract(1, 'seconds')
+					.format('HH:mm:ss')}`
+			);
+			const blockEnd = block(
+				mem.memberId,
+				`${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment()
+					.startOf('days')
+					// .add(6, 'hours')
+					.format('HH:mm:ss')}`,
+				`${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(
+					checkWorkingTime[1].timeStart,
+					[ 'h:mm A' ]
+				).format('HH:mm:ss')}`
+			);
 
-		case 'Friday':
-			appointmentsMembers.forEach((mem) => {
-				const memFind = displayedMembers.find((member) => member.id === mem.memberId);
-				if (memFind.workingTimes.Friday.isCheck === false) {
-					mem.appointments.push(addFullBlock(mem.memberId, currentDate, 'Friday'));
-				} else {
-					const blockStart = block(
-						mem.memberId,
-						`${moment(currentDate).day('Friday').format('YYYY-MM-DD')}T${moment(
-							memFind.workingTimes.Friday.timeEnd,
-							[ 'h:mm A' ]
-						).format('HH:mm:ss')}`,
-						`${moment(currentDate).day('Friday').endOf('days').format('YYYY-MM-DD')}T${moment()
-							.endOf('days')
-							.subtract(1, 'hours')
-							.add(1, 'seconds')
-							.format('HH:mm:ss')}`
-					);
-					const blockEnd = block(
-						mem.memberId,
-						`${moment(currentDate).day('Friday').format('YYYY-MM-DD')}T${moment()
-							.startOf('days')
-							.add(6, 'hours')
-							.format('HH:mm:ss')}`,
-						`${moment(currentDate).day('Friday').format('YYYY-MM-DD')}T${moment(
-							memFind.workingTimes.Friday.timeStart,
-							[ 'h:mm A' ]
-						).format('HH:mm:ss')}`
-					);
-					mem.appointments.push(blockStart, blockEnd);
-				}
-			});
-			break;
-
-		case 'Saturday':
-			appointmentsMembers.forEach((mem) => {
-				const memFind = displayedMembers.find((member) => member.id === mem.memberId);
-				if (memFind.workingTimes.Saturday.isCheck === false) {
-					mem.appointments.push(addFullBlock(mem.memberId, currentDate, 'Saturday'));
-				} else {
-					const blockStart = block(
-						mem.memberId,
-						`${moment(currentDate).day('Saturday').format('YYYY-MM-DD')}T${moment(
-							memFind.workingTimes.Saturday.timeEnd,
-							[ 'h:mm A' ]
-						).format('HH:mm:ss')}`,
-						`${moment(currentDate).day('Saturday').endOf('days').format('YYYY-MM-DD')}T${moment()
-							.endOf('days')
-							.subtract(1, 'hours')
-							.add(1, 'seconds')
-							.format('HH:mm:ss')}`
-					);
-					const blockEnd = block(
-						mem.memberId,
-						`${moment(currentDate).day('Saturday').format('YYYY-MM-DD')}T${moment()
-							.startOf('days')
-							.add(6, 'hours')
-							.format('HH:mm:ss')}`,
-						`${moment(currentDate).day('Saturday').format('YYYY-MM-DD')}T${moment(
-							memFind.workingTimes.Saturday.timeStart,
-							[ 'h:mm A' ]
-						).format('HH:mm:ss')}`
-					);
-					mem.appointments.push(blockStart, blockEnd);
-				}
-			});
-			break;
-
-		case 'Sunday':
-			appointmentsMembers.forEach((mem) => {
-				const memFind = displayedMembers.find((member) => member.id === mem.memberId);
-				if (memFind.workingTimes.Sunday.isCheck === false) {
-					mem.appointments.push(addFullBlock(mem.memberId, currentDate, 'Sunday'));
-				} else {
-					const blockStart = block(
-						mem.memberId,
-						`${moment(currentDate).day('Sunday').format('YYYY-MM-DD')}T${moment(
-							memFind.workingTimes.Sunday.timeEnd,
-							[ 'h:mm A' ]
-						).format('HH:mm:ss')}`,
-						`${moment(currentDate).day('Sunday').endOf('days').format('YYYY-MM-DD')}T${moment()
-							.endOf('days')
-							.subtract(1, 'hours')
-							.add(1, 'seconds')
-							.format('HH:mm:ss')}`
-					);
-					const blockEnd = block(
-						mem.memberId,
-						`${moment(currentDate).day('Sunday').format('YYYY-MM-DD')}T${moment()
-							.startOf('days')
-							.add(6, 'hours')
-							.format('HH:mm:ss')}`,
-						`${moment(currentDate).day('Sunday').format('YYYY-MM-DD')}T${moment(
-							memFind.workingTimes.Sunday.timeStart,
-							[ 'h:mm A' ]
-						).format('HH:mm:ss')}`
-					);
-					mem.appointments.push(blockStart, blockEnd);
-				}
-			});
-			break;
-
-		default:
-			break;
-	}
+			mem.appointments.push(blockStart, blockEnd);
+		}
+	});
+	return;
 }
 
 export function checkTimeToAddAppointmdent() {
@@ -459,8 +258,6 @@ export function totalDuartionUpdateAppointment(services, extras, appointment) {
 			break;
 		}
     }
-    
-    console.log({total})
 
 	return total;
 }
@@ -486,7 +283,6 @@ export function dataUpdateAppointment(
 	memberId,
 	old_appointment,
 	status,
-	notesUpdate,
 	start,
 	newDate,
 	servicesUpdate,
@@ -503,7 +299,6 @@ export function dataUpdateAppointment(
 			services: old_appointment.options,
 			products: old_appointment.products,
 			extras: old_appointment.extras,
-			notes: notesUpdate
 		};
 	} else {
 		data = {
@@ -514,7 +309,6 @@ export function dataUpdateAppointment(
 			services: servicesUpdate,
 			products: productsUpdate,
 			extras: extrasUpdate,
-			notes: notesUpdate
 		};
 	}
 	return data;
@@ -555,7 +349,6 @@ export function dataChangeTimeAppointment(
 	options,
 	products,
 	extras,
-	notesUpdate
 ) {
 	return {
 		staffId: selectedStaff.id,
@@ -565,7 +358,6 @@ export function dataChangeTimeAppointment(
 		services: options,
 		products: products,
 		extras,
-		notes: notesUpdate
 	};
 }
 
@@ -629,4 +421,19 @@ export function totalDurationMoveAppointment(services, extras) {
 	});
 
 	return total;
+}
+
+export function addLastStaff(members){
+	return {
+		id: 0,
+		title: `Any staff`,
+		imageUrl: '',
+		orderNumber: 99999999999,
+		workingTimes: members[members.length - 2].workingTimes,
+		isDisabled: false,
+		pincode: 0,
+		isNextAvailableStaff: false,
+		blockTime: [],
+		timeLogin: 0
+	};
 }

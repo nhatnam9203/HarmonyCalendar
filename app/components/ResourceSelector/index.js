@@ -4,11 +4,9 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Carousel from 'nuka-carousel';
 import { FaCaretLeft, FaCaretRight } from 'react-icons/fa';
-import { staffId, isDesktopOrLaptop } from '../../../app-constants';
-import LoadingIndicator from 'components/LoadingIndicator';
-import Pincode from './Pincode';
+import { staffId } from '../../../app-constants';
+import PopupBlockTime from './PopupBlockTime';
 import SplashButton from './SplashButton'
-
 
 const ResourceSelectorWrapper = styled.div`
 	width: 100%;
@@ -72,17 +70,18 @@ const AnyStaff = styled(Resource)`
 
 AnyStaff.Image = styled.div`
 	border-radius: 4px;
-	/* background: #0071c5; */
 	width: 100%;
 	font-size: 1rem;
 	line-height: 2.8;
 	height: 100%;
 	cursor: pointer;
+	& > img {
+		width : 30px;
+		height : 26px;
+	}
 `;
 
 AnyStaff.Title = styled.div`
-	/* position: absolute;
-	bottom: 3rem; */
 	margin-top: -0.25rem !important;
 	width: 100%;
 	opacity: 0.75;
@@ -108,9 +107,10 @@ Resource.OrderNumber = styled.div`
 	position: absolute;
 	top: 2px;
 	right: 2px;
-	background: ${(props) => (props.next ? 'red' : '#1073C2')};
+	background: ${(props) => (props.next ? '#DD4124' : '#1073C2')};
 	width: 18px;
 	height: 18px;
+	font-weight : 600;
 	border-radius: 50%;
 	color: #ffffff;
 	padding: 2px;
@@ -205,8 +205,6 @@ class ResourceSelector extends React.Component {
 	afterSlide(index) {
 
 		const { resources } = this.props;
-		const isDeskTop = isDesktopOrLaptop;
-		const num = isDeskTop ? 7 : 5;
 		this.props.setDisplayedMembers(resources.slice(index * 5, index * 5 + 5));
 		this.props.renderAppointment();
 		this.props.setSlideIndex(index);
@@ -214,136 +212,6 @@ class ResourceSelector extends React.Component {
 
 	onTodayClick() {
 		this.props.onChangeToday(moment().format('DDMMYYYY'));
-	}
-
-	getWorrkingTime(staff, currentDay) {
-		switch (moment(currentDay).format('dddd')) {
-			case 'Monday':
-				if (staff.workingTimes.Monday.isCheck) {
-					return (
-						<Resource.WorkingTime>
-							{staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd}
-						</Resource.WorkingTime>
-					);
-				}
-			//  else {
-			// 	return (
-			// 		<Resource.WorkingTime notWork>
-			// 			{staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd} (Off)
-			// 		</Resource.WorkingTime>
-			// 	);
-			// }
-			// break;
-
-			case 'Tuesday':
-				if (staff.workingTimes.Tuesday.isCheck) {
-					return (
-						<Resource.WorkingTime>
-							{staff.workingTimes.Tuesday.timeStart} - {staff.workingTimes.Tuesday.timeEnd}
-						</Resource.WorkingTime>
-					);
-				}
-			//  else {
-			// 	return (
-			// 		<Resource.WorkingTime notWork>
-			// 			{staff.workingTimes.Tuesday.timeStart} - {staff.workingTimes.Tuesday.timeEnd} (Off)
-			// 		</Resource.WorkingTime>
-			// 	);
-			// }
-			// break;
-
-			case 'Wednesday':
-				if (staff.workingTimes.Wednesday.isCheck) {
-					return (
-						<Resource.WorkingTime>
-							{staff.workingTimes.Wednesday.timeStart} - {staff.workingTimes.Wednesday.timeEnd}
-						</Resource.WorkingTime>
-					);
-				}
-			//  else {
-			// 	return (
-			// 		<Resource.WorkingTime notWork>
-			// 			{staff.workingTimes.Wednesday.timeStart} - {staff.workingTimes.Wednesday.timeEnd} (Off)
-			// 		</Resource.WorkingTime>
-			// 	);
-			// }
-			// break;
-
-			case 'Thursday':
-				if (staff.workingTimes.Thursday.isCheck) {
-					return (
-						<Resource.WorkingTime>
-							{staff.workingTimes.Thursday.timeStart} - {staff.workingTimes.Thursday.timeEnd}
-						</Resource.WorkingTime>
-					);
-				}
-
-			// else {
-			// 	return (
-			// 		<Resource.WorkingTime notWork>
-			// 			{staff.workingTimes.Thursday.timeStart} - {staff.workingTimes.Thursday.timeEnd} (Off)
-			// 		</Resource.WorkingTime>
-			// 	);
-			// }
-			// break;
-
-			case 'Friday':
-				if (staff.workingTimes.Friday.isCheck) {
-					return (
-						<Resource.WorkingTime>
-							{staff.workingTimes.Friday.timeStart} - {staff.workingTimes.Friday.timeEnd}
-						</Resource.WorkingTime>
-					);
-				}
-
-			// else {
-			// 	return (
-			// 		<Resource.WorkingTime notWork>
-			// 			{staff.workingTimes.Friday.timeStart} - {staff.workingTimes.Friday.timeEnd} (Off)
-			// 		</Resource.WorkingTime>
-			// 	);
-			// }
-			// break;
-
-			case 'Saturday':
-				if (staff.workingTimes.Saturday.isCheck) {
-					return (
-						<Resource.WorkingTime>
-							{staff.workingTimes.Saturday.timeStart} - {staff.workingTimes.Saturday.timeEnd}
-						</Resource.WorkingTime>
-					);
-				}
-
-			// else {
-			// 	return (
-			// 		<Resource.WorkingTime notWork>
-			// 			{staff.workingTimes.Saturday.timeStart} - {staff.workingTimes.Saturday.timeEnd} (Off)
-			// 		</Resource.WorkingTime>
-			// 	);
-			// }
-			// break;
-
-			case 'Monday':
-				if (staff.workingTimes.Monday.isCheck) {
-					return (
-						<Resource.WorkingTime>
-							{staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd}
-						</Resource.WorkingTime>
-					);
-				}
-
-			// else {
-			// 	return (
-			// 		<Resource.WorkingTime notWork>
-			// 			{staff.workingTimes.Monday.timeStart} - {staff.workingTimes.Monday.timeEnd} (Off)
-			// 		</Resource.WorkingTime>
-			// 	);
-			// }
-			// break;
-
-			default:
-				break;
-		}
 	}
 
 	openPincode(staff) {
@@ -356,9 +224,38 @@ class ResourceSelector extends React.Component {
 		}
 	}
 
+	getActiveArrow() {
+		const { slideIndex, resources } = this.props;
+		let isActiveLeft = false, isActiveRight = false;
+		const totalSlide = (resources.length - 1) / 5;
+
+		if ((totalSlide) <= 1) {
+			isActiveLeft = false;
+			isActiveRight = false;
+		} else
+			if (totalSlide > 1) {
+				if (slideIndex > 0) {
+					if (slideIndex < totalSlide) {
+						if (totalSlide - slideIndex <= 1) {
+							isActiveRight = false;
+							isActiveLeft = true;
+						} else {
+							isActiveRight = true;
+							isActiveLeft = true
+						}
+					}
+				} else {
+					isActiveLeft = false;
+					isActiveRight = true;
+				}
+			}
+
+		return {
+			isActiveLeft, isActiveRight
+		}
+	}
+
 	renderResource(resource, index) {
-		const { calendarMembers, currentDay, togglePopupPincode } = this.props;
-		const member = calendarMembers ? calendarMembers.find((mem) => mem.memberId === resource.id) : '';
 		if (parseInt(resource.id) !== 0)
 			return (
 				<Resource
@@ -373,7 +270,6 @@ class ResourceSelector extends React.Component {
 					<Resource.OrderNumber next={resource.isNextAvailableStaff === 1 ? true : false}>
 						{resource.orderNumber}
 					</Resource.OrderNumber>
-					{/* <Resource.WorkingTime>{this.getWorrkingTime(resource, currentDay)}</Resource.WorkingTime> */}
 					<Resource.Title>{resource.title}</Resource.Title>
 				</Resource>
 			);
@@ -408,37 +304,6 @@ class ResourceSelector extends React.Component {
 		return null;
 	}
 
-	getActiveArrow() {
-		const { slideIndex, resources } = this.props;
-		let isActiveLeft = false, isActiveRight = false;
-		const totalSlide = (resources.length - 1) / 5;
-		
-		if ((totalSlide) <= 1) {
-			isActiveLeft = false;
-			isActiveRight = false;
-		}
-		if (totalSlide > 1) {
-			if (slideIndex > 0) {
-				if (slideIndex < totalSlide) {
-					if(totalSlide - slideIndex <= 1){
-						isActiveRight = false;
-						isActiveLeft = true;
-					}else{
-						isActiveRight = true;
-						isActiveLeft = true
-					}
-				}
-			} else {
-				isActiveLeft = false;
-				isActiveRight = true;
-			}
-		}
-
-		return {
-			isActiveLeft, isActiveRight
-		}
-	}
-
 	render() {
 		const {
 			checkPinCode,
@@ -451,13 +316,10 @@ class ResourceSelector extends React.Component {
 			deleteBlockTime,
 			currentDay,
 			editBlockTime,
-			slideIndex,
-			resources
 		} = this.props;
 
 		const isActiveLett = this.getActiveArrow().isActiveLeft;
 		const isActiveRight = this.getActiveArrow().isActiveRight;
-
 
 		return (
 			<React.Fragment>
@@ -465,15 +327,10 @@ class ResourceSelector extends React.Component {
 					<TodayWrapper>
 						<TodayWrapper.Button onClick={() => this.onTodayClick()}>Today</TodayWrapper.Button>
 					</TodayWrapper>
+
 					<AnyStaff>
 						<AnyStaff.Image>
-							<img
-								src={require('../../images/anystaff.png')}
-								style={{
-									width: 30,
-									height: 26
-								}}
-							/>
+							<img src={require('../../images/anystaff.png')}/>
 							<AnyStaff.Title>Any staff</AnyStaff.Title>
 						</AnyStaff.Image>
 					</AnyStaff>
@@ -485,7 +342,7 @@ class ResourceSelector extends React.Component {
 							renderCenterLeftControls={({ previousSlide }) => {
 								if (!isActiveLett) {
 									return (
-										<PrevButton onClick={()=>{}}>
+										<PrevButton onClick={() => { }}>
 											<FaCaretLeft />
 										</PrevButton>
 									)
@@ -498,8 +355,8 @@ class ResourceSelector extends React.Component {
 							}}
 							renderCenterRightControls={({ nextSlide }) => {
 								if (!isActiveRight) {
-									return ( 
-										<NextButton onClick={()=>{}}>
+									return (
+										<NextButton onClick={() => { }}>
 											<FaCaretRight />
 										</NextButton>
 									)
@@ -517,12 +374,12 @@ class ResourceSelector extends React.Component {
 					</ResourceSliderWrapper>
 					<WaitingHeader>Waiting</WaitingHeader>
 				</ResourceSelectorWrapper>
-				<Pincode
+
+				<PopupBlockTime
 					checkPinCode={checkPinCode}
 					popupPincode={popupPincode}
 					togglePopupPincode={togglePopupPincode}
 					disableCalendar={disableCalendar}
-					// PinStaff={PinStaff}
 					staff={PinStaff}
 					calendarMembers={calendarMembers}
 					SubmitEditBlockTime={SubmitEditBlockTime}

@@ -91,7 +91,7 @@ import {
 	UPDATE_USER,
 	RENDER_APPOINTMEMT,
 	UPDATE_APPOINTMENT_CALENDAR_FRONTEND,
-	SUBMIT_EDIT_BLOCKTIME,
+	ADD_BLOCKTIME,
 	DELETE_BLOCKTIME,
 	DELETE_BLOCKTIME_SUCCESSS,
 	GET_BLOCKTIME,
@@ -110,7 +110,11 @@ import {
 	RELOAD_CALENDAR,
 	RELOAD_STAFF,
 	EDIT_BLOCKTIME,
-	UPDATE_NOTE
+	UPDATE_NOTE,
+	SUBMIT_ADD_APPOINTMENT,
+	GET_DETAIL_APP_AFTER_ADD,
+	CHANGE_APPOINTMENT,
+	SENDLINK_CUSTOMER
 } from './constants';
 
 /**
@@ -709,7 +713,7 @@ export const updateAppointmentFrontend = (data) => ({
 });
 
 export const SubmitEditBlockTime = (data) => ({
-	type: SUBMIT_EDIT_BLOCKTIME,
+	type: ADD_BLOCKTIME,
 	data
 });
 
@@ -808,6 +812,27 @@ export function editBlockTime(payload) {
 export function updateNote(payload) {
 	return {
 		type: UPDATE_NOTE,
+		payload
+	};
+}
+
+export function submitAddAppointment(payload) {
+	return {
+		type: SUBMIT_ADD_APPOINTMENT,
+		payload
+	};
+}
+
+export function changeAppointment(payload) {
+	return {
+		type: CHANGE_APPOINTMENT,
+		payload
+	};
+}
+
+export function sendLinkCustomer(payload) {
+	return {
+		type: SENDLINK_CUSTOMER,
 		payload
 	};
 }

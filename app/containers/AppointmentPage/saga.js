@@ -33,13 +33,15 @@ import {
 	memberAdapter,
 	findLastIndex,
 	findLastIndexChangeTime,
-	totalDurationMoveAppointment
+	totalDurationMoveAppointment,
+	addLastStaff
 } from './utilSaga';
 
 import { assignAppointment as mockedPostAppointment } from '../../assets/mocks/assignAppointment';
 import { addEventsToCalendar, deleteEventFromCalendar } from '../../components/Calendar/constants';
 
-export function* reloadStaffSaga() {
+/********************************* GET STAFF LIST *********************************/
+export function* getMembers() {
 	if (navigator.onLine === true) {
 		try {
 			const requestURL = new URL(`${api_constants.GET_MEMBER}`);
@@ -47,7 +49,7 @@ export function* reloadStaffSaga() {
 			const url = `${requestURL.toString()}${currentDate.format('YYYY-MM-DD')}`;
 			const resp = yield api(url, '', 'GET', token);
 			if (resp.codeStatus !== 1) {
-				console.log(response.message);
+				console.log(resp.message);
 				console.log('error from api ' + url);
 				return;
 			}
@@ -56,26 +58,12 @@ export function* reloadStaffSaga() {
 					? resp.data.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0)
 					: [];
 
-				const lastStaff = {
-					id: 0,
-					title: `Any staff`,
-					imageUrl: '',
-					orderNumber: 0,
-					workingTimes: members[members.length - 2].workingTimes,
-					isDisabled: false,
-					pincode: 0,
-					isNextAvailableStaff: false,
-					blockTime: [],
-					timeLogin: 0
-				};
-
+				const lastStaff = addLastStaff(members);
 				members.push(lastStaff);
 				const slideIndex = yield select(makeSlideIndex());
 
 				localStorage.setItem('staffList', JSON.stringify(members));
 				yield put(actions.membersLoaded(members));
-				const isDeskTop = api_constants.isDesktopOrLaptop;
-				const num = isDeskTop ? 7 : 5;
 				yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
 				yield put(actions.reloadCalendar());
 			}
@@ -85,13 +73,13 @@ export function* reloadStaffSaga() {
 	} else {
 		const members = JSON.parse(localStorage.getItem('staffList'));
 		yield put(actions.membersLoaded(members));
-		const isDeskTop = api_constants.isDesktopOrLaptop;
-		const num = isDeskTop ? 7 : 5;
 		yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
 		yield put(actions.reloadCalendar());
 	}
 }
 
+
+/********************************* GET APPOINMENT CALENDAR LIST *********************************/
 export function* reloadCalendarSaga() {
 	try {
 		let appointments;
@@ -106,7 +94,6 @@ export function* reloadCalendarSaga() {
 			const response = yield api(url.toString(), '', 'GET', token);
 			if (response.codeStatus !== 1) {
 				console.log(response.message);
-				console.log('error from api ' + requestURL);
 				yield put(actions.loadingCalendar(false));
 				return;
 			}
@@ -115,11 +102,7 @@ export function* reloadCalendarSaga() {
 				response &&
 				response.data
 					.map((appointment) => appointmentAdapter(appointment))
-					.filter(
-						(app) =>
-							moment(app.start).format('YYYY-MM-DD hh:mm A') !==
-							moment(app.end).format('YYYY-MM-DD hh:mm A')
-					);
+					.filter((app) => app.options.length > 0);
 
 			if (apiDateQuery === moment().format('YYYY-MM-DD')) {
 				localStorage.setItem('AppointmentCalendar', JSON.stringify(appointments));
@@ -158,58 +141,6 @@ export function* reloadCalendarSaga() {
 	}
 }
 
-export function* getMembers() {
-	if (navigator.onLine === true) {
-		try {
-			const requestURL = new URL(`${api_constants.GET_MEMBER}`);
-			const currentDate = yield select(makeCurrentDay());
-			const url = `${requestURL.toString()}${currentDate.format('YYYY-MM-DD')}`;
-			const resp = yield api(url, '', 'GET', token);
-			if (resp.codeStatus !== 1) {
-				console.log(response.message);
-				console.log('error from api ' + url);
-				return;
-			}
-			if (resp.codeStatus === 1) {
-				const members = resp.data
-					? resp.data.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0)
-					: [];
-
-				const lastStaff = {
-					id: 0,
-					title: `Any staff`,
-					imageUrl: '',
-					orderNumber: 0,
-					workingTimes: members[members.length - 2].workingTimes,
-					isDisabled: false,
-					pincode: 0,
-					isNextAvailableStaff: false,
-					blockTime: [],
-					timeLogin: 0
-				};
-				members.push(lastStaff);
-				const slideIndex = yield select(makeSlideIndex());
-				// const Staffs = sorrtStaffByDate('', members);
-
-				localStorage.setItem('staffList', JSON.stringify(members));
-				yield put(actions.membersLoaded(members));
-				const isDeskTop = api_constants.isDesktopOrLaptop;
-				const num = isDeskTop ? 7 : 5;
-				yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
-				yield put(actions.reloadCalendar());
-			}
-		} catch (err) {
-			yield put(actions.memberLoadingError(err));
-		}
-	} else {
-		const members = JSON.parse(localStorage.getItem('staffList'));
-		yield put(actions.membersLoaded(members));
-		const isDeskTop = api_constants.isDesktopOrLaptop;
-		const num = isDeskTop ? 7 : 5;
-		yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
-		yield put(actions.reloadCalendar());
-	}
-}
 
 function* checkResponse(response) {
 	alert(response.message);
@@ -219,6 +150,7 @@ function* checkResponse(response) {
 	return;
 }
 
+/********************************* GET WAITING APPOINTMENT LIST *********************************/
 export function* getWaitingAppointments() {
 	if (navigator.onLine) {
 		try {
@@ -226,23 +158,18 @@ export function* getWaitingAppointments() {
 			const requestURL = new URL(api_constants.GET_APPOINTMENT_STATUS);
 			const timezone = new Date().getTimezoneOffset();
 			const url = `${requestURL.toString()}&timezone=${timezone}&waitingTime=${false}`;
+
 			const response = yield api(url.toString(), '', 'GET', token);
 			if (response.codeStatus !== 1) {
 				console.log(response.message);
 				yield put(actions.loadingWaiting(false));
-				console.log('error from api ' + url);
 				return;
 			}
 			yield put(actions.loadingWaiting(false));
-			const appointments =
-				response &&
-				response.data
-					.map((appointment) => appointmentAdapter(appointment))
-					.filter(
-						(app) =>
-							moment(app.start).format('YYYY-MM-DD hh:mm A') !==
-							moment(app.end).format('YYYY-MM-DD hh:mm A')
-					);
+
+			const appointments = response && response.data.map((appointment) => appointmentAdapter(appointment))
+				.filter((app) => app.options.length > 0);
+
 			localStorage.setItem('AppointmentWaiting', JSON.stringify(appointments));
 
 			yield put(actions.waitingAppointmentsLoaded(appointments));
@@ -257,6 +184,7 @@ export function* getWaitingAppointments() {
 	}
 }
 
+
 export function* getAppointmentsByMembersAndDate() {
 	try {
 		let appointments;
@@ -266,23 +194,16 @@ export function* getAppointmentsByMembersAndDate() {
 
 		if (navigator.onLine) {
 			yield put(actions.loadingCalendar(true));
-			// yield put(actions.getBlockTime());
+
 			const requestURL = new URL(api_constants.GET_APPOINTMENT_BY_DATE);
 			const url = `${requestURL.toString()}/${apiDateQuery}`;
 			const response = yield api(url.toString(), '', 'GET', token);
 			if (response.codeStatus !== 1) {
-				console.log('error from api ' + requestURL);
+				console.log(response.message)
 				return;
 			}
-			appointments =
-				response &&
-				response.data
-					.map((appointment) => appointmentAdapter(appointment))
-					.filter(
-						(app) =>
-							moment(app.start).format('YYYY-MM-DD hh:mm A') !==
-							moment(app.end).format('YYYY-MM-DD hh:mm A')
-					);
+			appointments = response && mresponse.data.map((appointment) => appointmentAdapter(appointment))
+				.filter((app) => app.options.length > 0);
 
 			if (apiDateQuery === moment().format('YYYY-MM-DD')) {
 				localStorage.setItem('AppointmentCalendar', JSON.stringify(appointments));
@@ -323,12 +244,15 @@ export function* getAppointmentsByMembersAndDate() {
 	}
 }
 
-export function* getAppointmentAfterSlide() {
+
+/********************************* RENDER APPOINTMENT IN CALENDAR *********************************/
+export function* reRenderAppointment() {
 	try {
 		const displayedMembers = yield select(makeSelectDisplayedMembers());
 		const appointments = yield select(makeSelectAllAppointments());
 		const currentDate = yield select(makeCurrentDay());
 		let apiDateQuery = currentDate.format('YYYY-MM-DD') || moment().format('YYYY-MM-DD');
+
 		const appointmentsMembers = displayedMembers.map((member) => ({
 			memberId: member.id,
 			appointments: appointments.filter(
@@ -351,6 +275,8 @@ export function* getAppointmentAfterSlide() {
 	}
 }
 
+
+/********************************* MOVE APPOINTMENT *********************************/
 export function* moveAppointment(action) {
 	const displayedMembers = yield select(makeSelectDisplayedMembers());
 	// const allMember = yield select(makeSelectMembers());
@@ -404,8 +330,6 @@ export function* moveAppointment(action) {
 		extras
 	};
 
-	// delay(1000)
-
 	yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
 	yield put(actions.renderAppointment());
 
@@ -416,54 +340,59 @@ export function* moveAppointment(action) {
 		if (response.codeStatus !== 1) {
 			return yield* checkResponse(response);
 		}
-		if (response.codeStatus === 1) {
-			// yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
-		}
 	} catch (err) {
 		yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
 		yield put(actions.renderAppointment());
 	}
 }
 
+
+/********************************* PUT BACK APPOINTMENT FROM CALENDAR TO WAITING LIST *********************************/
 export function* putBackAppointment(action) {
 	try {
 		const { appointment } = action;
 		let { memberId, start, end, options, products, extras } = appointment;
+
 		const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
 		const url = `${requestURL.toString()}/${appointment.id}`;
 		yield put(actions.appointmentPutBack(action.appointment));
+
 		const data = dataPutBackAppointment(memberId, start, end, options, products, extras);
+
 		try {
 			const response = yield api(url, data, 'PUT', token);
 			if (response.codeStatus !== 1) return yield* checkResponse(response);
 			if (response.codeStatus === 1) {
 			}
-		} catch (err) {}
+		} catch (err) { }
 	} catch (err) {
 		yield put(actions.appointmentPuttingBackError(err));
 	}
 }
 
-export function* cancelAppointment(action) {
-	const fcEvent = yield select(makeSelectFCEvent());
-	if (!fcEvent) {
-		yield put(actions.appointmentCancellingError('Cannot find selected fcEvent'));
-	}
-	try {
-		yield delay(200);
-		const result = mockedPostAppointment;
-		if (result) {
-			yield put(actions.appointmentCanceled(action.appointmentId));
-			deleteEventFromCalendar(fcEvent._id);
-			yield put(actions.deselectAppointment());
-		} else {
-			yield put(actions.appointmentCancellingError(result));
-		}
-	} catch (err) {
-		yield put(actions.appointmentCancellingError(err));
-	}
-}
 
+// export function* cancelAppointment(action) {
+// 	const fcEvent = yield select(makeSelectFCEvent());
+// 	if (!fcEvent) {
+// 		yield put(actions.appointmentCancellingError('Cannot find selected fcEvent'));
+// 	}
+// 	try {
+// 		yield delay(200);
+// 		const result = mockedPostAppointment;
+// 		if (result) {
+// 			yield put(actions.appointmentCanceled(action.appointmentId));
+// 			deleteEventFromCalendar(fcEvent._id);
+// 			yield put(actions.deselectAppointment());
+// 		} else {
+// 			yield put(actions.appointmentCancellingError(result));
+// 		}
+// 	} catch (err) {
+// 		yield put(actions.appointmentCancellingError(err));
+// 	}
+// }
+
+
+/********************************* ASSIGN APPOINTMENT FROM WAITING LIST TO CALENDAR *********************************/
 export function* assignAppointment(action) {
 	const displayedMembers = yield select(makeSelectDisplayedMembers());
 	const assignedMember = displayedMembers[action.resourceId];
@@ -504,12 +433,6 @@ export function* assignAppointment(action) {
 			extras
 		};
 
-		const pushData = {
-			data: { ...data, id: appointment.id },
-			action: 'updateAppointmemtOffline'
-		};
-		window.postMessage(pushData);
-
 		const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
 		const url = `${requestURL.toString()}/${appointment.id}`;
 		const response = yield api(url, data, 'PUT', token);
@@ -521,9 +444,17 @@ export function* assignAppointment(action) {
 	}
 }
 
+
+/********************************* UPDATE STATUS APPOINTMENY CONFIRM, CHECK IN, CANCEL *********************************/
 export function* upddateAppointment(action) {
 	try {
+		const displayedMembers = yield select(makeSelectDisplayedMembers());
+		const currentDate = yield select(makeCurrentDay());
+		const currentDayName = moment(currentDate).format('dddd');
 		const fcEvent = yield select(makeSelectFCEvent());
+
+		let isUpdate = true;
+
 		if (!fcEvent) {
 			yield put(actions.appointmentUpdatingStatusError('Cannot find selected fcEvent'));
 		}
@@ -533,75 +464,51 @@ export function* upddateAppointment(action) {
 			old_duration,
 			servicesUpdate,
 			productsUpdate,
-			notes,
 			old_status,
 			old_appointment,
 			extrasUpdate
 		} = action.appointment;
-
 		let { end, start, extras, memberId } = appointment;
-
-		// let _totalDuration = totalDuartionUpdateAppointment(servicesUpdate, extras, appointment);
-		// let _endTime =  moment(start).add(_totalDuration, 'minutes');
-		// let newDate = `${_endTime.format('YYYY-MM-DD')}T${_endTime.format('HH:mm:ss')}`;
 		let newDate = end;
 
 		if (status === 'cancel') {
 			yield put(actions.appointmentCanceled(appointment.id));
 			deleteEventFromCalendar(fcEvent._id);
 			yield put(actions.deselectAppointment());
-
 			yield put(actions.deleteAppointmentCalendar(appointment));
 			yield put(actions.renderAppointment());
+
 			const url_update_status = new URL(api_constants.PUT_UPDATE_STATUS_APPOINTMENT);
 			const url = `${url_update_status}/${appointment.id}`;
 			const kq = yield api(url, { status }, 'PUT', token);
+
 			if (kq.codeStatus !== 1) return yield* checkResponse(kq);
-			if (kq.codeStatus === 1) {
-				return;
-			}
 		}
 
-		let notesUpdate = [];
-		notes.forEach((note) => {
-			notesUpdate.push({
-				note: note.note
-			});
-		});
+		let data = dataUpdateAppointment(old_status, memberId, old_appointment, status, start, newDate, servicesUpdate, productsUpdate, extrasUpdate);
 
-		let data = dataUpdateAppointment(
-			old_status,
-			memberId,
-			old_appointment,
-			status,
-			notesUpdate,
-			start,
-			newDate,
-			servicesUpdate,
-			productsUpdate,
-			extrasUpdate
-		);
 
 		yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
 		yield put(actions.renderAppointment());
 
 		const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
 		const url = `${requestURL}/${appointment.id}`;
+
 		try {
 			const kq = yield api(url, data, 'PUT', token);
 			if (kq.codeStatus !== 1) return yield* checkResponse(kq);
-			if (kq.codeStatus === 1) {
-				return;
-			}
 		} catch (error) {
 			yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
 			yield put(actions.renderAppointment());
 		}
+
 	} catch (error) {
 		yield put(actions.updateAppointmentError(error));
 	}
 }
 
+
+/********************************* CHANGE DURATION, STATUS, STAFF ... OF APPOINTMENT *********************************/
 export function* changeTimeAppointment(action) {
 	try {
 		const fcEvent = yield select(makeSelectFCEvent());
@@ -613,7 +520,6 @@ export function* changeTimeAppointment(action) {
 			appointment,
 			dayPicker,
 			fromTime,
-			notes,
 			selectedStaff,
 			servicesUpdate,
 			productsUpdate,
@@ -630,94 +536,100 @@ export function* changeTimeAppointment(action) {
 				? moment(start_time).add(totalDuration, 'minutes').format('YYYY-MM-DD HH:mm')
 				: moment(start_time).add(15, 'minutes').format('YYYY-MM-DD HH:mm');
 
-		if (window.confirm('Accept changes?')) {
-			yield* changeTime(
-				appointment,
+			const payload = {
+				appointmentEdit: appointment,
 				fcEvent,
 				start_time,
 				end_time,
 				memberId,
-				servicesUpdate,
-				productsUpdate,
-				extrasUpdate,
-				notes,
+				options: servicesUpdate,
+				products: productsUpdate,
+				extras: extrasUpdate,
 				start,
 				selectedStaff
-			);
-		}
+			}
+			yield put(actions.changeAppointment(payload))
+
 	} catch (error) {
 		yield put(actions.updateAppointmentError(error));
 	}
+}
 
-	function totalDuarion(services, extras, appointment) {
-		let total = 0;
-		const lastIndex = findLastIndexChangeTime(services, services[0]);
-		if (lastIndex !== -1) {
-			for (let i = 0; i < services.length; i++) {
-				total += services[i].duration;
-				const findExtra = extras.find((ex) => ex.serviceId && ex.serviceId === services[i].serviceId);
-				if (findExtra) {
-					total += findExtra.duration;
-				}
-				if (i === lastIndex) {
-					break;
-				}
+function totalDuarion(services, extras, appointment) {
+	let total = 0;
+	const lastIndex = findLastIndexChangeTime(services, services[0]);
+	if (lastIndex !== -1) {
+		for (let i = 0; i < services.length; i++) {
+			total += services[i].duration;
+			const findExtra = extras.find((ex) => ex.serviceId && ex.serviceId === services[i].serviceId);
+			if (findExtra) {
+				total += findExtra.duration;
 			}
-		} else {
-			total = 15;
+			if (i === lastIndex) {
+				break;
+			}
 		}
-		return total;
+	} else {
+		total = 15;
+	}
+	return total;
+}
+
+/********************************* CHANGE APPOINTMENT STEP 2 *********************************/
+export function* changeAppointmentSaga(action) {
+	const displayedMembers = yield select(makeSelectDisplayedMembers());
+	const currentDate = yield select(makeCurrentDay());
+	const currentDayName = moment(currentDate).format('dddd');
+	let isUpdate = true;
+
+	const { appointmentEdit, fcEvent, start_time, end_time, options, products, extras, start, selectedStaff } = action.payload;
+
+	let appointment = {
+		...appointmentEdit,
+		memberId: options.length > 0 ? options[0].staffId : 0
+	};
+
+	let statusChange = 'confirm';
+	let diff_time = moment(start_time).diff(moment(start), 'minutes');
+	if ((diff_time < 45 && diff_time >= 0) || (diff_time < 0 && diff_time > -45)) {
+		statusChange = 'checkin';
 	}
 
-	function* changeTime(
-		appointmentEdit,
-		fcEvent,
-		start_time,
-		end_time,
-		memberId,
-		options,
-		products,
-		extras,
-		notes,
-		start,
-		selectedStaff
-	) {
+	let data = dataChangeTimeAppointment(selectedStaff, start_time, end_time, appointment, statusChange, options, products, extras);
+
+	const staff = displayedMembers.find(s => s.id === data.staffId);
+
+	/* check condition update to grey block */
+	if (staff) {
+		const timeWorking = Object.entries(staff.workingTimes).find(b => b[0] === currentDayName);
+		const timeEnd = `${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(
+			timeWorking[1].timeEnd,
+			['h:mm A']
+		).format('HH:mm:ss')}`;
+		const toTime = moment(data.fromTime).add(totalDuarion(data.services, data.extras, appointment), 'minutes')
+
+		if (moment(toTime).isSameOrAfter(timeEnd)) {
+			if (window.confirm('Accept appointment outside working hours?')) {
+				isUpdate = true
+			} else {
+				isUpdate = false
+			}
+		}else{
+			if (window.confirm('Accept changes?')){
+				isUpdate = true
+			}else{
+				isUpdate = false
+			}
+		}
+	}
+	/* end check condition */
+
+	if (isUpdate) {
+
 		yield put(actions.appointmentCanceled(appointmentEdit.id));
 		deleteEventFromCalendar(fcEvent._id);
 		yield put(actions.deselectAppointment());
-		let appointment = {
-			...appointmentEdit,
-			memberId: options.length > 0 ? options[0].staffId : 0
-		};
 
-		let notesUpdate = [];
-		notes.forEach((note) => {
-			notesUpdate.push({
-				note: note.note
-			});
-		});
-
-		/* check status của appointment check in > 45 mins */
-		let statusChange = 'confirm';
-		let diff_time = moment(start_time).diff(moment(start), 'minutes');
-		if ((diff_time < 45 && diff_time >= 0) || (diff_time < 0 && diff_time > -45)) {
-			statusChange = 'checkin';
-		}
-
-		/* data submit lên server */
-		let data = dataChangeTimeAppointment(
-			selectedStaff,
-			start_time,
-			end_time,
-			appointment,
-			statusChange,
-			options,
-			products,
-			extras,
-			notesUpdate
-		);
-
-		/* cập nhật appointment trên frontend */
 		yield put(
 			actions.updateAppointmentFrontend({
 				appointment: {
@@ -730,7 +642,6 @@ export function* changeTimeAppointment(action) {
 		);
 		yield put(actions.renderAppointment());
 
-		/* Gọi api submit data lên server, nếu lỗi ko có internet => cập nhật frontend , lưu local */
 		try {
 			const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
 			const url = `${requestURL.toString()}/${appointment.id}`;
@@ -758,173 +669,109 @@ export function* changeTimeAppointment(action) {
 	}
 }
 
+
+/********************************* ADD NEW CUSTOMER *********************************/
 export function* addNewCustomer(action) {
 	try {
-		const { first_name, last_name, phone, staffID, time, refPhone, note, email, referedBy } = action.customer;
-
-		console.log(action.customer);
-
+		const { first_name, last_name, phone, staffID, time, refPhone, note, email, referedBy, dataAnyStaff, isSendLink } = action.customer;
 		if (navigator.onLine === false) {
-			window.postMessage(
-				JSON.stringify({
-					first_name,
-					last_name,
-					phone,
-					staffID,
-					time,
-					refPhone,
-					note,
-					email,
-					action: 'signinAppointmentOffLine'
-				})
-			);
+			window.postMessage(JSON.stringify({ first_name, last_name, phone, staffID, time, refPhone, note, email, action: 'signinAppointmentOffLine' }));
 			return;
 		}
-
-		const Info_CheckPhone = yield select(makeInfoCheckPhone());
+		const infoUser = yield select(makeInfoCheckPhone());
 		let customerId;
 		let user_Id;
-		if (Info_CheckPhone === '') {
-			const requestURL = new URL(api_constants.POST_ADD_CUSTOMER);
-			const data = {
-				FirstName: first_name,
-				LastName: last_name,
-				Email: email,
-				Phone: phone,
-				referrerPhone: '+' + refPhone,
-				favourite: note,
-				ReferrerBy: referedBy
-			};
-
-			const result = yield api(requestURL.toString(), data, 'POST', token);
-			if (parseInt(result.codeStatus) != 1) {
-				alert('error from ' + api_constants.POST_ADD_CUSTOMER);
+		if (infoUser === '') {
+			const data = { FirstName: first_name, LastName: last_name, Email: email, Phone: phone, referrerPhone: refPhone ? '+' + refPhone : '', favourite: note, ReferrerBy: referedBy };
+			const response = yield api(new URL(api_constants.POST_ADD_CUSTOMER), data, 'POST', token);
+			if (parseInt(response.codeStatus) != 1) {
+				alert(response.message)
 				return;
 			}
-
-			customerId = result.data.customerId;
-			user_Id = result.data.userId;
+			customerId = response.data.customerId;
+			user_Id = response.data.userId;
+			if (isSendLink) {
+				yield put(actions.sendLinkCustomer({ phone }))
+			}
 		} else {
-			customerId = Info_CheckPhone.customerId;
-			user_Id = Info_CheckPhone.userId;
+			customerId = infoUser.customerId;
+			user_Id = infoUser.userId;
 		}
 
 		const data = {
-			staffId: time ? staffID : 0,
+			staffId: staffID ? staffID : 0,
 			customerId,
 			merchantId: merchantId,
 			userId: user_Id,
-			status: time ? 'checkin' : 'waiting',
+			status: !dataAnyStaff ? time ? 'checkin' : 'waiting' : 'unconfirm',
 			services: [],
 			products: [],
 			extras: [],
 			fromTime: time ? moment(new Date(time)).format('YYYY-MM-DD HH:mm') : checkTimeToAddAppointmdent(),
 			toTime: time
 				? moment(new Date(time)).add(15, 'minutes').format('YYYY-MM-DD HH:mm')
-				: moment(checkTimeToAddAppointmdent()).add(15, 'minutes').format('YYYY-MM-DD HH:mm')
+				: moment(checkTimeToAddAppointmdent()).add(15, 'minutes').format('YYYY-MM-DD HH:mm'),
+			time,
+			staffID,
+			dataAnyStaff,
+			user_Id
 		};
 
-		/* Add Appointment  */
-		const url_add = new URL(api_constants.POST_ADD_APPOINTMENT);
-		const rs_add = yield api(url_add.toString(), data, 'POST', token);
-		if (rs_add.codeStatus !== 1) {
-			alert('error add appoinment from ' + api_constants.POST_ADD_APPOINTMENT);
-			return;
-		}
+		yield put(actions.submitAddAppointment(data))
 
-		let id_appointment = '';
-		if (rs_add.codeStatus === 1) {
-			id_appointment = rs_add.data;
-		}
-
-		/* get appointment by id after add, add appointment to  waiting list */
-		const url_detail = new URL(api_constants.GET_APPOINTMENT_ID).toString();
-		const detailAppointment = yield api(`${url_detail}/${id_appointment}`, '', 'GET', token);
-
-		if (detailAppointment.codeStatus !== 1) {
-			alert('error from get appointmentId ' + api_constants.GET_APPOINTMENT_ID);
-			return;
-		}
-
-		yield put(actions.addCustomerSuccess(true));
-
-		const {
-			appointmentId,
-			createdDate,
-			fromTime,
-			toTime,
-			staffId,
-			phoneNumber,
-			services,
-			products,
-			userId,
-			firstName,
-			lastName,
-			extras
-		} = detailAppointment.data;
-
-		let waitingAppointment = {
-			id: appointmentId,
-			createDate: createdDate,
-			end: moment(toTime),
-			start: moment(fromTime),
-			memberId: time ? staffID : staffId,
-			phoneNumber: phoneNumber,
-			options: services,
-			products: products,
-			extras: extras,
-			status: time ? 'CHECKED_IN' : 'WAITING',
-			tipPercent: 0,
-			user_id: userId,
-			userFullName: firstName + ' ' + lastName,
-			notes: []
-		};
-
-		if (time) {
-		} else {
-			yield put(actions.addAppointmentWaiting(waitingAppointment));
-		}
-
-		if (staffID) {
-			window.postMessage(
-				JSON.stringify({
-					customerId,
-					userId,
-					appointmentId,
-					action: 'newAppointment'
-				})
-			);
-			window.postMessage(
-				JSON.stringify({
-					customerId,
-					userId,
-					appointmentId,
-					action: 'signinAppointment'
-				})
-			);
-		} else {
-			window.postMessage(
-				JSON.stringify({
-					customerId,
-					userId,
-					appointmentId,
-					action: 'newAppointment'
-				})
-			);
-			window.postMessage(
-				JSON.stringify({
-					customerId,
-					userId,
-					appointmentId,
-					action: 'signinAppointment'
-				})
-			);
-		}
 	} catch (error) {
 		yield put(actions.addCustomerError(error));
 	}
 }
 
+
+/********************************* ADD APPOINTMENT *********************************/
+function* addAppointmentSaga() {
+	yield takeLatest(constants.SUBMIT_ADD_APPOINTMENT, function* (action) {
+		try {
+			const data = action.payload;
+			const {
+				time,
+				staffID,
+				dataAnyStaff,
+			} = data;
+
+			const response = yield api(new URL(api_constants.POST_ADD_APPOINTMENT).toString(), data, 'POST', token);
+
+			if (response.codeStatus === 1) {
+				let appointmentId = response.data;
+				let dataPush = '';
+
+				if (dataAnyStaff) {
+					dataPush = JSON.stringify({
+						appointmentId,
+						dataAnyStaff,
+						action: 'addGroupAnyStaff',
+					})
+				} else {
+					dataPush = JSON.stringify({
+						appointmentId,
+						action: 'signinAppointment'
+					})
+				}
+
+				window.postMessage(dataPush)
+
+				delay(2000);
+				yield put(actions.TimeAndStaffID(''));
+			} else {
+				alert(response.message)
+			}
+
+		} catch (err) {
+			console.log({ err })
+			// yield put(memberLoadingError(err));
+		}
+	});
+}
+
+
+/********************************* SEARCH PHONE CUSTOMER *********************************/
 export function* checkPhoneCustomer(action) {
 	try {
 		const { phone, staffID, time } = action.phone;
@@ -937,24 +784,6 @@ export function* checkPhoneCustomer(action) {
 			} else {
 				yield put(actions.checkPhoneNumberCustomerError(true));
 				yield put(actions.infoCheckPhone(result.data));
-				if (staffID) {
-					window.postMessage(
-						JSON.stringify({
-							consumerId: result.data.customerId,
-							staffid: staffID,
-							from_time: time,
-							action: 'newAppointment'
-						})
-					);
-				} else {
-					window.postMessage(
-						JSON.stringify({
-							consumerId: result.data.customerId,
-							action: 'newAppointment'
-						})
-					);
-					yield put(actions.TimeAndStaffID(''));
-				}
 			}
 		} else {
 			yield put(actions.checkPhoneNumberCustomerSuccess(true));
@@ -964,6 +793,23 @@ export function* checkPhoneCustomer(action) {
 	}
 }
 
+/********************************* SEND LINK CUSTOMER *********************************/
+export function* sendLinkCustomerSaga(action) {
+	try {
+		const { phone } = action.payload;
+		const requestURL = new URL(api_constants.GET_SENDLINK_CUSTOMER);
+		const url = `${requestURL.toString()}${phone}`;
+		const result = yield api(url, '', 'GET', token);
+		if (result.codeStatus !== 1) {
+			alert(response.message)
+		}
+	} catch (error) {
+		console.log({ error })
+	}
+}
+
+
+/********************************* CANCEL APPONTMENT IN WAITING LIST *********************************/
 export function* deleteEventInWaitingList(action) {
 	const { appointment } = action;
 	const { memberId, start, end, options, products, extras } = appointment;
@@ -990,7 +836,9 @@ export function* deleteEventInWaitingList(action) {
 	}
 }
 
-export function* SubmitEditBlockTime_Saga(action) {
+
+/********************************* ADD BLOCK TIME *********************************/
+export function* addBlockTime(action) {
 	try {
 		const { data } = action;
 		const { staff, start, end, note } = data;
@@ -1009,10 +857,12 @@ export function* SubmitEditBlockTime_Saga(action) {
 			yield put(actions.loadMembers());
 			return;
 		}
-	} catch (error) {}
+	} catch (error) { }
 }
 
-export function* editBlockTimeSaga(action) {
+
+/********************************* EDIT BLOCK TIME *********************************/
+export function* editBlockTime(action) {
 	try {
 		const { payload } = action;
 		const { staff, start, end, note, id } = payload;
@@ -1030,9 +880,11 @@ export function* editBlockTimeSaga(action) {
 			yield put(actions.loadMembers());
 			return;
 		}
-	} catch (error) {}
+	} catch (error) { }
 }
 
+
+/********************************* DELETE BLOCK TIME *********************************/
 export function* deleteBlockTime_Saga(action) {
 	try {
 		const { block, staff } = action.data;
@@ -1042,9 +894,11 @@ export function* deleteBlockTime_Saga(action) {
 			yield put(actions.loadMembers());
 			yield put(actions.deleteBlockTimeSuccess({ staff, block }));
 		}
-	} catch (error) {}
+	} catch (error) { }
 }
 
+
+/********************************* GET BLOCK TIME LIST IN CALENDAR *********************************/
 export function* getBlockTimeSaga() {
 	try {
 		const currentDate = yield select(makeCurrentDay());
@@ -1056,9 +910,11 @@ export function* getBlockTimeSaga() {
 			yield put(actions.renderAppointment());
 			return;
 		}
-	} catch (error) {}
+	} catch (error) { }
 }
 
+
+/********************************* GET DETAIL APPOINTMENT *********************************/
 export function* getAppointmentByIdSaga(action) {
 	try {
 		if (navigator.onLine) {
@@ -1084,6 +940,8 @@ export function* getAppointmentByIdSaga(action) {
 	}
 }
 
+
+/********************************* GET TIME STAFF LOGIN *********************************/
 export function* getTimeStaffLoginSaga(action) {
 	try {
 		const { staffId } = action;
@@ -1098,11 +956,13 @@ export function* getTimeStaffLoginSaga(action) {
 			alert('error from ' + api_constants.API_GET_TIME_STAFF_LOGIN);
 			return;
 		}
-	} catch (err) {}
+	} catch (err) { }
 }
 
+
+/********************************* RELOAD STAFF & GET BLOCK TIME *********************************/
 function* updateNextStaff_Saga() {
-	yield takeLatest(constants.UPDATE_NEXT_STAFF, function*() {
+	yield takeLatest(constants.UPDATE_NEXT_STAFF, function* () {
 		try {
 			const requestURL = new URL(`${api_constants.GET_MEMBER}`);
 			const currentDate = yield select(makeCurrentDay());
@@ -1113,15 +973,13 @@ function* updateNextStaff_Saga() {
 				const members = response.data
 					? response.data.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0)
 					: [];
+
+				const lastStaff = addLastStaff(members);
+				members.push(lastStaff);
 				const slideIndex = yield select(makeSlideIndex());
-				// const Staffs = sorrtStaffByDate('', members);
 				yield put(actions.membersLoaded(members));
-				const isDeskTop = api_constants.isDesktopOrLaptop;
-				const num = isDeskTop ? 7 : 5;
 				yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
 				yield put(actions.getBlockTime());
-				// yield put(actions.loadAppointmentByMembers());
-				// yield put(updateNextStaffSuccess(members));
 			}
 		} catch (err) {
 			// yield put(memberLoadingError(err));
@@ -1129,6 +987,9 @@ function* updateNextStaff_Saga() {
 	});
 }
 
+
+
+/********************************* ADD NOTE APPOINTMENT *********************************/
 export function* updateNote_Saga(action) {
 	try {
 		const { notes, idAppointment } = action.payload;
@@ -1145,8 +1006,9 @@ export function* updateNote_Saga(action) {
 		if (response.codeStatus !== 1) {
 			return yield* checkResponse(response);
 		}
-	} catch (err) {}
+	} catch (err) { }
 }
+
 
 /* **************************** Subroutines ******************************** */
 
@@ -1173,21 +1035,21 @@ export function* selectDayOnCalendar() {
 	yield takeLatest(constants.SELECT_DAY_CALENDAR, selectDayAndWeek);
 }
 
-export function* EditBlockTime() {
-	yield takeLatest(constants.SUBMIT_EDIT_BLOCKTIME, SubmitEditBlockTime_Saga);
+export function* watch_addBlockTime() {
+	yield takeLatest(constants.ADD_BLOCKTIME, addBlockTime);
 }
 
-export function* _editBlockTime() {
-	yield takeLatest(constants.EDIT_BLOCKTIME, editBlockTimeSaga);
+export function* watch_editBlockTime() {
+	yield takeLatest(constants.EDIT_BLOCKTIME, editBlockTime);
 }
 
 export function* membersData() {
 	yield takeLatest(constants.LOAD_MEMBERS, getMembers);
 }
 
-export function* reloadStaffWatch() {
-	yield takeLatest(constants.RELOAD_STAFF, reloadStaffSaga);
-}
+// export function* reloadStaffWatch() {
+// 	yield takeLatest(constants.RELOAD_STAFF, reloadStaffSaga);
+// }
 
 export function* reloadCalendarWatch() {
 	yield takeLatest(constants.RELOAD_CALENDAR, reloadCalendarSaga);
@@ -1206,7 +1068,7 @@ export function* appointmentsByMembersData() {
 }
 
 export function* renderAppointmentSaga() {
-	yield takeLatest(constants.RENDER_APPOINTMEMT, getAppointmentAfterSlide);
+	yield takeLatest(constants.RENDER_APPOINTMEMT, reRenderAppointment);
 }
 
 export function* assignAppointmentData() {
@@ -1221,9 +1083,9 @@ export function* putBackAppointmentData() {
 	yield takeLatest(constants.PUT_BACK_APPOINTMENT, putBackAppointment);
 }
 
-export function* cancelAppointmentData() {
-	yield takeLatest(constants.CANCEL_APPOINTMENT, cancelAppointment);
-}
+// export function* cancelAppointmentData() {
+// 	yield takeLatest(constants.CANCEL_APPOINTMENT, cancelAppointment);
+// }
 
 export function* updateAppointmentStatus() {
 	yield takeLatest(constants.UPDATE_APPOINTMENT_STATUS, upddateAppointment);
@@ -1239,6 +1101,10 @@ export function* deleteEvent_WaitingList() {
 }
 export function* change_time_appointment() {
 	yield takeLatest(constants.CHANGE_APPOINTMENT_TIME, changeTimeAppointment);
+}
+
+export function* watch_changeAppointment() {
+	yield takeLatest(constants.CHANGE_APPOINTMENT, changeAppointmentSaga);
 }
 
 export function* delete_BlockTime() {
@@ -1260,6 +1126,10 @@ export function* watch_updateNote() {
 	yield takeLatest(constants.UPDATE_NOTE, updateNote_Saga);
 }
 
+export function* watch_sendLinkCustomer() {
+	yield takeLatest(constants.SENDLINK_CUSTOMER, sendLinkCustomerSaga);
+}
+
 /**
  * Root saga manages watcher lifecycle
  */
@@ -1273,21 +1143,24 @@ export default function* root() {
 		fork(assignAppointmentData),
 		fork(moveAppointmentData),
 		fork(putBackAppointmentData),
-		fork(cancelAppointmentData),
+		// fork(cancelAppointmentData),
 		fork(updateAppointmentStatus),
 		fork(add_Customer),
 		fork(check_Phone),
 		fork(deleteEvent_WaitingList),
 		fork(change_time_appointment),
-		fork(EditBlockTime),
+		fork(watch_addBlockTime),
 		fork(delete_BlockTime),
 		fork(getBlockTime_),
 		fork(watch_getAppointmentById),
 		fork(watch_getTimeStaffLogin),
-		fork(reloadStaffWatch),
+		// fork(reloadStaffWatch),
 		fork(reloadCalendarWatch),
 		fork(updateNextStaff_Saga),
-		fork(_editBlockTime),
-		fork(watch_updateNote)
+		fork(watch_editBlockTime),
+		fork(watch_updateNote),
+		fork(addAppointmentSaga),
+		fork(watch_changeAppointment),
+		fork(watch_sendLinkCustomer)
 	]);
 }

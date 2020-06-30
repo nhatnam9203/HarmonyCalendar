@@ -62,7 +62,6 @@ import {
 	DELETE_BLOCKTIME_SUCCESSS,
 	GET_BLOCKTIME_SUCCESS,
 	GET_APP_BY_ID_SUCCESS,
-	GROUP_APPOINTMENT,
 	UPDATE_APPOINTMENT_PAID_OFFLINE,
 	GET_TIME_STAFF_LOGIN_SUCCESS,
 	SET_SLIDE_INDEX
@@ -107,7 +106,6 @@ export const initialState = fromJS({
 		waiting: [],
 		allAppointment: [],
 		appointmentDetail: '',
-		groupAppointment: ''
 	},
 	checkPhoneNumber_success: false,
 	checkPhoneNumber_error: false,
@@ -742,12 +740,6 @@ function appointmentReducer(state = initialState, action) {
 					arr[pos].timeLogin = action.data.timeLogin ;
 					return [ ...arr ];
 				});
-
-		case GROUP_APPOINTMENT:
-			return state.updateIn([ 'appointments', 'groupAppointment' ], (group) => {
-				group = action.data;
-				return group;
-			});
 
 		default:
 			return state;

@@ -9,22 +9,16 @@ class FCAgenda extends React.Component {
     const { options } = this.props;
     $('#full-calendar').fullCalendar(options);
     $('.fc-now-indicator-arrow').html(moment().format('hh:mm A'));
-    // setInterval(() => {
-   
-    // }, );
   }
 
-  componentWillReceiveProps(nextProps){
-    const {disableCalendar} = nextProps;
-    if(disableCalendar === true){
-      $('.fc-scroller').css('-webkit-overflow-scrolling','auto');
-    }else{
-      $('.fc-scroller').css('-webkit-overflow-scrolling:','touch');
+  componentWillReceiveProps(nextProps) {
+    const { disableCalendar } = nextProps;
+    if (disableCalendar === true) {
+      $('.fc-scroller').css('-webkit-overflow-scrolling', 'auto');
+    } else {
+      $('.fc-scroller').css('-webkit-overflow-scrolling:', 'touch');
     }
   }
-
-
-
 
   render() {
     const { disableCalendar } = this.props;
