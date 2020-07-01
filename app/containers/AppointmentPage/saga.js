@@ -690,12 +690,13 @@ export function* addNewCustomer(action) {
 			}
 			customerId = response.data.customerId;
 			user_Id = response.data.userId;
-			if (isSendLink) {
-				yield put(actions.sendLinkCustomer({ phone }))
-			}
 		} else {
 			customerId = infoUser.customerId;
 			user_Id = infoUser.userId;
+		}
+
+		if (isSendLink && parseInt(user_Id) === 0) {
+			yield put(actions.sendLinkCustomer({ phone }))
 		}
 
 		const data = {
@@ -797,8 +798,9 @@ export function* checkPhoneCustomer(action) {
 export function* sendLinkCustomerSaga(action) {
 	try {
 		const { phone } = action.payload;
+		let phoneUpdate = phone.toString().replace("+","");
 		const requestURL = new URL(api_constants.GET_SENDLINK_CUSTOMER);
-		const url = `${requestURL.toString()}${phone}`;
+		const url = `${requestURL.toString()}${phoneUpdate}`;
 		const result = yield api(url, '', 'GET', token);
 		if (result.codeStatus !== 1) {
 			alert(response.message)

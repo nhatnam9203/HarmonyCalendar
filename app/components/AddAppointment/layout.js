@@ -284,7 +284,7 @@ class AddAppointment extends React.Component {
                         <IoIosCloseCircle style={{ height: 38, width: 38 }} />
                     </SearchingWrapper.Close>
                     <SearchingWrapper.Header backgroundColor="#0071C5">Add Appointment</SearchingWrapper.Header>
-                    <SearchingWrapper.Body>Enter phone number</SearchingWrapper.Body>
+                    <SearchingWrapper.Body>Enter Phone Number</SearchingWrapper.Body>
 
                     <FooterChekPhone>
                         <FormCheckPhone>
@@ -304,7 +304,7 @@ class AddAppointment extends React.Component {
                                 mask="_"
                                 value={this.state.phoneNumber}
                                 onChange={(e) => this.handleChange(e)}
-                                placeholder="Enter phone number"
+                                placeholder="Enter Phone Number"
                                 type="tel"
                             />
                         </FormCheckPhone>
@@ -322,6 +322,13 @@ class AddAppointment extends React.Component {
         )
     }
 
+    checkConditionSendLink(){
+        const { InfoAfterCheckPhone } = this.props;
+        if(InfoAfterCheckPhone && InfoAfterCheckPhone.userId === 0) return true
+        if(!InfoAfterCheckPhone) return true;
+        return false
+    }
+
     renderPopupAddCustomer() {
         const {
             isOpenAddingPopup,
@@ -329,10 +336,12 @@ class AddAppointment extends React.Component {
             isSendLink
         } = this.state;
 
+        const condition = this.checkConditionSendLink();
+
         const { InfoAfterCheckPhone, StateAddCustomerSuccess, checkPhoneError } = this.props;
 
         const PhoneShow = `+(${this.state.phoneCheck}) ${formatUsPhone(this.state.phoneNumber)}`;
-
+        console.log({InfoAfterCheckPhone})
         return (
             <AddingPopup
                 open={isOpenAddingPopup}
@@ -351,7 +360,7 @@ class AddAppointment extends React.Component {
                     <AddingWrapper.Body>
                         <Form onSubmit={(e) => e.preventDefault()}>
                             {success_addApointment && <p style={{ color: '#8D9440' }}>{success_addApointment}</p>}
-                            {checkPhoneError && <Label style={{ textAlign: 'center' }}>Phone number</Label>}
+                            {checkPhoneError && <Label style={{ textAlign: 'center' }}>Phone Number</Label>}
                             <input style={{ textAlign: 'center' }} value={PhoneShow} type="text" disabled />
                         </Form>
 
@@ -417,7 +426,7 @@ class AddAppointment extends React.Component {
                                     disabled={InfoAfterCheckPhone !== ''}
                                     value={this.RefPhoneExist() || ''}
                                     onChange={(e) => this.setState({ phone: e.target.value })}
-                                    placeholder="Phone number"
+                                    placeholder="Phone Number"
                                     type="tel"
                                 />
                             )}
@@ -455,7 +464,7 @@ class AddAppointment extends React.Component {
 
                         {/*********** SEND LINK ***********/}
                         {
-                            !InfoAfterCheckPhone || (InfoAfterCheckPhone.userId === 0) &&
+                            condition &&
                             <Row style={{ marginTop : 15 }} onClick={() => this.toggleSendLink()} >
                                 {
                                     isSendLink &&

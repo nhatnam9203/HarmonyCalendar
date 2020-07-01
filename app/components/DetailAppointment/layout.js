@@ -367,7 +367,7 @@ class Appointment extends React.Component {
 		const { notes } = this.state;
 		return (
 			<NoteWrapper>
-				<NoteWrapper.Form onSubmit={(e) => this.handleSubmit(e)}>
+				<NoteWrapper.Form onSubmit={(e) => this.addNote()}>
 					<input value={this.state.noteValue} onChange={(e) => this.handleChange(e)} />
 					<button onClick={() => this.addNote()} type="button">
 						<MdSubdirectoryArrowLeft style={{ width: 33, height: 33 }} />

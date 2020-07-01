@@ -56,15 +56,14 @@ export default class Extra extends Component {
 					</ButtonExtra>
                 </td>
 
-                <td style={{ textAlign: 'center' }}>
-                    <Row>
-                        <div onClick={appointment.status !== 'PAID' ? (
+                <td  onClick={appointment.status !== 'PAID' ? (
                             () => this.props.openPopupPrice(price, index, 'extra')
                         ) : (
                                 () => { }
                             )
-                        }
-                        >
+                        } style={{ textAlign: 'center' }}>
+                    <Row>
+                        <div>
                             <div style={appointment.status !== 'PAID' ? style.priceS : {}}>{price}</div>
                         </div>
 
