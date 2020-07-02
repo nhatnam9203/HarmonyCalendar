@@ -26,7 +26,8 @@ import {
   deleteBlockTime,
   getTimeStaffLogin,
   setSlideIndex,
-  editBlockTime
+  editBlockTime,
+  getDetailMerchant
 } from './actions';
 
 export function mapDispatchToProps(dispatch) {
@@ -43,6 +44,7 @@ export function mapDispatchToProps(dispatch) {
     getTimeStaffLogin:(staffId)=>dispatch(getTimeStaffLogin(staffId)),
     setSlideIndex:(slideIndex)=>dispatch(setSlideIndex(slideIndex)),
     editBlockTime:(data)=>dispatch(editBlockTime(data)),
+    getDetailMerchant : () => dispatch(getDetailMerchant())
   };
 }
 

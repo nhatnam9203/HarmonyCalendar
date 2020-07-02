@@ -190,8 +190,11 @@ function chunk(array, size) {
 
 class ResourceSelector extends React.Component {
 	componentWillMount() {
-		const { loadMembers } = this.props;
-		loadMembers();
+		const { loadMembers , getDetailMerchant } = this.props;
+		getDetailMerchant();
+		setTimeout(() => {
+			loadMembers();
+		}, 1000);
 	}
 
 	onPrevClick(event, previousSlide) {
@@ -203,7 +206,6 @@ class ResourceSelector extends React.Component {
 	}
 
 	afterSlide(index) {
-
 		const { resources } = this.props;
 		this.props.setDisplayedMembers(resources.slice(index * 5, index * 5 + 5));
 		this.props.renderAppointment();
@@ -316,6 +318,7 @@ class ResourceSelector extends React.Component {
 			deleteBlockTime,
 			currentDay,
 			editBlockTime,
+			resources
 		} = this.props;
 
 		const isActiveLett = this.getActiveArrow().isActiveLeft;
@@ -336,7 +339,7 @@ class ResourceSelector extends React.Component {
 					</AnyStaff>
 
 					<ResourceSliderWrapper>
-						<Carousel
+					{ resources.length > 0	&&<Carousel
 							dragging={true}
 							renderBottomCenterControls={() => ''}
 							renderCenterLeftControls={({ previousSlide }) => {
@@ -370,7 +373,7 @@ class ResourceSelector extends React.Component {
 							afterSlide={(slideIndex) => this.afterSlide(slideIndex)}
 						>
 							{this.renderCarouselSlide()}
-						</Carousel>
+						</Carousel>}
 					</ResourceSliderWrapper>
 					<WaitingHeader>Waiting</WaitingHeader>
 				</ResourceSelectorWrapper>

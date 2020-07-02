@@ -341,7 +341,6 @@ class AddAppointment extends React.Component {
         const { InfoAfterCheckPhone, StateAddCustomerSuccess, checkPhoneError } = this.props;
 
         const PhoneShow = `+(${this.state.phoneCheck}) ${formatUsPhone(this.state.phoneNumber)}`;
-        console.log({InfoAfterCheckPhone})
         return (
             <AddingPopup
                 open={isOpenAddingPopup}

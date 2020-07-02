@@ -9,6 +9,9 @@ const currentAppointment = (state) => state.get('appointment', initialState);
 
 const makeCurrentWeekDays = () =>
 	createSelector(currentAppointment, (appointmentState) => appointmentState.get('currentWeekDays'));
+	
+const makeMerchantInfo = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.get('merchantInfo'));
 
 const makeCurrentDay = () =>
 	createSelector(currentAppointment, (appointmentState) => appointmentState.get('currentDay'));
@@ -126,5 +129,6 @@ export {
 	makeSelectAppointmentDetail,
 	makeSelectGroupAppointment,
 	makeSelectStaffSort,
-	makeSlideIndex
+	makeSlideIndex,
+	makeMerchantInfo
 };

@@ -13,7 +13,8 @@ import {
 	makeInfoCheckPhone,
 	makeSelectAllAppointments,
 	makeSlideIndex,
-	makeSelectMembers
+	makeSelectMembers,
+	makeMerchantInfo
 } from './selectors';
 
 import { token, merchantId } from '../../../app-constants';
@@ -34,7 +35,9 @@ import {
 	findLastIndex,
 	findLastIndexChangeTime,
 	totalDurationMoveAppointment,
-	addLastStaff
+	addLastStaff,
+	block,
+	addBlockAnyStaff
 } from './utilSaga';
 
 import { assignAppointment as mockedPostAppointment } from '../../assets/mocks/assignAppointment';
@@ -57,15 +60,20 @@ export function* getMembers() {
 				const members = resp.data
 					? resp.data.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0)
 					: [];
-
-				const lastStaff = addLastStaff(members);
-				members.push(lastStaff);
-				const slideIndex = yield select(makeSlideIndex());
-
-				localStorage.setItem('staffList', JSON.stringify(members));
-				yield put(actions.membersLoaded(members));
-				yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
-				yield put(actions.reloadCalendar());
+				if(members.length > 0){
+					const lastStaff = addLastStaff(members);
+					members.push(lastStaff);
+					const slideIndex = yield select(makeSlideIndex());	
+					localStorage.setItem('staffList', JSON.stringify(members));
+					yield put(actions.membersLoaded(members));
+					yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
+					yield put(actions.reloadCalendar());
+				}else{
+					const arr_null = [];
+					yield put(actions.membersLoaded(arr_null));
+					yield put(actions.setDisplayedMembers(arr_null));
+					yield put(actions.reloadCalendar());
+				}
 			}
 		} catch (err) {
 			yield put(actions.memberLoadingError(err));
@@ -84,7 +92,10 @@ export function* reloadCalendarSaga() {
 	try {
 		let appointments;
 		const displayedMembers = yield select(makeSelectDisplayedMembers());
+		const merchantInfo = yield select(makeMerchantInfo());
 		const currentDate = yield select(makeCurrentDay());
+		const currentDayName = moment(currentDate).format('dddd');
+
 		let apiDateQuery = currentDate.format('YYYY-MM-DD') || moment().format('YYYY-MM-DD');
 
 		if (navigator.onLine) {
@@ -103,6 +114,8 @@ export function* reloadCalendarSaga() {
 				response.data
 					.map((appointment) => appointmentAdapter(appointment))
 					.filter((app) => app.options.length > 0);
+
+			addBlockAnyStaff(merchantInfo, currentDayName, currentDate, appointments);
 
 			if (apiDateQuery === moment().format('YYYY-MM-DD')) {
 				localStorage.setItem('AppointmentCalendar', JSON.stringify(appointments));
@@ -125,7 +138,7 @@ export function* reloadCalendarSaga() {
 			)
 		}));
 
-		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery);
+		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery, merchantInfo);
 		yield put(actions.loadedAllAppointments(appointments));
 		yield put(actions.appointmentByMembersLoaded(appointmentsMembers));
 		yield put(actions.getBlockTime());
@@ -536,19 +549,19 @@ export function* changeTimeAppointment(action) {
 				? moment(start_time).add(totalDuration, 'minutes').format('YYYY-MM-DD HH:mm')
 				: moment(start_time).add(15, 'minutes').format('YYYY-MM-DD HH:mm');
 
-			const payload = {
-				appointmentEdit: appointment,
-				fcEvent,
-				start_time,
-				end_time,
-				memberId,
-				options: servicesUpdate,
-				products: productsUpdate,
-				extras: extrasUpdate,
-				start,
-				selectedStaff
-			}
-			yield put(actions.changeAppointment(payload))
+		const payload = {
+			appointmentEdit: appointment,
+			fcEvent,
+			start_time,
+			end_time,
+			memberId,
+			options: servicesUpdate,
+			products: productsUpdate,
+			extras: extrasUpdate,
+			start,
+			selectedStaff
+		}
+		yield put(actions.changeAppointment(payload))
 
 	} catch (error) {
 		yield put(actions.updateAppointmentError(error));
@@ -614,10 +627,10 @@ export function* changeAppointmentSaga(action) {
 			} else {
 				isUpdate = false
 			}
-		}else{
-			if (window.confirm('Accept changes?')){
+		} else {
+			if (window.confirm('Accept changes?')) {
 				isUpdate = true
-			}else{
+			} else {
 				isUpdate = false
 			}
 		}
@@ -798,12 +811,25 @@ export function* checkPhoneCustomer(action) {
 export function* sendLinkCustomerSaga(action) {
 	try {
 		const { phone } = action.payload;
-		let phoneUpdate = phone.toString().replace("+","");
+		let phoneUpdate = phone.toString().replace("+", "");
 		const requestURL = new URL(api_constants.GET_SENDLINK_CUSTOMER);
 		const url = `${requestURL.toString()}${phoneUpdate}`;
 		const result = yield api(url, '', 'GET', token);
 		if (result.codeStatus !== 1) {
 			alert(response.message)
+		}
+	} catch (error) {
+		console.log({ error })
+	}
+}
+
+export function* getDetailMerchantSaga(action) {
+	try {
+		const requestURL = new URL(api_constants.GET_DETAIL_MERCHANT);
+		const url = `${requestURL.toString()}/${merchantId}`;
+		const response = yield api(url, '', 'GET', token);
+		if (parseInt(response.codeNumber) === 200) {
+			yield put(actions.setDetailMerchant(response.data));
 		}
 	} catch (error) {
 		console.log({ error })
@@ -1132,6 +1158,10 @@ export function* watch_sendLinkCustomer() {
 	yield takeLatest(constants.SENDLINK_CUSTOMER, sendLinkCustomerSaga);
 }
 
+export function* watch_getDetailMerchan() {
+	yield takeLatest(constants.GET_DETAIL_MERCHANT, getDetailMerchantSaga);
+}
+
 /**
  * Root saga manages watcher lifecycle
  */
@@ -1163,6 +1193,7 @@ export default function* root() {
 		fork(watch_updateNote),
 		fork(addAppointmentSaga),
 		fork(watch_changeAppointment),
-		fork(watch_sendLinkCustomer)
+		fork(watch_sendLinkCustomer),
+		fork(watch_getDetailMerchan)
 	]);
 }

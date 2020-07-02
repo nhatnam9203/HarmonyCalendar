@@ -45,6 +45,7 @@ const PUT_CHECKOUT = `${API_BASE_URL}/appointment/checkout`;
 const API_GET_TIME_STAFF_LOGIN = `${API_BASE_URL}/staff/loginTime`;
 const PUT_UPDATE_NOTE = `${API_BASE_URL}/appointment/note`;
 const GET_SENDLINK_CUSTOMER = `${API_BASE_URL}/user/sendlink?phone=`;
+const GET_DETAIL_MERCHANT = `${API_BASE_URL}/merchant`
 
 const VAR_DEFAULT_AVATAR_PATH = `/upload/staff/avatar.svg`;
 
@@ -78,6 +79,7 @@ export {
   API_GET_TIME_STAFF_LOGIN,
   PUT_UPDATE_NOTE,
   GET_SENDLINK_CUSTOMER,
+  GET_DETAIL_MERCHANT,
   VAR_DEFAULT_AVATAR_PATH,
   isDesktopOrLaptop
 }

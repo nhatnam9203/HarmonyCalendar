@@ -114,7 +114,9 @@ import {
 	SUBMIT_ADD_APPOINTMENT,
 	GET_DETAIL_APP_AFTER_ADD,
 	CHANGE_APPOINTMENT,
-	SENDLINK_CUSTOMER
+	SENDLINK_CUSTOMER,
+	GET_DETAIL_MERCHANT,
+	SET_DETAIL_MERCHANT
 } from './constants';
 
 /**
@@ -833,6 +835,21 @@ export function changeAppointment(payload) {
 export function sendLinkCustomer(payload) {
 	return {
 		type: SENDLINK_CUSTOMER,
+		payload
+	};
+}
+
+
+export function getDetailMerchant(payload) {
+	return {
+		type: GET_DETAIL_MERCHANT,
+		payload
+	};
+}
+
+export function setDetailMerchant(payload) {
+	return {
+		type: SET_DETAIL_MERCHANT,
 		payload
 	};
 }

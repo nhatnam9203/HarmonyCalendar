@@ -137,12 +137,26 @@ export const MAIN_CALENDAR_OPTIONS = {
 					staffId: 0,
 					action: 'addGroupAnyStaff'
 				};
-				const time = moment(start._d.toString().substr(0, 24));
+				const currentDay = store.getState().getIn(['appointment', 'currentDay']);
+				const merchantInfo = store.getState().getIn(['appointment', 'merchantInfo'])
+				const currentDayName = moment(currentDay).format('dddd');
+				const businessHour = Object.entries(merchantInfo.businessHour).find(b => b[0] === currentDayName);
 
-				window.postMessage(JSON.stringify(data));
-				// store.dispatch(disableCalendar(true));
-				// store.dispatch(openAddingAppointment({}));
-				// store.dispatch(TimeAndStaffID({ time: time, staffID: 0, dataAnyStaff : data }));
+				const start_bussiness = `${moment(currentDay).format('YYYY-MM-DD')}T${moment(businessHour[1].timeStart, [
+					'h:mm A'
+				]).format('HH:mm:ss')}`;
+				const end_bussiness = `${moment(currentDay).format('YYYY-MM-DD')}T${moment(businessHour[1].timeEnd, [
+					'h:mm A'
+				]).format('HH:mm:ss')}`;
+
+				if(moment(start).isSameOrAfter(moment(start_bussiness)) && moment(start).isBefore(moment(end_bussiness))){
+					window.postMessage(JSON.stringify(data));
+					const time = moment(start._d.toString().substr(0, 24));
+					// store.dispatch(disableCalendar(true));
+					// store.dispatch(openAddingAppointment({}));
+					// store.dispatch(TimeAndStaffID({ time: time, staffID: 0, dataAnyStaff : data }));
+				}
+			
 			}
 		}
 		/* end book any staff */
@@ -351,11 +365,39 @@ export const MAIN_CALENDAR_OPTIONS = {
 		/* 	move appointment any staff trong cột any staff */
 		if (!staffAvailable) {
 			if (event.data.memberId === 0) {
+				let isTest = false;
+				const currentDay = store.getState().getIn(['appointment', 'currentDay']);
+				const merchantInfo = store.getState().getIn(['appointment', 'merchantInfo'])
+				const currentDayName = moment(currentDay).format('dddd');
+				const businessHour = Object.entries(merchantInfo.businessHour).find(b => b[0] === currentDayName);
+
 				const endTime =
 					event.end !== null
 						? `${event.end.format('YYYY-MM-DD')}T${event.end.format('HH:mm:ss')}`
 						: moment(start_time).add(90, 'minutes').format('YYYY-MM-DD HH:mm:ss');
 				const startTime = `${event.start.format('YYYY-MM-DD')}T${event.start.format('HH:mm:ss')}`;
+
+				const start = `${moment(currentDay).format('YYYY-MM-DD')}T${moment(businessHour[1].timeStart, [
+					'h:mm A'
+				]).format('HH:mm:ss')}`;
+				const end = `${moment(currentDay).format('YYYY-MM-DD')}T${moment(businessHour[1].timeEnd, [
+					'h:mm A'
+				]).format('HH:mm:ss')}`;
+
+				if(moment(startTime).isBefore(start) || moment(endTime).isAfter(end)){
+					isTest = true
+				}
+
+				if(isTest){
+					if (window.confirm('Accept appointment outside working hours?')){
+						store.dispatch(moveAppointment(event.data.id, 0, startTime, endTime));
+						return;
+					}else{
+						revertFunc();
+						return;
+					}
+				}
+
 				store.dispatch(moveAppointment(event.data.id, 0, startTime, endTime));
 				return;
 			}
@@ -547,6 +589,7 @@ export const addEventsToCalendar = async (currentDate, appointmentsMembers) => {
 	const app_in_anystaff = allAppointments
 		? allAppointments.filter((app) => app.memberId === 0 && app.status !== 'WAITING')
 		: [];
+
 	app_in_anystaff.forEach((appointment) => {
 		events.push({
 			resourceId: 0,

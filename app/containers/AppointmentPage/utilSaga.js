@@ -145,7 +145,39 @@ export function blockTemp(memberId, start, end, note, appointmentId) {
 	};
 }
 
-export function addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery) {
+export function addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery,merchantInfo) {
+	const currentDayName = moment(currentDate).format('dddd');
+	
+	// const businessHour = merchantInfo.businessHour;
+	// const businessHour = Object.entries(merchantInfo.businessHour).find(b=>b[0] === currentDayName);
+	// if(merchantInfo){
+	// 	const blockStart = block(0,
+	// 		`${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(
+	// 			businessHour[1].timeEnd,
+	// 			[ 'h:mm A' ]
+	// 		).format('HH:mm:ss')}`,
+	// 		`${moment(currentDate).day(currentDayName).endOf('days').format('YYYY-MM-DD')}T${moment()
+	// 			.endOf('days')
+	// 			// .subtract(1, 'hours')
+	// 			.subtract(1, 'seconds')
+	// 			.format('HH:mm:ss')}`
+	// 	);
+	// 	const blockEnd = block(
+	// 		0,
+	// 		`${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment()
+	// 			.startOf('days')
+	// 			// .add(6, 'hours')
+	// 			.format('HH:mm:ss')}`,
+	// 		`${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(
+	// 			businessHour[1].timeStart,
+	// 			[ 'h:mm A' ]
+	// 		).format('HH:mm:ss')}`
+	// 	);
+
+	// 	mem.appointments.push(blockStart, blockEnd);
+	
+	// }
+
 	/* ADD BLOCK TEMP ( YELLOW BLOCK ) */
 	appointmentsMembers.forEach((mem) => {
 		const memFind = displayedMembers.find((member) => member.id === mem.memberId);
@@ -166,7 +198,6 @@ export function addBlockCalendar(appointmentsMembers, displayedMembers, currentD
 	});
 
 	/* ADD BLOCK ( GREY BLOCK ) */
-	const currentDayName = moment(currentDate).format('dddd');
 	appointmentsMembers.forEach((mem) => {
 		const memFind = displayedMembers.find((member) => member.id === mem.memberId);
 		const checkWorkingTime = Object.entries(memFind.workingTimes).find(b=>b[0] === currentDayName);
@@ -436,4 +467,20 @@ export function addLastStaff(members){
 		blockTime: [],
 		timeLogin: 0
 	};
+}
+
+export function addBlockAnyStaff(merchantInfo, currentDayName, currentDate, appointments) {
+	const businessHour = Object.entries(merchantInfo.businessHour).find(b => b[0] === currentDayName);
+	if (merchantInfo) {
+		const blockStart = block(0, `${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(businessHour[1].timeEnd, ['h:mm A']).format('HH:mm:ss')}`, `${moment(currentDate).day(currentDayName).endOf('days').format('YYYY-MM-DD')}T${moment()
+			.endOf('days')
+			// .subtract(1, 'hours')
+			.subtract(1, 'seconds')
+			.format('HH:mm:ss')}`);
+		const blockEnd = block(0, `${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment()
+			.startOf('days')
+			// .add(6, 'hours')
+			.format('HH:mm:ss')}`, `${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(businessHour[1].timeStart, ['h:mm A']).format('HH:mm:ss')}`);
+		appointments.push(blockStart, blockEnd);
+	}
 }

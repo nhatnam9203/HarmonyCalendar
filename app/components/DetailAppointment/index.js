@@ -514,7 +514,10 @@ class Appointment extends Layout {
 		this.closePopupPrice();
 	}
 
-	async addNote() {
+	async addNote(e) {
+		if(e){
+			e.preventDefault();
+		}
 		const { newNotes, notes, noteValue } = await this.state;
 		if (noteValue.trim() !== '') {
 			const { appointment } = this.props;
