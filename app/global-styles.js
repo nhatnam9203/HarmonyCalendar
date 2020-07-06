@@ -255,6 +255,30 @@ const GlobalStyle = createGlobalStyle`
 
 }
 
+
+
+.timePicker{
+  border : 10px !important;
+  margin-top : 5px;
+}
+
+.rc-time-picker-input{
+  border : 0 !important;
+}
+.rc-time-picker-clear{
+  display : none;
+
+}
+.rc-time-picker-input{
+  font-size : 1rem !important;
+  color : #333;
+  padding-left : 10px !important;
+}
+
+.event-assigned:hover ,.event-confirmed:hover,.event-anystaff:hover{
+  font-weight : 500;
+  color : #333;
+}
 .event-assigned{
   background: linear-gradient(
         to right,
@@ -282,29 +306,6 @@ const GlobalStyle = createGlobalStyle`
 
   background-size: 300% 2px, 2px 300%;/* increase size to show at once the bit from 2 gradient colors */
   animation: bd 5s infinite linear;
-}
-
-.timePicker{
-  border : 10px !important;
-  margin-top : 5px;
-}
-
-.rc-time-picker-input{
-  border : 0 !important;
-}
-.rc-time-picker-clear{
-  display : none;
-
-}
-.rc-time-picker-input{
-  font-size : 1rem !important;
-  color : #333;
-  padding-left : 10px !important;
-}
-
-.event-assigned:hover ,.event-confirmed:hover,.event-anystaff:hover{
-  font-weight : 500;
-  color : #333;
 }
 .DayPickerInput input{
   color : #333 !important;
@@ -358,6 +359,12 @@ const GlobalStyle = createGlobalStyle`
   border-top-left-radius : 10px;
   border-top-right-radius : 10px;
 }
+
+.loading-animation{
+  color: #1172C1 !important;
+  opacity : 1 !important;
+}
+
 #full-calendar{
 
 }

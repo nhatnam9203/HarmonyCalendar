@@ -263,12 +263,7 @@ class PopupBlockTime extends Component {
 			<StaffHeader.Right>
 				<div style={styles.title}>{staff.title}</div>
 				<div style={styles.headerRight}>
-					<div
-						style={{
-							display: 'flex',
-							flexDirection: 'row'
-						}}
-					>
+					<div style={{ display: 'flex', flexDirection: 'row' }}>
 						{this.renderTimeLogin(staff.timeLogin)}
 					</div>
 					<div style={styles.appointmentQuantity}>
@@ -295,6 +290,7 @@ class PopupBlockTime extends Component {
 					</div>
 
 					<div style={styles.test}>
+					
 						<div style={styles.blockHeader}>
 							<div style={styles.workingDate}>{moment(obj.workingDate).format('MM/DD/YYYY')}</div>
 							<div style={styles.timeBlock}>
@@ -312,8 +308,7 @@ class PopupBlockTime extends Component {
 					</div>
 
 					{obj.editable && (
-						<div
-							onClick={() => {
+						<div onClick={() => {
 								this.setState({ isPopupDelete: true, blockDelete: obj }, () => {
 									this.setState({ isAddBlock: false })
 								});

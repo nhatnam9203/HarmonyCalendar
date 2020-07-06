@@ -67,8 +67,9 @@ class DaySlider extends React.Component {
 
   onDayClick(day) {
 
-    const { onChangeDay } = this.props;
+    const { onChangeDay , loadingCalendar} = this.props;
     onChangeDay(day.format('DDMMYYYY'));
+    loadingCalendar(true);
   }
 
   renderDay(day) {

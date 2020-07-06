@@ -194,9 +194,9 @@ class ResourceSelector extends React.Component {
 		getDetailMerchant();
 		setTimeout(() => {
 			loadMembers();
-		}, 1000);
+		}, 300);
 	}
-
+''
 	onPrevClick(event, previousSlide) {
 		previousSlide(event);
 	}

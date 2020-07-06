@@ -40,7 +40,6 @@ import {
 	addBlockAnyStaff
 } from './utilSaga';
 
-import { assignAppointment as mockedPostAppointment } from '../../assets/mocks/assignAppointment';
 import { addEventsToCalendar, deleteEventFromCalendar } from '../../components/Calendar/constants';
 
 /********************************* GET STAFF LIST *********************************/
@@ -51,6 +50,7 @@ export function* getMembers() {
 			const currentDate = yield select(makeCurrentDay());
 			const url = `${requestURL.toString()}${currentDate.format('YYYY-MM-DD')}`;
 			const resp = yield api(url, '', 'GET', token);
+
 			if (resp.codeStatus !== 1) {
 				console.log(resp.message);
 				console.log('error from api ' + url);
@@ -60,20 +60,17 @@ export function* getMembers() {
 				const members = resp.data
 					? resp.data.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0)
 					: [];
-				if(members.length > 0){
+
+				if (members.length > 0) {
 					const lastStaff = addLastStaff(members);
 					members.push(lastStaff);
-					const slideIndex = yield select(makeSlideIndex());	
-					localStorage.setItem('staffList', JSON.stringify(members));
-					yield put(actions.membersLoaded(members));
-					yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
-					yield put(actions.reloadCalendar());
-				}else{
-					const arr_null = [];
-					yield put(actions.membersLoaded(arr_null));
-					yield put(actions.setDisplayedMembers(arr_null));
-					yield put(actions.reloadCalendar());
 				}
+
+				const slideIndex = yield select(makeSlideIndex());
+				localStorage.setItem('staffList', JSON.stringify(members));
+				yield put(actions.membersLoaded(members));
+				yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
+				yield put(actions.reloadCalendar());
 			}
 		} catch (err) {
 			yield put(actions.memberLoadingError(err));
@@ -115,7 +112,9 @@ export function* reloadCalendarSaga() {
 					.map((appointment) => appointmentAdapter(appointment))
 					.filter((app) => app.options.length > 0);
 
-			addBlockAnyStaff(merchantInfo, currentDayName, currentDate, appointments);
+			if (displayedMembers.length > 0) {
+				addBlockAnyStaff(merchantInfo, currentDayName, currentDate, appointments);
+			}
 
 			if (apiDateQuery === moment().format('YYYY-MM-DD')) {
 				localStorage.setItem('AppointmentCalendar', JSON.stringify(appointments));
@@ -124,6 +123,10 @@ export function* reloadCalendarSaga() {
 			yield put(actions.loadingCalendar(false));
 		} else {
 			appointments = JSON.parse(localStorage.getItem('AppointmentCalendar')); // chưa filter lọc ngày cho chức năng offline
+		}
+
+		if (displayedMembers.length === 0) {
+			appointments = [];
 		}
 
 		const appointmentsMembers = displayedMembers.map((member) => ({
@@ -150,6 +153,7 @@ export function* reloadCalendarSaga() {
 			}, 1000);
 		}
 	} catch (err) {
+		yield put(actions.loadingCalendar(false));
 		yield put(actions.appointmentByMemberLoadingError(err));
 	}
 }
@@ -280,8 +284,9 @@ export function* reRenderAppointment() {
 
 		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery);
 		yield put(actions.appointmentByMembersLoaded(appointmentsMembers));
+		addEventsToCalendar(currentDate, appointmentsMembers);
 		setTimeout(() => {
-			addEventsToCalendar(currentDate, appointmentsMembers);
+
 		}, 200);
 	} catch (err) {
 		yield put(actions.appointmentByMemberLoadingError(err));
@@ -347,11 +352,13 @@ export function* moveAppointment(action) {
 	yield put(actions.renderAppointment());
 
 	try {
-		const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
-		const url = `${requestURL.toString()}/${appointment.id}`;
-		const response = yield api(url, data, 'PUT', token);
-		if (response.codeStatus !== 1) {
-			return yield* checkResponse(response);
+		if (navigator.onLine) {
+			const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
+			const url = `${requestURL.toString()}/${appointment.id}`;
+			const response = yield api(url, data, 'PUT', token);
+			if (response.codeStatus !== 1) {
+				return yield* checkResponse(response);
+			}
 		}
 	} catch (err) {
 		yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
@@ -373,36 +380,17 @@ export function* putBackAppointment(action) {
 		const data = dataPutBackAppointment(memberId, start, end, options, products, extras);
 
 		try {
-			const response = yield api(url, data, 'PUT', token);
-			if (response.codeStatus !== 1) return yield* checkResponse(response);
-			if (response.codeStatus === 1) {
+			if (navigator.onLine) {
+				const response = yield api(url, data, 'PUT', token);
+				if (response.codeStatus !== 1) return yield* checkResponse(response);
+				if (response.codeStatus === 1) {
+				}
 			}
 		} catch (err) { }
 	} catch (err) {
 		yield put(actions.appointmentPuttingBackError(err));
 	}
 }
-
-
-// export function* cancelAppointment(action) {
-// 	const fcEvent = yield select(makeSelectFCEvent());
-// 	if (!fcEvent) {
-// 		yield put(actions.appointmentCancellingError('Cannot find selected fcEvent'));
-// 	}
-// 	try {
-// 		yield delay(200);
-// 		const result = mockedPostAppointment;
-// 		if (result) {
-// 			yield put(actions.appointmentCanceled(action.appointmentId));
-// 			deleteEventFromCalendar(fcEvent._id);
-// 			yield put(actions.deselectAppointment());
-// 		} else {
-// 			yield put(actions.appointmentCancellingError(result));
-// 		}
-// 	} catch (err) {
-// 		yield put(actions.appointmentCancellingError(err));
-// 	}
-// }
 
 
 /********************************* ASSIGN APPOINTMENT FROM WAITING LIST TO CALENDAR *********************************/
@@ -446,11 +434,13 @@ export function* assignAppointment(action) {
 			extras
 		};
 
-		const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
-		const url = `${requestURL.toString()}/${appointment.id}`;
-		const response = yield api(url, data, 'PUT', token);
-		if (response.codeStatus !== 1) return yield* checkResponse(response);
-		if (response.codeStatus === 1) {
+		if (navigator.onLine) {
+			const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
+			const url = `${requestURL.toString()}/${appointment.id}`;
+			const response = yield api(url, data, 'PUT', token);
+			if (response.codeStatus !== 1) return yield* checkResponse(response);
+			if (response.codeStatus === 1) {
+			}
 		}
 	} catch (err) {
 		// yield put(appointmentAssigningError(err));
@@ -461,12 +451,8 @@ export function* assignAppointment(action) {
 /********************************* UPDATE STATUS APPOINTMENY CONFIRM, CHECK IN, CANCEL *********************************/
 export function* upddateAppointment(action) {
 	try {
-		const displayedMembers = yield select(makeSelectDisplayedMembers());
-		const currentDate = yield select(makeCurrentDay());
-		const currentDayName = moment(currentDate).format('dddd');
 		const fcEvent = yield select(makeSelectFCEvent());
 
-		let isUpdate = true;
 
 		if (!fcEvent) {
 			yield put(actions.appointmentUpdatingStatusError('Cannot find selected fcEvent'));
@@ -474,14 +460,13 @@ export function* upddateAppointment(action) {
 		let {
 			appointment,
 			status,
-			old_duration,
 			servicesUpdate,
 			productsUpdate,
 			old_status,
 			old_appointment,
 			extrasUpdate
 		} = action.appointment;
-		let { end, start, extras, memberId } = appointment;
+		let { end, start, memberId } = appointment;
 		let newDate = end;
 
 		if (status === 'cancel') {
@@ -500,6 +485,8 @@ export function* upddateAppointment(action) {
 
 		let data = dataUpdateAppointment(old_status, memberId, old_appointment, status, start, newDate, servicesUpdate, productsUpdate, extrasUpdate);
 
+		console.log('data update appointment');
+		console.log({ data });
 
 		yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
 		yield put(actions.renderAppointment());
@@ -508,15 +495,17 @@ export function* upddateAppointment(action) {
 		const url = `${requestURL}/${appointment.id}`;
 
 		try {
-			const kq = yield api(url, data, 'PUT', token);
-			if (kq.codeStatus !== 1) return yield* checkResponse(kq);
+			if (navigator.onLine) {
+				const kq = yield api(url, data, 'PUT', token);
+				if (kq.codeStatus !== 1) return yield* checkResponse(kq);
+			}
 		} catch (error) {
 			yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
 			yield put(actions.renderAppointment());
 		}
 
 	} catch (error) {
-		yield put(actions.updateAppointmentError(error));
+		// yield put(actions.updateAppointmentError(error));
 	}
 }
 
@@ -638,7 +627,6 @@ export function* changeAppointmentSaga(action) {
 	/* end check condition */
 
 	if (isUpdate) {
-
 		yield put(actions.appointmentCanceled(appointmentEdit.id));
 		deleteEventFromCalendar(fcEvent._id);
 		yield put(actions.deselectAppointment());
@@ -656,13 +644,15 @@ export function* changeAppointmentSaga(action) {
 		yield put(actions.renderAppointment());
 
 		try {
-			const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
-			const url = `${requestURL.toString()}/${appointment.id}`;
-			const response = yield api(url, data, 'PUT', token);
-			if (response.codeStatus !== 1) {
-				return yield* checkResponse(response);
-			}
-			if (response.codeStatus === 1) {
+			if (navigator.onLine) {
+				const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
+				const url = `${requestURL.toString()}/${appointment.id}`;
+				const response = yield api(url, data, 'PUT', token);
+				if (response.codeStatus !== 1) {
+					return yield* checkResponse(response);
+				}
+				if (response.codeStatus === 1) {
+				}
 			}
 		} catch (err) {
 			yield put(

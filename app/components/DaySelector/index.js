@@ -37,6 +37,7 @@ class DaySelector extends React.Component {
       onChangeDay,
       onChangeWeek,
       onChangeDayOnCalendar,
+      loadingCalendar
     } = this.props;
     return (
       <DaySelectorWrapper>
@@ -49,6 +50,7 @@ class DaySelector extends React.Component {
           selectedDay={currentDay}
           onChangeDay={onChangeDay}
           onChangeWeek={onChangeWeek}
+          loadingCalendar={loadingCalendar}
         />
       </DaySelectorWrapper>
     );

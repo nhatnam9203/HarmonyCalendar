@@ -27,17 +27,17 @@ export const appointmentAdapter = (appointment) => {
 		firstName: appointment.firstName,
 		lastName: appointment.lastName,
 		phoneNumber: appointment.phoneNumber,
-		options: appointment.services.sort(function(a, b) {
+		options: appointment.services.sort(function (a, b) {
 			var c = a.bookingServiceId;
 			var d = b.bookingServiceId;
 			return d - c;
 		}),
-		products: appointment.products.sort(function(a, b) {
+		products: appointment.products.sort(function (a, b) {
 			var c = a.bookingProductId;
 			var d = b.bookingProductId;
 			return d - c;
 		}),
-		extras: appointment.extras.sort(function(a, b) {
+		extras: appointment.extras.sort(function (a, b) {
 			var c = a.bookingExtraId;
 			var d = b.bookingExtraId;
 			return d - c;
@@ -55,15 +55,15 @@ export const appointmentAdapter = (appointment) => {
 		tax: appointment.tax,
 		isVip: appointment.isVip,
 		discount: appointment.discount,
-		customerId : appointment.customerId,
+		customerId: appointment.customerId,
 		giftCard: appointment.giftCard,
 		giftCards: appointment.giftCards ? appointment.giftCards : [],
 		notes: appointment.notes
-			? appointment.notes.sort(function(a, b) {
-					var c = a.appointmentNoteId;
-					var d = b.appointmentNoteId;
-					return d - c;
-				})
+			? appointment.notes.sort(function (a, b) {
+				var c = a.appointmentNoteId;
+				var d = b.appointmentNoteId;
+				return d - c;
+			})
 			: []
 	};
 };
@@ -145,38 +145,8 @@ export function blockTemp(memberId, start, end, note, appointmentId) {
 	};
 }
 
-export function addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery,merchantInfo) {
+export function addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery, merchantInfo) {
 	const currentDayName = moment(currentDate).format('dddd');
-	
-	// const businessHour = merchantInfo.businessHour;
-	// const businessHour = Object.entries(merchantInfo.businessHour).find(b=>b[0] === currentDayName);
-	// if(merchantInfo){
-	// 	const blockStart = block(0,
-	// 		`${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(
-	// 			businessHour[1].timeEnd,
-	// 			[ 'h:mm A' ]
-	// 		).format('HH:mm:ss')}`,
-	// 		`${moment(currentDate).day(currentDayName).endOf('days').format('YYYY-MM-DD')}T${moment()
-	// 			.endOf('days')
-	// 			// .subtract(1, 'hours')
-	// 			.subtract(1, 'seconds')
-	// 			.format('HH:mm:ss')}`
-	// 	);
-	// 	const blockEnd = block(
-	// 		0,
-	// 		`${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment()
-	// 			.startOf('days')
-	// 			// .add(6, 'hours')
-	// 			.format('HH:mm:ss')}`,
-	// 		`${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(
-	// 			businessHour[1].timeStart,
-	// 			[ 'h:mm A' ]
-	// 		).format('HH:mm:ss')}`
-	// 	);
-
-	// 	mem.appointments.push(blockStart, blockEnd);
-	
-	// }
 
 	/* ADD BLOCK TEMP ( YELLOW BLOCK ) */
 	appointmentsMembers.forEach((mem) => {
@@ -200,7 +170,7 @@ export function addBlockCalendar(appointmentsMembers, displayedMembers, currentD
 	/* ADD BLOCK ( GREY BLOCK ) */
 	appointmentsMembers.forEach((mem) => {
 		const memFind = displayedMembers.find((member) => member.id === mem.memberId);
-		const checkWorkingTime = Object.entries(memFind.workingTimes).find(b=>b[0] === currentDayName);
+		const checkWorkingTime = Object.entries(memFind.workingTimes).find(b => b[0] === currentDayName);
 
 		if (checkWorkingTime[1].isCheck === false) {
 			mem.appointments.push(addFullBlock(mem.memberId, currentDate, currentDayName));
@@ -209,7 +179,7 @@ export function addBlockCalendar(appointmentsMembers, displayedMembers, currentD
 				mem.memberId,
 				`${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(
 					checkWorkingTime[1].timeEnd,
-					[ 'h:mm A' ]
+					['h:mm A']
 				).format('HH:mm:ss')}`,
 				`${moment(currentDate).day(currentDayName).endOf('days').format('YYYY-MM-DD')}T${moment()
 					.endOf('days')
@@ -225,7 +195,7 @@ export function addBlockCalendar(appointmentsMembers, displayedMembers, currentD
 					.format('HH:mm:ss')}`,
 				`${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(
 					checkWorkingTime[1].timeStart,
-					[ 'h:mm A' ]
+					['h:mm A']
 				).format('HH:mm:ss')}`
 			);
 
@@ -258,7 +228,7 @@ export function checkTimeToAddAppointmdent() {
 
 export function totalDuationChangeTime(appointment, extras) {
 	let totalDuration = 0;
-	let services = [ ...appointment.options ];
+	let services = [...appointment.options];
 
 	for (let i = 0; i < services.length; i++) {
 		if (appointment.memberId === services[i].staffId) {
@@ -277,18 +247,18 @@ export function totalDuationChangeTime(appointment, extras) {
 }
 
 export function totalDuartionUpdateAppointment(services, extras, appointment) {
-    let total = 0;
+	let total = 0;
 	const lastIndex = findLastIndex(services, appointment);
 	for (let i = 0; i < services.length; i++) {
-        total += services[i].duration;
-        const findExtra = extras.find(ex=> ex.serviceId && (ex.serviceId === services[i].serviceId));
+		total += services[i].duration;
+		const findExtra = extras.find(ex => ex.serviceId && (ex.serviceId === services[i].serviceId));
 		if (findExtra) {
 			total += findExtra.duration;
 		}
 		if (i === lastIndex) {
 			break;
 		}
-    }
+	}
 
 	return total;
 }
@@ -428,15 +398,15 @@ export function findLastIndex(services, appointment) {
 }
 
 export function findLastIndexChangeTime(services, sv) {
-    let lastIndex = -1;
-    if(sv){
-        for (let i = services.length - 1; i >= 0; i--) {
-            if (services[i].staffId === sv.staffId) {
-                lastIndex = i;
-                break;
-            }
-        }
-    }
+	let lastIndex = -1;
+	if (sv) {
+		for (let i = services.length - 1; i >= 0; i--) {
+			if (services[i].staffId === sv.staffId) {
+				lastIndex = i;
+				break;
+			}
+		}
+	}
 	return lastIndex;
 }
 
@@ -454,13 +424,51 @@ export function totalDurationMoveAppointment(services, extras) {
 	return total;
 }
 
-export function addLastStaff(members){
+const cloneWorkingTime = {
+	Monday: {
+		isCheck: true,
+		timeEnd: "08:00 PM",
+		timeStart: "10:00 AM",
+	},
+	Tuesday: {
+		isCheck: true,
+		timeEnd: "08:00 PM",
+		timeStart: "10:00 AM",
+	},
+	Wednesday: {
+		isCheck: true,
+		timeEnd: "08:00 PM",
+		timeStart: "10:00 AM",
+	},
+	Thursday: {
+		isCheck: true,
+		timeEnd: "08:00 PM",
+		timeStart: "10:00 AM",
+	},
+	Friday: {
+		isCheck: true,
+		timeEnd: "08:00 PM",
+		timeStart: "10:00 AM",
+	},
+	Saturday: {
+		isCheck: true,
+		timeEnd: "08:00 PM",
+		timeStart: "10:00 AM",
+	},
+	Sunday: {
+		isCheck: true,
+		timeEnd: "08:00 PM",
+		timeStart: "10:00 AM",
+	}
+}
+
+export function addLastStaff(members) {
 	return {
 		id: 0,
 		title: `Any staff`,
 		imageUrl: '',
 		orderNumber: 99999999999,
-		workingTimes: members[members.length - 2].workingTimes,
+		workingTimes: cloneWorkingTime,
 		isDisabled: false,
 		pincode: 0,
 		isNextAvailableStaff: false,
