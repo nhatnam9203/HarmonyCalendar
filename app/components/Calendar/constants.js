@@ -84,8 +84,9 @@ export const MAIN_CALENDAR_OPTIONS = {
 						count = count + 1;
 					}
 					else {
+						let _i = 0;
+						let _j = 0;
 						el.member.blockTime.forEach(b => {
-
 							const timeStart = `${moment(b.workingDate).format('YYYY-MM-DD')}T${moment(b.blockTimeStart, ['h:mm A']).format('HH:mm:ss')}`;
 							const timeEnd = `${moment(b.workingDate).format('YYYY-MM-DD')}T${moment(b.blockTimeEnd, ['h:mm A']).format('HH:mm:ss')}`;
 							if (
@@ -94,8 +95,10 @@ export const MAIN_CALENDAR_OPTIONS = {
 								moment(start).isSameOrAfter(moment(timeStart))
 
 							) {
-
-								count = count + 1;
+								if(_i === 0){
+									count = count + 1;
+									_i = _i + 1;
+								}
 							}
 						});
 
@@ -107,7 +110,10 @@ export const MAIN_CALENDAR_OPTIONS = {
 								(app.status === 'CHECKED_IN' || app.status === 'CONFIRMED' || app.status === 'BLOCK_TEMP')
 								// (app.memberId !== 0)
 							) {
-								count = count + 1;
+								if(_j === 0){
+									count = count + 1;
+									_j = _j + 1;
+								}
 							}
 
 							if (
@@ -122,6 +128,8 @@ export const MAIN_CALENDAR_OPTIONS = {
 					}
 				}
 			});
+
+			console.log({count,countAppAnyStaff,allMember , length : allMember.length})
 
 			if (count >= allMember.length - 1) {
 				alert('There is no staff available at this time.');

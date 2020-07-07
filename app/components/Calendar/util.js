@@ -67,7 +67,7 @@ export function	returnAppointment(appointment) {
             var d = b.bookingExtraId;
             return d - c;
         }),
-        status: statusConvertKey[appointment.Status],
+        status: appointment.Status ? statusConvertKey[appointment.Status] : "ASSIGNED",
         memberId: appointment.StaffId,
         start: appointment.FromTime,
         end: appointment.ToTime,
