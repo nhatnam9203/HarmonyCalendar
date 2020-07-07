@@ -140,7 +140,7 @@ class Calendar extends React.Component {
 		connection.on('ListWaNotification', async (data) => {
 			let app = JSON.parse(data);
 			if (app.data) {
-				console.log('signalR update');
+				console.log('signal R update');
 				let type = app.data.Type;
 				switch (type) {
 					case 'user_update':
