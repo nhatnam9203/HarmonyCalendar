@@ -113,9 +113,9 @@ class Calendar extends React.Component {
 
 	addAppointmentFromSignalr(appointment_R) {
 		if (appointment_R.options.length > 0) {
-			if (appointment_R.status === 'CHECKED_IN' && parseInt(appointment_R.memberId) === 0) {
-				return;
-			}
+			// if (appointment_R.status === 'CHECKED_IN' && parseInt(appointment_R.memberId) === 0) {
+			// 	return;
+			// }
 			if (appointment_R.status === 'ASSIGNED' || appointment_R.status === 'CHECKED_IN') {
 				const displayMember = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
 

@@ -480,13 +480,12 @@ export function* upddateAppointment(action) {
 			const url = `${url_update_status}/${appointment.id}`;
 			const kq = yield api(url, { status }, 'PUT', token);
 
-			if (kq.codeStatus !== 1) return yield* checkResponse(kq);
+			if (kq.codeStatus !== 1) {
+				return yield* checkResponse(kq)
+			} else return;
 		}
 
 		let data = dataUpdateAppointment(old_status, memberId, old_appointment, status, start, newDate, servicesUpdate, productsUpdate, extrasUpdate);
-
-		console.log('data update appointment');
-		console.log({ data });
 
 		yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
 		yield put(actions.renderAppointment());
