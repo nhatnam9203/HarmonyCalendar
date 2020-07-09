@@ -186,6 +186,7 @@ export function* getWaitingAppointments() {
 
 			const appointments = response && response.data.map((appointment) => appointmentAdapter(appointment))
 				.filter((app) => app.options.length > 0);
+			// console.log({appointments})
 
 			localStorage.setItem('AppointmentWaiting', JSON.stringify(appointments));
 
@@ -434,6 +435,8 @@ export function* assignAppointment(action) {
 			extras
 		};
 
+		console.log({data,appointment})
+
 		if (navigator.onLine) {
 			const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
 			const url = `${requestURL.toString()}/${appointment.id}`;
@@ -480,13 +483,12 @@ export function* upddateAppointment(action) {
 			const url = `${url_update_status}/${appointment.id}`;
 			const kq = yield api(url, { status }, 'PUT', token);
 
-			if (kq.codeStatus !== 1) return yield* checkResponse(kq);
+			if (kq.codeStatus !== 1) {
+				return yield* checkResponse(kq)
+			} else return;
 		}
 
 		let data = dataUpdateAppointment(old_status, memberId, old_appointment, status, start, newDate, servicesUpdate, productsUpdate, extrasUpdate);
-
-		console.log('data update appointment');
-		console.log({ data });
 
 		yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
 		yield put(actions.renderAppointment());
