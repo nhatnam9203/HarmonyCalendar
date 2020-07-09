@@ -186,6 +186,7 @@ export function* getWaitingAppointments() {
 
 			const appointments = response && response.data.map((appointment) => appointmentAdapter(appointment))
 				.filter((app) => app.options.length > 0);
+			// console.log({appointments})
 
 			localStorage.setItem('AppointmentWaiting', JSON.stringify(appointments));
 
@@ -433,6 +434,8 @@ export function* assignAppointment(action) {
 			products,
 			extras
 		};
+
+		console.log({data,appointment})
 
 		if (navigator.onLine) {
 			const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
