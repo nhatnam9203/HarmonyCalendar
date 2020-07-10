@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import Popup from 'reactjs-popup';
 import styled from 'styled-components';
 import { FaClock } from 'react-icons/fa';
-import { GiAlarmClock } from 'react-icons/gi';
+import { MdAccessAlarms } from 'react-icons/md';
 import { FaTrash, FaCaretDown } from 'react-icons/fa';
-import { TiDelete } from 'react-icons/ti';
+import { IoIosCloseCircle } from 'react-icons/io';
 import { PopupTimePicker } from '../DetailAppointment/widget';
 import ConfirmDelete from './ConfirmDelete';
 import moment from 'moment';
@@ -263,9 +263,7 @@ class PopupBlockTime extends Component {
 			<StaffHeader.Right>
 				<div style={styles.title}>{staff.title}</div>
 				<div style={styles.headerRight}>
-					<div style={{ display: 'flex', flexDirection: 'row' }}>
-						{this.renderTimeLogin(staff.timeLogin)}
-					</div>
+					<div style={{ display: 'flex', flexDirection: 'row' }}>{this.renderTimeLogin(staff.timeLogin)}</div>
 					<div style={styles.appointmentQuantity}>
 						<div>Appointments : </div>
 						<div style={{ fontWeight: 600 }}>&nbsp;{`${this.countAppointment()}`}</div>
@@ -290,7 +288,6 @@ class PopupBlockTime extends Component {
 					</div>
 
 					<div style={styles.test}>
-					
 						<div style={styles.blockHeader}>
 							<div style={styles.workingDate}>{moment(obj.workingDate).format('MM/DD/YYYY')}</div>
 							<div style={styles.timeBlock}>
@@ -308,11 +305,11 @@ class PopupBlockTime extends Component {
 					</div>
 
 					{obj.editable && (
-						<div onClick={() => {
+						<div
+							onClick={() => {
 								this.setState({ isPopupDelete: true, blockDelete: obj }, () => {
-									this.setState({ isAddBlock: false })
+									this.setState({ isAddBlock: false });
 								});
-
 							}}
 							style={styles.trashButton}
 						>
@@ -330,7 +327,7 @@ class PopupBlockTime extends Component {
 			return (
 				<React.Fragment>
 					<ButtonAddBlock onClick={() => this.setState({ isAddBlock: true })}>
-						<GiAlarmClock size={20} color={'#4B4B4B'} />
+						<MdAccessAlarms size={20} color={'#4B4B4B'} />
 						<div style={{ marginLeft: 8, color: '#4B4B4B' }}>Add Blocked Time</div>
 					</ButtonAddBlock>
 					<BlockList>{this.renderBlockTimeList()}</BlockList>
@@ -422,10 +419,10 @@ class PopupBlockTime extends Component {
 		return (
 			<Container active={isPopupSelectTime} open closeOnDocumentClick={false}>
 				<React.Fragment>
-					<TiDelete
-						onClick={isPopupSelectTime ? () => { } : () => this.closeModal()}
+					<IoIosCloseCircle
+						onClick={isPopupSelectTime ? () => {} : () => this.closeModal()}
 						color="#6A6A6A"
-						size={38}
+						size={35}
 						style={styles.closeModal}
 					/>
 					<BodyPopup>

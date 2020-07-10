@@ -11,7 +11,7 @@
  */
 import moment from 'moment';
 import { fromJS } from 'immutable';
-import { statusConvertKey, statusConvertData, appointmentAdapter } from './utilSaga'
+import { statusConvertKey, appointmentAdapter } from './utilSaga'
 import {
 	SELECT_DAY,
 	SELECT_WEEK,
@@ -68,9 +68,7 @@ import {
 	SET_DETAIL_MERCHANT
 } from './constants';
 import { dataPutBackAppointment } from './utilSaga';
-import { store } from 'app';
-
-var _ = require('lodash');
+import { unionBy } from 'lodash'
 
 const initialCurrentDay = moment();
 const firstDayOfWeek = initialCurrentDay.clone().startOf('isoWeek');
@@ -188,7 +186,7 @@ function appointmentReducer(state = initialState, action) {
 			return state.setIn(['members', 'all'], action.members).set('loading', false);
 
 		case SET_DETAIL_MERCHANT:
-			return state.set('merchantInfo',action.payload);
+			return state.set('merchantInfo', action.payload);
 
 		case LOAD_MEMBERS_ERROR:
 			return state.set('error', action.error).set('loading', false);
@@ -599,7 +597,7 @@ function appointmentReducer(state = initialState, action) {
 					if (pos === -1) {
 						//add
 						arr.push(action.appointment.appointment);
-						arr = _.unionBy(arr, 'id');
+						arr = unionBy(arr, 'id');
 					} else {
 						//update
 						arr[pos] = action.appointment.appointment;

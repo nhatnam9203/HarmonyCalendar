@@ -2,8 +2,6 @@ import React, { Component } from 'react'
 
 import styled from 'styled-components';
 import NumberFormat from 'react-number-format';
-import 'antd-mobile/dist/antd-mobile.css';
-import _ from 'lodash';
 import PopupStaff from './PopupStaff';
 import { FaCaretDown } from 'react-icons/fa';
 

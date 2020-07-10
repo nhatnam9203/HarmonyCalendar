@@ -1,10 +1,8 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import _ from 'lodash';
-import { convertAppointment, statusConvertData, initialState } from './widget/utilDetail';
+import { isEqual } from 'lodash'
+import { convertAppointment, initialState } from './widget/utilDetail';
 import Layout from './layout'
-import { store } from 'app';
 
 class Appointment extends Layout {
 	constructor(props) {
@@ -135,9 +133,9 @@ class Appointment extends Layout {
 
 		if (selectedStaff && old_selectedStaff) {
 			if (
-				_.isEqual(old_service.sort(), services.sort()) &&
-				_.isEqual(old_product.sort(), products.sort()) &&
-				_.isEqual(old_extra.sort(), extras.sort()) &&
+				isEqual(old_service.sort(), services.sort()) &&
+				isEqual(old_product.sort(), products.sort()) &&
+				isEqual(old_extra.sort(), extras.sort()) &&
 				moment(old_fromTime).format('hh:mm A') === moment(fromTime).format('hh:mm A') &&
 				moment(dayChange).format('MM/DD/YYYY') === moment(old_dayChange).format('MM/DD/YYYY') &&
 				selectedStaff.id === old_selectedStaff.id
@@ -515,7 +513,7 @@ class Appointment extends Layout {
 	}
 
 	async addNote(e) {
-		if(e){
+		if (e) {
 			e.preventDefault();
 		}
 		const { newNotes, notes, noteValue } = await this.state;

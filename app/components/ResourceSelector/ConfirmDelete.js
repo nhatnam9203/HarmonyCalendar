@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Popup from 'reactjs-popup';
 import styled from 'styled-components';
-import {IoIosCloseCircle} from 'react-icons/io';
+import { IoIosCloseCircle } from 'react-icons/io';
 
 const ConfirmPopup = styled(Popup)`
   border-radius: 1.5rem;
@@ -80,7 +80,7 @@ ConfirmPopupWrapper.ButtonNo = styled(ConfirmPopupWrapper.ButtonYes)`
 class ConfirmDeleteWaiting extends Component {
 
 	render() {
-		const { isPopupDelete, onPressYes,onPressNo } = this.props;
+		const { isPopupDelete, onPressYes, onPressNo } = this.props;
 		if (isPopupDelete === false) return '';
 		return (
 			<ConfirmPopup closeOnDocumentClick open onOpen={() => onPressNo()} onClose={() => onPressNo()}>
@@ -88,12 +88,12 @@ class ConfirmDeleteWaiting extends Component {
 					<ConfirmPopupWrapper.Header>
 						Confirmation
 						<ConfirmPopupWrapper.ButtonX onClick={() => onPressNo()}>
-						<IoIosCloseCircle style={{ width : 38, height : 38 }} />
+							<IoIosCloseCircle style={{ width: 38, height: 38 }} />
 						</ConfirmPopupWrapper.ButtonX>
 					</ConfirmPopupWrapper.Header>
 
 					<ConfirmPopupWrapper.Body>
-                        Do you want to Cancel this Blocked Time?
+						Do you want to Cancel this Blocked Time?
 					</ConfirmPopupWrapper.Body>
 
 					<ConfirmPopupWrapper.Footer>

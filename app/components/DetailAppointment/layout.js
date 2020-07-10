@@ -1,8 +1,5 @@
 import React from 'react';
 import 'react-day-picker/lib/style.css';
-import 'rc-time-picker/assets/index.css';
-import 'antd-mobile/dist/antd-mobile.css';
-import _ from 'lodash';
 import styled from 'styled-components';
 import Popup from 'reactjs-popup';
 import moment from 'moment';
@@ -10,7 +7,7 @@ import DayPicker from 'react-day-picker';
 import OutsideClickHandler from 'react-outside-click-handler';
 import { formatPhone } from '../../utils/helper';
 import { FaCaretDown } from 'react-icons/fa';
-import {PopupTimePicker} from './widget';
+import { PopupTimePicker } from './widget';
 import { MdSubdirectoryArrowLeft } from 'react-icons/md';
 import { IoIosCloseCircle } from 'react-icons/io';
 
@@ -378,7 +375,7 @@ class Appointment extends React.Component {
 		);
 	}
 
-    /********************************* RENDER BUTTON BELONG TO STATUS *********************************/
+	/********************************* RENDER BUTTON BELONG TO STATUS *********************************/
 	renderNextStatusButton() {
 		const { appointment } = this.props;
 		if (this.conditionButtonChange()) {
@@ -409,7 +406,7 @@ class Appointment extends React.Component {
 		}
 	}
 
-    /********************************* RENDER ROW CHANGE TIME *********************************/
+	/********************************* RENDER ROW CHANGE TIME *********************************/
 	renderChangeAppointTime() {
 		return (
 			<WrapperTimeChange>
@@ -428,7 +425,7 @@ class Appointment extends React.Component {
 		);
 	}
 
-    /********************************* RENDER GIFT CARD *********************************/
+	/********************************* RENDER GIFT CARD *********************************/
 	renderGiftCard(giftCard, index) {
 		if (giftCard) {
 			return (
@@ -441,7 +438,7 @@ class Appointment extends React.Component {
 		}
 	}
 
-    /********************************* RENDER DAY PICKER  *********************************/
+	/********************************* RENDER DAY PICKER  *********************************/
 	renderSelectDay() {
 		const { dayChange, isPopupDay } = this.state;
 		return (
@@ -472,7 +469,7 @@ class Appointment extends React.Component {
 		);
 	}
 
-    /********************************* RENDER SELECT TIME *********************************/
+	/********************************* RENDER SELECT TIME *********************************/
 	renderTimeSelect() {
 		const { fromTime, isPopupTimePicker } = this.state;
 		return (
@@ -497,11 +494,11 @@ class Appointment extends React.Component {
 		);
 	}
 
-    /********************************* RENDER SERVICES *********************************/
+	/********************************* RENDER SERVICES *********************************/
 	renderServices() {
 		const { services } = this.state;
 		const { prices, isPopupStaff, indexPopupStaff } = this.state;
-		const { appointment , staffList } = this.props;
+		const { appointment, staffList } = this.props;
 		if (services.length > 0) {
 			return (
 				<table>
@@ -526,19 +523,19 @@ class Appointment extends React.Component {
 					<tbody>{services.map((s, i) =>
 						<Service
 							key={'service' + i}
-							service={s} 
+							service={s}
 							index={i}
 							appointment={appointment}
 							staffList={staffList}
 							prices={prices}
 							isPopupStaff={isPopupStaff}
 							indexPopupStaff={indexPopupStaff}
-							togglePopupStaff={(staff,index)=>this.togglePopupStaff(staff,index)}
-							closePopupStaff={()=>this.closePopupStaff()}
-							subtractService={(index)=>this.subtractService(index)}
-							addService={(index)=>this.addService(index)}
-							openPopupPrice={(price,index,key) => this.openPopupPrice(price,index,key)}
-							onChangePrice={(value,index) => this.onChangePrice(value,index)}
+							togglePopupStaff={(staff, index) => this.togglePopupStaff(staff, index)}
+							closePopupStaff={() => this.closePopupStaff()}
+							subtractService={(index) => this.subtractService(index)}
+							addService={(index) => this.addService(index)}
+							openPopupPrice={(price, index, key) => this.openPopupPrice(price, index, key)}
+							onChangePrice={(value, index) => this.onChangePrice(value, index)}
 						/>
 					)}</tbody>
 				</table>
@@ -546,7 +543,7 @@ class Appointment extends React.Component {
 		}
 	}
 
-    /********************************* RENDER PRODUCTS *********************************/
+	/********************************* RENDER PRODUCTS *********************************/
 	renderProducts() {
 		const { products } = this.state;
 		const { appointment } = this.props;
@@ -580,7 +577,7 @@ class Appointment extends React.Component {
 		}
 	}
 
-    /********************************* RENDER EXTRAS *********************************/
+	/********************************* RENDER EXTRAS *********************************/
 	renderExtras() {
 		const { extras } = this.state;
 		const { appointment } = this.props;
@@ -615,7 +612,7 @@ class Appointment extends React.Component {
 		}
 	}
 
-    /********************************* RENDER HEADER APPOINTMENT *********************************/
+	/********************************* RENDER HEADER APPOINTMENT *********************************/
 	renderHeader() {
 		const { appointment } = this.props;
 		switch (appointment.status) {
@@ -655,7 +652,7 @@ class Appointment extends React.Component {
 		}
 	}
 
-    /********************************* RENDER BODY APPOINTMENT *********************************/
+	/********************************* RENDER BODY APPOINTMENT *********************************/
 	renderBody() {
 		const { appointment, currentDay } = this.props;
 		const { isVip } = appointment;
@@ -701,7 +698,7 @@ class Appointment extends React.Component {
 		let colorDelete = appointment.status === 'ASSIGNED' || appointment.status === 'CONFIRMED' ? '#585858' : 'white';
 		return (
 			<div>
-                {/********************************** POPUP DETAIL APPOINTMENT *********************************/}
+				{/********************************** POPUP DETAIL APPOINTMENT *********************************/}
 				<AppointmentPopup
 					closeOnDocumentClick
 					open
@@ -726,7 +723,7 @@ class Appointment extends React.Component {
 					</AppointmentWrapper>
 				</AppointmentPopup>
 
-                {/********************************** POPUP CONFIRM CANCEL APPOINTMENT *********************************/}
+				{/********************************** POPUP CONFIRM CANCEL APPOINTMENT *********************************/}
 				<ConfirmationPopup open={this.state.confirmationModal}>
 					<ConfirmationWrapper>
 
