@@ -1,11 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import Popup from 'reactjs-popup';
-import { IoIosCloseCircle } from 'react-icons/io'
 import { formatUsPhone } from '../../utils/helper';
 import NumberFormat from 'react-number-format';
-import { MdSubdirectoryArrowLeft } from 'react-icons/md';
-import { FaRegSquare } from 'react-icons/fa'
 
 const AppPopup = styled(Popup)`
   border-radius: 1.5rem;
@@ -249,27 +246,46 @@ NoteWrapper.Form = styled.form`
 	}
 `;
 
+const ImageEnter = styled.img`
+    width : 1.3rem;
+    height : 1.3rem;
+`;
+
+const BtnClose = styled.div`
+	position: absolute;
+	right: 0.5rem;
+	top: 0.25rem;
+	line-height: 1;
+	font-size: 2rem;
+	color: #ffffff;
+	cursor: pointer;
+	& > img{
+		width : 30px;
+		height : 30px;
+	}
+`;
+
 
 class AddAppointment extends React.Component {
 
     renderNote = (note, index) => (
-		<NoteInformation key={index}>
-			<div>{note}</div>
-		</NoteInformation>
-	);
+        <NoteInformation key={index}>
+            <div>{note}</div>
+        </NoteInformation>
+    );
 
-	renderNotes() {
-		const { notes } = this.state;
-		return (
-			<div style={{ height: 60, overflowY: 'scroll', marginTop: 15 }}>
-				{notes.map((note, index) => {
-					return (
-						<div style={{ marginBottom: 5 }} key={index + "note"} >{note}</div>
-					)
-				})}
-			</div>
-		);
-	}
+    renderNotes() {
+        const { notes } = this.state;
+        return (
+            <div style={{ height: 60, overflowY: 'scroll', marginTop: 15 }}>
+                {notes.map((note, index) => {
+                    return (
+                        <div style={{ marginBottom: 5 }} key={index + "note"} >{note}</div>
+                    )
+                })}
+            </div>
+        );
+    }
 
     renderPopupSearch() {
         const {
@@ -280,9 +296,9 @@ class AddAppointment extends React.Component {
         return (
             <SearchingPopup open={isOpenSearchingPopup} closeOnDocumentClick={false} lockScroll={true}>
                 <SearchingWrapper>
-                    <SearchingWrapper.Close onClick={() => this.closeAllModal()}>
-                        <IoIosCloseCircle style={{ height: 38, width: 38 }} />
-                    </SearchingWrapper.Close>
+                    <BtnClose onClick={() => this.closeAllModal()}>
+                        <img src={require("../../images/close_white.png")} />
+                    </BtnClose>
                     <SearchingWrapper.Header backgroundColor="#0071C5">Add Appointment</SearchingWrapper.Header>
                     <SearchingWrapper.Body>Enter Phone Number</SearchingWrapper.Body>
 
@@ -322,10 +338,10 @@ class AddAppointment extends React.Component {
         )
     }
 
-    checkConditionSendLink(){
+    checkConditionSendLink() {
         const { InfoAfterCheckPhone } = this.props;
-        if(InfoAfterCheckPhone && InfoAfterCheckPhone.userId === 0) return true
-        if(!InfoAfterCheckPhone) return true;
+        if (InfoAfterCheckPhone && InfoAfterCheckPhone.userId === 0) return true
+        if (!InfoAfterCheckPhone) return true;
         return false
     }
 
@@ -350,9 +366,9 @@ class AddAppointment extends React.Component {
                 position={'left center'}
             >
                 <AddingWrapper>
-                    <AddingWrapper.Close style={{ top: 10, }} onClick={() => this.closeAllModal()}>
-                        <IoIosCloseCircle style={{ height: 38, width: 38 }} />
-                    </AddingWrapper.Close>
+                    <BtnClose style={{ top : 10 }} onClick={() => this.closeAllModal()}>
+                        <img src={require("../../images/close_white.png")} />
+                    </BtnClose>
 
                     <AddingWrapper.Header backgroundColor="#1173C3">Add Appointment</AddingWrapper.Header>
 
@@ -450,12 +466,7 @@ class AddAppointment extends React.Component {
                                     onChange={(e) => this.handleChangeNote(e)}
                                 />
                                 <button disabled={InfoAfterCheckPhone.favourite ? true : false} type="submit" onClick={() => this.addNotes()}>
-                                    <MdSubdirectoryArrowLeft
-                                        style={{
-                                            width: 28,
-                                            height: 28
-                                        }}
-                                    />
+                                    <ImageEnter src={require('../../images/enter@3x.png')} />
                                 </button>
                             </NoteWrapper.Form>}
                             {this.renderNotes()}
@@ -464,14 +475,14 @@ class AddAppointment extends React.Component {
                         {/*********** SEND LINK ***********/}
                         {
                             condition &&
-                            <Row style={{ marginTop : 15 }} onClick={() => this.toggleSendLink()} >
+                            <Row style={{ marginTop: 15 }} onClick={() => this.toggleSendLink()} >
                                 {
                                     isSendLink &&
-                                    <ImageSendLink src={require('../../images/checkbox.png')} />
+                                    <ImageSendLink src={require('../../images/check-box@3x.png')} />
                                 }
                                 {
-                                    !isSendLink && 
-                                    <FaRegSquare style={{ color: '#1366AE', width: 20, height: 20, marginRight: 10 }} />
+                                    !isSendLink &&
+                                    <ImageSendLink src={require('../../images/check-box-empty@3x.png')} />
                                 }
                                 <div style={{ fontSize: 15 }}>Send application download link to customer</div>
                             </Row>

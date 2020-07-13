@@ -39,6 +39,11 @@ export default class FooterAppointment extends Component {
 
     render() {
         const { appointment } = this.props;
+
+        let subTotal = appointment.subTotal ? parseFloat(appointment.subTotal.toString().replace(/,/g, '')).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') : "0.00";
+        
+        let total = appointment.total ? parseFloat(appointment.total.toString().replace(/,/g, '')).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') : "0.00";
+
         if (appointment.status === 'PAID') {
             return (
                 <React.Fragment>
@@ -47,11 +52,11 @@ export default class FooterAppointment extends Component {
                             <WrapperFooterPaid>
                                 <WrapperFooterPaid.ItemLeft>
                                     <div>Subtotal : </div>
-                                    <div>$ {parseFloat(appointment.subTotal).toFixed(2)}</div>
+                                    <div>$ {appointment.subTotal}</div>
                                 </WrapperFooterPaid.ItemLeft>
                                 <WrapperFooterPaid.Item>
                                     <div>Discount : </div>
-                                    <div>$ {parseFloat(appointment.discount).toFixed(2)}</div>
+                                    <div>$ {appointment.discount}</div>
                                 </WrapperFooterPaid.Item>
                             </WrapperFooterPaid>
                         </div>
@@ -60,11 +65,11 @@ export default class FooterAppointment extends Component {
                             <WrapperFooterPaid>
                                 <WrapperFooterPaid.ItemLeft>
                                     <div>Tip : </div>
-                                    <div>$ {parseFloat(appointment.tipAmount).toFixed(2)}</div>
+                                    <div>$ {appointment.tipAmount}</div>
                                 </WrapperFooterPaid.ItemLeft>
                                 <WrapperFooterPaid.Item>
                                     <div>Gift card : </div>
-                                    <div>$ {parseFloat(appointment.giftCard).toFixed(2)}</div>
+                                    <div>$ {appointment.giftCard}</div>
                                 </WrapperFooterPaid.Item>
                             </WrapperFooterPaid>
                         </div>
@@ -73,14 +78,14 @@ export default class FooterAppointment extends Component {
                             <WrapperFooterPaid>
                                 <WrapperFooterPaid.ItemLeft>
                                     <div>Tax : </div>
-                                    <div style={{ paddingRight: 10 }}>$ {parseFloat(appointment.tax).toFixed(2)}</div>
+                                    <div style={{ paddingRight: 10 }}>$ {appointment.tax}</div>
                                 </WrapperFooterPaid.ItemLeft>
                             </WrapperFooterPaid>
                         </div>
 
                         <FooterTotal>
                             <div>Total</div>
-                            <div>$ {parseFloat(appointment.total).toFixed(2)}</div>
+                            <div>$ {total}</div>
                         </FooterTotal>
                     </div>
                 </React.Fragment>
@@ -94,11 +99,11 @@ export default class FooterAppointment extends Component {
                     </div>
                     <div>
                         <span>Tip : </span>
-                        <strong>{parseFloat(appointment.tipPercent).toFixed(2)}</strong>
+                        <strong>{appointment.tipPercent}</strong>
                     </div>
                     <div>
                         <span>Total : </span>
-                        <strong>$ {parseFloat(appointment.subTotal).toFixed(2)}</strong>
+                        <strong>$ {subTotal}</strong>
                     </div>
                 </React.Fragment>
             );

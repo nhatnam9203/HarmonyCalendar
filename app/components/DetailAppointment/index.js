@@ -3,6 +3,7 @@ import moment from 'moment';
 import { isEqual } from 'lodash'
 import { convertAppointment, initialState } from './widget/utilDetail';
 import Layout from './layout'
+import {addLastStaff} from "../../containers/AppointmentPage/utilSaga"
 
 class Appointment extends Layout {
 	constructor(props) {
@@ -212,19 +213,9 @@ class Appointment extends Layout {
 	reMakeStaffList(staffList) {
 		let staff0 = staffList.find((s) => s.id === 0);
 		let _staffList = staffList;
+
 		if (!staff0) {
-			const lastStaff = {
-				id: 0,
-				title: `Any staff`,
-				imageUrl: '',
-				orderNumber: 0,
-				workingTimes: _staffList[_staffList.length - 2].workingTimes,
-				isDisabled: false,
-				pincode: 0,
-				isNextAvailableStaff: false,
-				blockTime: [],
-				timeLogin: 0
-			};
+			const lastStaff = addLastStaff();
 
 			_staffList.push(lastStaff);
 		}
@@ -237,10 +228,10 @@ class Appointment extends Layout {
 			let _services = appointmentDetail.options;
 			let _extras = appointmentDetail.extras;
 			_services.forEach((element) => {
-				element.price = parseFloat(element.price);
+				element.price = element.price;
 			});
 			_extras.forEach((element) => {
-				element.price = parseFloat(element.price);
+				element.price = element.price;
 			});
 
 			let _staffList = this.reMakeStaffList(staffList);
@@ -286,15 +277,15 @@ class Appointment extends Layout {
 			for (let i = 0; i < appointmentDetail.options.length; i++) {
 				const price = appointmentDetail.options[i].price;
 				this.setState({
-					prices: [...this.state.prices, parseFloat(price)],
-					old_prices: [...this.state.prices, parseFloat(price)]
+					prices: [...this.state.prices, price],
+					old_prices: [...this.state.prices, price]
 				});
 			}
 			for (let i = 0; i < appointmentDetail.extras.length; i++) {
 				const price = appointmentDetail.extras[i].price;
 				this.setState({
-					pricesExtras: [...this.state.pricesExtras, parseFloat(price)],
-					old_priceExtras: [...this.state.old_priceExtras, parseFloat(price)]
+					pricesExtras: [...this.state.pricesExtras, price],
+					old_priceExtras: [...this.state.old_priceExtras, price]
 				});
 			}
 		}

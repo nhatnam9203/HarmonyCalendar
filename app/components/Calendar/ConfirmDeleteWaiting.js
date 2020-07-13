@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Popup from 'reactjs-popup';
 import styled from 'styled-components';
-import {IoIosCloseCircle} from 'react-icons/io';
 
 const ConfirmPopup = styled(Popup)`
   border-radius: 1.5rem;
@@ -77,6 +76,20 @@ ConfirmPopupWrapper.ButtonNo = styled(ConfirmPopupWrapper.ButtonYes)`
 
 `;
 
+const BtnClose = styled.div`
+	position: absolute;
+	right: 0.5rem;
+	top: 0.25rem;
+	line-height: 1;
+	font-size: 2rem;
+	color: #ffffff;
+	cursor: pointer;
+	& > img{
+		width : 32px;
+		height : 32px;
+	}
+`;
+
 class ConfirmDeleteWaiting extends Component {
 	deleteEventWaiting() {
 		const { deleteEventWaitingList, event } = this.props;
@@ -97,9 +110,9 @@ class ConfirmDeleteWaiting extends Component {
 				<ConfirmPopupWrapper>
 					<ConfirmPopupWrapper.Header>
 						Confirmation
-						<ConfirmPopupWrapper.ButtonX onClick={() => this.closeModal()}>
-						<IoIosCloseCircle style={{ width : 38, height : 38 }} />
-						</ConfirmPopupWrapper.ButtonX>
+						<BtnClose onClick={() => this.closeModal()}>
+							<img src={require("../../images/close_white.png")} />
+						</BtnClose>
 					</ConfirmPopupWrapper.Header>
 
 					<ConfirmPopupWrapper.Body>

@@ -6,10 +6,7 @@ import moment from 'moment';
 import DayPicker from 'react-day-picker';
 import OutsideClickHandler from 'react-outside-click-handler';
 import { formatPhone } from '../../utils/helper';
-import { FaCaretDown } from 'react-icons/fa';
 import { PopupTimePicker } from './widget';
-import { MdSubdirectoryArrowLeft } from 'react-icons/md';
-import { IoIosCloseCircle } from 'react-icons/io';
 
 import { FooterAppointment, PopupPrice, Product, Extra, Service } from './widget'
 
@@ -24,7 +21,7 @@ const AppPopupWrapper = styled.div`position: relative;`;
 
 AppPopupWrapper.Header = styled.div`
 	height: 3rem;
-	font-size: 23px;
+	font-size: 22px;
 	font-weight: 600;
 	background: ${(props) => props.backgroundColor};
 	color: ${(props) => (props.color ? props.color : 'white')};
@@ -45,6 +42,20 @@ AppPopupWrapper.Close = styled.div`
 	font-size: 2rem;
 	color: #ffffff;
 	cursor: pointer;
+`;
+
+const BtnClose = styled.div`
+	position: absolute;
+	right: 0.5rem;
+	top: 0.25rem;
+	line-height: 1;
+	font-size: 2rem;
+	color: #ffffff;
+	cursor: pointer;
+	& > img{
+		width : 32px;
+		height : 32px;
+	}
 `;
 
 AppPopupWrapper.Body = styled.div`
@@ -98,13 +109,21 @@ const UserInformation = styled.div`
 	justify-content: space-between;
 	align-items: center;
 	padding: 0.5rem;
+	margin-bottom : 0.5rem;
 	& > div {
-		width: 35%;
+		width: 50%;
 		display: flex;
 		justify-content: space-between;
 	}
 	& > div:nth-child(1) {
-
+		width: 40%;
+	}
+	& > div:nth-child(2) {
+		width: 50%;
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
 	}
 	& > div > span:nth-child(1){
 		color: #333;
@@ -305,9 +324,8 @@ CalendarPopup.Heading = styled.div`
 `;
 
 const LogoVip = styled.div`
-	width: 12% !important;
 	border-radius: 100px;
-	padding: 8px;
+	padding: 6.7px 15px;
 	background-color: #22da27;
 	align-items: center !important;
 	justify-content: center !important;
@@ -326,8 +344,10 @@ const ButtonDayChange = styled.div`
 	background-color: #eeeeee;
 	border-radius: 5px;
 	padding: 10px;
-	text-align: center;
 	width: 130px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
 `;
 
 const ButtonTime = styled.div`
@@ -339,10 +359,15 @@ const ButtonTime = styled.div`
 	position: relative;
 `;
 
-const Row = styled.div`
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
+const ImageEnter = styled.img`
+    width : 1.3rem;
+    height : 1.3rem;
+`;
+
+const ImgButton = styled.img`
+	width : 12px;
+	height : 6px; 
+	margin-left : 8px; 
 `;
 
 CalendarPopup.Body = styled.div``;
@@ -367,7 +392,8 @@ class Appointment extends React.Component {
 				<NoteWrapper.Form onSubmit={(e) => this.addNote(e)}>
 					<input value={this.state.noteValue} onChange={(e) => this.handleChange(e)} />
 					<button onClick={() => this.addNote()} type="button">
-						<MdSubdirectoryArrowLeft style={{ width: 33, height: 33 }} />
+						{/* <MdSubdirectoryArrowLeft style={{ width: 33, height: 33 }} /> */}
+						<ImageEnter src={require('../../images/enter@3x.png')} />
 					</button>
 				</NoteWrapper.Form>
 				{notes.map(this.renderNote)}
@@ -446,7 +472,7 @@ class Appointment extends React.Component {
 
 				<ButtonDayChange onClick={() => this.setState({ isPopupDay: !isPopupDay })}>
 					{moment(dayChange).format('MM/DD/YYYY')}
-					<FaCaretDown style={{ marginLeft: 10, color: '#1173C3' }} />
+					<ImgButton src={require('../../images/top_arrow@3x.png')} />
 				</ButtonDayChange>
 
 				{isPopupDay && (
@@ -478,7 +504,7 @@ class Appointment extends React.Component {
 
 					<ButtonTime onClick={() => this.openPopupTimePicker()}>
 						{moment(fromTime).format('hh:mm A').toString()}
-						<FaCaretDown style={{ marginLeft: 10, color: '#1173C3' }} />
+						<ImgButton src={require('../../images/top_arrow@3x.png')} />
 					</ButtonTime>
 
 					{isPopupTimePicker && (
@@ -667,13 +693,13 @@ class Appointment extends React.Component {
 					<div>
 						<span>Phone Number: </span>
 						<span>{formatPhone(appointment.phoneNumber)}</span>
+						{isVip === 1 && (
+							<LogoVip>
+								<img src={require('../../images/vip.png')} />
+								<span>VIP</span>
+							</LogoVip>
+						)}
 					</div>
-					{isVip === 1 && (
-						<LogoVip>
-							<img src={require('../../images/vip.png')} />
-							<span>VIP</span>
-						</LogoVip>
-					)}
 				</UserInformation>
 
 				{appointment.status !== 'PAID' && this.renderChangeAppointTime()}
@@ -695,7 +721,8 @@ class Appointment extends React.Component {
 		const { isPoupPrice } = this.state;
 		if (!appointment) return '';
 		if (appointmentDetail === '') return '';
-		let colorDelete = appointment.status === 'ASSIGNED' || appointment.status === 'CONFIRMED' ? '#585858' : 'white';
+		let isCheckColor = appointment.status === 'ASSIGNED' || appointment.status === 'CONFIRMED' ? true : false;
+
 		return (
 			<div>
 				{/********************************** POPUP DETAIL APPOINTMENT *********************************/}
@@ -706,9 +733,10 @@ class Appointment extends React.Component {
 					onClose={() => this.closeModal()}
 				>
 					<AppointmentWrapper>
-						<AppointmentWrapper.Close onClick={() => this.closeModal()}>
-							<IoIosCloseCircle style={{ width: 38, height: 38 }} color={colorDelete} />
-						</AppointmentWrapper.Close>
+						<BtnClose onClick={() => this.closeModal()}>
+							{isCheckColor && <img src={require("../../images/close_black.png")} />}
+							{!isCheckColor && <img src={require("../../images/close_white.png")} />}
+						</BtnClose>
 						{this.renderHeader()}
 						{this.renderBody()}
 
@@ -727,9 +755,9 @@ class Appointment extends React.Component {
 				<ConfirmationPopup open={this.state.confirmationModal}>
 					<ConfirmationWrapper>
 
-						<ConfirmationWrapper.Close onClick={() => this.closeConfirmationModal()}>
-							<IoIosCloseCircle style={{ width: 36, height: 36 }} color={'white'} />
-						</ConfirmationWrapper.Close>
+						<BtnClose onClick={() => this.closeConfirmationModal()}>
+							<img src={require("../../images/close_white.png")} />
+						</BtnClose>
 
 						<ConfirmationWrapper.Header backgroundColor="#1173C3">Confirmation</ConfirmationWrapper.Header>
 						<ConfirmationWrapper.Body>

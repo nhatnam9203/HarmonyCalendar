@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import Popup from 'reactjs-popup';
-import { FaDollarSign } from 'react-icons/fa';
 import CurrencyInput from 'react-currency-masked-input';
 
 const PricePopup = styled(Popup)`
@@ -150,7 +149,7 @@ export default class PopupPrice extends Component {
 
 					<Body>
 						<InputPrice onClick={() => this.handleFocus()}>
-							<FaDollarSign style={{ color: '#585858' }} />
+							<img style={{width : 18,height : 18 }} src={require('../../../images/dollar.png')} />
 							<CurrencyInput
 								name="myInput"
 								id="myInput"

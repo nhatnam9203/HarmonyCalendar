@@ -129,8 +129,6 @@ export const MAIN_CALENDAR_OPTIONS = {
 				}
 			});
 
-			console.log({count,countAppAnyStaff,allMember , length : allMember.length})
-
 			if (count >= allMember.length - 1) {
 				alert('There is no staff available at this time.');
 				return;
@@ -316,7 +314,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 			if (check === false) {
 				// const text =  "Are you sure want to assign appointment at this position ?";
 
-				const text = check_workingTime ? "Accept appointment outside working hours?" : "Are you sure want to assign appointment at this position ?";
+				const text = check_workingTime ? "Accept this appointment outside of business hours?" : "Are you sure want to assign appointment at this position ?";
 				if (window.confirm(text)) {
 					store.dispatch(
 						assignAppointment({
@@ -397,7 +395,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 				}
 
 				if(isTest){
-					if (window.confirm('Accept appointment outside working hours?')){
+					if (window.confirm('Accept this appointment outside of business hours?')){
 						store.dispatch(moveAppointment(event.data.id, 0, startTime, endTime));
 						return;
 					}else{
@@ -516,7 +514,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 					? `${event.end.format('YYYY-MM-DD')}T${event.end.format('HH:mm:ss')}`
 					: moment(start_time).add(90, 'minutes').format('YYYY-MM-DD HH:mm:ss');
 			if (check === false) {
-				const text = check_block_grey ? 'Accept appointment outside working hours?' : 'Accept overlapping appointments?';
+				const text = check_block_grey ? 'Accept this appointment outside of business hours?' : 'Accept overlapping appointments?';
 				if (window.confirm(text)) {
 					store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId), start_time, endTime));
 				} else {

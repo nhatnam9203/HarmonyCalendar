@@ -3,7 +3,7 @@ import { fork, put, takeLatest, all, select } from 'redux-saga/effects';
 import moment from 'moment';
 import { api } from '../../utils/helper';
 import * as constants from './constants';
-import * as actions from './actions';
+import * as actions from './actions'; 
 import * as api_constants from '../../../app-constants';
 
 import {
@@ -106,11 +106,8 @@ export function* reloadCalendarSaga() {
 				return;
 			}
 
-			appointments =
-				response &&
-				response.data
-					.map((appointment) => appointmentAdapter(appointment))
-					.filter((app) => app.options.length > 0);
+			appointments = response && response.data.map((appointment) => appointmentAdapter(appointment))
+				// .filter((app) => app.options.length > 0);
 
 			if (displayedMembers.length > 0) {
 				addBlockAnyStaff(merchantInfo, currentDayName, currentDate, appointments);
@@ -185,7 +182,6 @@ export function* getWaitingAppointments() {
 			yield put(actions.loadingWaiting(false));
 
 			const appointments = response && response.data.map((appointment) => appointmentAdapter(appointment))
-				.filter((app) => app.options.length > 0);
 			// console.log({appointments})
 
 			localStorage.setItem('AppointmentWaiting', JSON.stringify(appointments));
@@ -220,7 +216,7 @@ export function* getAppointmentsByMembersAndDate() {
 				console.log(response.message)
 				return;
 			}
-			appointments = response && mresponse.data.map((appointment) => appointmentAdapter(appointment))
+			appointments = response && response.data.map((appointment) => appointmentAdapter(appointment))
 				.filter((app) => app.options.length > 0);
 
 			if (apiDateQuery === moment().format('YYYY-MM-DD')) {
@@ -333,7 +329,7 @@ export function* moveAppointment(action) {
 		}
 	}
 
-	const { memberId, start, end, status, options, products, extras } = appointment;
+	const { memberId, start, end, status, options, products, extras,giftCards } = appointment;
 
 	options.forEach((sv) => {
 		sv.staffId = assignedMember ? assignedMember.id : 0;
@@ -342,11 +338,12 @@ export function* moveAppointment(action) {
 	const data = {
 		staffId: memberId,
 		fromTime: start,
-		toTime: end,
+		toTime: options.length > 0 ? end : moment(start).add("minutes",15),
 		status: statusConvertData[status],
 		services: options,
 		products,
-		extras
+		extras,
+		giftCards
 	};
 
 	yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
@@ -372,13 +369,13 @@ export function* moveAppointment(action) {
 export function* putBackAppointment(action) {
 	try {
 		const { appointment } = action;
-		let { memberId, start, end, options, products, extras } = appointment;
+		let { memberId, start, end, options, products, extras ,giftCards} = appointment;
 
 		const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
 		const url = `${requestURL.toString()}/${appointment.id}`;
 		yield put(actions.appointmentPutBack(action.appointment));
 
-		const data = dataPutBackAppointment(memberId, start, end, options, products, extras);
+		const data = dataPutBackAppointment(memberId, start, end, options, products, extras,giftCards);
 
 		try {
 			if (navigator.onLine) {
@@ -405,7 +402,7 @@ export function* assignAppointment(action) {
 
 	try {
 		yield put(actions.removeAppointmentWaiting(appointment));
-		const { memberId, start, status, options, products, extras } = appointment;
+		const { memberId, start, status, options, products, extras,giftCards } = appointment;
 		options.forEach((sv) => {
 			sv.staffId = assignedMember ? assignedMember.id : 0;
 		});
@@ -432,10 +429,9 @@ export function* assignAppointment(action) {
 			status: statusConvertData[status],
 			services: options,
 			products,
-			extras
+			extras,
+			giftCards
 		};
-
-		console.log({data,appointment})
 
 		if (navigator.onLine) {
 			const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
@@ -469,7 +465,7 @@ export function* upddateAppointment(action) {
 			old_appointment,
 			extrasUpdate
 		} = action.appointment;
-		let { end, start, memberId } = appointment;
+		let { end, start, memberId,giftCards } = appointment;
 		let newDate = end;
 
 		if (status === 'cancel') {
@@ -488,7 +484,7 @@ export function* upddateAppointment(action) {
 			} else return;
 		}
 
-		let data = dataUpdateAppointment(old_status, memberId, old_appointment, status, start, newDate, servicesUpdate, productsUpdate, extrasUpdate);
+		let data = dataUpdateAppointment(old_status, memberId, old_appointment, status, start, newDate, servicesUpdate, productsUpdate, extrasUpdate,giftCards);
 
 		yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
 		yield put(actions.renderAppointment());
@@ -530,7 +526,7 @@ export function* changeTimeAppointment(action) {
 			extrasUpdate
 		} = action.appointment;
 
-		let { memberId, options, products, extras, id, start } = appointment;
+		let { memberId, options, products, extras, id, start, giftCards } = appointment;
 
 		let totalDuration = totalDuationChangeTime(appointment, extras);
 
@@ -550,7 +546,8 @@ export function* changeTimeAppointment(action) {
 			products: productsUpdate,
 			extras: extrasUpdate,
 			start,
-			selectedStaff
+			selectedStaff,
+			giftCards
 		}
 		yield put(actions.changeAppointment(payload))
 
@@ -586,7 +583,7 @@ export function* changeAppointmentSaga(action) {
 	const currentDayName = moment(currentDate).format('dddd');
 	let isUpdate = true;
 
-	const { appointmentEdit, fcEvent, start_time, end_time, options, products, extras, start, selectedStaff } = action.payload;
+	const { appointmentEdit, fcEvent, start_time, end_time, options, products, extras, start, selectedStaff,giftCards } = action.payload;
 
 	let appointment = {
 		...appointmentEdit,
@@ -599,7 +596,7 @@ export function* changeAppointmentSaga(action) {
 		statusChange = 'checkin';
 	}
 
-	let data = dataChangeTimeAppointment(selectedStaff, start_time, end_time, appointment, statusChange, options, products, extras);
+	let data = dataChangeTimeAppointment(selectedStaff, start_time, end_time, appointment, statusChange, options, products, extras,giftCards);
 
 	const staff = displayedMembers.find(s => s.id === data.staffId);
 
@@ -610,10 +607,15 @@ export function* changeAppointmentSaga(action) {
 			timeWorking[1].timeEnd,
 			['h:mm A']
 		).format('HH:mm:ss')}`;
+		const timeStart = `${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(
+			timeWorking[1].timeStart,
+			['h:mm A']
+		).format('HH:mm:ss')}`;
+
 		const toTime = moment(data.fromTime).add(totalDuarion(data.services, data.extras, appointment), 'minutes')
 
-		if (moment(toTime).isSameOrAfter(timeEnd)) {
-			if (window.confirm('Accept appointment outside working hours?')) {
+		if (moment(toTime).isSameOrAfter(timeEnd) || moment(data.fromTime).isBefore(timeStart)) {
+			if (window.confirm('Accept this appointment outside of business hours?')) {
 				isUpdate = true
 			} else {
 				isUpdate = false

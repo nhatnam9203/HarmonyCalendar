@@ -3,8 +3,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Carousel from 'nuka-carousel';
-import { FaCaretLeft, FaCaretRight } from 'react-icons/fa';
-import SplashButton from '../ResourceSelector/SplashButton'
+import ButtonSplash from "./ButtonPlash"
 
 const DateSliderWrapper = styled.div`
     width: calc(100% - 5.05rem);
@@ -67,7 +66,7 @@ class DaySlider extends React.Component {
 
   onDayClick(day) {
 
-    const { onChangeDay , loadingCalendar} = this.props;
+    const { onChangeDay, loadingCalendar } = this.props;
     onChangeDay(day.format('DDMMYYYY'));
     loadingCalendar(true);
   }
@@ -135,14 +134,10 @@ class DaySlider extends React.Component {
           dragging={true}
           renderBottomCenterControls={() => ''}
           renderCenterLeftControls={({ previousSlide }) => (
-            <SplashButton onClick={ev => this.onPrevClick(ev, previousSlide)}>
-              <FaCaretLeft />
-            </SplashButton>
+            <ButtonSplash isLeft onClick={ev => this.onPrevClick(ev, previousSlide)} />
           )}
           renderCenterRightControls={({ nextSlide }) => (
-            <SplashButton onClick={ev => this.onNextClick(ev, nextSlide)}>
-              <FaCaretRight />
-            </SplashButton>
+            <ButtonSplash onClick={ev => this.onNextClick(ev, nextSlide)} />
           )}
           afterSlide={slideIndex => this.afterSlide(slideIndex)}
         >

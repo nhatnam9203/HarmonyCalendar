@@ -3,10 +3,9 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Carousel from 'nuka-carousel';
-import { FaCaretLeft, FaCaretRight } from 'react-icons/fa';
 import { staffId } from '../../../app-constants';
 import PopupBlockTime from './PopupBlockTime';
-import SplashButton from './SplashButton'
+import ButtonSplash from "../DaySelector/ButtonPlash"
 
 const ResourceSelectorWrapper = styled.div`
 	width: 100%;
@@ -33,10 +32,13 @@ TodayWrapper.Button = styled.div`
 	background: #0071c5;
 	color: #ffffff;
 	width: 100%;
-	font-size: 1rem;
+	font-size: 0.95rem;
 	line-height: 2.8;
 	height: 100%;
 	cursor: pointer;
+	display : flex;
+	justify-content : center;
+	align-items : center;
 `;
 
 const ResourceSliderWrapper = styled.div`
@@ -47,7 +49,6 @@ const ResourceSliderWrapper = styled.div`
 const ResourceWrapper = styled.div`
 	height: calc(4rem - 2px);
 	position: relative;
-	/* border-left: 1px solid #3883bb; */
 	display: flex;
 `;
 
@@ -149,22 +150,6 @@ Resource.Title = styled.div`
 	font-weight: 400;
 `;
 
-const PrevButton = styled.div`
-	color: #3883bb;
-	font-size: 2rem;
-	line-height: 2rem;
-	cursor: pointer;
-	padding-left : 0.5rem;
-`;
-
-const NextButton = styled.div`
-	color: #3883bb;
-	font-size: 2rem;
-	line-height: 2rem;
-	cursor: pointer;
-	padding-right: 0.5rem;
-`;
-
 const WaitingHeader = styled.div`
 	width: calc((100vw - 5.05rem) / 7);
 	text-align: center;
@@ -173,6 +158,16 @@ const WaitingHeader = styled.div`
 	color: #333333;
 	background: #f4f4f5;
 	border-left: 1px solid #3883bb;
+`;
+
+const ButtonArrow = styled.div`
+	& > img {
+		width: 19px;
+		height: 19px;
+		margin-left: ${props => props.isLeft ? "8px" : "0px"};
+		margin-right : ${props => props.isLeft ? "0px" : "8px"};
+		transform : ${props => props.isLeft ? "rotate(180deg)" : "rotate(0deg)"};
+	}
 `;
 
 function chunk(array, size) {
@@ -190,13 +185,13 @@ function chunk(array, size) {
 
 class ResourceSelector extends React.Component {
 	componentWillMount() {
-		const { loadMembers , getDetailMerchant } = this.props;
+		const { loadMembers, getDetailMerchant } = this.props;
 		getDetailMerchant();
 		setTimeout(() => {
 			loadMembers();
 		}, 300);
 	}
-''
+	''
 	onPrevClick(event, previousSlide) {
 		previousSlide(event);
 	}
@@ -333,41 +328,37 @@ class ResourceSelector extends React.Component {
 
 					<AnyStaff>
 						<AnyStaff.Image>
-							<img src={require('../../images/anystaff.png')}/>
+							<img src={require('../../images/anystaff.png')} />
 							<AnyStaff.Title>Any staff</AnyStaff.Title>
 						</AnyStaff.Image>
 					</AnyStaff>
 
 					<ResourceSliderWrapper>
-					{ resources.length > 0	&&<Carousel
+						{resources.length > 0 && <Carousel
 							dragging={true}
 							renderBottomCenterControls={() => ''}
 							renderCenterLeftControls={({ previousSlide }) => {
 								if (!isActiveLett) {
 									return (
-										<PrevButton onClick={() => { }}>
-											<FaCaretLeft />
-										</PrevButton>
+										<ButtonArrow isLeft>
+											<img src={require('../../images/arrow-right.png')} />
+										</ButtonArrow>
 									)
 								} else
 									return (
-										<SplashButton isLeft onClick={(ev) => this.onPrevClick(ev, previousSlide)}>
-											<FaCaretLeft />
-										</SplashButton>
+										<ButtonSplash isLeft onClick={(ev) => this.onPrevClick(ev, previousSlide)} />
 									)
 							}}
 							renderCenterRightControls={({ nextSlide }) => {
 								if (!isActiveRight) {
 									return (
-										<NextButton onClick={() => { }}>
-											<FaCaretRight />
-										</NextButton>
+										<ButtonArrow>
+											<img src={require('../../images/arrow-right.png')} />
+										</ButtonArrow>
 									)
 								} else
 									return (
-										<SplashButton isRight onClick={(ev) => this.onNextClick(ev, nextSlide)}>
-											<FaCaretRight />
-										</SplashButton>
+										<ButtonSplash onClick={(ev) => this.onNextClick(ev, nextSlide)} />
 									)
 							}}
 							afterSlide={(slideIndex) => this.afterSlide(slideIndex)}

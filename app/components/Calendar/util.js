@@ -70,7 +70,7 @@ export function	returnAppointment(appointment) {
         status: appointment.Status ? statusConvertKey[appointment.Status] : "ASSIGNED",
         memberId: appointment.StaffId,
         start: appointment.FromTime,
-        end: appointment.ToTime,
+        end: appointment.Duration && parseInt(appointment.Duration) > 0 ? appointment.ToTime : moment(appointment.FromTime).add('minutes',15),
         user_id: appointment.UserId,
         createDate: appointment.CreatedDate,
         tipPercent: appointment.TipPercent,

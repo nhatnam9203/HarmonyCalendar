@@ -3,7 +3,6 @@ import React, { Component } from 'react'
 import styled from 'styled-components';
 import NumberFormat from 'react-number-format';
 import PopupStaff from './PopupStaff';
-import { FaCaretDown } from 'react-icons/fa';
 
 const ButtonService = styled.button`
 	background: ${(props) => props.backgroundColor};
@@ -14,6 +13,13 @@ const ButtonService = styled.button`
 	border-radius: 3px;
 	cursor: ${(props) => (props.active ? 'pointer' : 'initial')};
 `;
+
+const ImgButton = styled.img`
+	width : 12px;
+	height : 6px; 
+	margin-left : 8px; 
+`;
+
 
 export default class Service extends Component {
 
@@ -34,7 +40,8 @@ export default class Service extends Component {
 
         const staff = staffList.find((s) => parseInt(s.id) === parseInt(service.staffId));
 
-        let price = prices[index] ? parseFloat(prices[index]).toFixed(2) : '0.00';
+        let price = prices[index] ? parseFloat(prices[index].replace(/,/g, '')).toFixed(2) : "0.00";
+		price = price.toString().replace(/\d(?=(\d{3})+\.)/g, '$&,');
 
         const duration =
             service.duration.toString().length === 1 ? '0' + service.duration.toString() : service.duration;
@@ -47,8 +54,7 @@ export default class Service extends Component {
                     <td style={{ borderRight: 0 }}>
                         <div onClick={() => this.props.togglePopupStaff('', index)} style={style.staffService}>
                             <p style={style.staffNameColumn}>{title}</p>
-                            <FaCaretDown style={{ color: '#1173C3' }} />
-
+                            <ImgButton src={require('../../../images/top_arrow@3x.png')} />
                             {isPopupStaff &&
                                 index === indexPopupStaff && (
                                     <PopupStaff
@@ -106,7 +112,7 @@ export default class Service extends Component {
                 return (
                     <tr key={index}>
                         <td style={{ borderRight: 0 }}>
-                            <div style={{ display: 'flex', flexDirection: 'row' }}>
+                            <div style={{ display: 'flex', flexDirection: 'row' , alignItems: 'center' }}>
                                 <img
                                     src={service.staff.imageUrl}
                                     style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 25 }}
@@ -183,7 +189,8 @@ const style = {
         alignItems: 'center'
     },
     staffNameColumn: {
-        marginLeft: 8
+        marginLeft: 8,
+        width : 50
     },
     serviceName: {
         width: 150,

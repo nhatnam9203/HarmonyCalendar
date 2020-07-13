@@ -5,7 +5,6 @@ import { Helmet } from 'react-helmet';
 import styled from 'styled-components';
 import DayPicker from 'react-day-picker';
 import 'react-day-picker/lib/style.css';
-import { FaCalendarAlt } from 'react-icons/fa';
 import OutsideClickHandler from 'react-outside-click-handler';
 
 const MiniCalendarWrapper = styled.div`
@@ -54,6 +53,7 @@ CalendarPopup.Heading = styled.div`
 
 CalendarPopup.Body = styled.div``;
 
+
 class MiniCalendar extends React.Component {
   constructor(props) {
     super(props);
@@ -77,8 +77,8 @@ class MiniCalendar extends React.Component {
 
   onDaySelected(day) {
     // if(navigator.onLine){
-      const { onChangeDay } = this.props;
-      onChangeDay(moment(new Date(day)).format('DDMMYYYY'));
+    const { onChangeDay } = this.props;
+    onChangeDay(moment(new Date(day)).format('DDMMYYYY'));
     // }else{
     //   alert('You must have an internet connection to perform this !!!');
     // }
@@ -99,8 +99,8 @@ class MiniCalendar extends React.Component {
         </CalendarPopup.Body>
       </CalendarPopup>
     ) : (
-      ''
-    );
+        ''
+      );
   }
 
   render() {
@@ -115,7 +115,8 @@ class MiniCalendar extends React.Component {
         </Helmet>
         <MiniCalendarWrapper>
           <MiniCalendarWrapper.Button onClick={() => this.onClickButton()}>
-            <FaCalendarAlt />
+            {/* <FaCalendarAlt /> */}
+              <img style={{ width: 25, height: 25 }} src={require('../../images/calendar.png')} />
           </MiniCalendarWrapper.Button>
           {this.renderPopup()}
         </MiniCalendarWrapper>

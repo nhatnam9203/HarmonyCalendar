@@ -1,17 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { FaCaretUp, FaCaretDown } from 'react-icons/fa';
 import $ from 'jquery';
 import 'jquery-ui';
 import moment from 'moment';
-import { IoIosCloseCircle } from 'react-icons/io';
 import ConfirmDeleteWaiting from './ConfirmDeleteWaiting'
 import { formatPhone } from '../../utils/helper'
-import vip from '../../images/vip.png'
 import call from '../../images/call.png'
-import SplashButton from './SplashButton'
-
+import ButtonSplash from "./ButtonSplash"
 
 const DragZoneWrapper = styled.div`
   height: calc(100vh - 4rem - 4rem - 4rem);
@@ -27,17 +23,20 @@ const EventWrapper = styled.div`
   position : relative;
 `;
 
-EventWrapper.buttonDelete = styled.div`
-  position: absolute;
-  right: 0.25rem;
-  top: 0.25rem;
-  line-height: 1;
-  font-size: 2rem;
-  color: #ffffff;
-  font-size : 1.25rem;
-  color : #717171;
-  cursor: pointer;
-`
+const BtnClose = styled.div`
+	position: absolute;
+	right: 0.5rem;
+	top: 0.25rem;
+	line-height: 1;
+	font-size: 2rem;
+	color: #ffffff;
+	cursor: pointer;
+	& > img{
+		width : 18px;
+		height : 18px;
+	}
+`;
+
 
 const PrevButton = styled.div`
   color: #3883bb;
@@ -46,12 +45,22 @@ const PrevButton = styled.div`
   cursor: pointer;
   text-align: center;
   width: 100%;
+  & > img{
+    width: 19px;
+    height: 19px;
+    transform: rotate(180deg)
+  }
 `;
 
 const NextButton = styled(PrevButton)`
   position: absolute;
   left: 0;
   bottom: 0;
+  & > img{
+    width: 19px;
+    height: 19px;
+    transform: rotate(360deg)
+  }
 `;
 
 
@@ -189,21 +198,24 @@ class FCDragZone extends React.PureComponent {
       <React.Fragment>
         <DragZoneWrapper>
           {/* Prev Button  */}
-          {isActiveLeft && <SplashButton onClick={() => this.prevSlide()}>
-            <FaCaretUp />
-          </SplashButton>}
+          {isActiveLeft &&
+            <ButtonSplash isTop onClick={() => this.prevSlide()} />
+          }
           {!isActiveLeft &&
             <PrevButton onClick={() => { }}>
-              <FaCaretUp />
-            </PrevButton>}
+              <img src={require('../../images/down-arrow-2.png')} />
+            </PrevButton>
+          }
 
-            {/* Next Button */}
-          {isActiveRight && <SplashButton isBottom onClick={() => this.nextSlide()}>
-            <FaCaretDown />
-          </SplashButton>}
-          {!isActiveRight && <NextButton onClick={() => {}}>
-            <FaCaretDown />
-          </NextButton>}
+          {/* Next Button */}
+          {isActiveRight &&
+            <ButtonSplash onClick={() => this.nextSlide()} />
+          }
+          {!isActiveRight &&
+            <NextButton onClick={() => { }}>
+              <img src={require('../../images/down-arrow-2.png')} />
+            </NextButton>
+          }
 
           <div id="waiting-events">
             {displayedEvents.map((event) => (
@@ -212,9 +224,10 @@ class FCDragZone extends React.PureComponent {
                 key={event.id}
                 data-event-information={JSON.stringify(event)}
               >
-                <EventWrapper.buttonDelete onClick={() => this.deleteEventWaiting(event)}>
-                  <IoIosCloseCircle style={{ width: 20, height: 20 }} />
-                </EventWrapper.buttonDelete>
+                <BtnClose onClick={() => this.deleteEventWaiting(event)}>
+                  <img src={require("../../images/close_black.png")} />
+                </BtnClose>
+
                 <div className="app-event__id-number2">{event.code}</div>
                 <div className="app-event__full-name">{event.firstName}</div>
                 <div className="app-event__phone-number4">

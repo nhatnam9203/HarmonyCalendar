@@ -1,10 +1,6 @@
 import React, { Component } from 'react';
 import Popup from 'reactjs-popup';
 import styled from 'styled-components';
-import { FaClock } from 'react-icons/fa';
-import { MdAccessAlarms } from 'react-icons/md';
-import { FaTrash, FaCaretDown } from 'react-icons/fa';
-import { IoIosCloseCircle } from 'react-icons/io';
 import { PopupTimePicker } from '../DetailAppointment/widget';
 import ConfirmDelete from './ConfirmDelete';
 import moment from 'moment';
@@ -136,6 +132,21 @@ const BlockList = styled.div`
 	height: 100% !important;
 `;
 
+const BtnClose = styled.div`
+	position: absolute;
+	right: 0.5rem;
+	top: 0.25rem;
+	line-height: 1;
+	font-size: 2rem;
+	color: #ffffff;
+	cursor: pointer;
+	& > img{
+		width : 28px;
+		height : 28px;
+	}
+`;
+
+
 const initialState = {
 	pincode: '',
 	note: '',
@@ -179,7 +190,7 @@ class PopupBlockTime extends Component {
 		const memApp = calendarMembers.find((mem) => parseInt(mem.memberId) === parseInt(staff.id));
 		if (!memApp) return 0;
 		count = memApp.appointments.filter((app) => app.status !== 'BLOCK' && app.status !== 'BLOCK_TEMP').length;
-		return count.toString();
+		return count ? count.toString() : 0;
 	}
 
 	editBlockTime() {
@@ -263,7 +274,7 @@ class PopupBlockTime extends Component {
 			<StaffHeader.Right>
 				<div style={styles.title}>{staff.title}</div>
 				<div style={styles.headerRight}>
-					<div style={{ display: 'flex', flexDirection: 'row' }}>{this.renderTimeLogin(staff.timeLogin)}</div>
+					<div style={{ display: 'flex', flexDirection: 'row', marginTop: 5 }}>{this.renderTimeLogin(staff.timeLogin)}</div>
 					<div style={styles.appointmentQuantity}>
 						<div>Appointments : </div>
 						<div style={{ fontWeight: 600 }}>&nbsp;{`${this.countAppointment()}`}</div>
@@ -284,7 +295,7 @@ class PopupBlockTime extends Component {
 					style={styles.blockTime}
 				>
 					<div style={{ width: '10%' }}>
-						<FaClock color={'#1266AE'} size={18} />
+						<img style={{ width : 17, height : 17 }} src={require('../../images/clock_2.png')} />
 					</div>
 
 					<div style={styles.test}>
@@ -313,7 +324,7 @@ class PopupBlockTime extends Component {
 							}}
 							style={styles.trashButton}
 						>
-							<FaTrash color={'#6A6A6A'} size={20} style={styles.trash} />
+							<img style={{ width : 20, height : 20 }} src={require('../../images/delete.png')} />
 						</div>
 					)}
 				</div>
@@ -327,7 +338,7 @@ class PopupBlockTime extends Component {
 			return (
 				<React.Fragment>
 					<ButtonAddBlock onClick={() => this.setState({ isAddBlock: true })}>
-						<MdAccessAlarms size={20} color={'#4B4B4B'} />
+						<img style={{ width : 21, height : 21 }} src={require("../../images/clock.png")} />
 						<div style={{ marginLeft: 8, color: '#4B4B4B' }}>Add Blocked Time</div>
 					</ButtonAddBlock>
 					<BlockList>{this.renderBlockTimeList()}</BlockList>
@@ -344,14 +355,14 @@ class PopupBlockTime extends Component {
 						<div style={styles.select}>
 							{start.toString().substring(0, 5)}
 							<span> {start.toString().substring(6, 8)}</span>
-							<FaCaretDown style={styles.faCaretDown} />
+							<img style={{ width : 11, height : 11 , marginLeft : 5 }} src={require("../../images/down-arrow.png")} />
 						</div>
 					</div>
 					<p style={{ marginLeft: 8, marginTop: 7, fontWeight: '500', fontSize: 16 }}> - </p>
 					<div onClick={() => this.setState({ isPopupSelectTime: true, isEnd: true })}>
 						<div style={styles.select}>
 							{end}
-							<FaCaretDown style={styles.faCaretDown} />
+							<img style={{ width : 11, height : 11 , marginLeft : 5 }} src={require("../../images/down-arrow.png")} />
 						</div>
 					</div>
 				</Row>
@@ -419,12 +430,11 @@ class PopupBlockTime extends Component {
 		return (
 			<Container active={isPopupSelectTime} open closeOnDocumentClick={false}>
 				<React.Fragment>
-					<IoIosCloseCircle
-						onClick={isPopupSelectTime ? () => {} : () => this.closeModal()}
-						color="#6A6A6A"
-						size={35}
-						style={styles.closeModal}
-					/>
+
+					<BtnClose onClick={isPopupSelectTime ? () => { } : () => this.closeModal()}>
+						<img src={require("../../images/close_black.png")} />
+					</BtnClose>
+
 					<BodyPopup>
 						<StaffHeader>
 							<StaffHeader.Left>
@@ -453,17 +463,9 @@ const styles = {
 		marginLeft: 10
 	},
 	imgStaff: {
-		width: 50,
-		height: 50,
+		width: 55,
+		height: 55,
 		borderRadius: 40
-	},
-	faCaretDown: {
-		position: 'absolute',
-		right: 5,
-		top: 9,
-		width: 17,
-		height: 17,
-		color: '#333'
 	},
 	select: {
 		width: 123,
@@ -473,8 +475,8 @@ const styles = {
 		borderStyle: 'solid',
 		marginLeft: 10,
 		fontWeight: 300,
-		paddingTop: 12,
-		position: 'relative'
+		paddingTop: 7,
+		position: 'relative',
 	},
 	titleBody: {
 		width: 100,
@@ -491,7 +493,8 @@ const styles = {
 		marginLeft: 10,
 		backgroundColor: '#FAFAFA',
 		padding: 10,
-		reSize: 'none'
+		reSize: 'none',
+		fontSize: 16
 	},
 	btnSubmit: {
 		textAlign: 'center',
@@ -574,7 +577,8 @@ const styles = {
 		display: 'flex',
 		justifyContent: 'space-between',
 		alignItems: 'stretch',
-		flexDirection: 'row'
+		flexDirection: 'row',
+		marginTop: 5
 	},
 	note: {
 		letterSpacing: 0.3

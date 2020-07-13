@@ -31,6 +31,9 @@ export default class Product extends Component {
         const { appointment , product,index } = this.props;
 		const quantity =
 			product.quantity.toString().length === 1 ? '0' + product.quantity.toString() : product.quantity;
+		
+		let price = product.price ? parseFloat(product.price.replace(/,/g, '')).toFixed(2) : "0.00";
+		price = (parseFloat(price) * product.quantity).toFixed(2).toString().replace(/\d(?=(\d{3})+\.)/g, '$&,');
 
 		return (
 			<tr key={index}>
@@ -55,7 +58,7 @@ export default class Product extends Component {
 				<td>
 					<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
 						<div style={appointment.status !== 'PAID' ? style.price2 : {}}>
-							{parseFloat(product.price * product.quantity).toFixed(2)}
+							{price}
 						</div>
 					</div>
 				</td>
@@ -71,7 +74,7 @@ const style = {
 		width: 60,
 		textAlign: 'center',
 		marginLeft: -15,
-		fontSize: 13,
+		fontSize: 16,
 		letterSpacing: 0.06,
 		fontFamily: 'sans-serif'
 	},

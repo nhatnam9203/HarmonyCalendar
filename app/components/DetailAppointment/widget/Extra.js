@@ -33,7 +33,9 @@ export default class Extra extends Component {
 
     render() {
         const { appointment, pricesExtras, extra, index } = this.props;
-        let price = pricesExtras[index] ? parseFloat(pricesExtras[index]).toFixed(2) : '0.00';
+
+        let price = pricesExtras[index] ? parseFloat(pricesExtras[index].replace(/,/g, '')).toFixed(2) : "0.00";
+		price = price.toString().replace(/\d(?=(\d{3})+\.)/g, '$&,');
 
         return (
             <tr key={index}>

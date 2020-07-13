@@ -290,7 +290,7 @@ function appointmentReducer(state = initialState, action) {
 						{
 							...action.appointment,
 							status: 'WAITING',
-							memberId: null
+							memberId: -1
 						},
 						...arr
 					];

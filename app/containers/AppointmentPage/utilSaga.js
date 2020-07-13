@@ -45,7 +45,7 @@ export const appointmentAdapter = (appointment) => {
 		status: statusConvertKey[appointment.status],
 		memberId: appointment.staffId,
 		start: appointment.fromTime,
-		end: appointment.toTime,
+		end: appointment.duration && parseInt(appointment.duration) > 0 ? appointment.toTime : moment(appointment.fromTime).add('minutes',15),
 		user_id: appointment.userId,
 		createDate: appointment.createdDate,
 		tipPercent: appointment.tipPercent,
@@ -288,7 +288,8 @@ export function dataUpdateAppointment(
 	newDate,
 	servicesUpdate,
 	productsUpdate,
-	extrasUpdate
+	extrasUpdate,
+	giftCards
 ) {
 	let data;
 	if (old_status === 'ASSIGNED') {
@@ -300,6 +301,7 @@ export function dataUpdateAppointment(
 			services: old_appointment.options,
 			products: old_appointment.products,
 			extras: old_appointment.extras,
+			giftCards
 		};
 	} else {
 		data = {
@@ -310,6 +312,7 @@ export function dataUpdateAppointment(
 			services: servicesUpdate,
 			products: productsUpdate,
 			extras: extrasUpdate,
+			giftCards
 		};
 	}
 	return data;
@@ -350,6 +353,7 @@ export function dataChangeTimeAppointment(
 	options,
 	products,
 	extras,
+	giftCards
 ) {
 	return {
 		staffId: selectedStaff.id,
@@ -359,10 +363,11 @@ export function dataChangeTimeAppointment(
 		services: options,
 		products: products,
 		extras,
+		giftCards
 	};
 }
 
-export function dataPutBackAppointment(memberId, start, end, options, products, extras) {
+export function dataPutBackAppointment(memberId, start, end, options, products, extras,giftCards) {
 	return {
 		staffId: memberId,
 		fromTime: start,
@@ -370,7 +375,8 @@ export function dataPutBackAppointment(memberId, start, end, options, products, 
 		status: 'waiting',
 		services: options,
 		products,
-		extras
+		extras,
+		giftCards
 	};
 }
 
