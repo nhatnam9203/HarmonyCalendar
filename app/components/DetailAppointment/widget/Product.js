@@ -15,14 +15,14 @@ export default class Product extends Component {
 
     getStyleProduct(appointment, product, index) {
 		let backgroundColor = '#dddddd';
-		if (appointment.status !== 'PAID' && product.quantity > 1) backgroundColor = '#0071c5';
+		if (appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' && product.quantity > 1) backgroundColor = '#0071c5';
 
 		return backgroundColor;
 	}
 
 	getStyleProduct2(appointment, product, index) {
 		let backgroundColor = '#dddddd';
-		if (appointment.status !== 'PAID') backgroundColor = '#0071c5';
+		if (appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND') backgroundColor = '#0071c5';
 		return backgroundColor;
 	}
 
@@ -41,7 +41,7 @@ export default class Product extends Component {
 				<td style={{ textAlign: 'center' }}>
 					<ButtonProduct
 						backgroundColor={this.getStyleProduct(appointment, product, index)}
-						disabled={appointment.status === 'PAID' || product.quantity <= 1}
+						disabled={appointment.status === 'PAID' || appointment.status === 'VOID'  || appointment.status === 'REFUND' || product.quantity <= 1}
 						onClick={() => this.props.subtractProduct(index)}
 					>
 						-
@@ -49,7 +49,7 @@ export default class Product extends Component {
 						{quantity}
 					<ButtonProduct
 						backgroundColor={this.getStyleProduct2(appointment, product, index)}
-						disabled={appointment.status === 'PAID'}
+						disabled={appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND'}
 						onClick={() => this.props.addProduct(index)}
 					>
 						+
@@ -57,7 +57,7 @@ export default class Product extends Component {
 				</td>
 				<td>
 					<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-						<div style={appointment.status !== 'PAID' ? style.price2 : {}}>
+						<div style={(appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND') ? style.price2 : {}}>
 							{price}
 						</div>
 					</div>

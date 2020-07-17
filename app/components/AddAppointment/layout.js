@@ -356,6 +356,8 @@ class AddAppointment extends React.Component {
 
         const { InfoAfterCheckPhone, StateAddCustomerSuccess, checkPhoneError } = this.props;
 
+        const { createdDate } = InfoAfterCheckPhone;
+
         const PhoneShow = `+(${this.state.phoneCheck}) ${formatUsPhone(this.state.phoneNumber)}`;
         return (
             <AddingPopup
@@ -366,7 +368,7 @@ class AddAppointment extends React.Component {
                 position={'left center'}
             >
                 <AddingWrapper>
-                    <BtnClose style={{ top : 10 }} onClick={() => this.closeAllModal()}>
+                    <BtnClose style={{ top: 10 }} onClick={() => this.closeAllModal()}>
                         <img src={require("../../images/close_white.png")} />
                     </BtnClose>
 
@@ -457,7 +459,7 @@ class AddAppointment extends React.Component {
                             />
                         </Form>
 
-                        <NoteWrapper>
+                        {!createdDate && <NoteWrapper>
                             <Label>Note:</Label>
                             {!InfoAfterCheckPhone.favourite && <NoteWrapper.Form onSubmit={(e) => e.preventDefault()}>
                                 <input
@@ -470,7 +472,7 @@ class AddAppointment extends React.Component {
                                 </button>
                             </NoteWrapper.Form>}
                             {this.renderNotes()}
-                        </NoteWrapper>
+                        </NoteWrapper>}
 
                         {/*********** SEND LINK ***********/}
                         {

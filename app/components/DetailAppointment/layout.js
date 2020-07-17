@@ -58,6 +58,13 @@ const BtnClose = styled.div`
 	}
 `;
 
+const BtnCloseSelectDay = styled(BtnClose)`
+	& > img{
+		width : 27px;
+		height : 27px;
+	}
+`;
+
 AppPopupWrapper.Body = styled.div`
 	background: #ffffff;
 	width: 100%;
@@ -321,6 +328,7 @@ CalendarPopup.Heading = styled.div`
 	line-height: 2;
 	text-align: center;
 	padding-top: 0.3rem;
+	position : relative
 `;
 
 const LogoVip = styled.div`
@@ -454,11 +462,16 @@ class Appointment extends React.Component {
 	/********************************* RENDER GIFT CARD *********************************/
 	renderGiftCard(giftCard, index) {
 		if (giftCard) {
+			const quantity =
+				giftCard.quantity.toString().length === 1 ? '0' + giftCard.quantity.toString() : giftCard.quantity;
+			let price = giftCard.price ? parseFloat(giftCard.price.toString().replace(/,/g, '')).toFixed(2) : "0.00";
 			return (
 				<tr key={index}>
 					<td>{giftCard.name ? giftCard.name : ''}</td>
-					<td style={{ textAlign: 'center' }}>{giftCard.quantity}</td>
-					<td style={{ textAlign: 'center' }}>{giftCard.price}</td>
+					<td style={{ textAlign: 'center' }}>{quantity}</td>
+					<td style={{ textAlign: 'center' }}>
+						<div style={{ color: '#0764B0', fontWeight: '900', fontFamily: 'sans-serif' }}>{price}</div>
+					</td>
 				</tr>
 			);
 		}
@@ -478,7 +491,12 @@ class Appointment extends React.Component {
 				{isPopupDay && (
 					<OutsideClickHandler onOutsideClick={() => this.setState({ isPopupDay: !isPopupDay })}>
 						<CalendarPopup>
-							<CalendarPopup.Heading>Select Day</CalendarPopup.Heading>
+							<CalendarPopup.Heading>
+								Select Day
+							<BtnCloseSelectDay onClick={() => this.setState({ isPopupDay: !isPopupDay })}>
+									{<img src={require("../../images/close_white.png")} />}
+							</BtnCloseSelectDay>
+							</CalendarPopup.Heading>
 							<CalendarPopup.Body>
 								<DayPicker
 									firstDayOfWeek={1}
@@ -669,6 +687,20 @@ class Appointment extends React.Component {
 					</AppointmentWrapper.Header>
 				);
 
+			case 'VOID':
+				return (
+					<AppointmentWrapper.Header color={'white'} backgroundColor={'#FD594F'}>
+						{appointment.code} Void Appointment
+					</AppointmentWrapper.Header>
+				);
+
+			case 'REFUND':
+				return (
+					<AppointmentWrapper.Header color={'white'} backgroundColor={'#FD594F'}>
+						{appointment.code} Refund Appointment
+					</AppointmentWrapper.Header>
+				);
+
 			default:
 				return (
 					<AppointmentWrapper.Header backgroundColor="red">
@@ -702,7 +734,7 @@ class Appointment extends React.Component {
 					</div>
 				</UserInformation>
 
-				{appointment.status !== 'PAID' && this.renderChangeAppointTime()}
+				{appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' && this.renderChangeAppointTime()}
 				{this.renderServices()}
 				{this.renderProducts()}
 				{this.renderExtras()}
@@ -741,7 +773,7 @@ class Appointment extends React.Component {
 						{this.renderBody()}
 
 						<AppointmentWrapper.Footer>
-							{appointment.status !== 'PAID' && (
+							{(appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND') && (
 								<div>
 									<Button onClick={() => this.openConfirmationModal()}>Cancel</Button>
 								</div>

@@ -13,7 +13,7 @@ const signalR = require('@microsoft/signalr');
 import { store } from 'app';
 import { addEventsToCalendar } from './constants';
 import { PROD_API_BASE_URL } from '../../../app-constants';
-import { returnAppointment } from './util';
+import { returnAppointment, PromiseAction } from './util';
 
 const CalendarWrapper = styled.div`
 	display: flex;
@@ -144,7 +144,7 @@ class Calendar extends React.Component {
 				let type = app.data.Type;
 				switch (type) {
 					case 'user_update':
-						// console.log('user update');
+						console.log('user update');
 						this.props.updateConsumer(app.data.user);
 						const displayMember = store.getState().getIn(['appointment', 'appointments', 'calendar']);
 						const selectDay = store.getState().getIn(['appointment', 'currentDay']);
@@ -152,7 +152,7 @@ class Calendar extends React.Component {
 						break;
 
 					case 'appointment_add':
-						// console.log('appointmemt add');
+						console.log('appointmemt add');
 						const appointment = app.data.Appointment;
 						if (appointment) {
 							let appointment_R = returnAppointment(appointment);
@@ -169,9 +169,19 @@ class Calendar extends React.Component {
 						let app_update = app.data.appointment;
 						if (app_update) {
 							let appointment = JSON.parse(app_update);
-							// console.log({ appointment });
+							console.log({appointment})
+							// const giftCards = appointment.GiftCards;
+
+							// const checkGiftCard_wrong = giftCards.find(obj => obj.Name === null);
+							// if (checkGiftCard_wrong) {
+							// 	const action = this.props.getApppointmentById;
+							// 	const data = { appointment };
+							// 	console.log({data})
+							// 	const _promise = await PromiseAction(action, data);
+							// }
+
 							let appointment_R = returnAppointment(appointment);
-							// console.log('update appointment');
+							console.log('update appointment');
 
 							this.props.deselectAppointment();
 							this.props.disable_Calendar(false);
@@ -199,7 +209,7 @@ class Calendar extends React.Component {
 									const app = this.props.waitingAppointments.find(obj => parseInt(obj.id) === parseInt(appointment_R.id));
 									if (app) {
 										this.props.loadWaitingAppointments();
-									} else{
+									} else {
 										this.props.reloadCalendar();
 									}
 									break;
@@ -224,12 +234,12 @@ class Calendar extends React.Component {
 						}
 						break;
 					case 'appointment_checkout':
-						// console.log('appointmemt checkout');
+						console.log('appointmemt checkout');
 						this.props.reloadCalendar();
 						break;
 
 					case 'change_item':
-						// console.log('change item');
+						console.log('change item');
 						setTimeout(() => {
 							this.props.loadWaitingAppointments();
 							this.props.reloadCalendar();
@@ -243,14 +253,16 @@ class Calendar extends React.Component {
 			if (app.type) {
 				let type = app.type;
 				if (type === 'staff_update') {
-					// console.log('staff update');
+					console.log('staff update')
+					console.log('staff update');
 					this.props.deselectAppointment();
 					this.props.disable_Calendar(false);
 					this.props.loadMembers();
 				}
 
 				if (type === 'update_blocktime') {
-					// console.log('update blocktime');
+					console.log('update block time')
+					console.log('update blocktime');
 					this.props.deselectAppointment();
 					this.props.disable_Calendar(false);
 					this.props.updateNextStaff();

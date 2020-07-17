@@ -3,7 +3,7 @@ import { fork, put, takeLatest, all, select } from 'redux-saga/effects';
 import moment from 'moment';
 import { api } from '../../utils/helper';
 import * as constants from './constants';
-import * as actions from './actions'; 
+import * as actions from './actions';
 import * as api_constants from '../../../app-constants';
 
 import {
@@ -100,6 +100,7 @@ export function* reloadCalendarSaga() {
 			const requestURL = new URL(api_constants.GET_APPOINTMENT_BY_DATE);
 			const url = `${requestURL.toString()}/${apiDateQuery}`;
 			const response = yield api(url.toString(), '', 'GET', token);
+
 			if (response.codeStatus !== 1) {
 				console.log(response.message);
 				yield put(actions.loadingCalendar(false));
@@ -107,7 +108,7 @@ export function* reloadCalendarSaga() {
 			}
 
 			appointments = response && response.data.map((appointment) => appointmentAdapter(appointment))
-				// .filter((app) => app.options.length > 0);
+			// .filter((app) => app.options.length > 0);
 
 			if (displayedMembers.length > 0) {
 				addBlockAnyStaff(merchantInfo, currentDayName, currentDate, appointments);
@@ -179,6 +180,7 @@ export function* getWaitingAppointments() {
 				yield put(actions.loadingWaiting(false));
 				return;
 			}
+
 			yield put(actions.loadingWaiting(false));
 
 			const appointments = response && response.data.map((appointment) => appointmentAdapter(appointment))
@@ -327,9 +329,19 @@ export function* moveAppointment(action) {
 				appointment.status = 'CONFIRMED';
 			}
 		}
+	} else {
+		if (assignedMember && previousMemberId === 0) {
+			const now = moment();
+			if (now.isBefore(moment(appointment.end)) && now.isAfter(appointment.start)) {
+				appointment.status = 'CHECKED_IN';
+			}
+		} else
+			if (!assignedMember) {
+				appointment.status = 'ASSIGNED';
+			}
 	}
 
-	const { memberId, start, end, status, options, products, extras,giftCards } = appointment;
+	const { memberId, start, end, status, options, products, extras, giftCards } = appointment;
 
 	options.forEach((sv) => {
 		sv.staffId = assignedMember ? assignedMember.id : 0;
@@ -338,7 +350,7 @@ export function* moveAppointment(action) {
 	const data = {
 		staffId: memberId,
 		fromTime: start,
-		toTime: options.length > 0 ? end : moment(start).add("minutes",15),
+		toTime: options.length > 0 ? end : moment(start).add("minutes", 15),
 		status: statusConvertData[status],
 		services: options,
 		products,
@@ -369,13 +381,13 @@ export function* moveAppointment(action) {
 export function* putBackAppointment(action) {
 	try {
 		const { appointment } = action;
-		let { memberId, start, end, options, products, extras ,giftCards} = appointment;
+		let { memberId, start, end, options, products, extras, giftCards } = appointment;
 
 		const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
 		const url = `${requestURL.toString()}/${appointment.id}`;
 		yield put(actions.appointmentPutBack(action.appointment));
 
-		const data = dataPutBackAppointment(memberId, start, end, options, products, extras,giftCards);
+		const data = dataPutBackAppointment(memberId, start, end, options, products, extras, giftCards);
 
 		try {
 			if (navigator.onLine) {
@@ -402,7 +414,7 @@ export function* assignAppointment(action) {
 
 	try {
 		yield put(actions.removeAppointmentWaiting(appointment));
-		const { memberId, start, status, options, products, extras,giftCards } = appointment;
+		const { memberId, start, status, options, products, extras, giftCards } = appointment;
 		options.forEach((sv) => {
 			sv.staffId = assignedMember ? assignedMember.id : 0;
 		});
@@ -465,7 +477,7 @@ export function* upddateAppointment(action) {
 			old_appointment,
 			extrasUpdate
 		} = action.appointment;
-		let { end, start, memberId,giftCards } = appointment;
+		let { end, start, memberId, giftCards } = appointment;
 		let newDate = end;
 
 		if (status === 'cancel') {
@@ -484,7 +496,7 @@ export function* upddateAppointment(action) {
 			} else return;
 		}
 
-		let data = dataUpdateAppointment(old_status, memberId, old_appointment, status, start, newDate, servicesUpdate, productsUpdate, extrasUpdate,giftCards);
+		let data = dataUpdateAppointment(old_status, memberId, old_appointment, status, start, newDate, servicesUpdate, productsUpdate, extrasUpdate, giftCards);
 
 		yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
 		yield put(actions.renderAppointment());
@@ -556,23 +568,34 @@ export function* changeTimeAppointment(action) {
 	}
 }
 
-function totalDuarion(services, extras, appointment) {
+function totalDuarion(services, extras, appointment, memberId) {
 	let total = 0;
-	const lastIndex = findLastIndexChangeTime(services, services[0]);
-	if (lastIndex !== -1) {
+	if (memberId === 0 && appointment.memberId !== 0) {
 		for (let i = 0; i < services.length; i++) {
 			total += services[i].duration;
-			const findExtra = extras.find((ex) => ex.serviceId && ex.serviceId === services[i].serviceId);
-			if (findExtra) {
-				total += findExtra.duration;
-			}
-			if (i === lastIndex) {
-				break;
-			}
 		}
-	} else {
-		total = 15;
+		for (let i = 0; i < extras.length; i++) {
+			total += extras[i].duration;
+		}
+	} 
+	else {
+		const lastIndex = findLastIndexChangeTime(services, services[0]);
+		if (lastIndex !== -1) {
+			for (let i = 0; i < services.length; i++) {
+				total += services[i].duration;
+				const findExtra = extras.find((ex) => ex.serviceId && ex.serviceId === services[i].serviceId);
+				if (findExtra) {
+					total += findExtra.duration;
+				}
+				if (i === lastIndex) {
+					break;
+				}
+			}
+		} else {
+			total = 15;
+		}
 	}
+
 	return total;
 }
 
@@ -583,36 +606,40 @@ export function* changeAppointmentSaga(action) {
 	const currentDayName = moment(currentDate).format('dddd');
 	let isUpdate = true;
 
-	const { appointmentEdit, fcEvent, start_time, end_time, options, products, extras, start, selectedStaff,giftCards } = action.payload;
-
+	const { appointmentEdit, fcEvent, start_time, end_time, memberId, options, products, extras, start, selectedStaff, giftCards } = action.payload;
 	let appointment = {
-		...appointmentEdit,
+		...JSON.parse(JSON.stringify(appointmentEdit)),
 		memberId: options.length > 0 ? options[0].staffId : 0
 	};
 
 	let statusChange = 'confirm';
-	let diff_time = moment(start_time).diff(moment(start), 'minutes');
-	if ((diff_time < 45 && diff_time >= 0) || (diff_time < 0 && diff_time > -45)) {
-		statusChange = 'checkin';
+
+	if (memberId !== 0) {
+		let diff_time = moment(start_time).diff(moment(start), 'minutes');
+		if ((diff_time < 45 && diff_time >= 0) || (diff_time < 0 && diff_time > -45)) {
+			statusChange = 'checkin';
+		}
 	}
 
-	let data = dataChangeTimeAppointment(selectedStaff, start_time, end_time, appointment, statusChange, options, products, extras,giftCards);
+	let data = dataChangeTimeAppointment(selectedStaff, start_time, end_time, appointment, statusChange, options, products, extras, giftCards, memberId);
 
 	const staff = displayedMembers.find(s => s.id === data.staffId);
 
 	/* check condition update to grey block */
+	const toTime = moment(data.fromTime).add(totalDuarion(data.services, data.extras, appointment, memberId), 'minutes');
+
 	if (staff) {
 		const timeWorking = Object.entries(staff.workingTimes).find(b => b[0] === currentDayName);
+
 		const timeEnd = `${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(
 			timeWorking[1].timeEnd,
 			['h:mm A']
 		).format('HH:mm:ss')}`;
+
 		const timeStart = `${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(
 			timeWorking[1].timeStart,
 			['h:mm A']
 		).format('HH:mm:ss')}`;
-
-		const toTime = moment(data.fromTime).add(totalDuarion(data.services, data.extras, appointment), 'minutes')
 
 		if (moment(toTime).isSameOrAfter(timeEnd) || moment(data.fromTime).isBefore(timeStart)) {
 			if (window.confirm('Accept this appointment outside of business hours?')) {
@@ -640,7 +667,7 @@ export function* changeAppointmentSaga(action) {
 				appointment: {
 					...data,
 					staffId: options.length > 0 ? options[0].staffId : 0,
-					toTime: moment(data.fromTime).add(totalDuarion(data.services, data.extras, appointment), 'minutes')
+					toTime,
 				},
 				id: appointment.id
 			})
@@ -822,6 +849,7 @@ export function* getDetailMerchantSaga(action) {
 		const requestURL = new URL(api_constants.GET_DETAIL_MERCHANT);
 		const url = `${requestURL.toString()}/${merchantId}`;
 		const response = yield api(url, '', 'GET', token);
+
 		if (parseInt(response.codeNumber) === 200) {
 			yield put(actions.setDetailMerchant(response.data));
 		}

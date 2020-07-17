@@ -158,8 +158,8 @@ export default class PopupPrice extends Component {
 								defaultValue={price}
 								placeholder="0.00"
 								style={{
-									width: width + 20,
-									paddingLeft: 5,
+									width: width + 30,
+									paddingLeft: 10,
 									color: '#1173c3',
 									fontWeight: 600,
 								}}

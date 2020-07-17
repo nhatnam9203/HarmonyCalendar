@@ -53,6 +53,21 @@ CalendarPopup.Heading = styled.div`
 
 CalendarPopup.Body = styled.div``;
 
+const BtnClose = styled.div`
+	position: absolute;
+	right: 0.5rem;
+	top: 0.3rem;
+	line-height: 1;
+	font-size: 2rem;
+	color: #ffffff;
+	cursor: pointer;
+	& > img{
+		width : 27px;
+		height : 27px;
+	}
+`;
+
+
 
 class MiniCalendar extends React.Component {
   constructor(props) {
@@ -76,12 +91,8 @@ class MiniCalendar extends React.Component {
   }
 
   onDaySelected(day) {
-    // if(navigator.onLine){
     const { onChangeDay } = this.props;
     onChangeDay(moment(new Date(day)).format('DDMMYYYY'));
-    // }else{
-    //   alert('You must have an internet connection to perform this !!!');
-    // }
   }
 
   renderPopup() {
@@ -89,7 +100,12 @@ class MiniCalendar extends React.Component {
     const { isPopupOpen } = this.state;
     return isPopupOpen ? (
       <CalendarPopup>
-        <CalendarPopup.Heading>Calendar</CalendarPopup.Heading>
+        <CalendarPopup.Heading>
+          Calendar
+          <BtnClose onClick={() => this.onOutsideClickPopup()}>
+            {<img src={require("../../images/close_white.png")} />}
+          </BtnClose>
+        </CalendarPopup.Heading>
         <CalendarPopup.Body>
           <DayPicker
             firstDayOfWeek={1}
@@ -116,7 +132,7 @@ class MiniCalendar extends React.Component {
         <MiniCalendarWrapper>
           <MiniCalendarWrapper.Button onClick={() => this.onClickButton()}>
             {/* <FaCalendarAlt /> */}
-              <img style={{ width: 25, height: 25 }} src={require('../../images/calendar.png')} />
+            <img style={{ width: 25, height: 25 }} src={require('../../images/calendar.png')} />
           </MiniCalendarWrapper.Button>
           {this.renderPopup()}
         </MiniCalendarWrapper>

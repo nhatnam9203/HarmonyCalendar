@@ -25,7 +25,7 @@ const EVENT_RENDER_TEMPLATE = (event) => `
     <div class="app-event__full-name">${event.userFullName}</div>
     <div class="app-event__phone-number">
     ${event.status !== 'BLOCK' && event.status !== 'BLOCK_TEMP'
-		? event.status === 'CHECKED_IN' || event.status === 'PAID' || event.status === 'WAITING'
+		? event.status === 'CHECKED_IN' || event.status === 'PAID' || event.status === 'WAITING' || event.status === 'VOID' ||  event.status === 'REFUND'
 			? "<img class='icon-phone' src='" + call + "' width='17' height='17'>"
 			: "<img class='icon-phone2' src='" + call + "' width='17' height='17'>"
 		: ''}
@@ -61,6 +61,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 	schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
 
 	select: (start, end, event, view, resource) => {
+
 		let check_block_temp = false;
 		let timeEnd, timeStart, isCheckWorking;
 
@@ -156,11 +157,11 @@ export const MAIN_CALENDAR_OPTIONS = {
 				]).format('HH:mm:ss')}`;
 
 				if(moment(start).isSameOrAfter(moment(start_bussiness)) && moment(start).isBefore(moment(end_bussiness))){
-					window.postMessage(JSON.stringify(data));
+					// window.postMessage(JSON.stringify(data));
 					const time = moment(start._d.toString().substr(0, 24));
-					// store.dispatch(disableCalendar(true));
-					// store.dispatch(openAddingAppointment({}));
-					// store.dispatch(TimeAndStaffID({ time: time, staffID: 0, dataAnyStaff : data }));
+					store.dispatch(disableCalendar(true));
+					store.dispatch(openAddingAppointment({}));
+					store.dispatch(TimeAndStaffID({ time: time, staffID: 0, dataAnyStaff : data }));
 				}
 			
 			}
@@ -267,13 +268,11 @@ export const MAIN_CALENDAR_OPTIONS = {
 
 		if (pos !== -1) {
 			const currentDay = store.getState().getIn(['appointment', 'currentDay']);
-
 			const currentDayName = moment(currentDay).format('dddd');
 			const checkWorkingTime = Object.entries(displayedMembers[parseInt(resourceId)].workingTimes).find(b => b[0] === currentDayName)
 			check_workingStaff = checkWorkingTime[1].isCheck;
 			time_working_start = checkWorkingTime[1].timeStart;
 			time_working_end = checkWorkingTime[1].timeEnd;
-
 		}
 
 		if (!displayedMembers[parseInt(resourceId)]) {
@@ -303,7 +302,11 @@ export const MAIN_CALENDAR_OPTIONS = {
 		}
 
 		if (check_workingStaff) {
-			check_staff_drop = true;
+			if(displayedMembers[parseInt(resourceId)] && displayedMembers[parseInt(resourceId)].id === 0){
+				check_staff_drop = false
+			}else{
+				check_staff_drop = true;
+			}
 		}
 
 		if (pos === -1 || check_staff_drop === false || check === 1 ) {
@@ -583,8 +586,8 @@ export const addEventsToCalendar = async (currentDate, appointmentsMembers) => {
 					rendering:
 						appointment.status === 'BLOCK' || appointment.status === 'BLOCK_TEMP' ? 'background' : '',
 					className: getAtrributeByStatus(appointment).eventClass,
-					startEditable: !(appointment.status === 'PAID'),
-					resourceEditable: !(appointment.status === 'PAID')
+					startEditable: !(appointment.status === 'PAID' || appointment.status === 'VOID'),
+					resourceEditable: !(appointment.status === 'PAID' || appointment.status === 'VOID')
 				});
 			});
 		}
@@ -691,6 +694,10 @@ function getAtrributeByStatus(appointment) {
 	if (appointment.status === 'BLOCK_TEMP') {
 		eventColor = 'yellow';
 		eventClass = 'event-block-temp';
+	}
+	if (appointment.status === 'VOID' || appointment.status === "REFUND") {
+		eventColor = '#FD594F';
+		eventClass = 'event-void';
 	}
 	if (!appointment.status) {
 		eventColor = 'red';

@@ -77,6 +77,7 @@ export function mapDispatchToProps(dispatch) {
     updateAppointmentPaidOffline:(idAppointment)=>dispatch(updateAppointmentPaidOffline(idAppointment)),
     deselectAppointment: () => dispatch(deselectAppointment()),
     renderAppointment: () => dispatch(renderAppointment()),
+    getApppointmentById : ()=>dispatch(getApppointmentById()),
   };
 }
 

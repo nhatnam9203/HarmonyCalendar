@@ -48,7 +48,7 @@ export default class Service extends Component {
 
         const title = staff ? staff.title : '';
 
-        if (appointment.status !== 'PAID') {
+        if (appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND') {
             return (
                 <tr key={index}>
                     <td style={{ borderRight: 0 }}>
@@ -190,7 +190,8 @@ const style = {
     },
     staffNameColumn: {
         marginLeft: 8,
-        width : 50
+        width : 50,
+        fontSize: 15,
     },
     serviceName: {
         width: 150,

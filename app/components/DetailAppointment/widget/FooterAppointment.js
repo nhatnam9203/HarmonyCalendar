@@ -44,6 +44,10 @@ export default class FooterAppointment extends Component {
         
         let total = appointment.total ? parseFloat(appointment.total.toString().replace(/,/g, '')).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') : "0.00";
 
+        let tipAmount = appointment.tipAmount ? parseFloat(appointment.tipAmount.toString().replace(/,/g, '')).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') : "0.00";
+
+        let tipPercent = appointment.tipPercent ? parseFloat(appointment.tipPercent.toString().replace(/,/g, '')).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') : "0.00";
+
         if (appointment.status === 'PAID') {
             return (
                 <React.Fragment>
@@ -65,7 +69,7 @@ export default class FooterAppointment extends Component {
                             <WrapperFooterPaid>
                                 <WrapperFooterPaid.ItemLeft>
                                     <div>Tip : </div>
-                                    <div>$ {appointment.tipAmount}</div>
+                                    <div>$ {tipAmount}</div>
                                 </WrapperFooterPaid.ItemLeft>
                                 <WrapperFooterPaid.Item>
                                     <div>Gift card : </div>
@@ -99,7 +103,7 @@ export default class FooterAppointment extends Component {
                     </div>
                     <div>
                         <span>Tip : </span>
-                        <strong>{appointment.tipPercent}</strong>
+                        <strong>{tipPercent}</strong>
                     </div>
                     <div>
                         <span>Total : </span>

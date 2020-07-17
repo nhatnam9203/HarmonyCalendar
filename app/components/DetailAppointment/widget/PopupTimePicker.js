@@ -58,6 +58,7 @@ const Button = styled.div`
 	zIndex: 1111;
 	& > span {
 		font-weight: 500;
+		font-family : 'Arial'
 	},
 `;
 

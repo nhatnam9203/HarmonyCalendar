@@ -247,6 +247,14 @@ const GlobalStyle = createGlobalStyle`
   color : #333;
   letter-spacing : 0.6;
 }
+
+.event-void{
+  font-weight : 500;
+  color : #ffffff;
+  letter-spacing : 0.6;
+}
+
+
 .event-checkin,.event-confirmed,.event-paid,.event-anystaff{
   border : 1px solid #ffffff !important;
 }

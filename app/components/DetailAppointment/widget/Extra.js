@@ -21,13 +21,13 @@ export default class Extra extends Component {
 
     getStyleExtra(appointment, extra, index) {
 		let backgroundColor = '#dddddd';
-		if (appointment.status !== 'PAID' && extra.duration > 5) backgroundColor = '#0071c5';
+		if (appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' && extra.duration > 5) backgroundColor = '#0071c5';
 		return backgroundColor;
 	}
 
 	getStyleExtra2(appointment, extra, index) {
 		let backgroundColor = '#dddddd';
-		if (appointment.status !== 'PAID') backgroundColor = '#0071c5';
+		if (appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND') backgroundColor = '#0071c5';
 		return backgroundColor;
 	}
 
@@ -43,7 +43,7 @@ export default class Extra extends Component {
                 <td style={{ textAlign: 'center' }}>
                     <ButtonExtra
                         backgroundColor={this.getStyleExtra(appointment, extra, index)}
-                        disabled={appointment.status === 'PAID' || extra.duration <= 5}
+                        disabled={appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND' || extra.duration <= 5}
                         onClick={() => this.props.subtractExtra(index)}
                     >
                         -5&#39;
@@ -51,14 +51,14 @@ export default class Extra extends Component {
                     {extra.duration}
                     <ButtonExtra
                         backgroundColor={this.getStyleExtra2(appointment, extra, index)}
-                        disabled={appointment.status === 'PAID'}
+                        disabled={appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND'}
                         onClick={() => this.props.addExtra(index)}
                     >
                         +5&#39;
 					</ButtonExtra>
                 </td>
 
-                <td  onClick={appointment.status !== 'PAID' ? (
+                <td  onClick={appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' ? (
                             () => this.props.openPopupPrice(price, index, 'extra')
                         ) : (
                                 () => { }
@@ -66,10 +66,10 @@ export default class Extra extends Component {
                         } style={{ textAlign: 'center' }}>
                     <Row>
                         <div>
-                            <div style={appointment.status !== 'PAID' ? style.priceS : {}}>{price}</div>
+                            <div style={appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' ? style.priceS : {}}>{price}</div>
                         </div>
 
-                        {appointment.status !== 'PAID' && (
+                        {appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' && (
                             <img src={require('../../../images/edit.png')} style={{ width: 16, height: 16 }} />
                         )}
                     </Row>

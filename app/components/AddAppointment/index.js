@@ -182,7 +182,7 @@ class AddAppointment extends Layout {
 			} else if (phone.charAt(0) === '1') {
 				refPhone = '(+1) ' + formatUsPhone(phone.substring(1));
 			} else if (phone.charAt(1) === '8' && phone.charAt(2) === '4') {
-				refPhone = '(+84) ' + formatUsPhone(phone.substring(2));
+				refPhone = '(+84) ' + formatUsPhone(phone.substring(3));
 			} else if (phone.charAt(0) === '8' && phone.charAt(1) === '4') {
 				refPhone = '(+84) ' + formatUsPhone(phone.substring(2));
 			} else {
