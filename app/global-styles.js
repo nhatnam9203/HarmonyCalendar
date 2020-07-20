@@ -261,7 +261,10 @@ const GlobalStyle = createGlobalStyle`
   }
 
   .fc-time-grid .fc-slats td{
-    height: 2.2rem !important;
+    height: 1.9rem !important;
+    @media(min-width : 1024px){
+      height: 2.2rem !important;
+    }
   }
 
   .timeline {

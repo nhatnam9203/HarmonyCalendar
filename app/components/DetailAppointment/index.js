@@ -3,7 +3,7 @@ import moment from 'moment';
 import { isEqual } from 'lodash'
 import { convertAppointment, initialState } from './widget/utilDetail';
 import Layout from './layout'
-import {addLastStaff} from "../../containers/AppointmentPage/utilSaga"
+import { addLastStaff } from "../../containers/AppointmentPage/utilSaga"
 
 class Appointment extends Layout {
 	constructor(props) {
@@ -248,6 +248,8 @@ class Appointment extends Layout {
 				old_service: _services,
 				old_product: appointmentDetail.products,
 				old_extra: _extras,
+				companionName: parseInt(appointmentDetail.companionName) !== 0 ? appointmentDetail.companionName : '',
+				companionPhone: parseInt(appointmentDetail.companionPhone) !== 0 ? appointmentDetail.companionPhone : '',
 				services: options,
 				userFullName: firstName + ' ' + lastName,
 				products: products,
@@ -406,6 +408,11 @@ class Appointment extends Layout {
 		this.props.updateAppointment(payload);
 	}
 
+	updateCompanion() {
+		const { appointment: { id } } = this.props;
+		const { companionPhone, companionName } = this.state;
+		this.props.updateCompanion({ companionPhone, companionName, id })
+	}
 
 	openPopupTimePicker() {
 		this.setState({
@@ -478,6 +485,14 @@ class Appointment extends Layout {
 		if (isPopupPriceState === 'service') this.onChangePrice(price, index);
 		else if (isPopupPriceState === 'extra') this.onChangePriceExtra(price, index);
 		this.closePopupPrice();
+	}
+
+	onChangeCompanionName = (e) => {
+		this.setState({ companionName: e.target.value });
+	}
+
+	onChangeCompanionPhone = (e) => {
+		this.setState({ companionPhone: e.target.value })
 	}
 
 	async addNote(e) {

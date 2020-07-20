@@ -102,6 +102,10 @@ export function returnAppointment(appointment) {
         customerId: appointment.CustomerId,
         isVip: appointment.IsVip,
         total: appointment.Total,
+        bookingGroupId : appointment.BookingGroupId,
+		companionName : appointment.CompanionName,
+		companionPhone : appointment.CompanionPhone,
+		isMainBookingGroup : appointment.IsMainBookingGroup,
         notes: appointment.Notes
             .sort(function (a, b) {
                 var c = a.AppointmentNoteId;

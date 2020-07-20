@@ -100,6 +100,7 @@ export function* reloadCalendarSaga() {
 			const requestURL = new URL(api_constants.GET_APPOINTMENT_BY_DATE);
 			const url = `${requestURL.toString()}/${apiDateQuery}`;
 			const response = yield api(url.toString(), '', 'GET', token);
+			console.log({ response })
 
 			if (response.codeStatus !== 1) {
 				console.log(response.message);
@@ -1068,6 +1069,26 @@ export function* updateNote_Saga(action) {
 	} catch (err) { }
 }
 
+export function* updateCompanion_Saga(action) {
+	try {
+		const { companionName, companionPhone,id } = action.payload;
+		const requestURL = new URL(`${api_constants.PUT_UPDATE_COMPANION}/${id}`);
+		const data = {
+			companionName, 
+			companionPhone
+		};
+
+		const response = yield api(requestURL.toString(), data, 'PUT', token);
+
+		if (response.codeStatus === 1) {
+			// yield put({ type: 'GET_TIME_STAFF_LOGIN_SUCCESS', data: { timeLogin: response.data, staffId } });
+		}
+		if (response.codeStatus !== 1) {
+			return yield* checkResponse(response);
+		}
+	} catch (err) { }
+}
+
 
 /* **************************** Subroutines ******************************** */
 
@@ -1185,6 +1206,10 @@ export function* watch_updateNote() {
 	yield takeLatest(constants.UPDATE_NOTE, updateNote_Saga);
 }
 
+export function* watch_updateCompanion() {
+	yield takeLatest(constants.UPDATE_COMPANION, updateCompanion_Saga);
+}
+
 export function* watch_sendLinkCustomer() {
 	yield takeLatest(constants.SENDLINK_CUSTOMER, sendLinkCustomerSaga);
 }
@@ -1225,6 +1250,7 @@ export default function* root() {
 		fork(addAppointmentSaga),
 		fork(watch_changeAppointment),
 		fork(watch_sendLinkCustomer),
-		fork(watch_getDetailMerchan)
+		fork(watch_getDetailMerchan),
+		fork(watch_updateCompanion)
 	]);
 }

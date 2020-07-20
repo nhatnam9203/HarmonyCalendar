@@ -43,6 +43,10 @@ export const convertAppointment = (appointment) => {
 		subTotal: appointment.subTotal,
 		customerId : appointment.customerId,
 		total: appointment.total,
+		bookingGroupId : appointment.bookingGroupId,
+		companionName : appointment.companionName,
+		companionPhone : appointment.companionPhone,
+		isMainBookingGroup : appointment.isMainBookingGroup,
 		tax: appointment.tax,
 		discount: appointment.discount,
 		giftCard: appointment.giftCard,
@@ -97,5 +101,7 @@ export const initialState = {
 	isPoupPrice : false,
 	indexPrice : '',
 	valuePriceIndex : '',
-	isPopupPriceState : 'service'
+	isPopupPriceState : 'service',
+	companionName : '',
+	companionPhone : '',
 };

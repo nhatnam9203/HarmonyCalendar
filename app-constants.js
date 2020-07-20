@@ -11,11 +11,11 @@ const API_PORT = 8010;
 // const DEV_API_BASE_URL = `https://api.harmonypayment.com`;
 // const PROD_API_BASE_URL = `https://api.harmonypayment.com`;
 
-// const DEV_API_BASE_URL = `https://dev.harmonypayment.com`;
-// const PROD_API_BASE_URL = `https://dev.harmonypayment.com`;
+const DEV_API_BASE_URL = `https://dev.harmonypayment.com`;
+const PROD_API_BASE_URL = `https://dev.harmonypayment.com`;
 
- const DEV_API_BASE_URL = `https://staging.harmonypayment.com`;
- const PROD_API_BASE_URL = `https://staging.harmonypayment.com`;
+//  const DEV_API_BASE_URL = `https://staging.harmonypayment.com`;
+//  const PROD_API_BASE_URL = `https://staging.harmonypayment.com`;
 
 const isDesktopOrLaptop = window.innerWidth > 1000 ? true : false;
 
@@ -46,6 +46,7 @@ const API_GET_TIME_STAFF_LOGIN = `${API_BASE_URL}/staff/loginTime`;
 const PUT_UPDATE_NOTE = `${API_BASE_URL}/appointment/note`;
 const GET_SENDLINK_CUSTOMER = `${API_BASE_URL}/user/sendlink?phone=`;
 const GET_DETAIL_MERCHANT = `${API_BASE_URL}/merchant`
+const PUT_UPDATE_COMPANION = `${API_BASE_URL}/appointment/updateCompanion`
 
 const VAR_DEFAULT_AVATAR_PATH = `/upload/staff/avatar.svg`;
 
@@ -80,8 +81,9 @@ export {
   PUT_UPDATE_NOTE,
   GET_SENDLINK_CUSTOMER,
   GET_DETAIL_MERCHANT,
+  PUT_UPDATE_COMPANION,
   VAR_DEFAULT_AVATAR_PATH,
-  isDesktopOrLaptop
+  isDesktopOrLaptop,
 }
 
 

@@ -348,6 +348,24 @@ const LogoVip = styled.div`
 	}
 `;
 
+const LogoVip2 = styled.div`
+	border-radius: 100px;
+	padding: 6px 15px;
+	background-color: #22da27;
+	align-items: center !important;
+	justify-content: center !important;
+	display: flex !important;
+	& > span {
+		color: white;
+		margin-left: 5px;
+		font-size : 13px
+	}
+	& > img {
+		width: 13px;
+		height: 13px;
+	}
+`;
+
 const ButtonDayChange = styled.div`
 	background-color: #eeeeee;
 	border-radius: 5px;
@@ -379,6 +397,53 @@ const ImgButton = styled.img`
 `;
 
 CalendarPopup.Body = styled.div``;
+
+const CompanionWrapper = styled.div`
+	display: flex;
+	flex-direction : row;
+	width : 100%;
+	justify-content : space-between;
+	align-items : center;
+	& > div:nth-child(2){
+		justify-content : flex-end !important;
+	}
+`;
+
+const CompanionWrapperName = styled.div`
+	display: flex;
+	flex-direction : row;
+	width : 100%;
+	justify-content : space-between;
+	align-items : center;
+`;
+
+CompanionWrapper.Column = styled.div`
+	display: flex;
+	flex-direction : row;
+	width : 50%;
+	justify-content : space-between;
+	align-items : center;
+	& > input {
+		width : 15rem;
+		height : 2.3rem;
+		border : 1px solid #dddddd;
+		border-radius : 3px;
+		background-color : #FAFAFA;
+		padding : 5px;
+	}
+	& > img {
+		width : 35px;
+		height : 35px;
+		margin-left : 1rem;
+	}
+`;
+
+CompanionWrapper.ColumnName = styled.div`
+	display: flex;
+	flex-direction : row;
+	width : 50%;
+	align-items : center;
+`;
 
 class Appointment extends React.Component {
 
@@ -710,13 +775,45 @@ class Appointment extends React.Component {
 		}
 	}
 
-	/********************************* RENDER BODY APPOINTMENT *********************************/
-	renderBody() {
+	renderCustomerName() {
 		const { appointment, currentDay } = this.props;
-		const { isVip } = appointment;
-		const { isPopupTimePicker } = this.state;
-		return (
-			<AppointmentWrapper.Body scroll={isPopupTimePicker ? false : true}>
+		const { bookingGroupId, isMainBookingGroup, isVip, companionName, companionPhone } = appointment;
+
+		if (parseInt(bookingGroupId) > 0 && parseInt(isMainBookingGroup) === 0) {
+			return (
+				<React.Fragment>
+					<CompanionWrapperName>
+						<CompanionWrapper.ColumnName>
+							<span>Main customer: </span>
+							<span style={{ marginLeft: 35 }}>{`${appointment.firstName} ${appointment.lastName}`}</span>
+						</CompanionWrapper.ColumnName>
+
+						<CompanionWrapper.ColumnName>
+							<span style={{ marginLeft: 92 }}>{formatPhone(appointment.phoneNumber)}</span>
+							{isVip === 1 && (
+								<LogoVip2 style={{ marginLeft: 15 }}>
+									<img src={require('../../images/vip.png')} />
+									<span>VIP</span>
+								</LogoVip2>
+							)}
+						</CompanionWrapper.ColumnName>
+					</CompanionWrapperName>
+
+					<CompanionWrapper style={{ marginTop: 15 }}>
+						<CompanionWrapper.Column>
+							<span>Companion: </span>
+							<input onChange={(e) => this.onChangeCompanionName(e)} value={this.state.companionName} placeholder="Full name" />
+						</CompanionWrapper.Column>
+
+						<CompanionWrapper.Column>
+							<input onChange={(e) => this.onChangeCompanionPhone(e)} value={this.state.companionPhone} placeholder="Phone number" />
+							<img onClick={() => this.updateCompanion()} src={require('../../images/buttonSave.png')} />
+						</CompanionWrapper.Column>
+					</CompanionWrapper>
+				</React.Fragment>
+			)
+		} else {
+			return (
 				<UserInformation>
 					<div>
 						<span>Customer Name: </span>
@@ -733,6 +830,17 @@ class Appointment extends React.Component {
 						)}
 					</div>
 				</UserInformation>
+			)
+		}
+	}
+
+	/********************************* RENDER BODY APPOINTMENT *********************************/
+	renderBody() {
+		const { appointment, currentDay } = this.props;
+		const { isPopupTimePicker } = this.state;
+		return (
+			<AppointmentWrapper.Body scroll={isPopupTimePicker ? false : true}>
+				{this.renderCustomerName()}
 
 				{appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' && this.renderChangeAppointTime()}
 				{this.renderServices()}

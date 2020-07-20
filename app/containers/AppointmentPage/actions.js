@@ -116,7 +116,8 @@ import {
 	CHANGE_APPOINTMENT,
 	SENDLINK_CUSTOMER,
 	GET_DETAIL_MERCHANT,
-	SET_DETAIL_MERCHANT
+	SET_DETAIL_MERCHANT,
+	UPDATE_COMPANION
 } from './constants';
 
 /**
@@ -851,6 +852,13 @@ export function getDetailMerchant(payload) {
 export function setDetailMerchant(payload) {
 	return {
 		type: SET_DETAIL_MERCHANT,
+		payload
+	};
+}
+
+export function updateCompanion(payload) {
+	return {
+		type: UPDATE_COMPANION,
 		payload
 	};
 }
