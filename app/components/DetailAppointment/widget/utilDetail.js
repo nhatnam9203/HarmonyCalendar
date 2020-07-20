@@ -104,4 +104,6 @@ export const initialState = {
 	isPopupPriceState : 'service',
 	companionName : '',
 	companionPhone : '',
+	companionPhoneHeader : "+1",
+	isLoadingCompanion : false 
 };

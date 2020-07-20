@@ -100,7 +100,6 @@ export function* reloadCalendarSaga() {
 			const requestURL = new URL(api_constants.GET_APPOINTMENT_BY_DATE);
 			const url = `${requestURL.toString()}/${apiDateQuery}`;
 			const response = yield api(url.toString(), '', 'GET', token);
-			console.log({ response })
 
 			if (response.codeStatus !== 1) {
 				console.log(response.message);
@@ -1069,20 +1068,23 @@ export function* updateNote_Saga(action) {
 	} catch (err) { }
 }
 
+/********************************* UPDATE COMPANION *********************************/
 export function* updateCompanion_Saga(action) {
 	try {
-		const { companionName, companionPhone,id } = action.payload;
+		const { data, resolve, reject } = action.payload;
+		const { companionName, companionPhone, id } = data;
 		const requestURL = new URL(`${api_constants.PUT_UPDATE_COMPANION}/${id}`);
-		const data = {
-			companionName, 
+		const body = {
+			companionName,
 			companionPhone
 		};
 
-		const response = yield api(requestURL.toString(), data, 'PUT', token);
-
+		const response = yield api(requestURL.toString(), body, 'PUT', token);
 		if (response.codeStatus === 1) {
-			// yield put({ type: 'GET_TIME_STAFF_LOGIN_SUCCESS', data: { timeLogin: response.data, staffId } });
+		}else{
+			alert(response.message)
 		}
+		resolve({ success: true })
 		if (response.codeStatus !== 1) {
 			return yield* checkResponse(response);
 		}

@@ -4,6 +4,7 @@ import { isEqual } from 'lodash'
 import { convertAppointment, initialState } from './widget/utilDetail';
 import Layout from './layout'
 import { addLastStaff } from "../../containers/AppointmentPage/utilSaga"
+import { checkStringNumber2 , PromiseAction } from "../../utils/helper"
 
 class Appointment extends Layout {
 	constructor(props) {
@@ -249,7 +250,6 @@ class Appointment extends Layout {
 				old_product: appointmentDetail.products,
 				old_extra: _extras,
 				companionName: parseInt(appointmentDetail.companionName) !== 0 ? appointmentDetail.companionName : '',
-				companionPhone: parseInt(appointmentDetail.companionPhone) !== 0 ? appointmentDetail.companionPhone : '',
 				services: options,
 				userFullName: firstName + ' ' + lastName,
 				products: products,
@@ -263,6 +263,7 @@ class Appointment extends Layout {
 				old_selectedStaff: selectedStaff,
 				cloneAppointment: JSON.parse(JSON.stringify(appointmentDetail))
 			});
+			this.checkPhoneCompanion(appointmentDetail.companionPhone)
 
 			let old_duration = 0;
 			await appointmentDetail.options.forEach((el) => {
@@ -320,9 +321,7 @@ class Appointment extends Layout {
 	}
 
 	ChangeAppointmentTime() {
-		// const { services } = this.state;
 		const { appointment } = this.props;
-		// const servicesUpdate = services.map((service) => `${service.id}@${service.duration}@${appointment.memberId}`);
 
 		if (appointment.status === 'ASSIGNED') {
 			this.updateChangeAppointment('unconfirm');
@@ -408,10 +407,15 @@ class Appointment extends Layout {
 		this.props.updateAppointment(payload);
 	}
 
-	updateCompanion() {
+	async updateCompanion() {
 		const { appointment: { id } } = this.props;
-		const { companionPhone, companionName } = this.state;
-		this.props.updateCompanion({ companionPhone, companionName, id })
+		let { companionPhone, companionName, companionPhoneHeader,isLoadingCompanion } = this.state;
+		companionPhone = companionPhoneHeader + checkStringNumber2(companionPhone);
+
+		const action = this.props.updateCompanion;
+		const data = { companionPhone, companionName, id }
+		const _promise = await PromiseAction(action,data);
+
 	}
 
 	openPopupTimePicker() {
@@ -436,6 +440,24 @@ class Appointment extends Layout {
 
 	cancelTimePicker() {
 		this.closePopupTimePicker();
+	}
+
+	checkPhoneCompanion = (phone) => {
+		if (phone && phone.toString().includes('+84')) {
+			this.setState({
+				companionPhoneHeader: "+84",
+				companionPhone: phone.toString().substring(3)
+			})
+		} else if (phone && phone.toString().includes('+1')) {
+			this.setState({
+				companionPhoneHeader: "+1",
+				companionPhone: phone.toString().substring(2)
+			})
+		} else {
+			this.setState({
+				companionPhone: ""
+			})
+		}
 	}
 
 	onChangePrice = async (value, index) => {
@@ -492,7 +514,9 @@ class Appointment extends Layout {
 	}
 
 	onChangeCompanionPhone = (e) => {
-		this.setState({ companionPhone: e.target.value })
+		const val = e.target.value;
+		if (e.target.validity.valid) this.setState({ companionPhone: e.target.value.replace(/^0+/, '') });
+		else if (val === '' || val === '-') this.setState({ companionPhone: val });
 	}
 
 	async addNote(e) {

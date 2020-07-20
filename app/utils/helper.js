@@ -93,3 +93,9 @@ export function api(path, params, method, token) {
 		.then((json) => json)
 		.catch((error) => error);
 }
+
+export const PromiseAction = async (action, data) => {
+	return await new Promise((resolve, rejects) => {
+		action({ data, resolve, rejects });
+	});
+};

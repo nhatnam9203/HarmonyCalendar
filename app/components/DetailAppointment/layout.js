@@ -7,7 +7,7 @@ import DayPicker from 'react-day-picker';
 import OutsideClickHandler from 'react-outside-click-handler';
 import { formatPhone } from '../../utils/helper';
 import { PopupTimePicker } from './widget';
-
+import NumberFormat from 'react-number-format';
 import { FooterAppointment, PopupPrice, Product, Extra, Service } from './widget'
 
 const AppPopup = styled(Popup)`
@@ -18,6 +18,18 @@ const AppPopup = styled(Popup)`
 `;
 
 const AppPopupWrapper = styled.div`position: relative;`;
+
+const LoadingCompanion = styled.div`
+	position : absolute;
+	top : 0;
+	left : 0;
+	right : 0;
+	bottom : 0;
+	background : rgba(255,255,255,0.4);
+	display : flex;
+	justify-content : center;
+	align-items : center;
+`;
 
 AppPopupWrapper.Header = styled.div`
 	height: 3rem;
@@ -436,6 +448,25 @@ CompanionWrapper.Column = styled.div`
 		height : 35px;
 		margin-left : 1rem;
 	}
+	& > select {
+		border : 1px solid #dddddd;
+		border-radius : 3px;
+		background-color : #FAFAFA;
+		height : 2.3rem;
+		width : 2.8rem;
+		display : flex;
+		justify-content : center;
+		align-items : center;
+		padding-left : 0.8rem;
+		-moz-appearance: none;
+  		-webkit-appearance: none;
+		border-top-right-radius : 0;
+		border-bottom-right-radius : 0;
+		border-right-width: 0;
+	}
+	& > select::-ms-expand {
+    	display: none !important;
+	}
 `;
 
 CompanionWrapper.ColumnName = styled.div`
@@ -776,8 +807,8 @@ class Appointment extends React.Component {
 	}
 
 	renderCustomerName() {
-		const { appointment, currentDay } = this.props;
-		const { bookingGroupId, isMainBookingGroup, isVip, companionName, companionPhone } = appointment;
+		const { appointment } = this.props;
+		const { bookingGroupId, isMainBookingGroup, isVip } = appointment;
 
 		if (parseInt(bookingGroupId) > 0 && parseInt(isMainBookingGroup) === 0) {
 			return (
@@ -789,7 +820,7 @@ class Appointment extends React.Component {
 						</CompanionWrapper.ColumnName>
 
 						<CompanionWrapper.ColumnName>
-							<span style={{ marginLeft: 92 }}>{formatPhone(appointment.phoneNumber)}</span>
+							<span style={{ marginLeft: 39 }}>{formatPhone(appointment.phoneNumber)}</span>
 							{isVip === 1 && (
 								<LogoVip2 style={{ marginLeft: 15 }}>
 									<img src={require('../../images/vip.png')} />
@@ -806,7 +837,28 @@ class Appointment extends React.Component {
 						</CompanionWrapper.Column>
 
 						<CompanionWrapper.Column>
-							<input onChange={(e) => this.onChangeCompanionPhone(e)} value={this.state.companionPhone} placeholder="Phone number" />
+							<select
+								value={this.state.companionPhoneHeader}
+								onChange={(e) => this.setState({ companionPhoneHeader: e.target.value })}
+							>
+								<option value="+1">+1</option>
+								<option value="+84">+84</option>
+								<option />
+							</select>
+							<NumberFormat
+								format="###-###-####"
+								mask="_"
+								style={{
+									borderTopLeftRadius: 0,
+									borderBottomLeftRadius: 0,
+									borderLeftWidth: 0,
+									width: 250
+								}}
+								value={this.state.companionPhone}
+								onChange={(e) => this.onChangeCompanionPhone(e)}
+								placeholder="Phone number"
+								type="tel"
+							/>
 							<img onClick={() => this.updateCompanion()} src={require('../../images/buttonSave.png')} />
 						</CompanionWrapper.Column>
 					</CompanionWrapper>
