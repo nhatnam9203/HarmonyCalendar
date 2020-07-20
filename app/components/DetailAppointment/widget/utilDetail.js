@@ -4,7 +4,9 @@ export const statusConvertData = {
 	CHECKED_IN: 'checkin',
 	PAID: 'paid',
 	WAITING: 'waiting',
-	CANCEL: 'cancel'
+	CANCEL: 'cancel',
+	REFUND : 'refund',
+	VOID : 'void'
 };
 
 export const convertAppointment = (appointment) => {

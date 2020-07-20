@@ -33,7 +33,8 @@ import {
   reloadStaff,
   reloadCalendar,
   deselectAppointment,
-  renderAppointment
+  renderAppointment,
+  getDetailMerchant
 } from './actions';
 import {
   makeSelectWaitingAppointments,
@@ -69,7 +70,7 @@ export function mapDispatchToProps(dispatch) {
     reloadStaff: ()=>dispatch(reloadStaff()),
     reloadCalendar: ()=>dispatch(reloadCalendar()),
     loadAppointmentByMembers :()=>dispatch(loadAppointmentByMembers()),
-    updateNextStaff:()=>dispatch(updateNextStaff()),
+    updateNextStaff:(data)=>dispatch(updateNextStaff(data)),
     updateConsumer:(data)=>dispatch(updateConsumer(data)),
     groupIdAppointment:(idAppointment)=>dispatch(groupAppointment(idAppointment)),
     membersLoaded:(members)=>dispatch(membersLoaded(members)),
@@ -78,6 +79,7 @@ export function mapDispatchToProps(dispatch) {
     deselectAppointment: () => dispatch(deselectAppointment()),
     renderAppointment: () => dispatch(renderAppointment()),
     getApppointmentById : ()=>dispatch(getApppointmentById()),
+    getDetailMerchant : ()=>dispatch(getDetailMerchant())
   };
 }
 

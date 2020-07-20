@@ -674,7 +674,7 @@ export const updateAppointmentPaid = (appointment) => ({
 	type: UPDATE_APPOINTMENT_PAID,
 	appointment
 });
-
+  
 export const deleteAppointmentCalendar = (appointment) => ({
 	type: DELETE_APPOINTMENT_CALENDAR,
 	appointment
@@ -694,8 +694,9 @@ export const togglePopupPincode = (data, pincode) => ({
 	pincode
 });
 
-export const updateNextStaff = () => ({
-	type: UPDATE_NEXT_STAFF
+export const updateNextStaff = (payload) => ({
+	type: UPDATE_NEXT_STAFF,
+	payload
 });
 export const renderAppointment = () => ({
 	type: RENDER_APPOINTMEMT

@@ -8,7 +8,7 @@ import ButtonSplash from "./ButtonPlash"
 const DateSliderWrapper = styled.div`
     width: calc(100% - 5.05rem);
     position: relative;
-    height : 4rem !important;
+    height : 5rem !important;
 `;
 
 const CarouselItem = styled.div`
@@ -19,13 +19,18 @@ const CarouselItem = styled.div`
 const NormalDay = styled.div`
     flex: 1;
     border-right: 1px solid #3883bb;
-    text-align: center;
     padding: 0.5rem;
+    display : flex;
+    flex-direction : column;
+    align-items : center;
+    justify-content : center;
     overflow: hidden;
-    height : 4rem ;
+    height : 5rem ;
     padding-top : 0.6rem;
-    font-size : 0.9rem;
+    font-size : 1.02rem;
     line-height : 1.5;
+    letter-spacing : 0.3;
+    font-weight : 500;
     &:last-child {
       border-right: none;
     }
@@ -38,8 +43,9 @@ const NormalDay = styled.div`
 `;
 
 const ActiveDay = styled(NormalDay)`
-    background: #0071c5;
+    background: #1366AE;
     color: #ffffff;
+    font-weight : 600;
 `;
 
 const TodayDay = styled(NormalDay)`

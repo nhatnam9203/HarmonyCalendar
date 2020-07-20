@@ -404,29 +404,6 @@ class Appointment extends Layout {
 			old_appointment: cloneAppointment
 		}
 		this.props.updateAppointment(payload);
-
-		// console.log({ appointment });
-		// if(appointment.memberId !== 0){
-		// 	const payload = {
-		// 		appointment,
-		// 		servicesUpdate: services,
-		// 		productsUpdate: products,
-		// 		extrasUpdate: extras,
-		// 		status,
-		// 		notes: newNotes,
-		// 		old_duration: this.state.old_total_duration,
-		// 		old_status: appointment.status,
-		// 		old_appointment: cloneAppointment
-		// 	}
-		// 	this.props.updateAppointment(payload);
-		// }else{
-		// 	const allAppointment = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
-		// 	allAppointment.forEach(app => {
-		// 		if(app.memberId === 0 && appointment.start === app.start){
-		// 			console.log({app})
-		// 		}
-		// 	});
-		// }
 	}
 
 

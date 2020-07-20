@@ -170,7 +170,7 @@ NoteWrapper.Form = styled.form`
 		width: 5rem;
 		border-top-right-radius: 4px;
 		border-bottom-right-radius: 4px;
-		background: #0071c5;
+		background: #1366AE;
 		color: #ffffff;
 		line-height: 2.8;
 		cursor: pointer;
@@ -249,10 +249,7 @@ SelectDateWrapper.SelectDate = styled.div`
 `;
 SelectDateWrapper.SelectStaff = styled(SelectDateWrapper.SelectDate)`
 	padding-left : 50%;
-	`;
-// ************************************************* //
-// ************************************************* //
-// ************************************************* //
+`;
 
 const ConfirmationPopup = styled(AppPopup)`
 	width: 30rem !important;
@@ -273,6 +270,9 @@ ConfirmationWrapper.Body = styled(AppPopupWrapper.Body)`
 	border-bottom-left-radius: 1.5rem;
 	border-bottom-right-radius: 1.5rem;
 	font-size : 1rem;
+	@media (max-width: 1024px) {
+    	font-size : 1.1rem;
+  	}
 	`;
 
 ConfirmationWrapper.Close = styled(AppPopupWrapper.Close)`
@@ -495,7 +495,7 @@ class Appointment extends React.Component {
 								Select Day
 							<BtnCloseSelectDay onClick={() => this.setState({ isPopupDay: !isPopupDay })}>
 									{<img src={require("../../images/close_white.png")} />}
-							</BtnCloseSelectDay>
+								</BtnCloseSelectDay>
 							</CalendarPopup.Heading>
 							<CalendarPopup.Body>
 								<DayPicker
@@ -675,14 +675,14 @@ class Appointment extends React.Component {
 
 			case 'CHECKED_IN':
 				return (
-					<AppointmentWrapper.Header color={'white'} backgroundColor={'#00b4f7'}>
+					<AppointmentWrapper.Header color={'white'} backgroundColor={'#28AAE9'}>
 						{appointment.code} Check-In Appointment
 					</AppointmentWrapper.Header>
 				);
 
 			case 'PAID':
 				return (
-					<AppointmentWrapper.Header color={'white'} backgroundColor={'#00dc00'}>
+					<AppointmentWrapper.Header color={'white'} backgroundColor={'#50CF25'}>
 						{appointment.code} Paid Appointment
 					</AppointmentWrapper.Header>
 				);
@@ -784,7 +784,10 @@ class Appointment extends React.Component {
 				</AppointmentPopup>
 
 				{/********************************** POPUP CONFIRM CANCEL APPOINTMENT *********************************/}
-				<ConfirmationPopup open={this.state.confirmationModal}>
+				<ConfirmationPopup
+					onClose={() => this.closeConfirmationModal()}
+					open={this.state.confirmationModal}
+				>
 					<ConfirmationWrapper>
 
 						<BtnClose onClick={() => this.closeConfirmationModal()}>

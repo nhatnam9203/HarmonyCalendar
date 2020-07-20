@@ -635,11 +635,11 @@ export const updateEventToCalendar = (fcEvent) => {
 		eventClass = 'event-confirmed';
 	}
 	if (status === 'CHECKED_IN') {
-		eventColor = '#00b4f7';
+		eventColor = '#28AAE9';
 		eventClass = 'event-checkin';
 	}
 	if (status === 'PAID') {
-		eventColor = '#00dc00';
+		eventColor = '#50CF25';
 		eventClass = 'event-paid';
 		startEditable = false;
 		resourceEditable = false;
@@ -680,11 +680,11 @@ function getAtrributeByStatus(appointment) {
 		eventClass = 'event-confirmed';
 	}
 	if (appointment.status === 'CHECKED_IN') {
-		eventColor = '#00b4f7';
+		eventColor = '#28AAE9';
 		eventClass = 'event-checkin';
 	}
 	if (appointment.status === 'PAID') {
-		eventColor = '#00dc00';
+		eventColor = '#50CF25';
 		eventClass = 'event-paid';
 	}
 	if (appointment.status === 'BLOCK') {

@@ -198,7 +198,7 @@ const Form = styled.form`
 
 const Button = styled.button`
 	border-radius: 4px;
-	background: ${(props) => (props.primary ? '#0071c5' : '#eeeeee')};
+	background: ${(props) => (props.primary ? '#1366AE' : '#eeeeee')};
 	color: ${(props) => (props.primary ? '#ffffff' : '#333333')};
 	border: 1px solid #dddddd;
 	font-size: 1rem;
@@ -299,7 +299,7 @@ class AddAppointment extends React.Component {
                     <BtnClose onClick={() => this.closeAllModal()}>
                         <img src={require("../../images/close_white.png")} />
                     </BtnClose>
-                    <SearchingWrapper.Header backgroundColor="#0071C5">Add Appointment</SearchingWrapper.Header>
+                    <SearchingWrapper.Header backgroundColor="#1366AE">Add Appointment</SearchingWrapper.Header>
                     <SearchingWrapper.Body>Enter Phone Number</SearchingWrapper.Body>
 
                     <FooterChekPhone>
@@ -372,7 +372,7 @@ class AddAppointment extends React.Component {
                         <img src={require("../../images/close_white.png")} />
                     </BtnClose>
 
-                    <AddingWrapper.Header backgroundColor="#1173C3">Add Appointment</AddingWrapper.Header>
+                    <AddingWrapper.Header backgroundColor="#1366AE">Add Appointment</AddingWrapper.Header>
 
                     <AddingWrapper.Body>
                         <Form onSubmit={(e) => e.preventDefault()}>

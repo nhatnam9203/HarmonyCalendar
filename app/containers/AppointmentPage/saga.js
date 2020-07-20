@@ -110,7 +110,7 @@ export function* reloadCalendarSaga() {
 			appointments = response && response.data.map((appointment) => appointmentAdapter(appointment))
 			// .filter((app) => app.options.length > 0);
 
-			if (displayedMembers.length > 0) {
+			if (displayedMembers.length > 0 && merchantInfo) {
 				addBlockAnyStaff(merchantInfo, currentDayName, currentDate, appointments);
 			}
 
@@ -139,7 +139,7 @@ export function* reloadCalendarSaga() {
 			)
 		}));
 
-		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery, merchantInfo);
+		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery);
 		yield put(actions.loadedAllAppointments(appointments));
 		yield put(actions.appointmentByMembersLoaded(appointmentsMembers));
 		yield put(actions.getBlockTime());
@@ -577,7 +577,7 @@ function totalDuarion(services, extras, appointment, memberId) {
 		for (let i = 0; i < extras.length; i++) {
 			total += extras[i].duration;
 		}
-	} 
+	}
 	else {
 		const lastIndex = findLastIndexChangeTime(services, services[0]);
 		if (lastIndex !== -1) {
@@ -1012,8 +1012,9 @@ export function* getTimeStaffLoginSaga(action) {
 
 /********************************* RELOAD STAFF & GET BLOCK TIME *********************************/
 function* updateNextStaff_Saga() {
-	yield takeLatest(constants.UPDATE_NEXT_STAFF, function* () {
+	yield takeLatest(constants.UPDATE_NEXT_STAFF, function* (action) {
 		try {
+			const { isReloadCalendar } = action.payload;
 			const requestURL = new URL(`${api_constants.GET_MEMBER}`);
 			const currentDate = yield select(makeCurrentDay());
 			const url = `${requestURL.toString()}${currentDate.format('YYYY-MM-DD')}`;
@@ -1029,13 +1030,21 @@ function* updateNextStaff_Saga() {
 				const slideIndex = yield select(makeSlideIndex());
 				yield put(actions.membersLoaded(members));
 				yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
-				yield put(actions.getBlockTime());
+				if (!isReloadCalendar)
+					yield put(actions.getBlockTime());
+				else yield put(actions.reloadCalendar());
+
 			}
 		} catch (err) {
 			// yield put(memberLoadingError(err));
 		}
+
+
+		/* &&&&*76678678678678 */
+
 	});
 }
+
 
 
 

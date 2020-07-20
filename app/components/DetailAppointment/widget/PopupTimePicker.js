@@ -26,9 +26,10 @@ const Header = styled.div`
 	background-color: #eaeaea;
 	border-top-left-radius: 5px;
 	border-top-right-radius: 5px;
-	font-weight: 900;
-	font-size: 1rem;
+	font-weight: 500;
+	font-size: 1.17rem;
 	color : #585858;
+	font-family : 'arial'
 `;
 
 const Body = styled.div`height: 12rem;`;

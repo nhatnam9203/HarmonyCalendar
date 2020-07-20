@@ -41,12 +41,14 @@ export default class Service extends Component {
         const staff = staffList.find((s) => parseInt(s.id) === parseInt(service.staffId));
 
         let price = prices[index] ? parseFloat(prices[index].replace(/,/g, '')).toFixed(2) : "0.00";
-		price = price.toString().replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        price = price.toString().replace(/\d(?=(\d{3})+\.)/g, '$&,');
 
         const duration =
             service.duration.toString().length === 1 ? '0' + service.duration.toString() : service.duration;
 
-        const title = staff ? staff.title : '';
+        const title = staff ? staff.title.toString().length > 13 ?
+            staff.title.toString().slice(0, 10) + "..." :
+            staff.title : '';
 
         if (appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND') {
             return (
@@ -81,9 +83,7 @@ export default class Service extends Component {
                             >
                                 -5&#39;
 							</ButtonService>
-
-                            {duration}
-
+                                    {duration}
                             <ButtonService
                                 backgroundColor={this.getStyleService2(appointment, service, index)}
                                 disabled={appointment.status === 'PAID'}
@@ -112,7 +112,7 @@ export default class Service extends Component {
                 return (
                     <tr key={index}>
                         <td style={{ borderRight: 0 }}>
-                            <div style={{ display: 'flex', flexDirection: 'row' , alignItems: 'center' }}>
+                            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                 <img
                                     src={service.staff.imageUrl}
                                     style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 25 }}
@@ -123,7 +123,6 @@ export default class Service extends Component {
                         <td style={{ borderLeft: 0 }}>
                             <div style={style.serviceName}>{service.serviceName}</div>
                         </td>
-
                         <td style={{ textAlign: 'center' }}>{service.staff.tip}</td>
                         <td>
                             <div style={{ textAlign: 'center' }}>{price}</div>
@@ -190,7 +189,7 @@ const style = {
     },
     staffNameColumn: {
         marginLeft: 8,
-        width : 50,
+        width: 50,
         fontSize: 15,
     },
     serviceName: {

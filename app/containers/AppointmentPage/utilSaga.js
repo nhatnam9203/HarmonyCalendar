@@ -152,7 +152,7 @@ export function blockTemp(memberId, start, end, note, appointmentId) {
 	};
 }
 
-export function addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery, merchantInfo) {
+export function addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery) {
 	const currentDayName = moment(currentDate).format('dddd');
 
 	/* ADD BLOCK TEMP ( YELLOW BLOCK ) */

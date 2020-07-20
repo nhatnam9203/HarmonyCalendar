@@ -41,6 +41,9 @@ ConfirmPopupWrapper.Body = styled.div`
 	color: #333;
 	text-align: center;
 	padding-top: 1rem;
+	@media (min-width: 1024px) {
+    	font-size: 1.1rem;
+  	}
 `;
 
 ConfirmPopupWrapper.Footer = styled.div`
@@ -60,6 +63,7 @@ ConfirmPopupWrapper.Button = styled.button`
 	padding: 0.8rem 3.5rem;
 	border-radius: 3px;
 	font-size: 1rem;
+	font-weight : 500;
 	cursor: pointer;
 `;
 

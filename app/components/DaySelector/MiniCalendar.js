@@ -10,7 +10,10 @@ import OutsideClickHandler from 'react-outside-click-handler';
 const MiniCalendarWrapper = styled.div`
   width: calc(5.05rem - 1px);
   height: 100%;
-  text-align: center;
+  display : flex;
+  text-align : center;
+  justify-content : center;
+  align-items: center;
   border-right: 1px solid #3883bb;
   position: relative;
   padding: 0.5rem;
@@ -18,13 +21,17 @@ const MiniCalendarWrapper = styled.div`
 
 MiniCalendarWrapper.Button = styled.div`
   border-radius: 4px;
-  background: #0071c5;
+  background: #1366AE;
   color: #ffffff;
   width: 100%;
   font-size: 1.5rem;
   line-height: 1.5;
-  height: 100%;
+  /* height: 100%; */
+  height : 3rem;
   cursor: pointer;
+  display : flex;
+  justify-content : center;
+  align-items : center;
 `;
 
 const CalendarPopup = styled.div`
@@ -44,7 +51,7 @@ const CalendarPopup = styled.div`
 `;
 
 CalendarPopup.Heading = styled.div`
-  background: #0071c5;
+  background: #1366AE;
   color: #ffffff;
   height: 3rem;
   font-size: 1.5rem;

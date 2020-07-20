@@ -14,6 +14,9 @@ const Loading = styled.div`
     font-style: italic;
     color: #61859f;
     font-size: 14px;
+    @media (min-width: 1024px) {
+      font-size: 20px;
+    }
 `
 
 export default class WaitingLoading extends Component {

@@ -1,6 +1,18 @@
 import React, { Component } from 'react';
+import styled from "styled-components"
 
-export default class Button extends Component {
+const Button = styled.div`
+	& > img {
+	width: 19px;
+	height: 19px;
+	opacity:  ${(props) => props.isSplash ? 1 : 0.5};
+	margin-right: ${(props) => props.isLeft ? "0px" : "8px"};
+	margin-left: ${(props) => props.isLeft ? "8px" : "0px"};
+	transform : ${(props) => props.isLeft ? "rotate(180deg)" : "rotate(0deg)"};
+	}
+`;
+
+export default class ButtonSplash extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -19,16 +31,9 @@ export default class Button extends Component {
 		const { onClick, isLeft } = this.props;
 		const { isSplash } = this.state;
 		return (
-			<div onClick={onClick}>
-				<img style={{
-					width: 19,
-					height: 19,
-					opacity: isSplash ? 1 : 0.5,
-					marginRight: isLeft ? 0 : 8,
-					marginLeft: isLeft ? 8 : 0,
-					transform : isLeft ? 'rotate(180deg)' : 'rotate(0deg)' 
-				}} src={require('../../images/arrow-right.png')} />
-			</div>
+			<Button isLeft={isLeft} isSplash={isSplash} onClick={onClick}>
+				<img src={require('../../images/arrow-right.png')} />
+			</Button>
 		);
 	}
 }

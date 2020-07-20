@@ -9,7 +9,7 @@ import ButtonSplash from "../DaySelector/ButtonPlash"
 
 const ResourceSelectorWrapper = styled.div`
 	width: 100%;
-	height: 4rem;
+	height: 5rem;
 	border-left: 2px solid #3883bb;
 	border-right: 2px solid #3883bb;
 	border-top: 2px solid #3883bb;
@@ -25,16 +25,21 @@ const TodayWrapper = styled.div`
 	height: 100%;
 	text-align: center;
 	padding: 0.5rem;
+	display : flex;
+	justify-content : center;
+	align-items : center
 `;
 
 TodayWrapper.Button = styled.div`
 	border-radius: 4px;
-	background: #0071c5;
+	/* background: #0071c5; */
+	background : #1366AE;
 	color: #ffffff;
+	font-weight : 600;
 	width: 100%;
 	font-size: 0.95rem;
 	line-height: 2.8;
-	height: 100%;
+	height : 3rem;
 	cursor: pointer;
 	display : flex;
 	justify-content : center;
@@ -47,7 +52,7 @@ const ResourceSliderWrapper = styled.div`
 `;
 
 const ResourceWrapper = styled.div`
-	height: calc(4rem - 2px);
+	height: calc(5rem - 2px);
 	position: relative;
 	display: flex;
 `;
@@ -64,9 +69,12 @@ const Resource = styled.div`
 
 const AnyStaff = styled(Resource)`
 	width : calc(100% - 5.05rem - ((calc((100vw - 5.05rem) / 7)) * 6) + 4px);
-	height : 4.4rem;
+	height : 5rem;
 	border-left: 1px solid #1173C3;
 	background-color : #F5F5F5;
+	display : flex;
+	justify-content : center;
+	align-items : center;
 `;
 
 AnyStaff.Image = styled.div`
@@ -74,31 +82,35 @@ AnyStaff.Image = styled.div`
 	width: 100%;
 	font-size: 1rem;
 	line-height: 2.8;
+	margin-top : 0.8rem;
 	height: 100%;
 	cursor: pointer;
 	& > img {
-		width : 30px;
-		height : 26px;
+		width : 37px;
+		height : 33px;
 	}
 `;
 
 AnyStaff.Title = styled.div`
-	margin-top: -0.25rem !important;
+	/* margin-top: 0.rem !important; */
 	width: 100%;
 	opacity: 0.75;
 	text-align: center;
 	padding-bottom: 4px;
-	font-size: 0.8rem;
+	font-size: 0.9rem;
 	line-height: 1.3;
 	font-weight: 500;
+	@media (min-width: 1024px) {
+		font-size: 0.95rem;
+  	}
 `;
 
 Resource.Avatar = styled.div`
 	padding: 2px;
 	cursor: pointer;
 	& img {
-		width: 3rem;
-		height: 3rem;
+		width: 4rem;
+		height: 4rem;
 		border-radius: 50%;
 		object-fit: cover;
 	}
@@ -109,13 +121,16 @@ Resource.OrderNumber = styled.div`
 	top: 2px;
 	right: 2px;
 	background: ${(props) => (props.next ? '#DD4124' : '#1073C2')};
-	width: 18px;
-	height: 18px;
+	width: 20px;
+	height: 20px;
+	display: flex;
+	justify-content : center;
+	align-items : center;
 	font-weight : 600;
 	border-radius: 50%;
 	color: #ffffff;
 	padding: 2px;
-	font-size: 11px;
+	font-size: 12px;
 	line-height: 1.3;
 `;
 
@@ -148,16 +163,26 @@ Resource.Title = styled.div`
 	font-size: 0.8rem;
 	line-height: 1.3;
 	font-weight: 400;
+	@media (min-width: 1024px) {
+		font-size: 0.93rem;
+  	}
 `;
 
 const WaitingHeader = styled.div`
 	width: calc((100vw - 5.05rem) / 7);
 	text-align: center;
+	display : flex;
+	justify-content : center;
+	font-weight : 500;
+	align-items: center;
 	line-height: 64px;
 	font-size: 18px;
 	color: #333333;
 	background: #f4f4f5;
 	border-left: 1px solid #3883bb;
+	@media (min-width: 1024px) {
+		font-size: 1.3rem;
+  	}
 `;
 
 const ButtonArrow = styled.div`
@@ -185,10 +210,9 @@ function chunk(array, size) {
 
 class ResourceSelector extends React.Component {
 	componentWillMount() {
-		const { loadMembers, getDetailMerchant } = this.props;
-		getDetailMerchant();
+		this.props.getDetailMerchant();
 		setTimeout(() => {
-			loadMembers();
+			this.props.loadMembers();
 		}, 300);
 	}
 	''

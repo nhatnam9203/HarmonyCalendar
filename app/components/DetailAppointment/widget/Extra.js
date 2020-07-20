@@ -20,22 +20,22 @@ const Row = styled.div`
 export default class Extra extends Component {
 
     getStyleExtra(appointment, extra, index) {
-		let backgroundColor = '#dddddd';
-		if (appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' && extra.duration > 5) backgroundColor = '#0071c5';
-		return backgroundColor;
-	}
+        let backgroundColor = '#dddddd';
+        if (appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' && extra.duration > 5) backgroundColor = '#0071c5';
+        return backgroundColor;
+    }
 
-	getStyleExtra2(appointment, extra, index) {
-		let backgroundColor = '#dddddd';
-		if (appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND') backgroundColor = '#0071c5';
-		return backgroundColor;
-	}
+    getStyleExtra2(appointment, extra, index) {
+        let backgroundColor = '#dddddd';
+        if (appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND') backgroundColor = '#0071c5';
+        return backgroundColor;
+    }
 
     render() {
         const { appointment, pricesExtras, extra, index } = this.props;
 
         let price = pricesExtras[index] ? parseFloat(pricesExtras[index].replace(/,/g, '')).toFixed(2) : "0.00";
-		price = price.toString().replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        price = price.toString().replace(/\d(?=(\d{3})+\.)/g, '$&,');
 
         return (
             <tr key={index}>
@@ -58,12 +58,9 @@ export default class Extra extends Component {
 					</ButtonExtra>
                 </td>
 
-                <td  onClick={appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' ? (
-                            () => this.props.openPopupPrice(price, index, 'extra')
-                        ) : (
-                                () => { }
-                            )
-                        } style={{ textAlign: 'center' }}>
+                <td onClick={appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' ? (
+                    () => this.props.openPopupPrice(price, index, 'extra')) : (() => { })} style={{ textAlign: 'center' }}
+                >
                     <Row>
                         <div>
                             <div style={appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' ? style.priceS : {}}>{price}</div>

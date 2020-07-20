@@ -13,25 +13,26 @@ const ButtonProduct = styled.button`
 
 export default class Product extends Component {
 
-    getStyleProduct(appointment, product, index) {
+	getStyleProduct(appointment, product, index) {
 		let backgroundColor = '#dddddd';
-		if (appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' && product.quantity > 1) backgroundColor = '#0071c5';
-
+		if (appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' && product.quantity > 1)
+			backgroundColor = '#0071c5';
 		return backgroundColor;
 	}
 
 	getStyleProduct2(appointment, product, index) {
 		let backgroundColor = '#dddddd';
-		if (appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND') backgroundColor = '#0071c5';
+		if (appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND')
+			backgroundColor = '#0071c5';
 		return backgroundColor;
 	}
 
-    render() {
+	render() {
 
-        const { appointment , product,index } = this.props;
+		const { appointment, product, index } = this.props;
 		const quantity =
 			product.quantity.toString().length === 1 ? '0' + product.quantity.toString() : product.quantity;
-		
+
 		let price = product.price ? parseFloat(product.price.replace(/,/g, '')).toFixed(2) : "0.00";
 		price = (parseFloat(price) * product.quantity).toFixed(2).toString().replace(/\d(?=(\d{3})+\.)/g, '$&,');
 
@@ -41,12 +42,12 @@ export default class Product extends Component {
 				<td style={{ textAlign: 'center' }}>
 					<ButtonProduct
 						backgroundColor={this.getStyleProduct(appointment, product, index)}
-						disabled={appointment.status === 'PAID' || appointment.status === 'VOID'  || appointment.status === 'REFUND' || product.quantity <= 1}
+						disabled={appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND' || product.quantity <= 1}
 						onClick={() => this.props.subtractProduct(index)}
 					>
 						-
 					</ButtonProduct>
-						{quantity}
+					{quantity}
 					<ButtonProduct
 						backgroundColor={this.getStyleProduct2(appointment, product, index)}
 						disabled={appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND'}
@@ -64,7 +65,7 @@ export default class Product extends Component {
 				</td>
 			</tr>
 		);
-    }
+	}
 }
 
 const style = {

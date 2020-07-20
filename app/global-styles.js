@@ -20,12 +20,35 @@ const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    font-family: 'Helvetica Neue'
+
   }
 
   body.fontLoaded {
-    font-family: 'Open Sans', 'Helvetica Neue'
+
   }
+
+  @media only screen and (min-width: 1024px) {
+    .app-event__option{
+      font-size : 0.95rem !important;
+    }
+    .app-event__full-name{
+      font-size : 1.2rem !important;
+    }
+    .app-event__phone-number{
+      font-size : 1rem !important;
+    }
+    .app-event__phone-number4{
+      font-size : 1rem !important;
+    }
+    .app-event__id-number{
+      font-size : 0.8rem !important;
+    }
+    .app-event__id-number2{
+      font-size : 0.8rem !important;
+    }
+  }
+
+
 
   #app {
     background-color: #fafafa;
@@ -64,6 +87,7 @@ const GlobalStyle = createGlobalStyle`
   // ############################################
   .fc-unthemed td.fc-today {
     background: #ffffff;
+    border-color : #dddddd;
 }
   .fc-unthemed th, .fc-unthemed td {
     border-color: #1484c0;
@@ -161,7 +185,13 @@ const GlobalStyle = createGlobalStyle`
     margin-top : 5px;
     ${'' /* margin-bottom: 4px; */}
     line-height: 1.3;
+    fontFamily: 'Arial'
   }
+
+  .waiting-event{
+    font-weight : 600 !important;
+  }
+
 
   .app-event__full-name2 {
     position : absolute;
@@ -222,12 +252,16 @@ const GlobalStyle = createGlobalStyle`
   }
 
   .app-event__option {
-    font-size: 12px;
+    font-size: 0.8rem;
     margin-left: 8px;
     margin-bottom : 5px;
     line-height: 1.2;
     font-style: italic;
     letter-spacing : 0.3;
+  }
+
+  .fc-time-grid .fc-slats td{
+    height: 2.2rem !important;
   }
 
   .timeline {
@@ -255,7 +289,7 @@ const GlobalStyle = createGlobalStyle`
 }
 
 
-.event-checkin,.event-confirmed,.event-paid,.event-anystaff{
+.event-checkin,.event-confirmed,.event-paid,.event-anystaff,.event-void,.event-assigned{
   border : 1px solid #ffffff !important;
 }
 
@@ -312,7 +346,7 @@ const GlobalStyle = createGlobalStyle`
       10%
       repeat-y;
 
-  background-size: 300% 2px, 2px 300%;/* increase size to show at once the bit from 2 gradient colors */
+  background-size: 300% 1.4px, 1.2px 300%;/* increase size to show at once the bit from 2 gradient colors */
   animation: bd 5s infinite linear;
 }
 .DayPickerInput input{
@@ -443,5 +477,7 @@ const GlobalStyle = createGlobalStyle`
   }
 }
 `;
+
+
 
 export default GlobalStyle;

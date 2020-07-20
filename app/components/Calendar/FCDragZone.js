@@ -10,15 +10,15 @@ import call from '../../images/call.png'
 import ButtonSplash from "./ButtonSplash"
 
 const DragZoneWrapper = styled.div`
-  height: calc(100vh - 4rem - 4rem - 4rem);
+  height: calc(100vh - 10rem - 4rem);
   position: relative;
 `;
 
 const EventWrapper = styled.div`
   background: #f4f4f5;
-  border: 1px solid #ffffff;
+  border: 0.5px solid #ffffff;
   color: #333333;
-  height : 110px;
+  height : calc((100vh - 10rem - 4rem - 60px)/4);
   overflow : hidden;
   position : relative;
 `;
@@ -53,9 +53,8 @@ const PrevButton = styled.div`
 `;
 
 const NextButton = styled(PrevButton)`
-  position: absolute;
-  left: 0;
-  bottom: 0;
+  position : absolute;
+  bottom : 0;
   & > img{
     width: 19px;
     height: 19px;
@@ -92,17 +91,17 @@ function handleDrag() {
 }
 
 class FCDragZone extends React.PureComponent {
-  state = {
-    slideIndex: 0,
-    slidesToShow: 4,
-    event: ''
-  };
+
+  constructor(props){
+    super(props);
+    this.state={
+      slideIndex: 0,
+      slidesToShow: 4,
+      event: ''
+    }
+  }
 
   updateDimensions() {
-    this.setState({
-      slidesToShow:
-        Math.round(($(window).height() - 64 * 3 - 36) / 127) || 1
-    });
     setInterval(() => {
       $('#waiting-events > div').each(handleDrag);
     }, 500);
@@ -207,16 +206,6 @@ class FCDragZone extends React.PureComponent {
             </PrevButton>
           }
 
-          {/* Next Button */}
-          {isActiveRight &&
-            <ButtonSplash onClick={() => this.nextSlide()} />
-          }
-          {!isActiveRight &&
-            <NextButton onClick={() => { }}>
-              <img src={require('../../images/down-arrow-2.png')} />
-            </NextButton>
-          }
-
           <div id="waiting-events">
             {displayedEvents.map((event) => (
               <EventWrapper
@@ -229,7 +218,7 @@ class FCDragZone extends React.PureComponent {
                 </BtnClose>
 
                 <div className="app-event__id-number2">{event.code}</div>
-                <div className="app-event__full-name">{event.firstName}</div>
+                <div className="app-event__full-name waiting-event">{event.firstName}</div>
                 <div className="app-event__phone-number4">
                   <img className='icon-phone3' src={call} width='15' height='15' />
                   {` ${formatPhone(event.phoneNumber)}`}</div>
@@ -241,6 +230,16 @@ class FCDragZone extends React.PureComponent {
               </EventWrapper>
             ))}
           </div>
+
+          {/* Next Button */}
+          {isActiveRight &&
+            <ButtonSplash onClick={() => this.nextSlide()} />
+          }
+          {!isActiveRight &&
+            <NextButton onClick={() => { }}>
+              <img src={require('../../images/down-arrow-2.png')} />
+            </NextButton>
+          }
         </DragZoneWrapper>
         <ConfirmDeleteWaiting StatusDeleteWaiting={StatusDeleteWaiting} event={this.state.event} deleteEventWaitingList={deleteEventWaitingList} deleteWaitingAppointment={deleteWaitingAppointment} />
       </React.Fragment>

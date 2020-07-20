@@ -118,7 +118,7 @@ const ButtonAddBlock = styled.div`
 	padding: 0.2rem;
 	background-color: #f2f2f2;
 	width: 55%;
-	font-weight: 600;
+	font-weight: 500;
 	/* collor: #333; */
 	align-items: center;
 	justify-content: center;
@@ -474,7 +474,7 @@ const styles = {
 		borderColor: '#dddddd',
 		borderStyle: 'solid',
 		marginLeft: 10,
-		fontWeight: 300,
+		fontWeight: 400,
 		paddingTop: 7,
 		position: 'relative',
 	},
@@ -501,7 +501,7 @@ const styles = {
 		padding: 12,
 		width: 100,
 		color: '#ffffff',
-		backgroundColor: '#1B75C0',
+		backgroundColor: '#1366AE',
 		fontSize: 16,
 		fontWeight: '500',
 		letterSpacing: 0.3,
@@ -570,7 +570,7 @@ const styles = {
 		color: '#1266AE'
 	},
 	timeLogin: {
-		fontWeight: '600',
+		fontWeight: '500',
 		marginLeft: 15
 	},
 	appointmentQuantity: {

@@ -8,7 +8,7 @@ import DaySlider from './DaySlider';
 
 const DaySelectorWrapper = styled.div`
   width: 100%;
-  height: 4rem;
+  height: 5rem;
   border-left: 2px solid #3883bb;
   border-right: 2px solid #3883bb;
   border-bottom: 2px solid #3883bb;

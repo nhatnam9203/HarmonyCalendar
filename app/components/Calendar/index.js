@@ -13,16 +13,17 @@ const signalR = require('@microsoft/signalr');
 import { store } from 'app';
 import { addEventsToCalendar } from './constants';
 import { PROD_API_BASE_URL } from '../../../app-constants';
-import { returnAppointment, PromiseAction } from './util';
+import { returnAppointment } from './util';
 
 const CalendarWrapper = styled.div`
 	display: flex;
 	border-left: 2px solid #3883bb;
 	border-right: 2px solid #3883bb;
 	border-bottom: 2px solid #3883bb;
-	height: calc(100% - 4rem - 4rem);
+	height: calc(100% - 10rem);
 	overflow: hidden;
 `;
+
 
 const MainCalendar = styled.div`
 	flex: 1 0;
@@ -47,7 +48,7 @@ const SignInWrapper = styled.div`
 
 SignInWrapper.Button = styled.div`
 	border-radius: 4px;
-	background: #0071c5;
+	background: #1366AE;
 	color: #ffffff;
 	width: 100%;
 	font-size: 1.05rem;
@@ -137,10 +138,9 @@ class Calendar extends React.Component {
 		let connection = new signalR.HubConnectionBuilder().withUrl(url).withAutomaticReconnect().build();
 		connection.serverTimeoutInMilliseconds = 6000000;
 
-		connection.on('ListWaNotification', async (data) => {
+		connection.on('ListWaNotification', async (data) => { 
 			let app = JSON.parse(data);
 			if (app.data) {
-				// console.log('signal R update');
 				let type = app.data.Type;
 				switch (type) {
 					case 'user_update':
@@ -169,16 +169,7 @@ class Calendar extends React.Component {
 						let app_update = app.data.appointment;
 						if (app_update) {
 							let appointment = JSON.parse(app_update);
-							console.log({appointment})
-							// const giftCards = appointment.GiftCards;
-
-							// const checkGiftCard_wrong = giftCards.find(obj => obj.Name === null);
-							// if (checkGiftCard_wrong) {
-							// 	const action = this.props.getApppointmentById;
-							// 	const data = { appointment };
-							// 	console.log({data})
-							// 	const _promise = await PromiseAction(action, data);
-							// }
+							console.log({ appointment })
 
 							let appointment_R = returnAppointment(appointment);
 							console.log('update appointment');
@@ -235,7 +226,9 @@ class Calendar extends React.Component {
 						break;
 					case 'appointment_checkout':
 						console.log('appointmemt checkout');
-						this.props.reloadCalendar();
+						setTimeout(() => {
+							this.props.reloadCalendar();
+						}, 500);
 						break;
 
 					case 'change_item':
@@ -253,19 +246,23 @@ class Calendar extends React.Component {
 			if (app.type) {
 				let type = app.type;
 				if (type === 'staff_update') {
-					console.log('staff update')
 					console.log('staff update');
 					this.props.deselectAppointment();
 					this.props.disable_Calendar(false);
-					this.props.loadMembers();
+					this.props.updateNextStaff({ isReloadCalendar: true });
 				}
 
 				if (type === 'update_blocktime') {
-					console.log('update block time')
 					console.log('update blocktime');
 					this.props.deselectAppointment();
 					this.props.disable_Calendar(false);
-					this.props.updateNextStaff();
+					this.props.updateNextStaff({ isReloadCalendar: false });
+				}
+				if (type === 'update_merchant') {
+					this.props.getDetailMerchant();
+					setTimeout(() => {
+						this.props.updateNextStaff({ isReloadCalendar: true });
+					}, 500);
 				}
 			}
 		});
