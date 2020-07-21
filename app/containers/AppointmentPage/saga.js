@@ -149,6 +149,8 @@ export function* reloadCalendarSaga() {
 			setTimeout(() => {
 				addEventsToCalendar(currentDate, appointmentsMembers);
 			}, 1000);
+			yield put(actions.loadingCalendar(false));
+
 		}
 	} catch (err) {
 		yield put(actions.loadingCalendar(false));
@@ -968,20 +970,22 @@ export function* getBlockTimeSaga() {
 export function* getAppointmentByIdSaga(action) {
 	try {
 		if (navigator.onLine) {
-			const idAppointment = action.data.id;
-			const requestURL = new URL(`${api_constants.GET_APPOINTMENT_ID}/${idAppointment}`);
+			const { appointment, event } = action.data;
+			const { id } = appointment
+			const requestURL = new URL(`${api_constants.GET_APPOINTMENT_ID}/${id}`);
 			const response = yield api(requestURL.toString(), '', 'GET', token);
 			if (response.codeStatus === 1) {
 				yield put({ type: 'GET_APP_BY_ID_SUCCESS', data: response.data });
+				yield put(actions.selectAppointment(appointmentAdapter(response.data), event))
 				return;
 			}
 			if (response.codeStatus !== 1) {
 				alert('error from get app id : ' + api_constants.GET_APPOINTMENT_ID);
-				// alert(response.data);
 				return;
 			}
 		} else {
-			const appointment = action.data;
+			const { appointment, event } = action.data;
+			yield put(actions.selectAppointment(appointment, event))
 			yield put({ type: 'GET_APP_BY_ID_SUCCESS', data: appointment });
 		}
 	} catch (err) {
@@ -1081,11 +1085,11 @@ export function* updateCompanion_Saga(action) {
 
 		const response = yield api(requestURL.toString(), body, 'PUT', token);
 		if (response.codeStatus === 1) {
-		}else{
-			alert(response.message)
+
 		}
 		resolve({ success: true })
 		if (response.codeStatus !== 1) {
+			resolve({ success: true })
 			return yield* checkResponse(response);
 		}
 	} catch (err) { }

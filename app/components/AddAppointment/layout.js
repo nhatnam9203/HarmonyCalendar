@@ -58,7 +58,6 @@ AppPopupWrapper.Footer = styled.div`
 	}
 `;
 
-
 const SearchingPopup = styled(AppPopup)`
   width: 30rem !important;
   
@@ -77,7 +76,7 @@ SearchingWrapper.Body = styled(AppPopupWrapper.Body)`
 `;
 
 SearchingWrapper.Close = styled(AppPopupWrapper.Close)`
-  //
+
 `;
 
 SearchingWrapper.Footer = styled.div`
@@ -108,16 +107,12 @@ AddingWrapper.Body = styled(AppPopupWrapper.Body)`
 `;
 
 AddingWrapper.Close = styled(AppPopupWrapper.Close)`
-  //
+
 `;
 
 AddingWrapper.Footer = styled(AppPopupWrapper.Footer)`
-  //
-`;
 
-// ************************************************* //
-// ************************************************* //
-// ************************************************* //
+`;
 
 
 const Label = styled.div`

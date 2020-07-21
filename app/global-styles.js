@@ -27,27 +27,6 @@ const GlobalStyle = createGlobalStyle`
 
   }
 
-  @media only screen and (min-width: 1024px) {
-    .app-event__option{
-      font-size : 0.95rem !important;
-    }
-    .app-event__full-name{
-      font-size : 1.2rem !important;
-    }
-    .app-event__phone-number{
-      font-size : 1rem !important;
-    }
-    .app-event__phone-number4{
-      font-size : 1rem !important;
-    }
-    .app-event__id-number{
-      font-size : 0.8rem !important;
-    }
-    .app-event__id-number2{
-      font-size : 0.8rem !important;
-    }
-  }
-
 
 
   #app {
@@ -262,9 +241,6 @@ const GlobalStyle = createGlobalStyle`
 
   .fc-time-grid .fc-slats td{
     height: 1.9rem !important;
-    @media(min-width : 1024px){
-      height: 2.2rem !important;
-    }
   }
 
   .timeline {
@@ -473,6 +449,30 @@ const GlobalStyle = createGlobalStyle`
 ::-webkit-scrollbar { 
     display: none; 
 }
+
+  @media only screen and (min-width: 1024px) {
+    .app-event__option{
+      font-size : 0.95rem !important;
+    }
+    .app-event__full-name{
+      font-size : 1.2rem !important;
+    }
+    .app-event__phone-number{
+      font-size : 1rem !important;
+    }
+    .app-event__phone-number4{
+      font-size : 1rem !important;
+    }
+    .app-event__id-number{
+      font-size : 0.8rem !important;
+    }
+    .app-event__id-number2{
+      font-size : 0.8rem !important;
+    }
+    .fc-time-grid .fc-slats td{
+      height : 2.2rem !important;
+    }
+  }
 
 @keyframes bd {
   50% {

@@ -34,7 +34,8 @@ import {
   reloadCalendar,
   deselectAppointment,
   renderAppointment,
-  getDetailMerchant
+  getDetailMerchant,
+  loadingPopup
 } from './actions';
 import {
   makeSelectWaitingAppointments,
@@ -45,7 +46,8 @@ import {
   makeLoadCalendar,
   makeLoadWaiting,
   makeStatusDeleteWaiting,
-  makeSlideIndex
+  makeSlideIndex,
+  makeLoadingPopup
 } from './selectors';
 
 export function mapDispatchToProps(dispatch) {
@@ -79,7 +81,8 @@ export function mapDispatchToProps(dispatch) {
     deselectAppointment: () => dispatch(deselectAppointment()),
     renderAppointment: () => dispatch(renderAppointment()),
     getApppointmentById : ()=>dispatch(getApppointmentById()),
-    getDetailMerchant : ()=>dispatch(getDetailMerchant())
+    getDetailMerchant : ()=>dispatch(getDetailMerchant()),
+    loadingPopup : (data)=>dispatch(loadingPopup(data))
   };
 }
 
@@ -93,6 +96,7 @@ const mapStateToProps = createStructuredSelector({
   isLoadCalendar : makeLoadCalendar(),
   StatusDeleteWaiting : makeStatusDeleteWaiting(),
   slideIndex : makeSlideIndex(),
+  isLoadingPopup : makeLoadingPopup(),
 });
 
 const withConnect = connect(

@@ -100,6 +100,9 @@ const makeSelectGroupAppointment = () =>
 const makeSlideIndex = () =>
 	createSelector(currentAppointment, (appointmentState) => appointmentState.get('slideIndex'));
 
+const makeLoadingPopup = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.get('isLoadingPopup'));
+
 export {
 	currentAppointment,
 	makeCurrentDay,
@@ -130,5 +133,6 @@ export {
 	makeSelectGroupAppointment,
 	makeSelectStaffSort,
 	makeSlideIndex,
-	makeMerchantInfo
+	makeMerchantInfo,
+	makeLoadingPopup
 };

@@ -117,7 +117,8 @@ import {
 	SENDLINK_CUSTOMER,
 	GET_DETAIL_MERCHANT,
 	SET_DETAIL_MERCHANT,
-	UPDATE_COMPANION
+	UPDATE_COMPANION,
+	IS_LOADING_POPUP
 } from './constants';
 
 /**
@@ -859,6 +860,13 @@ export function setDetailMerchant(payload) {
 export function updateCompanion(payload) {
 	return {
 		type: UPDATE_COMPANION,
+		payload
+	};
+}
+
+export function loadingPopup(payload) {
+	return {
+		type: IS_LOADING_POPUP,
 		payload
 	};
 }

@@ -4,7 +4,7 @@ import { isEqual } from 'lodash'
 import { convertAppointment, initialState } from './widget/utilDetail';
 import Layout from './layout'
 import { addLastStaff } from "../../containers/AppointmentPage/utilSaga"
-import { checkStringNumber2 , PromiseAction } from "../../utils/helper"
+import { checkStringNumber2, PromiseAction } from "../../utils/helper"
 
 class Appointment extends Layout {
 	constructor(props) {
@@ -407,14 +407,22 @@ class Appointment extends Layout {
 		this.props.updateAppointment(payload);
 	}
 
+	loadingPopupDetail() {
+		this.setState({ isLoadingCompanion: true });
+		this.props.loadingPopup(true);
+	}
+
 	async updateCompanion() {
 		const { appointment: { id } } = this.props;
-		let { companionPhone, companionName, companionPhoneHeader,isLoadingCompanion } = this.state;
+		let { companionPhone, companionName, companionPhoneHeader, isLoadingCompanion } = this.state;
 		companionPhone = companionPhoneHeader + checkStringNumber2(companionPhone);
-
 		const action = this.props.updateCompanion;
-		const data = { companionPhone, companionName, id }
-		const _promise = await PromiseAction(action,data);
+		const data = { companionPhone, companionName, id };
+		this.loadingPopupDetail();
+		const _promise = await PromiseAction(action, data);
+		if (_promise.success) {
+			this.setState({ isLoadingCompanion: false })
+		}
 
 	}
 

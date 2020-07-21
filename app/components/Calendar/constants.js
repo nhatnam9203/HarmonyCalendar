@@ -223,8 +223,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 		const allAppointment = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
 		const appointment = allAppointment.find((app) => parseInt(app.id) === parseInt(event.data.id));
 		if (!appointment) return;
-		store.dispatch(selectAppointment(appointment, event));
-		store.dispatch(getApppointmentById(appointment));
+		store.dispatch(getApppointmentById({appointment,event}));
 		store.dispatch(disableCalendar(true));
 	},
 

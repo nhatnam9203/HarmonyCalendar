@@ -116,9 +116,22 @@ export function returnAppointment(appointment) {
     };
 }
 
+
 export const PromiseAction = async (action, data) => {
-    console.log({data,action})
 	return await new Promise((resolve, rejects) => {
 		action({ data, resolve, rejects });
+	});
+};
+
+
+export const PromiseAction2 = async (action, data) => {
+	return await new Promise((resolve, rejects) => {
+        const body = {
+            data,
+            resolve,
+            rejects
+        }
+        console.log({body})
+		action(body);
 	});
 };

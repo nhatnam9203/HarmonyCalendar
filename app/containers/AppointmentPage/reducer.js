@@ -65,7 +65,8 @@ import {
 	UPDATE_APPOINTMENT_PAID_OFFLINE,
 	GET_TIME_STAFF_LOGIN_SUCCESS,
 	SET_SLIDE_INDEX,
-	SET_DETAIL_MERCHANT
+	SET_DETAIL_MERCHANT,
+	IS_LOADING_POPUP
 } from './constants';
 import { dataPutBackAppointment } from './utilSaga';
 import { unionBy } from 'lodash'
@@ -118,6 +119,7 @@ export const initialState = fromJS({
 	PopupPincode: false,
 	PinStaff: '',
 	slideIndex: 0,
+	isLoadingPopup: false
 });
 
 function saveAppointmentOffLine(app) {
@@ -160,6 +162,9 @@ function appointmentReducer(state = initialState, action) {
 			return state.set('selectedAppointment', action.appointment).set('selectedFCEvent', {
 				...action.fcEvent
 			});
+
+		case IS_LOADING_POPUP:
+			return state.set('isLoadingPopup', action.payload);
 
 		case DESELECT_APPOINTMENT:
 			return state

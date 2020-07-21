@@ -9,6 +9,7 @@ import { formatPhone } from '../../utils/helper';
 import { PopupTimePicker } from './widget';
 import NumberFormat from 'react-number-format';
 import { FooterAppointment, PopupPrice, Product, Extra, Service } from './widget'
+import ReactLoading from 'react-loading';
 
 const AppPopup = styled(Popup)`
 	border-radius: 1.5rem;
@@ -25,6 +26,8 @@ const LoadingCompanion = styled.div`
 	left : 0;
 	right : 0;
 	bottom : 0;
+	z-index : 9999;
+	border-radius : 25px;
 	background : rgba(255,255,255,0.4);
 	display : flex;
 	justify-content : center;
@@ -93,10 +96,6 @@ AppPopupWrapper.Footer = styled.div`
 		text-align: center;
 	}
 `;
-
-// ************************************************* //
-// ************************************************ //
-// ************************************************* //
 
 const AppointmentPopup = styled(AppPopup)`
 	width: 50rem !important;
@@ -453,19 +452,14 @@ CompanionWrapper.Column = styled.div`
 		border-radius : 3px;
 		background-color : #FAFAFA;
 		height : 2.3rem;
-		width : 2.8rem;
+		width : 4rem;
 		display : flex;
 		justify-content : center;
 		align-items : center;
 		padding-left : 0.8rem;
-		-moz-appearance: none;
-  		-webkit-appearance: none;
 		border-top-right-radius : 0;
 		border-bottom-right-radius : 0;
 		border-right-width: 0;
-	}
-	& > select::-ms-expand {
-    	display: none !important;
 	}
 `;
 
@@ -815,7 +809,7 @@ class Appointment extends React.Component {
 				<React.Fragment>
 					<CompanionWrapperName>
 						<CompanionWrapper.ColumnName>
-							<span>Main customer: </span>
+							<span>Main Customer: </span>
 							<span style={{ marginLeft: 35 }}>{`${appointment.firstName} ${appointment.lastName}`}</span>
 						</CompanionWrapper.ColumnName>
 
@@ -833,7 +827,7 @@ class Appointment extends React.Component {
 					<CompanionWrapper style={{ marginTop: 15 }}>
 						<CompanionWrapper.Column>
 							<span>Companion: </span>
-							<input onChange={(e) => this.onChangeCompanionName(e)} value={this.state.companionName} placeholder="Full name" />
+							<input onChange={(e) => this.onChangeCompanionName(e)} value={this.state.companionName} placeholder="Full Name" />
 						</CompanionWrapper.Column>
 
 						<CompanionWrapper.Column>
@@ -856,7 +850,7 @@ class Appointment extends React.Component {
 								}}
 								value={this.state.companionPhone}
 								onChange={(e) => this.onChangeCompanionPhone(e)}
-								placeholder="Phone number"
+								placeholder="Phone Number"
 								type="tel"
 							/>
 							<img onClick={() => this.updateCompanion()} src={require('../../images/buttonSave.png')} />
@@ -910,7 +904,7 @@ class Appointment extends React.Component {
 
 	render() {
 		const { appointment, appointmentDetail } = this.props;
-		const { isPoupPrice } = this.state;
+		const { isPoupPrice , companionPhone,companionName , isLoadingCompanion } = this.state;
 		if (!appointment) return '';
 		if (appointmentDetail === '') return '';
 		let isCheckColor = appointment.status === 'ASSIGNED' || appointment.status === 'CONFIRMED' ? true : false;
@@ -925,6 +919,10 @@ class Appointment extends React.Component {
 					onClose={() => this.closeModal()}
 				>
 					<AppointmentWrapper>
+						{isLoadingCompanion &&
+							<LoadingCompanion>
+								<ReactLoading type={'spin'} color={'#1B68AC'} height={50} width={50} />
+							</LoadingCompanion>}
 						<BtnClose onClick={() => this.closeModal()}>
 							{isCheckColor && <img src={require("../../images/close_black.png")} />}
 							{!isCheckColor && <img src={require("../../images/close_white.png")} />}

@@ -9,7 +9,8 @@ import {
 	makeCurrentDay,
 	makeSelectMembers,
 	makeSelectAppointmentDetail,
-	makeSelectGroupAppointment
+	makeSelectGroupAppointment,
+	makeLoadingPopup
 } from './selectors';
 import {
 	cancelAppointment,
@@ -20,7 +21,8 @@ import {
 	changeAppointmentTime,
 	getApppointmentById,
 	updateNote,
-	updateCompanion
+	updateCompanion,
+	loadingPopup
 } from './actions';
 
 export function mapDispatchToProps(dispatch) {
@@ -34,7 +36,8 @@ export function mapDispatchToProps(dispatch) {
 		disableCalendar: (status) => dispatch(disableCalendar(status)),
 		changeAppointmentTime: (appointment) => dispatch(changeAppointmentTime(appointment)),
 		updateNote: (data) => dispatch(updateNote(data)),
-		updateCompanion : (data)=>dispatch(updateCompanion(data))
+		updateCompanion : (data)=>dispatch(updateCompanion(data)),
+		loadingPopup : (data)=>dispatch(loadingPopup(data))
 	};
 }
 
