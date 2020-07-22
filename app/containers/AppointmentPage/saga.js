@@ -563,8 +563,14 @@ export function* changeTimeAppointment(action) {
 			selectedStaff,
 			giftCards
 		}
-		yield put(actions.changeAppointment(payload))
-
+		if(memberId === 0 && (moment(start_time).format("HH:mm A") !== moment(start).format("HH:mm A"))){
+			const text = " This Any Staff appointment is set to begin at a different time. Do you want to change original time of appointment?"
+			if(window.confirm(text)){
+				yield put(actions.changeAppointment(payload))
+			}
+		}else{
+			yield put(actions.changeAppointment(payload))
+		}
 	} catch (error) {
 		yield put(actions.updateAppointmentError(error));
 	}

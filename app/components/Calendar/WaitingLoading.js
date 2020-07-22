@@ -14,7 +14,7 @@ const Loading = styled.div`
     font-style: italic;
     color: #61859f;
     font-size: 14px;
-    @media (min-width: 1024px) {
+    @media (min-width: 1025px) {
       font-size: 20px;
     }
 `

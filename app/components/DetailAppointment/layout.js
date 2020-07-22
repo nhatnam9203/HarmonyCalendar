@@ -84,7 +84,7 @@ AppPopupWrapper.Body = styled.div`
 	background: #ffffff;
 	width: 100%;
 	padding: 1rem 1rem 0 1rem;
-	height: 450px;
+	height: 460px;
 	overflow-y: ${(props) => (props.scroll ? 'scroll' : 'hidden')};
 `;
 
@@ -814,7 +814,7 @@ class Appointment extends React.Component {
 						</CompanionWrapper.ColumnName>
 
 						<CompanionWrapper.ColumnName>
-							<span style={{ marginLeft: 39 }}>{formatPhone(appointment.phoneNumber)}</span>
+							<span style={{ marginLeft: 20 }}>{formatPhone(appointment.phoneNumber)}</span>
 							{isVip === 1 && (
 								<LogoVip2 style={{ marginLeft: 15 }}>
 									<img src={require('../../images/vip.png')} />
@@ -824,7 +824,7 @@ class Appointment extends React.Component {
 						</CompanionWrapper.ColumnName>
 					</CompanionWrapperName>
 
-					<CompanionWrapper style={{ marginTop: 15 }}>
+					<CompanionWrapper style={{ marginTop: 15 , marginBottom : 15 }}>
 						<CompanionWrapper.Column>
 							<span>Companion: </span>
 							<input onChange={(e) => this.onChangeCompanionName(e)} value={this.state.companionName} placeholder="Full Name" />

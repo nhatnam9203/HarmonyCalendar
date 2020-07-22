@@ -25,7 +25,7 @@ const EVENT_RENDER_TEMPLATE = (event) => `
     <div class="app-event__full-name">${event.userFullName}</div>
     <div class="app-event__phone-number">
     ${event.status !== 'BLOCK' && event.status !== 'BLOCK_TEMP'
-		? event.status === 'CHECKED_IN' || event.status === 'PAID' || event.status === 'WAITING' || event.status === 'VOID' ||  event.status === 'REFUND'
+		? event.status === 'CHECKED_IN' || event.status === 'PAID' || event.status === 'WAITING' || event.status === 'VOID' || event.status === 'REFUND'
 			? "<img class='icon-phone' src='" + call + "' width='17' height='17'>"
 			: "<img class='icon-phone2' src='" + call + "' width='17' height='17'>"
 		: ''}
@@ -96,7 +96,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 								moment(start).isSameOrAfter(moment(timeStart))
 
 							) {
-								if(_i === 0){
+								if (_i === 0) {
 									count = count + 1;
 									_i = _i + 1;
 								}
@@ -111,7 +111,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 								(app.status === 'CHECKED_IN' || app.status === 'CONFIRMED' || app.status === 'BLOCK_TEMP')
 								// (app.memberId !== 0)
 							) {
-								if(_j === 0){
+								if (_j === 0) {
 									count = count + 1;
 									_j = _j + 1;
 								}
@@ -156,14 +156,22 @@ export const MAIN_CALENDAR_OPTIONS = {
 					'h:mm A'
 				]).format('HH:mm:ss')}`;
 
-				if(moment(start).isSameOrAfter(moment(start_bussiness)) && moment(start).isBefore(moment(end_bussiness))){
+				if (moment(start).isSameOrAfter(moment(start_bussiness)) && moment(start).isBefore(moment(end_bussiness))) {
 					// window.postMessage(JSON.stringify(data));
 					const time = moment(start._d.toString().substr(0, 24));
+					if (moment(time).isBefore(moment())) {
+						if (window.confirm('This appointment is set for a time that has already passed. Do you still want to set this appointment at this time? ')) {
+							store.dispatch(disableCalendar(true));
+							store.dispatch(openAddingAppointment({}));
+							store.dispatch(TimeAndStaffID({ time: time, staffID: 0, dataAnyStaff: data }));
+						}
+						return;
+					}
 					store.dispatch(disableCalendar(true));
 					store.dispatch(openAddingAppointment({}));
-					store.dispatch(TimeAndStaffID({ time: time, staffID: 0, dataAnyStaff : data }));
+					store.dispatch(TimeAndStaffID({ time: time, staffID: 0, dataAnyStaff: data }));
 				}
-			
+
 			}
 		}
 		/* end book any staff */
@@ -211,6 +219,14 @@ export const MAIN_CALENDAR_OPTIONS = {
 
 			if (Boolean(isCheckWorking) === true && check_block_temp === false) {
 				if (moment(time).isBefore(timeEnd) && moment(time).isSameOrAfter(timeStart)) {
+					if (moment(time).isBefore(moment())) {
+						if (window.confirm('This appointment is set for a time that has already passed. Do you still want to set this appointment at this time? ')) {
+							store.dispatch(disableCalendar(true));
+							store.dispatch(openAddingAppointment({}));
+							store.dispatch(TimeAndStaffID({ time: time, staffID: member.memberId }));
+						}
+						return;
+					}
 					store.dispatch(disableCalendar(true));
 					store.dispatch(openAddingAppointment({}));
 					store.dispatch(TimeAndStaffID({ time: time, staffID: member.memberId }));
@@ -223,7 +239,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 		const allAppointment = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
 		const appointment = allAppointment.find((app) => parseInt(app.id) === parseInt(event.data.id));
 		if (!appointment) return;
-		store.dispatch(getApppointmentById({appointment,event}));
+		store.dispatch(getApppointmentById({ appointment, event }));
 		store.dispatch(disableCalendar(true));
 	},
 
@@ -289,7 +305,7 @@ export const MAIN_CALENDAR_OPTIONS = {
 							if (app.status === 'BLOCK_TEMP') {
 								check = 1;
 							} else {
-								if(app.status === 'BLOCK') check_workingTime = true;
+								if (app.status === 'BLOCK') check_workingTime = true;
 								check = false;
 							}
 						}
@@ -301,14 +317,14 @@ export const MAIN_CALENDAR_OPTIONS = {
 		}
 
 		if (check_workingStaff) {
-			if(displayedMembers[parseInt(resourceId)] && displayedMembers[parseInt(resourceId)].id === 0){
+			if (displayedMembers[parseInt(resourceId)] && displayedMembers[parseInt(resourceId)].id === 0) {
 				check_staff_drop = false
-			}else{
+			} else {
 				check_staff_drop = true;
 			}
 		}
 
-		if (pos === -1 || check_staff_drop === false || check === 1 ) {
+		if (pos === -1 || check_staff_drop === false || check === 1) {
 			$('#full-calendar').fullCalendar('removeEvents', (event) => event.data.id === $(this).data().event.data.id);
 		} else {
 			/* check appointment assign overlap */
@@ -392,21 +408,29 @@ export const MAIN_CALENDAR_OPTIONS = {
 					'h:mm A'
 				]).format('HH:mm:ss')}`;
 
-				if(moment(startTime).isBefore(start) || moment(endTime).isAfter(end)){
+
+				if (moment(startTime).isBefore(start) || moment(endTime).isAfter(end)) {
 					isTest = true
 				}
 
-				if(isTest){
-					if (window.confirm('Accept this appointment outside of business hours?')){
+				if (isTest) {
+					if (window.confirm('Accept this appointment outside of business hours?')) {
 						store.dispatch(moveAppointment(event.data.id, 0, startTime, endTime));
 						return;
-					}else{
+					} else {
 						revertFunc();
 						return;
 					}
 				}
-
-				store.dispatch(moveAppointment(event.data.id, 0, startTime, endTime));
+				if (moment(event.data.start).format("HH:mm A") === moment(startTime).format("HH:mm A")) {
+					store.dispatch(moveAppointment(event.data.id, 0, startTime, endTime));
+				} else {
+					if (window.confirm(" This Any Staff appointment is set to begin at a different time. Do you want to change original time of appointment? ")) {
+						store.dispatch(moveAppointment(event.data.id, 0, startTime, endTime));
+					} else {
+						revertFunc();
+					}
+				}
 				return;
 			}
 		}
@@ -510,11 +534,11 @@ export const MAIN_CALENDAR_OPTIONS = {
 			revertFunc();
 		} else {
 			const start_time = `${event.start.format('YYYY-MM-DD')}T${event.start.format('HH:mm:ss')}`;
-
 			const endTime =
 				event.end !== null
 					? `${event.end.format('YYYY-MM-DD')}T${event.end.format('HH:mm:ss')}`
 					: moment(start_time).add(90, 'minutes').format('YYYY-MM-DD HH:mm:ss');
+
 			if (check === false) {
 				const text = check_block_grey ? 'Accept this appointment outside of business hours?' : 'Accept overlapping appointments?';
 				if (window.confirm(text)) {
@@ -523,7 +547,20 @@ export const MAIN_CALENDAR_OPTIONS = {
 					revertFunc();
 				}
 			} else {
-				store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId), start_time, endTime));
+				if (event.data.memberId === 0) { // move appointment từ cột any staff qua cột khác
+					if (moment(event.data.start).format("HH:mm A") === moment(start_time).format("HH:mm A")) {
+						store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId), start_time, endTime));
+					} else {
+						if (window.confirm(" This Any Staff appointment is set to begin at a different time. Do you want to change original time of appointment? ")) {
+							store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId), start_time, endTime));
+						} else {
+							revertFunc();
+						}
+					}
+				}else{
+					//move appointment từ staff này qua staff khác
+					store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId), start_time, endTime));
+				}
 			}
 		}
 		// }

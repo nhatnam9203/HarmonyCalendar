@@ -446,11 +446,15 @@ const GlobalStyle = createGlobalStyle`
   display : none !important; 
 }
 
+.picker-item{
+  font-size : 18px !important;
+}
+
 ::-webkit-scrollbar { 
     display: none; 
 }
 
-  @media only screen and (min-width: 1024px) {
+  @media only screen and (min-width: 1025px) {
     .app-event__option{
       font-size : 0.95rem !important;
     }

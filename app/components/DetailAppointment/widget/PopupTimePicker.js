@@ -12,7 +12,7 @@ const PopupTimePK = styled.div`
 	border-radius: 5px;
 	z-index: 999999999999999;
 	width: 22rem;
-	height: 18rem;
+	height: 17rem;
 	box-shadow: 0 3px 9px rgba(0, 0, 0, 0.15);
 `;
 
@@ -32,7 +32,10 @@ const Header = styled.div`
 	font-family : 'arial'
 `;
 
-const Body = styled.div`height: 12rem;`;
+const Body = styled.div`
+	height: 11rem;
+	overflow: hidden;
+`;
 
 const Footer = styled.div`
 	width: 100%;
