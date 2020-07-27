@@ -242,7 +242,7 @@ export function totalDuationChangeTime(appointment, extras) {
 
 	for (let i = 0; i < services.length; i++) {
 		if (appointment.memberId === services[i].staffId) {
-			totalDuration += app.duration;
+			totalDuration += services[i].duration;
 		}
 	}
 
@@ -253,6 +253,7 @@ export function totalDuationChangeTime(appointment, extras) {
 	extras.forEach((ext) => {
 		if (appointment.memberId === ext.staffId) totalDuration += ext.duration;
 	});
+
 	return totalDuration;
 }
 

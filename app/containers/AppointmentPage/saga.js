@@ -1,6 +1,7 @@
 import { delay } from 'redux-saga';
 import { fork, put, takeLatest, all, select } from 'redux-saga/effects';
 import moment from 'moment';
+import moment_tz from 'moment-timezone'
 import { api } from '../../utils/helper';
 import * as constants from './constants';
 import * as actions from './actions';
@@ -14,7 +15,7 @@ import {
 	makeSelectAllAppointments,
 	makeSlideIndex,
 	makeSelectMembers,
-	makeMerchantInfo
+	makeMerchantInfo,
 } from './selectors';
 
 import { token, merchantId } from '../../../app-constants';
@@ -298,6 +299,8 @@ export function* reRenderAppointment() {
 /********************************* MOVE APPOINTMENT *********************************/
 export function* moveAppointment(action) {
 	const displayedMembers = yield select(makeSelectDisplayedMembers());
+	const merchantInfo = yield select(makeMerchantInfo());
+	const timezone = merchantInfo.timezone;
 	// const allMember = yield select(makeSelectMembers());
 	const allAppointment = yield select(makeSelectAllAppointments());
 	const assignedMember = displayedMembers[action.newPositionIndex - 1];
@@ -333,8 +336,9 @@ export function* moveAppointment(action) {
 		}
 	} else {
 		if (assignedMember && previousMemberId === 0) {
-			const now = moment();
-			if (now.isBefore(moment(appointment.end)) && now.isAfter(appointment.start)) {
+			let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment();
+			let now = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
+			if (moment(now).isBefore(moment(appointment.end)) && moment(now).isAfter(appointment.start)) {
 				appointment.status = 'CHECKED_IN';
 			}
 		} else
@@ -563,12 +567,12 @@ export function* changeTimeAppointment(action) {
 			selectedStaff,
 			giftCards
 		}
-		if(memberId === 0 && (moment(start_time).format("HH:mm A") !== moment(start).format("HH:mm A"))){
+		if (memberId === 0 && (moment(start_time).format("HH:mm A") !== moment(start).format("HH:mm A"))) {
 			const text = " This Any Staff appointment is set to begin at a different time. Do you want to change original time of appointment?"
-			if(window.confirm(text)){
+			if (window.confirm(text)) {
 				yield put(actions.changeAppointment(payload))
 			}
-		}else{
+		} else {
 			yield put(actions.changeAppointment(payload))
 		}
 	} catch (error) {
@@ -604,6 +608,8 @@ function totalDuarion(services, extras, appointment, memberId) {
 		}
 	}
 
+	console.log({total})
+
 	return total;
 }
 
@@ -611,7 +617,7 @@ function totalDuarion(services, extras, appointment, memberId) {
 export function* changeAppointmentSaga(action) {
 	const displayedMembers = yield select(makeSelectDisplayedMembers());
 	const currentDate = yield select(makeCurrentDay());
-	const currentDayName = moment(currentDate).format('dddd');
+	// const currentDayName = moment(currentDate).format('dddd');
 	let isUpdate = true;
 
 	const { appointmentEdit, fcEvent, start_time, end_time, memberId, options, products, extras, start, selectedStaff, giftCards } = action.payload;
@@ -634,7 +640,10 @@ export function* changeAppointmentSaga(action) {
 	const staff = displayedMembers.find(s => s.id === data.staffId);
 
 	/* check condition update to grey block */
-	const toTime = moment(data.fromTime).add(totalDuarion(data.services, data.extras, appointment, memberId), 'minutes');
+	const _duration = totalDuarion(data.services, data.extras, appointment, memberId)
+	let toTime = moment(data.fromTime).add(_duration, 'minutes');
+	toTime = `${moment(toTime).format('YYYY-MM-DD')}T${moment(toTime).format('HH:mm')}`;
+	const currentDayName = moment(data.fromTime).format('dddd');
 
 	if (staff) {
 		const timeWorking = Object.entries(staff.workingTimes).find(b => b[0] === currentDayName);
@@ -649,7 +658,10 @@ export function* changeAppointmentSaga(action) {
 			['h:mm A']
 		).format('HH:mm:ss')}`;
 
-		if (moment(toTime).isSameOrAfter(timeEnd) || moment(data.fromTime).isBefore(timeStart)) {
+		if (
+			(moment(toTime).isSameOrAfter(timeEnd) || moment(data.fromTime).isBefore(timeStart))
+			&& moment(toTime).format('MM/DD/YYYY') == moment().format('MM/DD/YYYY')
+		) {
 			if (window.confirm('Accept this appointment outside of business hours?')) {
 				isUpdate = true
 			} else {
@@ -860,6 +872,15 @@ export function* getDetailMerchantSaga(action) {
 
 		if (parseInt(response.codeNumber) === 200) {
 			yield put(actions.setDetailMerchant(response.data));
+			const isLoadData  = action.payload && action.payload.isLoadData ? action.payload.isLoadData : '';
+			if (isLoadData) {
+				const { timezone } = response.data;
+				let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment();
+				let day = `${moment(timeNow).format("DDMMYYYY")}`;
+				yield put(actions.selectDay(day));
+				yield put(actions.selectWeek(day));
+				yield put(actions.updateNextStaff({ isReloadCalendar: true }))
+			}
 		}
 	} catch (error) {
 		console.log({ error })
@@ -912,7 +933,7 @@ export function* addBlockTime(action) {
 		};
 		const response = yield api(requestURL.toString(), dataSubmit, 'POST', token);
 		if (response.codeStatus === 1) {
-			yield put(actions.loadMembers());
+			// yield put(actions.loadMembers());
 			return;
 		}
 	} catch (error) { }
@@ -935,7 +956,7 @@ export function* editBlockTime(action) {
 		};
 		const response = yield api(requestURL.toString(), dataSubmit, 'PUT', token);
 		if (response.codeStatus === 1) {
-			yield put(actions.loadMembers());
+			// yield put(actions.loadMembers());
 			return;
 		}
 	} catch (error) { }
@@ -949,7 +970,7 @@ export function* deleteBlockTime_Saga(action) {
 		const requestURL = new URL(`${api_constants.DELETE_BLOCKTIME_API}/${block.blockTimeId}`);
 		const response = yield api(requestURL.toString(), '', 'DELETE', token);
 		if (response.codeStatus === 1) {
-			yield put(actions.loadMembers());
+			// yield put(actions.loadMembers());
 			yield put(actions.deleteBlockTimeSuccess({ staff, block }));
 		}
 	} catch (error) { }
@@ -977,16 +998,17 @@ export function* getAppointmentByIdSaga(action) {
 	try {
 		if (navigator.onLine) {
 			const { appointment, event } = action.data;
-			const { id } = appointment
+			const { id, end } = appointment
 			const requestURL = new URL(`${api_constants.GET_APPOINTMENT_ID}/${id}`);
 			const response = yield api(requestURL.toString(), '', 'GET', token);
 			if (response.codeStatus === 1) {
-				yield put({ type: 'GET_APP_BY_ID_SUCCESS', data: response.data });
-				yield put(actions.selectAppointment(appointmentAdapter(response.data), event))
+				let _data = { ...response.data, toTime: end }
+				yield put({ type: 'GET_APP_BY_ID_SUCCESS', data: _data });
+				yield put(actions.selectAppointment(appointmentAdapter(_data), event))
 				return;
 			}
 			if (response.codeStatus !== 1) {
-				alert('error from get app id : ' + api_constants.GET_APPOINTMENT_ID);
+				alert(response.message)
 				return;
 			}
 		} else {
@@ -1040,6 +1062,7 @@ function* updateNextStaff_Saga() {
 				const slideIndex = yield select(makeSlideIndex());
 				yield put(actions.membersLoaded(members));
 				yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
+				
 				if (!isReloadCalendar)
 					yield put(actions.getBlockTime());
 				else yield put(actions.reloadCalendar());
@@ -1078,6 +1101,25 @@ export function* updateNote_Saga(action) {
 	} catch (err) { }
 }
 
+/********************************* SEARCH PHONE COMPANION *********************************/
+export function* searchPhoneCompanion_Saga(action) {
+	try {
+		const { data, resolve, reject } = action.payload;
+		const { phone } = data;
+		const requestURL = new URL(api_constants.GET_BY_PHONE);
+		const url = `${requestURL.toString()}/${phone}`;
+
+		const response = yield api(url, '', 'GET', token);
+		if (response.codeStatus === 1) {
+			const { firstName, lastName } = response.data;
+			resolve({ success: true, data: `${firstName} ${lastName}` });
+		}
+		if (response.codeStatus !== 1) {
+			resolve({ success: false })
+		}
+	} catch (err) { }
+}
+
 /********************************* UPDATE COMPANION *********************************/
 export function* updateCompanion_Saga(action) {
 	try {
@@ -1088,7 +1130,6 @@ export function* updateCompanion_Saga(action) {
 			companionName,
 			companionPhone
 		};
-
 		const response = yield api(requestURL.toString(), body, 'PUT', token);
 		if (response.codeStatus === 1) {
 
@@ -1222,6 +1263,10 @@ export function* watch_updateCompanion() {
 	yield takeLatest(constants.UPDATE_COMPANION, updateCompanion_Saga);
 }
 
+export function* watch_searchPhoneCompanion() {
+	yield takeLatest(constants.SEARCH_PHONE_COMPANION, searchPhoneCompanion_Saga);
+}
+
 export function* watch_sendLinkCustomer() {
 	yield takeLatest(constants.SENDLINK_CUSTOMER, sendLinkCustomerSaga);
 }
@@ -1263,6 +1308,7 @@ export default function* root() {
 		fork(watch_changeAppointment),
 		fork(watch_sendLinkCustomer),
 		fork(watch_getDetailMerchan),
-		fork(watch_updateCompanion)
+		fork(watch_updateCompanion),
+		fork(watch_searchPhoneCompanion)
 	]);
 }

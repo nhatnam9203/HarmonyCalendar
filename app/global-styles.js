@@ -240,7 +240,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   .fc-time-grid .fc-slats td{
-    height: 1.9rem !important;
+      height : 1.75rem !important;
   }
 
   .timeline {
@@ -270,6 +270,7 @@ const GlobalStyle = createGlobalStyle`
 
 .event-checkin,.event-confirmed,.event-paid,.event-anystaff,.event-void,.event-assigned{
   border : 1px solid #ffffff !important;
+  overflow: hidden !important;
 }
 
 .btn-arrow{

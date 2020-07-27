@@ -5,7 +5,7 @@ import { compose } from 'redux';
 import DaySelector from 'components/DaySelector';
 
 import { selectDay, selectWeek, selectDayOnCalendar ,loadingCalendar} from './actions';
-import { makeCurrentDay, makeCurrentWeekDays } from './selectors';
+import { makeCurrentDay, makeCurrentWeekDays , makeMerchantInfo } from './selectors';
 
 export function mapDispatchToProps(dispatch) {
   return {
@@ -20,6 +20,7 @@ export function mapDispatchToProps(dispatch) {
 const mapStateToProps = createStructuredSelector({
   currentDay: makeCurrentDay(),
   weekDays: makeCurrentWeekDays(),
+  merchantInfo : makeMerchantInfo()
 });
 
 const withConnect = connect(

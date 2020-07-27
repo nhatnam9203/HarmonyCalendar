@@ -5,6 +5,7 @@ import { convertAppointment, initialState } from './widget/utilDetail';
 import Layout from './layout'
 import { addLastStaff } from "../../containers/AppointmentPage/utilSaga"
 import { checkStringNumber2, PromiseAction } from "../../utils/helper"
+import { debounce } from 'lodash'
 
 class Appointment extends Layout {
 	constructor(props) {
@@ -412,12 +413,26 @@ class Appointment extends Layout {
 		this.props.loadingPopup(true);
 	}
 
+	async searchPhoneCompanion() {
+		const { companionPhone, companionPhoneHeader } = this.state;
+		if (companionPhone.toString().trim() !== '') {
+			const phone = companionPhoneHeader + checkStringNumber2(companionPhone);
+			const data = { phone };
+			const action = this.props.searchPhoneCompanion;
+			const _promise = await PromiseAction(action, data);
+			if (_promise.success) {
+				this.setState({ companionName: _promise.data })
+			}
+		}
+	}
+
 	async updateCompanion() {
 		const { appointment: { id } } = this.props;
 		let { companionPhone, companionName, companionPhoneHeader, isLoadingCompanion } = this.state;
 		companionPhone = companionPhoneHeader + checkStringNumber2(companionPhone);
 		const action = this.props.updateCompanion;
 		const data = { companionPhone, companionName, id };
+		console.log({data})
 		this.loadingPopupDetail();
 		const _promise = await PromiseAction(action, data);
 		if (_promise.success) {
@@ -521,10 +536,11 @@ class Appointment extends Layout {
 		this.setState({ companionName: e.target.value });
 	}
 
-	onChangeCompanionPhone = (e) => {
+	onChangeCompanionPhone = async (e) => {
 		const val = e.target.value;
-		if (e.target.validity.valid) this.setState({ companionPhone: e.target.value.replace(/^0+/, '') });
-		else if (val === '' || val === '-') this.setState({ companionPhone: val });
+		if (e.target.validity.valid) await this.setState({ companionPhone: e.target.value.replace(/^0+/, '') });
+		else if (val === '' || val === '-') await this.setState({ companionPhone: val });
+		await this.searchPhoneCompanion();
 	}
 
 	async addNote(e) {

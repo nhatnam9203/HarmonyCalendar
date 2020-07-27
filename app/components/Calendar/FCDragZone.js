@@ -10,15 +10,21 @@ import call from '../../images/call.png'
 import ButtonSplash from "./ButtonSplash"
 
 const DragZoneWrapper = styled.div`
-  height: calc(100vh - 10rem - 4rem);
+  height: calc(100vh - 8.8rem - 4rem);
   position: relative;
+  @media (min-width: 1025px) {
+      height: calc(100vh - 10rem - 4rem);
+	}
 `;
 
 const EventWrapper = styled.div`
   background: #f4f4f5;
   border: 0.5px solid #ffffff;
   color: #333333;
-  height : calc((100vh - 10rem - 4rem - 60px)/4);
+  height : calc((100vh - 8.8rem - 4rem - 55px)/4);
+  @media (min-width: 1025px) {
+    height : calc((100vh - 10rem - 4rem - 60px)/4);
+	}
   overflow : hidden;
   position : relative;
 `;

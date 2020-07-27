@@ -8,11 +8,14 @@ import DaySlider from './DaySlider';
 
 const DaySelectorWrapper = styled.div`
   width: 100%;
-  height: 5rem;
+  height: 4.4rem;
   border-left: 2px solid #3883bb;
   border-right: 2px solid #3883bb;
   border-bottom: 2px solid #3883bb;
   display: flex;
+  @media (min-width: 1025px) {
+      height : 5rem;
+	  }
 `;
 
 class DaySelector extends React.Component {
@@ -37,7 +40,8 @@ class DaySelector extends React.Component {
       onChangeDay,
       onChangeWeek,
       onChangeDayOnCalendar,
-      loadingCalendar
+      loadingCalendar,
+      merchantInfo
     } = this.props;
     return (
       <DaySelectorWrapper>
@@ -51,6 +55,7 @@ class DaySelector extends React.Component {
           onChangeDay={onChangeDay}
           onChangeWeek={onChangeWeek}
           loadingCalendar={loadingCalendar}
+          merchantInfo={merchantInfo}
         />
       </DaySelectorWrapper>
     );

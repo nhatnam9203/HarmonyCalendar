@@ -22,7 +22,10 @@ const CalendarWrapper = styled.div`
 	border-left: 2px solid #3883bb;
 	border-right: 2px solid #3883bb;
 	border-bottom: 2px solid #3883bb;
-	height: calc(100% - 10rem);
+	height: calc(100% - 8.8rem);
+	@media (min-width: 1025px) {
+		height: calc(100% - 10rem);
+	}
 	overflow: hidden;
 `;
 
@@ -259,10 +262,13 @@ class Calendar extends React.Component {
 
 					case 'update_merchant':
 						console.log('update merchant')
-						this.props.getDetailMerchant();
+						// this.props.getDetailMerchant();
+						// setTimeout(() => {
+						// 	this.props.updateNextStaff({ isReloadCalendar: true });
+						// }, 500);
 						setTimeout(() => {
-							this.props.updateNextStaff({ isReloadCalendar: true });
-						}, 500);
+							window.location.reload();
+						}, 300);
 						break;
 					default:
 						break;
@@ -277,7 +283,7 @@ class Calendar extends React.Component {
 					this.props.disable_Calendar(false);
 					this.props.getDetailMerchant();
 					setTimeout(() => {
-						this.props.updateNextStaff({ isReloadCalendar: true });
+						this.props.updateNextStaff({ });
 					}, 500);
 				}
 
@@ -308,7 +314,8 @@ class Calendar extends React.Component {
 			deleteEventWaitingList,
 			StatusDeleteWaiting,
 			deleteWaitingAppointment,
-			updateAppointmentPaid
+			updateAppointmentPaid,
+			merchantInfo
 		} = this.props;
 		return (
 			<CalendarWrapper>
@@ -318,6 +325,7 @@ class Calendar extends React.Component {
 						disableCalendar={disableCalendar}
 						updateAppointmentPaid={updateAppointmentPaid}
 						options={MAIN_CALENDAR_OPTIONS}
+						merchantInfo={merchantInfo}
 					/>
 				</MainCalendar>
 				<RightSideBar id="drag-zone">

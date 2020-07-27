@@ -47,7 +47,8 @@ import {
   makeLoadWaiting,
   makeStatusDeleteWaiting,
   makeSlideIndex,
-  makeLoadingPopup
+  makeLoadingPopup,
+  makeMerchantInfo
 } from './selectors';
 
 export function mapDispatchToProps(dispatch) {
@@ -81,7 +82,7 @@ export function mapDispatchToProps(dispatch) {
     deselectAppointment: () => dispatch(deselectAppointment()),
     renderAppointment: () => dispatch(renderAppointment()),
     getApppointmentById : ()=>dispatch(getApppointmentById()),
-    getDetailMerchant : ()=>dispatch(getDetailMerchant()),
+    getDetailMerchant : (data)=>dispatch(getDetailMerchant(data)),
     loadingPopup : (data)=>dispatch(loadingPopup(data))
   };
 }
@@ -97,6 +98,7 @@ const mapStateToProps = createStructuredSelector({
   StatusDeleteWaiting : makeStatusDeleteWaiting(),
   slideIndex : makeSlideIndex(),
   isLoadingPopup : makeLoadingPopup(),
+  merchantInfo : makeMerchantInfo(),
 });
 
 const withConnect = connect(

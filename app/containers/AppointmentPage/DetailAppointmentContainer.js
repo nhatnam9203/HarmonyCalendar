@@ -22,7 +22,8 @@ import {
 	getApppointmentById,
 	updateNote,
 	updateCompanion,
-	loadingPopup
+	loadingPopup,
+	searchPhoneCompanion
 } from './actions';
 
 export function mapDispatchToProps(dispatch) {
@@ -37,7 +38,8 @@ export function mapDispatchToProps(dispatch) {
 		changeAppointmentTime: (appointment) => dispatch(changeAppointmentTime(appointment)),
 		updateNote: (data) => dispatch(updateNote(data)),
 		updateCompanion : (data)=>dispatch(updateCompanion(data)),
-		loadingPopup : (data)=>dispatch(loadingPopup(data))
+		loadingPopup : (data)=>dispatch(loadingPopup(data)),
+		searchPhoneCompanion : (data) => dispatch(searchPhoneCompanion(data))
 	};
 }
 

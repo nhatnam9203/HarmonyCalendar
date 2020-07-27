@@ -231,6 +231,7 @@ const Button = styled.button`
 	text-align: center;
 	padding: 0 2rem;
 	width: 9rem;
+	height : 2.92rem;
 `;
 
 const ButtonChange = styled(Button)`
@@ -688,7 +689,7 @@ class Appointment extends React.Component {
 						<tr>
 							<th style={{ width: '50%' }}>Selected Products</th>
 							<th style={{ width: '25%', textAlign: 'center' }}>
-								Amount
+								Quantity
 							</th>
 							<th style={{ textAlign: 'center' }}>Price ($)</th>
 						</tr>
@@ -824,7 +825,7 @@ class Appointment extends React.Component {
 						</CompanionWrapper.ColumnName>
 					</CompanionWrapperName>
 
-					<CompanionWrapper style={{ marginTop: 15 , marginBottom : 15 }}>
+					<CompanionWrapper style={{ marginTop: 15, marginBottom: 15 }}>
 						<CompanionWrapper.Column>
 							<span>Companion: </span>
 							<input onChange={(e) => this.onChangeCompanionName(e)} value={this.state.companionName} placeholder="Full Name" />
@@ -851,6 +852,7 @@ class Appointment extends React.Component {
 								value={this.state.companionPhone}
 								onChange={(e) => this.onChangeCompanionPhone(e)}
 								placeholder="Phone Number"
+								// onBlur={()=>this.searchPhoneCompanion()}
 								type="tel"
 							/>
 							<img onClick={() => this.updateCompanion()} src={require('../../images/buttonSave.png')} />
@@ -904,7 +906,7 @@ class Appointment extends React.Component {
 
 	render() {
 		const { appointment, appointmentDetail } = this.props;
-		const { isPoupPrice , companionPhone,companionName , isLoadingCompanion } = this.state;
+		const { isPoupPrice, companionPhone, companionName, isLoadingCompanion } = this.state;
 		if (!appointment) return '';
 		if (appointmentDetail === '') return '';
 		let isCheckColor = appointment.status === 'ASSIGNED' || appointment.status === 'CONFIRMED' ? true : false;

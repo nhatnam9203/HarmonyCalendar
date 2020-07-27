@@ -44,7 +44,7 @@ export function mapDispatchToProps(dispatch) {
     getTimeStaffLogin:(staffId)=>dispatch(getTimeStaffLogin(staffId)),
     setSlideIndex:(slideIndex)=>dispatch(setSlideIndex(slideIndex)),
     editBlockTime:(data)=>dispatch(editBlockTime(data)),
-    getDetailMerchant : () => dispatch(getDetailMerchant())
+    getDetailMerchant : (data) => dispatch(getDetailMerchant(data))
   };
 }
 

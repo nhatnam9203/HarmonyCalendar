@@ -6,10 +6,11 @@ import Carousel from 'nuka-carousel';
 import { staffId } from '../../../app-constants';
 import PopupBlockTime from './PopupBlockTime';
 import ButtonSplash from "../DaySelector/ButtonPlash"
+import {PromiseAction} from '../../utils/helper'
 
 const ResourceSelectorWrapper = styled.div`
 	width: 100%;
-	height: 5rem;
+	height: 4.4rem;
 	border-left: 2px solid #3883bb;
 	border-right: 2px solid #3883bb;
 	border-top: 2px solid #3883bb;
@@ -18,6 +19,9 @@ const ResourceSelectorWrapper = styled.div`
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+	@media (min-width: 1025px) {
+		height: 5rem;
+  	}
 `;
 
 const TodayWrapper = styled.div`
@@ -52,9 +56,12 @@ const ResourceSliderWrapper = styled.div`
 `;
 
 const ResourceWrapper = styled.div`
-	height: calc(5rem - 2px);
+	height: calc(4.4rem - 2px);
 	position: relative;
 	display: flex;
+	@media (min-width: 1025px) {
+		height: calc(5rem - 2px);
+  	}
 `;
 
 const Resource = styled.div`
@@ -75,6 +82,9 @@ const AnyStaff = styled(Resource)`
 	display : flex;
 	justify-content : center;
 	align-items : center;
+	@media (min-width: 1025px) {
+		height: 5rem;
+  	}
 `;
 
 AnyStaff.Image = styled.div`
@@ -82,26 +92,34 @@ AnyStaff.Image = styled.div`
 	width: 100%;
 	font-size: 1rem;
 	line-height: 2.8;
-	margin-top : 0.8rem;
+	margin-top : 0.6rem;
 	height: 100%;
 	cursor: pointer;
 	& > img {
+		width : 33px;
+		height : 29px;
+	}
+	@media (min-width: 1025px) {
+		& > img {
 		width : 37px;
 		height : 33px;
+		margin-top : 0.8rem;
 	}
+  	}
 `;
 
 AnyStaff.Title = styled.div`
-	/* margin-top: 0.rem !important; */
+	margin-top: -0.2rem !important;
 	width: 100%;
 	opacity: 0.75;
 	text-align: center;
 	padding-bottom: 4px;
-	font-size: 0.9rem;
+	font-size: 0.85rem;
 	line-height: 1.3;
 	font-weight: 500;
-	@media (min-width: 1024px) {
+	@media (min-width: 1025px) {
 		font-size: 0.95rem;
+		margin-top: 0rem !important;
   	}
 `;
 
@@ -109,11 +127,19 @@ Resource.Avatar = styled.div`
 	padding: 2px;
 	cursor: pointer;
 	& img {
+		width: 3.7rem;
+		height: 3.7rem;
+		border-radius: 50%;
+		object-fit: cover;
+	}
+	@media (min-width: 1025px) {
+		& img {
 		width: 4rem;
 		height: 4rem;
 		border-radius: 50%;
 		object-fit: cover;
 	}
+  	}
 `;
 
 Resource.OrderNumber = styled.div`
@@ -210,12 +236,11 @@ function chunk(array, size) {
 
 class ResourceSelector extends React.Component {
 	componentWillMount() {
-		this.props.getDetailMerchant();
-		setTimeout(() => {
-			this.props.loadMembers();
-		}, 300);
+		this.props.getDetailMerchant({ isLoadData : true});
+		// setTimeout(() => {
+		// 	this.props.loadMembers();
+		// }, 500);
 	}
-	''
 	onPrevClick(event, previousSlide) {
 		previousSlide(event);
 	}

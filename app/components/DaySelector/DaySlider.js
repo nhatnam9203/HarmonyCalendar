@@ -1,5 +1,6 @@
 import React from 'react';
 import moment from 'moment';
+import moment_tz from 'moment'
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Carousel from 'nuka-carousel';
@@ -8,7 +9,10 @@ import ButtonSplash from "./ButtonPlash"
 const DateSliderWrapper = styled.div`
     width: calc(100% - 5.05rem);
     position: relative;
-    height : 5rem !important;
+    height : 4.4rem !important;
+    @media (min-width: 1025px) {
+      height : 5rem !important;
+	  }
 `;
 
 const CarouselItem = styled.div`
@@ -25,9 +29,9 @@ const NormalDay = styled.div`
     align-items : center;
     justify-content : center;
     overflow: hidden;
-    height : 5rem ;
+    height : 4.4rem ;
     padding-top : 0.6rem;
-    font-size : 1.02rem;
+    font-size : 0.95rem;
     line-height : 1.5;
     letter-spacing : 0.3;
     font-weight : 500;
@@ -40,6 +44,11 @@ const NormalDay = styled.div`
       text-overflow: ellipsis;
       overflow: hidden;
     }
+
+    @media (min-width: 1025px) {
+      height : 5rem;
+      font-size : 1.02rem;
+	  }
 `;
 
 const ActiveDay = styled(NormalDay)`
@@ -62,6 +71,10 @@ class DaySlider extends React.Component {
     }
   }
 
+  componentDidMount() {
+
+  }
+
   onPrevClick(event, previousSlide) {
     previousSlide(event);
   }
@@ -71,7 +84,6 @@ class DaySlider extends React.Component {
   }
 
   onDayClick(day) {
-
     const { onChangeDay, loadingCalendar } = this.props;
     onChangeDay(day.format('DDMMYYYY'));
     loadingCalendar(true);
@@ -109,20 +121,26 @@ class DaySlider extends React.Component {
   }
 
   renderItems(day, index) {
-    const { selectedDay } = this.props;
-    if (day.format('DDMMYYYY') === selectedDay.format('DDMMYYYY')) {
-      return (
-        <ActiveDay key={index} onClick={() => this.onDayClick(day)}>
-          {this.renderDay(day)}
-        </ActiveDay>
-      );
-    }
-    if (day.format('DDMMYYYY') === moment().format('DDMMYYYY')) {
-      return (
-        <TodayDay key={index} onClick={() => this.onDayClick(day)}>
-          {this.renderDay(day)}
-        </TodayDay>
-      );
+    const { selectedDay, merchantInfo } = this.props;
+    const { timezone } = merchantInfo;
+    if(timezone){
+      let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment();
+      let tz = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
+    
+      if (moment(day).format('DDMMYYYY') === moment(selectedDay).format('DDMMYYYY')) {
+        return (
+          <ActiveDay key={index} onClick={() => this.onDayClick(day)}>
+            {this.renderDay(day)}
+          </ActiveDay>
+        );
+      }
+      if (moment(day).format('DDMMYYYY') === moment(tz).format('DDMMYYYY')) {
+        return (
+          <TodayDay key={index} onClick={() => this.onDayClick(day)}>
+            {this.renderDay(day)}
+          </TodayDay>
+        );
+      }
     }
     return (
       <NormalDay key={index} onClick={() => this.onDayClick(day)}>

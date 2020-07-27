@@ -118,7 +118,8 @@ import {
 	GET_DETAIL_MERCHANT,
 	SET_DETAIL_MERCHANT,
 	UPDATE_COMPANION,
-	IS_LOADING_POPUP
+	IS_LOADING_POPUP,
+	SEARCH_PHONE_COMPANION
 } from './constants';
 
 /**
@@ -867,6 +868,13 @@ export function updateCompanion(payload) {
 export function loadingPopup(payload) {
 	return {
 		type: IS_LOADING_POPUP,
+		payload
+	};
+}
+
+export function searchPhoneCompanion(payload) {
+	return {
+		type: SEARCH_PHONE_COMPANION,
 		payload
 	};
 }
