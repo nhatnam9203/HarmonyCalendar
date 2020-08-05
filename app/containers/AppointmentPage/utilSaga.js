@@ -24,6 +24,7 @@ export const statusConvertKey = {
 };
 
 export const appointmentAdapter = (appointment) => {
+		
 	return {
 		id: appointment.appointmentId,
 		code: `#${appointment.code}`,
@@ -50,9 +51,9 @@ export const appointmentAdapter = (appointment) => {
 		memberId: appointment.staffId,
 		start: appointment.fromTime,
 		end:
-			appointment.duration && parseInt(appointment.duration) > 0
+			appointment.fromTime !== appointment.toTime
 				? appointment.toTime
-				: moment(appointment.fromTime).add('minutes', 15),
+				: `${moment(appointment.fromTime).add('minutes', 15).format('YYYY-MM-DD')}T${moment(appointment.fromTime).add('minutes', 15).format('HH:mm:ss')}`,
 		user_id: appointment.userId,
 		createDate: appointment.createdDate,
 		tipPercent: appointment.tipPercent,
@@ -262,7 +263,7 @@ export function totalDuartionUpdateAppointment(services, extras, appointment) {
 	const lastIndex = findLastIndex(services, appointment);
 	for (let i = 0; i < services.length; i++) {
 		total += services[i].duration;
-		const findExtra = extras.find((ex) => ex.serviceId && ex.serviceId === services[i].serviceId);
+		const findExtra = extras.find((ex) => ex.bookingServiceId && ex.bookingServiceId === services[i].bookingServiceId);
 		if (findExtra) {
 			total += findExtra.duration;
 		}

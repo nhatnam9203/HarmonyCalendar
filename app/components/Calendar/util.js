@@ -26,6 +26,7 @@ const extrasAdapter = (extra) => {
     return {
         appointmentId: extra.AppointmentId,
         bookingExtraId: extra.BookingExtraId,
+        bookingServiceId : extra.BookingServiceId,
         duration: extra.Duration,
         extraId: extra.ExtraId,
         extraName: extra.ExtraName,

@@ -48,7 +48,8 @@ import {
   makeStatusDeleteWaiting,
   makeSlideIndex,
   makeLoadingPopup,
-  makeMerchantInfo
+  makeMerchantInfo,
+  makeToday
 } from './selectors';
 
 export function mapDispatchToProps(dispatch) {
@@ -99,6 +100,7 @@ const mapStateToProps = createStructuredSelector({
   slideIndex : makeSlideIndex(),
   isLoadingPopup : makeLoadingPopup(),
   merchantInfo : makeMerchantInfo(),
+  today : makeToday()
 });
 
 const withConnect = connect(

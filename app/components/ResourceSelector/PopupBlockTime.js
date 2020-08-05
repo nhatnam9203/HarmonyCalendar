@@ -119,7 +119,6 @@ const ButtonAddBlock = styled.div`
 	background-color: #f2f2f2;
 	width: 55%;
 	font-weight: 500;
-	/* collor: #333; */
 	align-items: center;
 	justify-content: center;
 	cursor: pointer;
@@ -295,7 +294,7 @@ class PopupBlockTime extends Component {
 					style={styles.blockTime}
 				>
 					<div style={{ width: '10%' }}>
-						<img style={{ width : 17, height : 17 }} src={require('../../images/clock_2.png')} />
+						<img style={{ width: 17, height: 17 }} src={require('../../images/clock_2.png')} />
 					</div>
 
 					<div style={styles.test}>
@@ -324,7 +323,7 @@ class PopupBlockTime extends Component {
 							}}
 							style={styles.trashButton}
 						>
-							<img style={{ width : 20, height : 20 }} src={require('../../images/delete.png')} />
+							<img style={{ width: 20, height: 20 }} src={require('../../images/delete.png')} />
 						</div>
 					)}
 				</div>
@@ -338,7 +337,7 @@ class PopupBlockTime extends Component {
 			return (
 				<React.Fragment>
 					<ButtonAddBlock onClick={() => this.setState({ isAddBlock: true })}>
-						<img style={{ width : 21, height : 21 }} src={require("../../images/clock.png")} />
+						<img style={{ width: 21, height: 21 }} src={require("../../images/clock.png")} />
 						<div style={{ marginLeft: 8, color: '#4B4B4B' }}>Add Blocked Time</div>
 					</ButtonAddBlock>
 					<BlockList>{this.renderBlockTimeList()}</BlockList>
@@ -355,14 +354,14 @@ class PopupBlockTime extends Component {
 						<div style={styles.select}>
 							{start.toString().substring(0, 5)}
 							<span> {start.toString().substring(6, 8)}</span>
-							<img style={{ width : 11, height : 11 , marginLeft : 5 }} src={require("../../images/down-arrow.png")} />
+							<img style={{ width: 11, height: 11, marginLeft: 5 }} src={require("../../images/down-arrow.png")} />
 						</div>
 					</div>
 					<p style={{ marginLeft: 8, marginTop: 7, fontWeight: '500', fontSize: 16 }}> - </p>
 					<div onClick={() => this.setState({ isPopupSelectTime: true, isEnd: true })}>
 						<div style={styles.select}>
 							{end}
-							<img style={{ width : 11, height : 11 , marginLeft : 5 }} src={require("../../images/down-arrow.png")} />
+							<img style={{ width: 11, height: 11, marginLeft: 5 }} src={require("../../images/down-arrow.png")} />
 						</div>
 					</div>
 				</Row>
@@ -391,7 +390,7 @@ class PopupBlockTime extends Component {
 	}
 
 	renderPopupSelectTime() {
-		const { isPopupSelectTime, isStart, isEnd } = this.state;
+		const { isPopupSelectTime } = this.state;
 		if (isPopupSelectTime) {
 			return (
 				<PopupTimePicker
@@ -424,31 +423,33 @@ class PopupBlockTime extends Component {
 
 	render() {
 		const { popupPincode, staff } = this.props;
-		const { isPopupSelectTime, isAddBlock } = this.state;
+		const { isPopupSelectTime, isAddBlock , isPopupDelete } = this.state;
 
 		if (popupPincode === false) return '';
 		return (
-			<Container active={isPopupSelectTime} open closeOnDocumentClick={false}>
-				<React.Fragment>
+			<React.Fragment>
+				{ !isPopupDelete && <Container active={isPopupSelectTime} open closeOnDocumentClick={false}>
+					<React.Fragment>
 
-					<BtnClose onClick={isPopupSelectTime ? () => { } : () => this.closeModal()}>
-						<img src={require("../../images/close_black.png")} />
-					</BtnClose>
+						<BtnClose onClick={isPopupSelectTime ? () => { } : () => this.closeModal()}>
+							<img src={require("../../images/close_black.png")} />
+						</BtnClose>
 
-					<BodyPopup>
-						<StaffHeader>
-							<StaffHeader.Left>
-								<img style={styles.imgStaff} src={staff.imageUrl} atl="" />
-							</StaffHeader.Left>
-							{this.renderHeaderRight()}
-						</StaffHeader>
-						{this.renderStaffBody()}
-					</BodyPopup>
-					{isPopupSelectTime && <OverLay />}
-					{this.renderPopupSelectTime()}
-					{this.renderPopupDelete()}
-				</React.Fragment>
-			</Container>
+						<BodyPopup>
+							<StaffHeader>
+								<StaffHeader.Left>
+									<img style={styles.imgStaff} src={staff.imageUrl} atl="" />
+								</StaffHeader.Left>
+								{this.renderHeaderRight()}
+							</StaffHeader>
+							{this.renderStaffBody()}
+						</BodyPopup>
+						{isPopupSelectTime && <OverLay />}
+						{this.renderPopupSelectTime()}
+					</React.Fragment>
+				</Container>}
+				{this.renderPopupDelete()}
+			</React.Fragment>
 		);
 	}
 }

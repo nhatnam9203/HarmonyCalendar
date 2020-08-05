@@ -6,6 +6,7 @@ import { api } from '../../utils/helper';
 import * as constants from './constants';
 import * as actions from './actions';
 import * as api_constants from '../../../app-constants';
+import { uniqBy } from 'lodash'
 
 import {
 	makeCurrentDay,
@@ -175,7 +176,7 @@ export function* getWaitingAppointments() {
 			yield put(actions.loadingWaiting(true));
 			const requestURL = new URL(api_constants.GET_APPOINTMENT_STATUS);
 			const timezone = new Date().getTimezoneOffset();
-			const url = `${requestURL.toString()}&timezone=${timezone}&waitingTime=${false}`;
+			const url = `${requestURL.toString()}&waitingTime=${false}`;
 
 			const response = yield api(url.toString(), '', 'GET', token);
 			if (response.codeStatus !== 1) {
@@ -287,9 +288,6 @@ export function* reRenderAppointment() {
 		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery);
 		yield put(actions.appointmentByMembersLoaded(appointmentsMembers));
 		addEventsToCalendar(currentDate, appointmentsMembers);
-		setTimeout(() => {
-
-		}, 200);
 	} catch (err) {
 		yield put(actions.appointmentByMemberLoadingError(err));
 	}
@@ -353,10 +351,13 @@ export function* moveAppointment(action) {
 		sv.staffId = assignedMember ? assignedMember.id : 0;
 	});
 
+	let _end = moment(start).add("minutes", 15);
+	_end = `${_end.format('YYYY-MM-DD')}T${_end.format("HH:mm:ss")}`;
+
 	const data = {
 		staffId: memberId,
 		fromTime: start,
-		toTime: options.length > 0 ? end : moment(start).add("minutes", 15),
+		toTime: options.length > 0 ? end : _end,
 		status: statusConvertData[status],
 		services: options,
 		products,
@@ -582,6 +583,7 @@ export function* changeTimeAppointment(action) {
 
 function totalDuarion(services, extras, appointment, memberId) {
 	let total = 0;
+	let duplicate_arr = [];
 	if (memberId === 0 && appointment.memberId !== 0) {
 		for (let i = 0; i < services.length; i++) {
 			total += services[i].duration;
@@ -595,9 +597,9 @@ function totalDuarion(services, extras, appointment, memberId) {
 		if (lastIndex !== -1) {
 			for (let i = 0; i < services.length; i++) {
 				total += services[i].duration;
-				const findExtra = extras.find((ex) => ex.serviceId && ex.serviceId === services[i].serviceId);
+				const findExtra = extras.find((ex) => ex.bookingServiceId && ex.bookingServiceId === services[i].bookingServiceId);
 				if (findExtra) {
-					total += findExtra.duration;
+					duplicate_arr.push(findExtra)
 				}
 				if (i === lastIndex) {
 					break;
@@ -608,7 +610,15 @@ function totalDuarion(services, extras, appointment, memberId) {
 		}
 	}
 
-	console.log({total})
+	const arr_extra = uniqBy(duplicate_arr, function (e) {
+		return e.serviceId;
+	});
+
+	if (arr_extra && arr_extra.length > 0) {
+		for (let i = 0; i < arr_extra.length; i++) {
+			total += arr_extra[i].duration;
+		}
+	}
 
 	return total;
 }
@@ -682,16 +692,18 @@ export function* changeAppointmentSaga(action) {
 		deleteEventFromCalendar(fcEvent._id);
 		yield put(actions.deselectAppointment());
 
-		yield put(
-			actions.updateAppointmentFrontend({
-				appointment: {
-					...data,
-					staffId: options.length > 0 ? options[0].staffId : 0,
-					toTime,
-				},
-				id: appointment.id
-			})
-		);
+		const _staffId = data.staffId;
+
+		const data_update_frontend = {
+			appointment: {
+				...data,
+				staffId: options.length > 0 ? options[0].staffId : _staffId,
+				toTime,
+			},
+			id: appointment.id
+		}
+
+		yield put(actions.updateAppointmentFrontend(data_update_frontend));
 		yield put(actions.renderAppointment());
 
 		try {
@@ -711,7 +723,7 @@ export function* changeAppointmentSaga(action) {
 					appointment: {
 						...data,
 						toTime: moment(data.fromTime).add(
-							totalDuarion(data.services, data.extras, appointment),
+							_duration,
 							'minutes'
 						)
 					},
@@ -871,13 +883,18 @@ export function* getDetailMerchantSaga(action) {
 		const response = yield api(url, '', 'GET', token);
 
 		if (parseInt(response.codeNumber) === 200) {
-			yield put(actions.setDetailMerchant(response.data));
-			const isLoadData  = action.payload && action.payload.isLoadData ? action.payload.isLoadData : '';
+			let infoMerchant = { ...response.data };
+			if (response.data.timezone === "null") {
+				infoMerchant.timezone = null;
+			}
+			yield put(actions.setDetailMerchant(infoMerchant));
+			const isLoadData = action.payload && action.payload.isLoadData ? action.payload.isLoadData : '';
 			if (isLoadData) {
 				const { timezone } = response.data;
-				let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment();
+				let timeNow = timezone && timezone !== "null" ? moment_tz.tz(timezone.substring(12)) : moment();
 				let day = `${moment(timeNow).format("DDMMYYYY")}`;
 				yield put(actions.selectDay(day));
+				yield put(actions.setToday(day));
 				yield put(actions.selectWeek(day));
 				yield put(actions.updateNextStaff({ isReloadCalendar: true }))
 			}
@@ -1028,7 +1045,7 @@ export function* getTimeStaffLoginSaga(action) {
 	try {
 		const { staffId } = action;
 		const timeZone = new Date().getTimezoneOffset();
-		const requestURL = new URL(`${api_constants.API_GET_TIME_STAFF_LOGIN}/${staffId}?timezone=${timeZone}`);
+		const requestURL = new URL(`${api_constants.API_GET_TIME_STAFF_LOGIN}/${staffId}`);
 		const response = yield api(requestURL.toString(), '', 'GET', token);
 
 		if (response.codeStatus === 1) {
@@ -1062,7 +1079,7 @@ function* updateNextStaff_Saga() {
 				const slideIndex = yield select(makeSlideIndex());
 				yield put(actions.membersLoaded(members));
 				yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
-				
+
 				if (!isReloadCalendar)
 					yield put(actions.getBlockTime());
 				else yield put(actions.reloadCalendar());

@@ -6,10 +6,6 @@ import moment_tz from 'moment-timezone'
 
 class FCAgenda extends React.Component {
 
-  // componentWillMount(){
-  //   moment_tz.tz.setDefault()
-  // }
-
   componentDidMount() {
     const { options, merchantInfo } = this.props;
     $('#full-calendar').fullCalendar(options());
@@ -22,7 +18,7 @@ class FCAgenda extends React.Component {
       const { timezone } = merchantInfo;
       let tz = timezone ? timezone.toString().substring(12) : null;
       let calendarOptions = $('#full-calendar').fullCalendar('getView').options;
-      calendarOptions.now = moment_tz.tz(tz);
+      calendarOptions.now = tz ? moment_tz.tz(tz) : moment().local();
       $('#full-calendar').fullCalendar('destroy');
       $('#full-calendar').fullCalendar(calendarOptions);
       $('#full-calendar').fullCalendar('render');

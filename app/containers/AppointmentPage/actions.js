@@ -119,7 +119,8 @@ import {
 	SET_DETAIL_MERCHANT,
 	UPDATE_COMPANION,
 	IS_LOADING_POPUP,
-	SEARCH_PHONE_COMPANION
+	SEARCH_PHONE_COMPANION,
+	SET_TODAY
 } from './constants';
 
 /**
@@ -875,6 +876,13 @@ export function loadingPopup(payload) {
 export function searchPhoneCompanion(payload) {
 	return {
 		type: SEARCH_PHONE_COMPANION,
+		payload
+	};
+}
+
+export function setToday(payload) {
+	return {
+		type: SET_TODAY,
 		payload
 	};
 }

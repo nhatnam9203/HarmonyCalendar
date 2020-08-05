@@ -103,6 +103,9 @@ const makeSlideIndex = () =>
 const makeLoadingPopup = () =>
 	createSelector(currentAppointment, (appointmentState) => appointmentState.get('isLoadingPopup'));
 
+const makeToday = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.get('today'));
+
 export {
 	currentAppointment,
 	makeCurrentDay,
@@ -134,5 +137,6 @@ export {
 	makeSelectStaffSort,
 	makeSlideIndex,
 	makeMerchantInfo,
-	makeLoadingPopup
+	makeLoadingPopup,
+	makeToday
 };

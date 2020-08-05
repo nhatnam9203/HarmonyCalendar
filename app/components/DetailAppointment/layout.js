@@ -13,6 +13,8 @@ import ReactLoading from 'react-loading';
 
 const AppPopup = styled(Popup)`
 	border-radius: 1.5rem;
+	border-top-left-radius: 1.7rem;
+	border-top-right-radius: 1.7rem;
 	padding: 0 !important;
 	border: none !important;
 	box-shadow : ${(props) => props.BoxShadow};

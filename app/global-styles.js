@@ -16,6 +16,7 @@ const GlobalStyle = createGlobalStyle`
     width: 100%;
     position: fixed;
     overflow: hidden;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
   }
 
@@ -26,6 +27,7 @@ const GlobalStyle = createGlobalStyle`
   body.fontLoaded {
 
   }
+
 
 
 
@@ -42,9 +44,20 @@ const GlobalStyle = createGlobalStyle`
   }
   
   :focus {
-    outline: none;
+    outline: none !important;
+    box-shadow: none !important;
   }
-  
+
+  :active {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  :visited {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
   table {
     border-collapse: collapse;
     width: 100%;

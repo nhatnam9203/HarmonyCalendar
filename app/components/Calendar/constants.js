@@ -57,7 +57,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 		eventOverlap: true,
 		minTime: '00:00:00',
 		maxTime: '24:00:00',
-		timezone : timezone_merchant ? 'local' : false,
+		timezone: timezone_merchant ? 'local' : false,
 		now: timezone_merchant ? moment_tz.tz('US/Eastern') : moment_tz().tz(),
 		longPressDelay: 200,
 		resources: resource,
@@ -105,30 +105,31 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 									}
 								}
 							});
-
-							el.appointments.forEach((app) => {
-								if (
-									// check appointment available ở các cột staff
-									moment(start).isBefore(moment(app.end)) &&
-									moment(start).isSameOrAfter(moment(app.start)) &&
-									(app.status === 'CHECKED_IN' || app.status === 'CONFIRMED' || app.status === 'BLOCK_TEMP')
-									// (app.memberId !== 0)
-								) {
-									if (_j === 0) {
-										count = count + 1;
-										_j = _j + 1;
+							if(_i === 0){
+								el.appointments.forEach((app) => {
+									if (
+										// check appointment available ở các cột staff
+										moment(start).isBefore(moment(app.end)) &&
+										moment(start).isSameOrAfter(moment(app.start)) &&
+										(app.status === 'CHECKED_IN' || app.status === 'CONFIRMED' || app.status === 'BLOCK_TEMP')
+										// (app.memberId !== 0)
+									) {
+										if (_j === 0) {
+											count = count + 1;
+											_j = _j + 1;
+										}
 									}
-								}
-
-								if (
-									// check appointment available ở cột any staff
-									moment(start).isBefore(moment(app.end)) &&
-									moment(start).isSameOrAfter(moment(app.start)) &&
-									app.memberId === 0
-								) {
-									countAppAnyStaff = countAppAnyStaff + 1;
-								}
-							});
+	
+									if (
+										// check appointment available ở cột any staff
+										moment(start).isBefore(moment(app.end)) &&
+										moment(start).isSameOrAfter(moment(app.start)) &&
+										app.memberId === 0
+									) {
+										countAppAnyStaff = countAppAnyStaff + 1;
+									}
+								});
+							}
 						}
 					}
 				});
@@ -222,7 +223,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 					isCheckWorking = checkWorkingTime[1].isCheck;
 				}
 
-				const time  = moment(start._d.toString().substr(0, 24));
+				const time = moment(start._d.toString().substr(0, 24));
 
 				if (Boolean(isCheckWorking) === true && check_block_temp === false) {
 					if (moment(time).isBefore(timeEnd) && moment(time).isSameOrAfter(timeStart)) {
@@ -230,7 +231,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 						/* Get timenow merchant's timezone */
 						const merchantInfo = store.getState().getIn(['appointment', 'merchantInfo']);
 						const timezone = merchantInfo.timezone;
-						let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment();
+						let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment().local();
 						timeNow = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
 
 						if (moment(time).isBefore(moment(timeNow))) {
@@ -414,7 +415,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 						event.end !== null
 							? `${event.end.format('YYYY-MM-DD')}T${event.end.format('HH:mm:ss')}`
 							: moment(start_time).add(90, 'minutes').format('YYYY-MM-DD HH:mm:ss');
-					const startTime = `${start_time.format('YYYY-MM-DD')}T${end_time.format('HH:mm:ss')}`;
+					const startTime = `${start_time.format('YYYY-MM-DD')}T${start_time.format('HH:mm:ss')}`;
 
 					const start = `${moment(currentDay).format('YYYY-MM-DD')}T${moment(businessHour[1].timeStart, [
 						'h:mm A'

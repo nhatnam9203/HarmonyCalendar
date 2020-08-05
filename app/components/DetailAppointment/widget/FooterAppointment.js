@@ -48,7 +48,7 @@ export default class FooterAppointment extends Component {
 
         let tipPercent = appointment.tipPercent ? parseFloat(appointment.tipPercent.toString().replace(/,/g, '')).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') : "0.00";
 
-        if (appointment.status === 'PAID') {
+        if (appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND') {
             return (
                 <React.Fragment>
                     <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
