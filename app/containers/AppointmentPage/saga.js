@@ -544,6 +544,8 @@ export function* changeTimeAppointment(action) {
 			productsUpdate,
 			extrasUpdate
 		} = action.appointment;
+		const merchantInfo = yield select(makeMerchantInfo());
+		const timezone = merchantInfo.timezone;
 
 		let { memberId, options, products, extras, id, start, giftCards } = appointment;
 
@@ -554,6 +556,9 @@ export function* changeTimeAppointment(action) {
 			totalDuration > 0
 				? moment(start_time).add(totalDuration, 'minutes').format('YYYY-MM-DD HH:mm')
 				: moment(start_time).add(15, 'minutes').format('YYYY-MM-DD HH:mm');
+
+		let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment();
+		let now = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
 
 		const payload = {
 			appointmentEdit: appointment,
@@ -568,7 +573,9 @@ export function* changeTimeAppointment(action) {
 			selectedStaff,
 			giftCards
 		}
-		if (memberId === 0 && (moment(start_time).format("HH:mm A") !== moment(start).format("HH:mm A"))) {
+		if ((memberId === 0 && (moment(start_time).format("HH:mm A") !== moment(start).format("HH:mm A")))
+			|| memberId !== 0 && moment(start_time).isBefore(moment(now))
+		) {
 			const text = " This Any Staff appointment is set to begin at a different time. Do you want to change original time of appointment?"
 			if (window.confirm(text)) {
 				yield put(actions.changeAppointment(payload))

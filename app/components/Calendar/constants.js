@@ -438,7 +438,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 							return;
 						}
 					}
-					if (moment(event.data.start).format("HH:mm A") === moment(startTime).format("HH:mm A")) {
+					if ((moment(event.data.start).format("HH:mm A") === moment(startTime).format("HH:mm A")) ) {
 						store.dispatch(moveAppointment(event.data.id, 0, startTime, endTime));
 					} else {
 						if (window.confirm(" This Any Staff appointment is set to begin at a different time. Do you want to change original time of appointment? ")) {
@@ -574,8 +574,22 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 							}
 						}
 					} else {
+						const merchantInfo = store.getState().getIn(['appointment', 'merchantInfo']);
+						const timezone = merchantInfo.timezone;
+						let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment().local();
+						timeNow = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
+						if (moment(start_time).isBefore(moment(timeNow))) {
+							console.log({timeNow,start_time})
+							const text = 'This appointment is set for a time that has already passed. Do you still want to set this appointment at this time?'
+							if(window.confirm(text)){
+								store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId), start_time, endTime));
+							}else{
+								revertFunc();
+							}
+						}else{
+							store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId), start_time, endTime));
+						}
 						//move appointment từ staff này qua staff khác
-						store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId), start_time, endTime));
 					}
 				}
 			}

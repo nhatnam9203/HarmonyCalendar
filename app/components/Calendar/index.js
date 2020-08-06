@@ -89,8 +89,8 @@ class Calendar extends React.Component {
 
 			if (action === 'PaidOffline') {
 				this.props.updateAppointmentPaidOffline(idAppointment);
-				const displayMember = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
-				const selectDay = store.getState().getIn([ 'appointment', 'currentDay' ]);
+				const displayMember = store.getState().getIn(['appointment', 'appointments', 'calendar']);
+				const selectDay = store.getState().getIn(['appointment', 'currentDay']);
 				addEventsToCalendar(selectDay, displayMember);
 			}
 
@@ -103,7 +103,7 @@ class Calendar extends React.Component {
 				}, 300);
 			}
 			if (action === 'resetWeb') {
-				if(today.toString() !== moment().format('DDMMYYYY').toString()){
+				if (today.toString() !== moment().format('DDMMYYYY').toString()) {
 					setTimeout(() => {
 						window.location.reload();
 					}, 300);
@@ -121,13 +121,13 @@ class Calendar extends React.Component {
 			}
 		});
 
-		
+
 		if (res.status === 200) {
 			if (res.data.codeNumber === 200) {
 				let appointment = appointmentAdapter(res.data.data);
-				let newEndTime = appointment.start === appointment.end ? 
-				`${moment(app.start).add('minutes', 15).format('YYYY-MM-DD')}T${moment(app.start).add('minutes', 15).format('HH:mm:ss')}` :
-				`${moment(app.end).format('YYYY-MM-DD')}T${moment(app.end).format('HH:mm:ss')}`
+				let newEndTime = appointment.start === appointment.end ?
+					`${moment(app.start).add('minutes', 15).format('YYYY-MM-DD')}T${moment(app.start).add('minutes', 15).format('HH:mm:ss')}` :
+					`${moment(app.end).format('YYYY-MM-DD')}T${moment(app.end).format('HH:mm:ss')}`
 				appointment.end = newEndTime;
 				return appointment;
 			} else {
@@ -156,7 +156,7 @@ class Calendar extends React.Component {
 			// 	return;
 			// }
 			if (appointment_R.status === 'ASSIGNED' || appointment_R.status === 'CHECKED_IN') {
-				const displayMember = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
+				const displayMember = store.getState().getIn(['appointment', 'appointments', 'calendar']);
 
 				const member = displayMember.find((mem) =>
 					mem.appointments.find((app) => parseInt(app.id) === parseInt(appointment_R.id))
@@ -171,6 +171,15 @@ class Calendar extends React.Component {
 		}
 	}
 
+	async pushNotification(isNotification, appointment) {
+		const data = await JSON.stringify({
+			action: 'push_notification',
+			isNotification,
+			appointment
+		});
+		window.postMessage(data);
+	}
+
 	runSignalR_Appointment() {
 		const url = `${PROD_API_BASE_URL}/notification/?merchantId=${merchantId}&Title=Merchant&kind=calendar&deviceId=${deviceId}`;
 		let connection = new signalR.HubConnectionBuilder().withUrl(url).withAutomaticReconnect().build();
@@ -182,18 +191,18 @@ class Calendar extends React.Component {
 				let type = app.data.Type;
 				switch (type) {
 					case 'user_update':
-						console.log('user update');
+						// console.log('user update');
 						this.props.updateConsumer(app.data.user);
-						const displayMember = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
-						const selectDay = store.getState().getIn([ 'appointment', 'currentDay' ]);
+						const displayMember = store.getState().getIn(['appointment', 'appointments', 'calendar']);
+						const selectDay = store.getState().getIn(['appointment', 'currentDay']);
 						addEventsToCalendar(selectDay, displayMember);
 						break;
 
 					case 'appointment_add':
-						console.log('appointmemt add');
 						const appointment = app.data.Appointment;
 						if (appointment) {
 							let appointment_R = returnAppointment(appointment);
+							this.pushNotification(app.data.IsNotification, appointment);
 							if (appointment_R.status === 'WAITING') {
 								this.props.loadWaitingAppointments();
 							} else {
@@ -204,7 +213,7 @@ class Calendar extends React.Component {
 						break;
 
 					case 'appointment_update':
-						console.log('update appointment');
+						// console.log('update appointment');
 						let app_update = app.data.appointment;
 						const { isLoadingPopup } = this.props;
 						if (app_update) {
@@ -219,8 +228,8 @@ class Calendar extends React.Component {
 
 								const displayMember = store
 									.getState()
-									.getIn([ 'appointment', 'appointments', 'calendar' ]);
-								const selectDay = store.getState().getIn([ 'appointment', 'currentDay' ]);
+									.getIn(['appointment', 'appointments', 'calendar']);
+								const selectDay = store.getState().getIn(['appointment', 'currentDay']);
 
 								switch (appointment_R.status) {
 									case 'WAITING':
@@ -243,7 +252,7 @@ class Calendar extends React.Component {
 									default:
 										const allAppointment = store
 											.getState()
-											.getIn([ 'appointment', 'appointments', 'allAppointment' ]);
+											.getIn(['appointment', 'appointments', 'allAppointment']);
 
 										const pos = allAppointment.findIndex((app) => app.id === appointment_R.id);
 
@@ -263,14 +272,14 @@ class Calendar extends React.Component {
 						}
 						break;
 					case 'appointment_checkout':
-						console.log('appointmemt checkout');
+						// console.log('appointmemt checkout');
 						setTimeout(() => {
 							this.props.reloadCalendar();
 						}, 500);
 						break;
 
 					case 'change_item':
-						console.log('change item');
+						// console.log('change item');
 						setTimeout(() => {
 							this.props.loadWaitingAppointments();
 							this.props.reloadCalendar();
@@ -278,7 +287,7 @@ class Calendar extends React.Component {
 						break;
 
 					case 'update_merchant':
-						console.log('update merchant');
+						// console.log('update merchant');
 						// this.props.getDetailMerchant();
 						// setTimeout(() => {
 						// 	this.props.updateNextStaff({ isReloadCalendar: true });
@@ -295,7 +304,7 @@ class Calendar extends React.Component {
 			if (app.type) {
 				let type = app.type;
 				if (type === 'staff_update') {
-					console.log('staff update');
+					// console.log('staff update');
 					this.props.deselectAppointment();
 					this.props.disable_Calendar(false);
 					// this.props.getDetailMerchant();
@@ -303,7 +312,7 @@ class Calendar extends React.Component {
 				}
 
 				if (type === 'update_blocktime') {
-					console.log('update blocktime');
+					// console.log('update blocktime');
 					this.props.deselectAppointment();
 					this.props.disable_Calendar(false);
 					this.props.updateNextStaff({ isReloadCalendar: false });
@@ -311,9 +320,9 @@ class Calendar extends React.Component {
 			}
 		});
 		connection.start().catch((error) => {
-			console.log({ error });
+			// console.log({ error });
 		});
-		connection.onclose(function() {});
+		connection.onclose(function () { });
 	}
 
 	render() {
@@ -355,8 +364,8 @@ class Calendar extends React.Component {
 							deleteWaitingAppointment={deleteWaitingAppointment}
 						/>
 					) : (
-						''
-					)}
+							''
+						)}
 					<SignInWrapper>
 						<SignInWrapper.Button
 							onClick={() => {
