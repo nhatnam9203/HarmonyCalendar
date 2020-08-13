@@ -1,15 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-
-import FCAgenda from './FCAgenda';
-import FCDragZone from './FCDragZone';
 import { updateEventToCalendar } from './constants';
 import { MAIN_CALENDAR_OPTIONS } from './constants';
 import { merchantId, deviceId, GET_APPOINTMENT_ID, token } from '../../../app-constants';
-import WaitingLoading from './WaitingLoading';
-import CalendarLoading from './CalendarLoading';
-const signalR = require('@microsoft/signalr');
 import { store } from 'app';
 import { addEventsToCalendar } from './constants';
 import { PROD_API_BASE_URL } from '../../../app-constants';
@@ -17,7 +11,12 @@ import { returnAppointment } from './util';
 import { appointmentAdapter } from '../../containers/AppointmentPage/utilSaga';
 import axios from 'axios';
 import moment from 'moment'
+import WaitingLoading from './WaitingLoading';
+import CalendarLoading from './CalendarLoading';
+import FCAgenda from './FCAgenda';
+import FCDragZone from './FCDragZone';
 
+const signalR = require('@microsoft/signalr');
 const CalendarWrapper = styled.div`
 	display: flex;
 	border-left: 2px solid #3883bb;
@@ -140,10 +139,6 @@ class Calendar extends React.Component {
 	componentDidMount() {
 		window.addEventListener('message', this.receiveMessage);
 		this.runSignalR();
-		const x = document.getElementsByClassName('fc-now-indicator fc-now-indicator-arrow');
-		for (let i = 0; i < x.length; i++) {
-			x[i].scrollIntoView();
-		}
 	}
 
 	runSignalR() {

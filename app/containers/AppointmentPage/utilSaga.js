@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { uniqBy } from 'lodash'
 
 export const statusConvertData = {
 	ASSIGNED: 'unconfirm',
@@ -7,8 +8,8 @@ export const statusConvertData = {
 	PAID: 'paid',
 	WAITING: 'waiting',
 	CANCEL: 'cancel',
-	VOID : 'void',
-	REFUND : 'refund'
+	VOID: 'void',
+	REFUND: 'refund'
 };
 
 export const statusConvertKey = {
@@ -19,12 +20,12 @@ export const statusConvertKey = {
 	waiting: 'WAITING',
 	cancel: 'CANCEL',
 	pending: 'PENDING',
-	void : 'VOID',
-	refund : 'REFUND'
+	void: 'VOID',
+	refund: 'REFUND'
 };
 
 export const appointmentAdapter = (appointment) => {
-		
+
 	return {
 		id: appointment.appointmentId,
 		code: `#${appointment.code}`,
@@ -32,17 +33,17 @@ export const appointmentAdapter = (appointment) => {
 		firstName: appointment.firstName,
 		lastName: appointment.lastName,
 		phoneNumber: appointment.phoneNumber,
-		options: appointment.services.sort(function(a, b) {
+		options: appointment.services.sort(function (a, b) {
 			var c = a.bookingServiceId;
 			var d = b.bookingServiceId;
 			return d - c;
 		}),
-		products: appointment.products.sort(function(a, b) {
+		products: appointment.products.sort(function (a, b) {
 			var c = a.bookingProductId;
 			var d = b.bookingProductId;
 			return d - c;
 		}),
-		extras: appointment.extras.sort(function(a, b) {
+		extras: appointment.extras.sort(function (a, b) {
 			var c = a.bookingExtraId;
 			var d = b.bookingExtraId;
 			return d - c;
@@ -63,19 +64,19 @@ export const appointmentAdapter = (appointment) => {
 		tax: appointment.tax,
 		isVip: appointment.isVip,
 		discount: appointment.discount,
-		bookingGroupId : appointment.bookingGroupId,
-		companionName : appointment.companionName,
-		companionPhone : appointment.companionPhone,
-		isMainBookingGroup : appointment.isMainBookingGroup,
+		bookingGroupId: appointment.bookingGroupId,
+		companionName: appointment.companionName,
+		companionPhone: appointment.companionPhone,
+		isMainBookingGroup: appointment.isMainBookingGroup,
 		customerId: appointment.customerId,
 		giftCard: appointment.giftCard,
 		giftCards: appointment.giftCards ? appointment.giftCards : [],
 		notes: appointment.notes
-			? appointment.notes.sort(function(a, b) {
-					var c = a.appointmentNoteId;
-					var d = b.appointmentNoteId;
-					return d - c;
-				})
+			? appointment.notes.sort(function (a, b) {
+				var c = a.appointmentNoteId;
+				var d = b.appointmentNoteId;
+				return d - c;
+			})
 			: []
 	};
 };
@@ -206,7 +207,7 @@ export function addBlockCalendar(appointmentsMembers, displayedMembers, currentD
 					.format('HH:mm:ss')}`,
 				`${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(
 					checkWorkingTime[1].timeStart,
-					[ 'h:mm A' ]
+					['h:mm A']
 				).format('HH:mm:ss')}`
 			);
 
@@ -239,7 +240,7 @@ export function checkTimeToAddAppointmdent() {
 
 export function totalDuationChangeTime(appointment, extras) {
 	let totalDuration = 0;
-	let services = [ ...appointment.options ];
+	let services = [...appointment.options];
 
 	for (let i = 0; i < services.length; i++) {
 		if (appointment.memberId === services[i].staffId) {
@@ -375,17 +376,17 @@ export function dataChangeTimeAppointment(
 		} else {
 			status = 'unconfirm';
 		}
-	}else if(memberId === 0 && appointment.memberId === 0){
+	} else if (memberId === 0 && appointment.memberId === 0) {
 		status = 'unconfirm'
-	} 
+	}
 	else {
 		/* change appointment trong cột any stafff tới staff khác */
-		if(memberId === 0 && appointment.memberId !== 0){
+		if (memberId === 0 && appointment.memberId !== 0) {
 			const now = moment();
-			if(now.isBefore(appointment.end) && now.isAfter(appointment.start)){
+			if (now.isBefore(appointment.end) && now.isAfter(appointment.start)) {
 				status = 'checkin'
 			}
-		}else{
+		} else {
 			status = statusConvertData[appointment.status];
 		}
 	}
@@ -543,4 +544,57 @@ export function addBlockAnyStaff(merchantInfo, currentDayName, currentDate, appo
 		);
 		appointments.push(blockStart, blockEnd);
 	}
+}
+
+export function new_total_duration(services, extras, appointment, memberId) {
+	let total = 0;
+	let duplicate_arr = [];
+	if (memberId === 0 && appointment.memberId !== 0) {
+		for (let i = 0; i < services.length; i++) {
+			total += services[i].duration;
+		}
+		for (let i = 0; i < extras.length; i++) {
+			total += extras[i].duration;
+		}
+	}
+	else {
+		const lastIndex = findLastIndexChangeTime(services, services[0]);
+		if (lastIndex !== -1) {
+			for (let i = 0; i < services.length; i++) {
+				total += services[i].duration;
+				const findExtra = extras.find((ex) => ex.bookingServiceId && ex.bookingServiceId === services[i].bookingServiceId);
+				if (findExtra) {
+					duplicate_arr.push(findExtra)
+				}
+				if (i === lastIndex) {
+					break;
+				}
+			}
+		} else {
+			total = 15;
+		}
+	}
+
+	const arr_extra = uniqBy(duplicate_arr, function (e) {
+		return e.serviceId;
+	});
+
+	if (arr_extra && arr_extra.length > 0) {
+		for (let i = 0; i < arr_extra.length; i++) {
+			total += arr_extra[i].duration;
+		}
+	}
+
+	return total;
+}
+
+export function checkMerchantWorking(merchantInfo, fromTime) {
+	const { businessHour } = merchantInfo;
+	const day = moment(fromTime).format('dddd');
+	const dayCheck = Object.entries(businessHour).find((obj) => obj[0] === day);
+	if (!dayCheck[1].isCheck) {
+		return false;
+	}
+	return true;
+
 }

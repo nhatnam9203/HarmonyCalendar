@@ -2,11 +2,10 @@ import { delay } from 'redux-saga';
 import { fork, put, takeLatest, all, select } from 'redux-saga/effects';
 import moment from 'moment';
 import moment_tz from 'moment-timezone'
-import { api } from '../../utils/helper';
+import { api , scrollToNow } from '../../utils/helper';
 import * as constants from './constants';
 import * as actions from './actions';
 import * as api_constants from '../../../app-constants';
-import { uniqBy } from 'lodash'
 
 import {
 	makeCurrentDay,
@@ -25,8 +24,6 @@ import {
 	addBlockCalendar,
 	checkTimeToAddAppointmdent,
 	totalDuationChangeTime,
-	totalDuartionUpdateAppointment,
-	newDateUpdateAppointment,
 	dataUpdateAppointment,
 	totalDurationAssignAppointment,
 	dataChangeTimeAppointment,
@@ -34,12 +31,12 @@ import {
 	statusConvertData,
 	appointmentAdapter,
 	memberAdapter,
-	findLastIndex,
-	findLastIndexChangeTime,
 	totalDurationMoveAppointment,
 	addLastStaff,
 	block,
-	addBlockAnyStaff
+	addBlockAnyStaff,
+	new_total_duration,
+	checkMerchantWorking
 } from './utilSaga';
 
 import { addEventsToCalendar, deleteEventFromCalendar } from '../../components/Calendar/constants';
@@ -471,7 +468,6 @@ export function* upddateAppointment(action) {
 	try {
 		const fcEvent = yield select(makeSelectFCEvent());
 
-
 		if (!fcEvent) {
 			yield put(actions.appointmentUpdatingStatusError('Cannot find selected fcEvent'));
 		}
@@ -560,6 +556,11 @@ export function* changeTimeAppointment(action) {
 		let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment();
 		let now = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
 
+		if(!checkMerchantWorking(merchantInfo,start_time)){
+			alert(`Merchant's not working on your selected date!`);
+			return;
+		}
+
 		const payload = {
 			appointmentEdit: appointment,
 			fcEvent,
@@ -576,7 +577,8 @@ export function* changeTimeAppointment(action) {
 		if ((memberId === 0 && (moment(start_time).format("HH:mm A") !== moment(start).format("HH:mm A")))
 			|| memberId !== 0 && moment(start_time).isBefore(moment(now))
 		) {
-			const text = " This Any Staff appointment is set to begin at a different time. Do you want to change original time of appointment?"
+			const text = memberId === 0 ? "This Any Staff appointment is set to begin at a different time. Do you want to change original time of appointment?" : 
+			"This appointment is set for a time that has already passed. Do you still want to set this appointment at this time?";
 			if (window.confirm(text)) {
 				yield put(actions.changeAppointment(payload))
 			}
@@ -588,47 +590,7 @@ export function* changeTimeAppointment(action) {
 	}
 }
 
-function totalDuarion(services, extras, appointment, memberId) {
-	let total = 0;
-	let duplicate_arr = [];
-	if (memberId === 0 && appointment.memberId !== 0) {
-		for (let i = 0; i < services.length; i++) {
-			total += services[i].duration;
-		}
-		for (let i = 0; i < extras.length; i++) {
-			total += extras[i].duration;
-		}
-	}
-	else {
-		const lastIndex = findLastIndexChangeTime(services, services[0]);
-		if (lastIndex !== -1) {
-			for (let i = 0; i < services.length; i++) {
-				total += services[i].duration;
-				const findExtra = extras.find((ex) => ex.bookingServiceId && ex.bookingServiceId === services[i].bookingServiceId);
-				if (findExtra) {
-					duplicate_arr.push(findExtra)
-				}
-				if (i === lastIndex) {
-					break;
-				}
-			}
-		} else {
-			total = 15;
-		}
-	}
 
-	const arr_extra = uniqBy(duplicate_arr, function (e) {
-		return e.serviceId;
-	});
-
-	if (arr_extra && arr_extra.length > 0) {
-		for (let i = 0; i < arr_extra.length; i++) {
-			total += arr_extra[i].duration;
-		}
-	}
-
-	return total;
-}
 
 /********************************* CHANGE APPOINTMENT STEP 2 *********************************/
 export function* changeAppointmentSaga(action) {
@@ -657,7 +619,7 @@ export function* changeAppointmentSaga(action) {
 	const staff = displayedMembers.find(s => s.id === data.staffId);
 
 	/* check condition update to grey block */
-	const _duration = totalDuarion(data.services, data.extras, appointment, memberId)
+	const _duration = new_total_duration(data.services, data.extras, appointment, memberId)
 	let toTime = moment(data.fromTime).add(_duration, 'minutes');
 	toTime = `${moment(toTime).format('YYYY-MM-DD')}T${moment(toTime).format('HH:mm')}`;
 	const currentDayName = moment(data.fromTime).format('dddd');
@@ -903,6 +865,7 @@ export function* getDetailMerchantSaga(action) {
 				yield put(actions.selectDay(day));
 				yield put(actions.setToday(day));
 				yield put(actions.selectWeek(day));
+				scrollToNow()
 				yield put(actions.updateNextStaff({ isReloadCalendar: true }))
 			}
 		}
@@ -1166,18 +1129,11 @@ export function* updateCompanion_Saga(action) {
 	} catch (err) { }
 }
 
-
 /* **************************** Subroutines ******************************** */
 
 export function* selectDayAndWeek(action) {
 	yield put(actions.selectDay(action.day));
 	yield put(actions.selectWeek(action.day));
-	setTimeout(() => {
-		const x = document.getElementsByClassName('fc-now-indicator fc-now-indicator-arrow');
-		for (let i = 0; i < x.length; i++) {
-			x[i].scrollIntoView();
-		}
-	}, 300);
 }
 
 export function* getDisplayedMembers() {
@@ -1203,10 +1159,6 @@ export function* watch_editBlockTime() {
 export function* membersData() {
 	yield takeLatest(constants.LOAD_MEMBERS, getMembers);
 }
-
-// export function* reloadStaffWatch() {
-// 	yield takeLatest(constants.RELOAD_STAFF, reloadStaffSaga);
-// }
 
 export function* reloadCalendarWatch() {
 	yield takeLatest(constants.RELOAD_CALENDAR, reloadCalendarSaga);
@@ -1239,10 +1191,6 @@ export function* moveAppointmentData() {
 export function* putBackAppointmentData() {
 	yield takeLatest(constants.PUT_BACK_APPOINTMENT, putBackAppointment);
 }
-
-// export function* cancelAppointmentData() {
-// 	yield takeLatest(constants.CANCEL_APPOINTMENT, cancelAppointment);
-// }
 
 export function* updateAppointmentStatus() {
 	yield takeLatest(constants.UPDATE_APPOINTMENT_STATUS, upddateAppointment);

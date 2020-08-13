@@ -9,7 +9,7 @@ class FCAgenda extends React.Component {
   componentDidMount() {
     const { options, merchantInfo } = this.props;
     $('#full-calendar').fullCalendar(options());
-    $('.fc-now-indicator-arrow').html(moment().format('hh:mm A'));
+    $('.fc-now-indicator-arrow').html(moment().format('hh:mm'));
   }
 
   componentWillReceiveProps(nextProps) {

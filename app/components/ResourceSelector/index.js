@@ -5,8 +5,8 @@ import styled from 'styled-components';
 import Carousel from 'nuka-carousel';
 import { staffId } from '../../../app-constants';
 import PopupBlockTime from './PopupBlockTime';
-import ButtonSplash from "../DaySelector/ButtonPlash"
-import {PromiseAction} from '../../utils/helper'
+import ButtonSplash from '../DaySelector/ButtonPlash';
+import moment_tz from "moment-timezone"
 
 const ResourceSelectorWrapper = styled.div`
 	width: 100%;
@@ -21,7 +21,7 @@ const ResourceSelectorWrapper = styled.div`
 	user-select: none;
 	@media (min-width: 1025px) {
 		height: 5rem;
-  	}
+	}
 `;
 
 const TodayWrapper = styled.div`
@@ -29,25 +29,25 @@ const TodayWrapper = styled.div`
 	height: 100%;
 	text-align: center;
 	padding: 0.5rem;
-	display : flex;
-	justify-content : center;
-	align-items : center
+	display: flex;
+	justify-content: center;
+	align-items: center;
 `;
 
 TodayWrapper.Button = styled.div`
 	border-radius: 4px;
 	/* background: #0071c5; */
-	background : #1366AE;
+	background: #1366ae;
 	color: #ffffff;
-	font-weight : 600;
+	font-weight: 600;
 	width: 100%;
 	font-size: 0.95rem;
 	line-height: 2.8;
-	height : 3rem;
+	height: 3rem;
 	cursor: pointer;
-	display : flex;
-	justify-content : center;
-	align-items : center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 `;
 
 const ResourceSliderWrapper = styled.div`
@@ -61,7 +61,7 @@ const ResourceWrapper = styled.div`
 	display: flex;
 	@media (min-width: 1025px) {
 		height: calc(5rem - 2px);
-  	}
+	}
 `;
 
 const Resource = styled.div`
@@ -92,20 +92,20 @@ AnyStaff.Image = styled.div`
 	width: 100%;
 	font-size: 1rem;
 	line-height: 2.8;
-	margin-top : 0.6rem;
+	margin-top: 0.6rem;
 	height: 100%;
 	cursor: pointer;
 	& > img {
-		width : 33px;
-		height : 29px;
+		width: 33px;
+		height: 29px;
 	}
 	@media (min-width: 1025px) {
 		& > img {
-		width : 37px;
-		height : 33px;
-		margin-top : 0.8rem;
+			width: 37px;
+			height: 33px;
+			margin-top: 0.8rem;
+		}
 	}
-  	}
 `;
 
 AnyStaff.Title = styled.div`
@@ -120,7 +120,7 @@ AnyStaff.Title = styled.div`
 	@media (min-width: 1025px) {
 		font-size: 0.95rem;
 		margin-top: 0rem !important;
-  	}
+	}
 `;
 
 Resource.Avatar = styled.div`
@@ -134,12 +134,12 @@ Resource.Avatar = styled.div`
 	}
 	@media (min-width: 1025px) {
 		& img {
-		width: 4rem;
-		height: 4rem;
-		border-radius: 50%;
-		object-fit: cover;
+			width: 4rem;
+			height: 4rem;
+			border-radius: 50%;
+			object-fit: cover;
+		}
 	}
-  	}
 `;
 
 Resource.OrderNumber = styled.div`
@@ -150,9 +150,9 @@ Resource.OrderNumber = styled.div`
 	width: 20px;
 	height: 20px;
 	display: flex;
-	justify-content : center;
-	align-items : center;
-	font-weight : 600;
+	justify-content: center;
+	align-items: center;
+	font-weight: 600;
 	border-radius: 50%;
 	color: #ffffff;
 	padding: 2px;
@@ -180,8 +180,8 @@ Resource.Title = styled.div`
 	position: absolute;
 	bottom: 0px;
 	left: 0;
-	background: rgba(255,255,255,1);
-	border-top : 2px solid white;
+	background: rgba(255, 255, 255, 1);
+	border-top: 2px solid white;
 	width: 100%;
 	opacity: 0.75;
 	text-align: center;
@@ -191,15 +191,15 @@ Resource.Title = styled.div`
 	font-weight: 400;
 	@media (min-width: 1024px) {
 		font-size: 0.93rem;
-  	}
+	}
 `;
 
 const WaitingHeader = styled.div`
 	width: calc((100vw - 5.05rem) / 7);
 	text-align: center;
-	display : flex;
-	justify-content : center;
-	font-weight : 500;
+	display: flex;
+	justify-content: center;
+	font-weight: 500;
 	align-items: center;
 	line-height: 64px;
 	font-size: 18px;
@@ -208,16 +208,16 @@ const WaitingHeader = styled.div`
 	border-left: 1px solid #3883bb;
 	@media (min-width: 1024px) {
 		font-size: 1.3rem;
-  	}
+	}
 `;
 
 const ButtonArrow = styled.div`
 	& > img {
 		width: 19px;
 		height: 19px;
-		margin-left: ${props => props.isLeft ? "8px" : "0px"};
-		margin-right : ${props => props.isLeft ? "0px" : "8px"};
-		transform : ${props => props.isLeft ? "rotate(180deg)" : "rotate(0deg)"};
+		margin-left: ${(props) => (props.isLeft ? '8px' : '0px')};
+		margin-right: ${(props) => (props.isLeft ? '0px' : '8px')};
+		transform: ${(props) => (props.isLeft ? 'rotate(180deg)' : 'rotate(0deg)')};
 	}
 `;
 
@@ -226,7 +226,7 @@ function chunk(array, size) {
 	for (let i = 0; i < array.length; i += 1) {
 		const last = chunkedArr[chunkedArr.length - 1];
 		if (!last || last.length === size) {
-			chunkedArr.push([array[i]]);
+			chunkedArr.push([ array[i] ]);
 		} else {
 			last.push(array[i]);
 		}
@@ -236,7 +236,7 @@ function chunk(array, size) {
 
 class ResourceSelector extends React.Component {
 	componentWillMount() {
-		this.props.getDetailMerchant({ isLoadData : true});
+		this.props.getDetailMerchant({ isLoadData: true });
 		// setTimeout(() => {
 		// 	this.props.loadMembers();
 		// }, 500);
@@ -257,7 +257,9 @@ class ResourceSelector extends React.Component {
 	}
 
 	onTodayClick() {
-		this.props.onChangeToday(moment().format('DDMMYYYY'));
+		const { timezone } = this.props.merchantInfo;
+		let timeNow = timezone ? moment_tz.tz(timezone.substring(12)).format('DDMMYYYY') : moment().format('DDMMYYYY');
+		this.props.onChangeToday(timeNow);
 	}
 
 	openPincode(staff) {
@@ -272,33 +274,34 @@ class ResourceSelector extends React.Component {
 
 	getActiveArrow() {
 		const { slideIndex, resources } = this.props;
-		let isActiveLeft = false, isActiveRight = false;
+		let isActiveLeft = false,
+			isActiveRight = false;
 		const totalSlide = (resources.length - 1) / 5;
 
-		if ((totalSlide) <= 1) {
+		if (totalSlide <= 1) {
 			isActiveLeft = false;
 			isActiveRight = false;
-		} else
-			if (totalSlide > 1) {
-				if (slideIndex > 0) {
-					if (slideIndex < totalSlide) {
-						if (totalSlide - slideIndex <= 1) {
-							isActiveRight = false;
-							isActiveLeft = true;
-						} else {
-							isActiveRight = true;
-							isActiveLeft = true
-						}
+		} else if (totalSlide > 1) {
+			if (slideIndex > 0) {
+				if (slideIndex < totalSlide) {
+					if (totalSlide - slideIndex <= 1) {
+						isActiveRight = false;
+						isActiveLeft = true;
+					} else {
+						isActiveRight = true;
+						isActiveLeft = true;
 					}
-				} else {
-					isActiveLeft = false;
-					isActiveRight = true;
 				}
+			} else {
+				isActiveLeft = false;
+				isActiveRight = true;
 			}
+		}
 
 		return {
-			isActiveLeft, isActiveRight
-		}
+			isActiveLeft,
+			isActiveRight
+		};
 	}
 
 	renderResource(resource, index) {
@@ -332,9 +335,7 @@ class ResourceSelector extends React.Component {
 	renderLoadingResources(index) {
 		return (
 			<ResourceWrapper key={index}>
-				<Resource>
-					{/* <LoadingIndicator /> */}
-				</Resource>
+				<Resource>{/* <LoadingIndicator /> */}</Resource>
 			</ResourceWrapper>
 		);
 	}
@@ -342,7 +343,7 @@ class ResourceSelector extends React.Component {
 	renderCarouselSlide() {
 		const { loading, resources } = this.props;
 		if (loading) {
-			return [1].map((index) => this.renderLoadingResources(index));
+			return [ 1 ].map((index) => this.renderLoadingResources(index));
 		}
 		if (resources) {
 			return chunk(resources, 5).map((resource, index) => this.renderResources(resource, index));
@@ -383,37 +384,39 @@ class ResourceSelector extends React.Component {
 					</AnyStaff>
 
 					<ResourceSliderWrapper>
-						{resources.length > 0 && <Carousel
-							dragging={true}
-							renderBottomCenterControls={() => ''}
-							renderCenterLeftControls={({ previousSlide }) => {
-								if (!isActiveLett) {
-									return (
-										<ButtonArrow isLeft>
-											<img src={require('../../images/arrow-right.png')} />
-										</ButtonArrow>
-									)
-								} else
-									return (
-										<ButtonSplash isLeft onClick={(ev) => this.onPrevClick(ev, previousSlide)} />
-									)
-							}}
-							renderCenterRightControls={({ nextSlide }) => {
-								if (!isActiveRight) {
-									return (
-										<ButtonArrow>
-											<img src={require('../../images/arrow-right.png')} />
-										</ButtonArrow>
-									)
-								} else
-									return (
-										<ButtonSplash onClick={(ev) => this.onNextClick(ev, nextSlide)} />
-									)
-							}}
-							afterSlide={(slideIndex) => this.afterSlide(slideIndex)}
-						>
-							{this.renderCarouselSlide()}
-						</Carousel>}
+						{resources.length > 0 && (
+							<Carousel
+								dragging={true}
+								renderBottomCenterControls={() => ''}
+								renderCenterLeftControls={({ previousSlide }) => {
+									if (!isActiveLett) {
+										return (
+											<ButtonArrow isLeft>
+												<img src={require('../../images/arrow-right.png')} />
+											</ButtonArrow>
+										);
+									} else
+										return (
+											<ButtonSplash
+												isLeft
+												onClick={(ev) => this.onPrevClick(ev, previousSlide)}
+											/>
+										);
+								}}
+								renderCenterRightControls={({ nextSlide }) => {
+									if (!isActiveRight) {
+										return (
+											<ButtonArrow>
+												<img src={require('../../images/arrow-right.png')} />
+											</ButtonArrow>
+										);
+									} else return <ButtonSplash onClick={(ev) => this.onNextClick(ev, nextSlide)} />;
+								}}
+								afterSlide={(slideIndex) => this.afterSlide(slideIndex)}
+							>
+								{this.renderCarouselSlide()}
+							</Carousel>
+						)}
 					</ResourceSliderWrapper>
 					<WaitingHeader>Waiting</WaitingHeader>
 				</ResourceSelectorWrapper>
@@ -445,4 +448,3 @@ ResourceSelector.propTypes = {
 };
 
 export default ResourceSelector;
-

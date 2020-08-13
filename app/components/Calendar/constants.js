@@ -2,6 +2,7 @@ import $ from 'jquery';
 import moment from 'moment';
 import moment_tz from "moment-timezone"
 import { store } from 'app';
+import {checkDragWaitingInThePast} from './util'
 import {
 	assignAppointment,
 	moveAppointment,
@@ -105,7 +106,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 									}
 								}
 							});
-							if(_i === 0){
+							if (_i === 0) {
 								el.appointments.forEach((app) => {
 									if (
 										// check appointment available ở các cột staff
@@ -119,7 +120,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 											_j = _j + 1;
 										}
 									}
-	
+
 									if (
 										// check appointment available ở cột any staff
 										moment(start).isBefore(moment(app.end)) &&
@@ -167,7 +168,9 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 						const timezone = merchantInfo.timezone;
 						let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment();
 						timeNow = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
-						if (moment(time).isBefore(timeNow)) {
+						const _time = `${moment(start).format("YYYY-MM-DD")}T${moment(start).format('HH:mm:ss')}`
+
+						if (moment(_time).isBefore(timeNow)) {
 							if (window.confirm('This appointment is set for a time that has already passed. Do you still want to set this appointment at this time? ')) {
 								store.dispatch(disableCalendar(true));
 								store.dispatch(openAddingAppointment({}));
@@ -233,8 +236,9 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 						const timezone = merchantInfo.timezone;
 						let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment().local();
 						timeNow = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
+						const _time = `${moment(start).format("YYYY-MM-DD")}T${moment(start).format('HH:mm:ss')}`
 
-						if (moment(time).isBefore(moment(timeNow))) {
+						if (moment(_time).isBefore(moment(timeNow))) {
 							if (window.confirm('This appointment is set for a time that has already passed. Do you still want to set this appointment at this time? ')) {
 								store.dispatch(disableCalendar(true));
 								store.dispatch(openAddingAppointment({}));
@@ -261,7 +265,8 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 		drop(date_time, jsEvent, ui, idResource) {
 			let date = moment(date_time).local();
 			const event = $(this).data().event.data;
-
+			const merchantInfo = store.getState().getIn(['appointment', 'merchantInfo']);
+			let check = true;
 			let check_workingStaff = '';
 			let check_staff_drop = false;
 			let time_working_start = '';
@@ -280,22 +285,24 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 					: moment(start_time).add(90, 'minutes');
 
 			const memberdisplay = store.getState().getIn(['appointment', 'appointments', 'calendar']);
-			let check = true;
 			let member_clone = JSON.parse(JSON.stringify(memberdisplay));
 			member_clone.forEach((element) => {
 				delete element.memberId;
 			});
-
 			const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
-
 			let all_appointments = [];
 			member_clone.forEach((apps) => {
 				all_appointments = [...all_appointments, ...apps.appointments];
 			});
-
 			const resourceId = parseInt(idResource) - 1;
-
 			const pos = displayedMembers.findIndex((mem) => parseInt(mem.resourceId) === parseInt(resourceId));
+
+			/* MOVE APPOINTMET TRONG QUÁ KHỨ */
+			if(!checkDragWaitingInThePast(merchantInfo,start_time)){
+				check = 1;
+			}
+			/* END */
+
 
 			if (pos !== -1) {
 				const currentDay = store.getState().getIn(['appointment', 'currentDay']);
@@ -438,7 +445,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 							return;
 						}
 					}
-					if ((moment(event.data.start).format("HH:mm A") === moment(startTime).format("HH:mm A")) ) {
+					if ((moment(event.data.start).format("HH:mm A") === moment(startTime).format("HH:mm A"))) {
 						store.dispatch(moveAppointment(event.data.id, 0, startTime, endTime));
 					} else {
 						if (window.confirm(" This Any Staff appointment is set to begin at a different time. Do you want to change original time of appointment? ")) {
@@ -577,16 +584,16 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 						const merchantInfo = store.getState().getIn(['appointment', 'merchantInfo']);
 						const timezone = merchantInfo.timezone;
 						let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment().local();
+						const _time = `${moment(start_time).format("YYYY-MM-DD")}T${moment(start_time).format('HH:mm:ss')}`
 						timeNow = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
-						if (moment(start_time).isBefore(moment(timeNow))) {
-							console.log({timeNow,start_time})
+						if (moment(_time).isBefore(moment(timeNow))) {
 							const text = 'This appointment is set for a time that has already passed. Do you still want to set this appointment at this time?'
-							if(window.confirm(text)){
+							if (window.confirm(text)) {
 								store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId), start_time, endTime));
-							}else{
+							} else {
 								revertFunc();
 							}
-						}else{
+						} else {
 							store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId), start_time, endTime));
 						}
 						//move appointment từ staff này qua staff khác

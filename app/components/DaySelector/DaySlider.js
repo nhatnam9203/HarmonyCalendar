@@ -4,7 +4,7 @@ import moment_tz from 'moment'
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Carousel from 'nuka-carousel';
-import ButtonSplash from "./ButtonPlash"
+import ButtonSplash from "./ButtonPlash";
 
 const DateSliderWrapper = styled.div`
     width: calc(100% - 5.05rem);
@@ -123,7 +123,7 @@ class DaySlider extends React.Component {
   renderItems(day, index) {
     const { selectedDay, merchantInfo } = this.props;
     const { timezone } = merchantInfo;
-    if(timezone){
+
       let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment();
       let tz = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
     
@@ -141,7 +141,7 @@ class DaySlider extends React.Component {
           </TodayDay>
         );
       }
-    }
+    
     return (
       <NormalDay key={index} onClick={() => this.onDayClick(day)}>
         {this.renderDay(day)}

@@ -1,5 +1,7 @@
 
 import { statusConvertKey } from '../../containers/AppointmentPage/utilSaga';
+import moment from 'moment'
+import moment_tz from 'moment-timezone'
 
 const servicesAdapter = (service) => {
     return {
@@ -26,7 +28,7 @@ const extrasAdapter = (extra) => {
     return {
         appointmentId: extra.AppointmentId,
         bookingExtraId: extra.BookingExtraId,
-        bookingServiceId : extra.BookingServiceId,
+        bookingServiceId: extra.BookingServiceId,
         duration: extra.Duration,
         extraId: extra.ExtraId,
         extraName: extra.ExtraName,
@@ -103,10 +105,10 @@ export function returnAppointment(appointment) {
         customerId: appointment.CustomerId,
         isVip: appointment.IsVip,
         total: appointment.Total,
-        bookingGroupId : appointment.BookingGroupId,
-		companionName : appointment.CompanionName,
-		companionPhone : appointment.CompanionPhone,
-		isMainBookingGroup : appointment.IsMainBookingGroup,
+        bookingGroupId: appointment.BookingGroupId,
+        companionName: appointment.CompanionName,
+        companionPhone: appointment.CompanionPhone,
+        isMainBookingGroup: appointment.IsMainBookingGroup,
         notes: appointment.Notes
             .sort(function (a, b) {
                 var c = a.AppointmentNoteId;
@@ -119,20 +121,35 @@ export function returnAppointment(appointment) {
 
 
 export const PromiseAction = async (action, data) => {
-	return await new Promise((resolve, rejects) => {
-		action({ data, resolve, rejects });
-	});
+    return await new Promise((resolve, rejects) => {
+        action({ data, resolve, rejects });
+    });
 };
 
 
 export const PromiseAction2 = async (action, data) => {
-	return await new Promise((resolve, rejects) => {
+    return await new Promise((resolve, rejects) => {
         const body = {
             data,
             resolve,
             rejects
         }
-        console.log({body})
-		action(body);
-	});
+        console.log({ body })
+        action(body);
+    });
 };
+
+
+export function checkDragWaitingInThePast(merchantInfo, start_time) {
+    const timezone = merchantInfo.timezone;
+    let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment().local();
+    timeNow = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
+    if (moment(start_time).isBefore(moment(timeNow))) {
+        if (window.confirm('This appointment is set for a time that has already passed. Do you still want to set this appointment at this time? ')) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    return true;
+}

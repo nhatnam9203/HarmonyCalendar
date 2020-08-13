@@ -99,3 +99,12 @@ export const PromiseAction = async (action, data) => {
 		action({ data, resolve, rejects });
 	});
 };
+
+export function scrollToNow(){
+	setTimeout(() => {
+		const x = document.getElementsByClassName('fc-now-indicator fc-now-indicator-arrow');
+		for (let i = 0; i < x.length; i++) {
+			x[i].scrollIntoView();
+		}
+	}, 300);
+}

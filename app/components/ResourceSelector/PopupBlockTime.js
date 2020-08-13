@@ -128,7 +128,7 @@ const ButtonAddBlock = styled.div`
 
 const BlockList = styled.div`
 	width: 100%;
-	height: 100% !important;
+	max-height : 19rem;
 `;
 
 const BtnClose = styled.div`
@@ -376,8 +376,8 @@ class PopupBlockTime extends Component {
 					</div>
 				</Row>
 				{!blockTimeEdit && (
-					<div onClick={() => this.submitEditBlock()} style={styles.bottom}>
-						<div style={styles.btnSubmit}>Submit</div>
+					<div style={styles.bottom}>
+						<div onClick={() => this.submitEditBlock()} style={styles.btnSubmit}>Submit</div>
 					</div>
 				)}
 				{blockTimeEdit && (

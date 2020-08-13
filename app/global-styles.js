@@ -457,7 +457,7 @@ const GlobalStyle = createGlobalStyle`
 }
 
 .fc-now-indicator-arrow{
-  display : none !important; 
+  opacity : 0 !important; 
 }
 
 .picker-item{
