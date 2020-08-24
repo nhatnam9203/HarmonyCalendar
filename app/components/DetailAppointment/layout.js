@@ -894,8 +894,8 @@ class Appointment extends React.Component {
 
 				{appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' && this.renderChangeAppointTime()}
 				{this.renderServices()}
-				{this.renderProducts()}
 				{this.renderExtras()}
+				{this.renderProducts()}
 				{this.renderNotes()}
 
 				<AppointmentInformation>

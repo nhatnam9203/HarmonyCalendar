@@ -103,7 +103,7 @@ export default class FooterAppointment extends Component {
                     </div>
                     <div>
                         <span>Tip : </span>
-                        <strong>{tipPercent}</strong>
+                        <strong>$ {tipAmount}</strong>
                     </div>
                     <div>
                         <span>Total : </span>

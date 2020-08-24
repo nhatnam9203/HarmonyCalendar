@@ -432,7 +432,6 @@ class Appointment extends Layout {
 		companionPhone = companionPhoneHeader + checkStringNumber2(companionPhone);
 		const action = this.props.updateCompanion;
 		const data = { companionPhone, companionName, id };
-		console.log({data})
 		this.loadingPopupDetail();
 		const _promise = await PromiseAction(action, data);
 		if (_promise.success) {

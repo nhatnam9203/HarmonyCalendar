@@ -660,8 +660,8 @@ export const addEventsToCalendar = async (currentDate, appointmentsMembers) => {
 					rendering:
 						appointment.status === 'BLOCK' || appointment.status === 'BLOCK_TEMP' ? 'background' : '',
 					className: getAtrributeByStatus(appointment).eventClass,
-					startEditable: !(appointment.status === 'PAID' || appointment.status === 'VOID'),
-					resourceEditable: !(appointment.status === 'PAID' || appointment.status === 'VOID')
+					startEditable: !(appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND'),
+					resourceEditable: !(appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND')
 				});
 			});
 		}
