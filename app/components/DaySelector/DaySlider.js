@@ -10,6 +10,8 @@ const DateSliderWrapper = styled.div`
     width: calc(100% - 5.05rem);
     position: relative;
     height : 4.4rem !important;
+    display : flex;
+    flex-direction : row;
     @media (min-width: 1025px) {
       height : 5rem !important;
 	  }
@@ -21,7 +23,6 @@ const CarouselItem = styled.div`
 `;
 
 const NormalDay = styled.div`
-    flex: 1;
     border-right: 1px solid #3883bb;
     padding: 0.5rem;
     display : flex;
@@ -30,14 +31,15 @@ const NormalDay = styled.div`
     justify-content : center;
     overflow: hidden;
     height : 4.4rem ;
+    width : calc((100vw - 5.05rem)/9);
     padding-top : 0.6rem;
     font-size : 0.95rem;
     line-height : 1.5;
     letter-spacing : 0.3;
     font-weight : 500;
-    &:last-child {
+    /* &:last-child {
       border-right: none;
-    }
+    } */
 
     & div {
       white-space: normal;
@@ -62,13 +64,19 @@ const TodayDay = styled(NormalDay)`
     color: #ffffff;
 `;
 
+const WrapSlider = styled.div`
+  width : calc(((100vw - 5.05rem)/9) * 7);
+
+`;
+
 class DaySlider extends React.Component {
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       currentSlide: 0
     }
+    this.refCarousel = React.createRef();
   }
 
   componentDidMount() {
@@ -124,24 +132,24 @@ class DaySlider extends React.Component {
     const { selectedDay, merchantInfo } = this.props;
     const { timezone } = merchantInfo;
 
-      let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment();
-      let tz = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
-    
-      if (moment(day).format('DDMMYYYY') === moment(selectedDay).format('DDMMYYYY')) {
-        return (
-          <ActiveDay key={index} onClick={() => this.onDayClick(day)}>
-            {this.renderDay(day)}
-          </ActiveDay>
-        );
-      }
-      if (moment(day).format('DDMMYYYY') === moment(tz).format('DDMMYYYY')) {
-        return (
-          <TodayDay key={index} onClick={() => this.onDayClick(day)}>
-            {this.renderDay(day)}
-          </TodayDay>
-        );
-      }
-    
+    let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment();
+    let tz = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
+
+    if (moment(day).format('DDMMYYYY') === moment(selectedDay).format('DDMMYYYY')) {
+      return (
+        <ActiveDay key={index} onClick={() => this.onDayClick(day)}>
+          {this.renderDay(day)}
+        </ActiveDay>
+      );
+    }
+    if (moment(day).format('DDMMYYYY') === moment(tz).format('DDMMYYYY')) {
+      return (
+        <TodayDay key={index} onClick={() => this.onDayClick(day)}>
+          {this.renderDay(day)}
+        </TodayDay>
+      );
+    }
+
     return (
       <NormalDay key={index} onClick={() => this.onDayClick(day)}>
         {this.renderDay(day)}
@@ -153,28 +161,45 @@ class DaySlider extends React.Component {
     const { days } = this.props;
     return (
       <DateSliderWrapper>
-        <Carousel
-          wrapAround
-          dragging={true}
-          renderBottomCenterControls={() => ''}
-          renderCenterLeftControls={({ previousSlide }) => (
-            <ButtonSplash isLeft onClick={ev => this.onPrevClick(ev, previousSlide)} />
-          )}
-          renderCenterRightControls={({ nextSlide }) => (
-            <ButtonSplash onClick={ev => this.onNextClick(ev, nextSlide)} />
-          )}
-          afterSlide={slideIndex => this.afterSlide(slideIndex)}
-        >
-          <CarouselItem>
-            {days.map((day, index) => this.renderItems(day, index))}
-          </CarouselItem>
-          <CarouselItem>
-            {days.map((day, index) => this.renderItems(day, index))}
-          </CarouselItem>
-          <CarouselItem>
-            {days.map((day, index) => this.renderItems(day, index))}
-          </CarouselItem>
-        </Carousel>
+        <NormalDay>
+        </NormalDay>
+        <WrapSlider>
+          <Carousel
+            wrapAround
+            innerRef={this.refCarousel}
+            dragging={true}
+            renderBottomCenterControls={() => ''}
+            renderCenterLeftControls={({ previousSlide }) => (
+              <ButtonSplash
+                style={{
+                  left: -85,
+                }}
+                isLeft onClick={ev => this.onPrevClick(ev, previousSlide)} />
+            )}
+            renderCenterRightControls={({ nextSlide }) => (
+              <ButtonSplash
+                style={{
+                  right: -85,
+                }}
+                onClick={ev => this.onNextClick(ev, nextSlide)} />
+            )}
+            afterSlide={slideIndex => this.afterSlide(slideIndex)}
+          >
+            <CarouselItem>
+              {days.map((day, index) => this.renderItems(day, index))}
+            </CarouselItem>
+            <CarouselItem>
+              {days.map((day, index) => this.renderItems(day, index))}
+            </CarouselItem>
+            <CarouselItem>
+              {days.map((day, index) => this.renderItems(day, index))}
+            </CarouselItem>
+          </Carousel>
+        </WrapSlider>
+        <NormalDay>
+
+        </NormalDay>
+
       </DateSliderWrapper>
     );
   }

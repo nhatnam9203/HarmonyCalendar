@@ -61,7 +61,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 		timezone: timezone_merchant ? 'local' : false,
 		now: timezone_merchant ? moment_tz.tz('US/Eastern') : moment_tz().tz(),
 		longPressDelay: 200,
-		resources: resource,
+		resources: resouceDesktop,
 		schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
 
 		select: (start_time, end, event, view, resource) => {
@@ -459,7 +459,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 			}
 			/* end move any staff */
 
-			if ((event.resourceId === '0' && event.data.memberId !== 0) || staffAvailable.id === 0) {
+			if ((event.resourceId === '0' && event.data.memberId !== 0) || (staffAvailable  &&  staffAvailable.id === 0)) {
 				revertFunc();
 				return;
 			}

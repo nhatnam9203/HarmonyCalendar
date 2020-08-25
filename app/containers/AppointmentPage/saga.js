@@ -68,7 +68,7 @@ export function* getMembers() {
 				const slideIndex = yield select(makeSlideIndex());
 				localStorage.setItem('staffList', JSON.stringify(members));
 				yield put(actions.membersLoaded(members));
-				yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
+				yield put(actions.setDisplayedMembers(members.slice(slideIndex * 7, slideIndex * 7 + 7)));
 				yield put(actions.reloadCalendar());
 			}
 		} catch (err) {
@@ -77,7 +77,7 @@ export function* getMembers() {
 	} else {
 		const members = JSON.parse(localStorage.getItem('staffList'));
 		yield put(actions.membersLoaded(members));
-		yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
+		yield put(actions.setDisplayedMembers(members.slice(slideIndex * 7, slideIndex * 7 + 7)));
 		yield put(actions.reloadCalendar());
 	}
 }
@@ -1048,7 +1048,7 @@ function* updateNextStaff_Saga() {
 				members.push(lastStaff);
 				const slideIndex = yield select(makeSlideIndex());
 				yield put(actions.membersLoaded(members));
-				yield put(actions.setDisplayedMembers(members.slice(slideIndex * 5, slideIndex * 5 + 5)));
+				yield put(actions.setDisplayedMembers(members.slice(slideIndex * 7, slideIndex * 7 + 7)));
 
 				if (!isReloadCalendar)
 					yield put(actions.getBlockTime());

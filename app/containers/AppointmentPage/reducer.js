@@ -207,7 +207,7 @@ function appointmentReducer(state = initialState, action) {
 			for (let index = 0; index < action.members.length; index++) {
 				action.members[index].resourceId = resourceId;
 				resourceId = resourceId + 1;
-				if (resourceId === 5) {
+				if (resourceId === 7) {
 					resourceId = 0;
 				}
 			}
