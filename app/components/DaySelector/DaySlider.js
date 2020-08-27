@@ -31,7 +31,7 @@ const NormalDay = styled.div`
     justify-content : center;
     overflow: hidden;
     height : 4.4rem ;
-    width : calc((100vw - 5.05rem)/9);
+    width : calc((100vw - 5.05rem)/10);
     padding-top : 0.6rem;
     font-size : 0.95rem;
     line-height : 1.5;
@@ -65,7 +65,7 @@ const TodayDay = styled(NormalDay)`
 `;
 
 const WrapSlider = styled.div`
-  width : calc(((100vw - 5.05rem)/9) * 7);
+  width : calc(((100vw - 5.05rem)/10) * 7);
 
 `;
 
@@ -197,7 +197,8 @@ class DaySlider extends React.Component {
           </Carousel>
         </WrapSlider>
         <NormalDay>
-
+        </NormalDay>
+        <NormalDay>
         </NormalDay>
 
       </DateSliderWrapper>

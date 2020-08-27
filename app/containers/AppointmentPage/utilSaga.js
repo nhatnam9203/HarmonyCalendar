@@ -238,42 +238,17 @@ export function checkTimeToAddAppointmdent() {
 	return time.format('YYYY-MM-DD HH:mm');
 }
 
-export function totalDuationChangeTime(appointment, extras) {
+export function totalDuationChangeTime(appointment, extras,services) {
 	let totalDuration = 0;
-	let services = [...appointment.options];
-
-	for (let i = 0; i < services.length; i++) {
-		if (appointment.memberId === services[i].staffId) {
-			totalDuration += services[i].duration;
-		}
-	}
-
-	appointment.options.forEach((app) => {
+	
+	services.forEach((app) => {
 		if (appointment.memberId === app.staffId) totalDuration += app.duration;
-	});
-
-	extras.forEach((ext) => {
-		if (appointment.memberId === ext.staffId) totalDuration += ext.duration;
+		extras.forEach((ext) => {
+			if (app.bookingServiceId === ext.bookingServiceId) totalDuration += ext.duration;
+		});
 	});
 
 	return totalDuration;
-}
-
-export function totalDuartionUpdateAppointment(services, extras, appointment) {
-	let total = 0;
-	const lastIndex = findLastIndex(services, appointment);
-	for (let i = 0; i < services.length; i++) {
-		total += services[i].duration;
-		const findExtra = extras.find((ex) => ex.bookingServiceId && ex.bookingServiceId === services[i].bookingServiceId);
-		if (findExtra) {
-			total += findExtra.duration;
-		}
-		if (i === lastIndex) {
-			break;
-		}
-	}
-
-	return total;
 }
 
 export function newDateUpdateAppointment(status, old_duration, new_total_duration, end) {

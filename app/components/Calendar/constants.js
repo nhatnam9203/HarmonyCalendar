@@ -38,7 +38,7 @@ const EVENT_RENDER_TEMPLATE = (event) => `
   </div>
 `;
 
-const resouceDesktop = [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }, { id: 6 }, { id: 7 }];
+const resouceDesktop = [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }, { id: 6 }, { id: 7 } , { id : 8 }];
 const resource = [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }];
 
 export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {

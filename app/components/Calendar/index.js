@@ -35,7 +35,7 @@ const MainCalendar = styled.div`
 `;
 
 const RightSideBar = styled.div`
-	width: calc((100vw - 5.05rem) / 9);
+	width: calc((100vw - 5.05rem) / 10);
 	border-top: 2px solid #3883bb;
 	position: relative;
 `;
@@ -43,7 +43,7 @@ const RightSideBar = styled.div`
 const SignInWrapper = styled.div`
 	position: absolute;
 	bottom: 0;
-	width: calc((100vw - 5.05rem) / 9);
+	width: calc((100vw - 5.05rem) / 10);
 	background: #fafafa;
 	height: 4rem;
 	text-align: center;

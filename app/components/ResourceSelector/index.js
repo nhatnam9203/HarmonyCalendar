@@ -51,7 +51,7 @@ TodayWrapper.Button = styled.div`
 `;
 
 const ResourceSliderWrapper = styled.div`
-	width: calc(100% - 5.05rem - (calc((100vw - 5.05rem) / 9)) - (calc((100vw - 5.05rem) / 9)) + 1px);
+	width: calc(100% - 5.05rem - (calc((100vw - 5.05rem) / 10)) - (calc((100vw - 5.05rem) / 10)) + 1px);
 	position: relative;
 `;
 
@@ -66,7 +66,7 @@ const ResourceWrapper = styled.div`
 
 const Resource = styled.div`
 	cursor: pointer;
-	width: calc(100% / 7);
+	width: calc(100% / 8);
 	padding: 0.25rem;
 	position: relative;
 	border-right: 1px solid #ddd;
@@ -75,7 +75,7 @@ const Resource = styled.div`
 `;
 
 const AnyStaff = styled(Resource)`
-	width : calc(100% - 5.05rem - ((calc((100vw - 5.05rem) / 9)) * 8) + 4px);
+	width : calc(100% - 5.05rem - ((calc((100vw - 5.05rem) / 10)) * 9) + 4px);
 	height : 5rem;
 	border-left: 1px solid #1173C3;
 	background-color : #F5F5F5;
@@ -195,7 +195,7 @@ Resource.Title = styled.div`
 `;
 
 const WaitingHeader = styled.div`
-	width: calc((100vw - 5.05rem) / 9);
+	width: calc((100vw - 5.05rem) / 10);
 	text-align: center;
 	display: flex;
 	justify-content: center;
@@ -251,7 +251,7 @@ class ResourceSelector extends React.Component {
 
 	afterSlide(index) {
 		const { resources } = this.props;
-		this.props.setDisplayedMembers(resources.slice(index * 7, index * 7 + 7));
+		this.props.setDisplayedMembers(resources.slice(index * 8, index * 8 + 8));
 		this.props.renderAppointment();
 		this.props.setSlideIndex(index);
 	}
@@ -276,7 +276,7 @@ class ResourceSelector extends React.Component {
 		const { slideIndex, resources } = this.props;
 		let isActiveLeft = false,
 			isActiveRight = false;
-		const totalSlide = (resources.length - 1) / 5;
+		const totalSlide = (resources.length - 1) / 8;
 
 		if (totalSlide <= 1) {
 			isActiveLeft = false;
@@ -346,7 +346,7 @@ class ResourceSelector extends React.Component {
 			return [ 1 ].map((index) => this.renderLoadingResources(index));
 		}
 		if (resources) {
-			return chunk(resources, 7).map((resource, index) => this.renderResources(resource, index));
+			return chunk(resources, 8).map((resource, index) => this.renderResources(resource, index));
 		}
 		return null;
 	}
