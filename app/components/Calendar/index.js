@@ -40,28 +40,6 @@ const RightSideBar = styled.div`
 	position: relative;
 `;
 
-const SignInWrapper = styled.div`
-	position: absolute;
-	bottom: 0;
-	width: calc((100vw - 5.05rem) / 10);
-	background: #fafafa;
-	height: 4rem;
-	text-align: center;
-	padding: 0.5rem;
-`;
-
-SignInWrapper.Button = styled.div`
-	border-radius: 4px;
-	background: #1366ae;
-	color: #ffffff;
-	width: 100%;
-	font-size: 1.05rem;
-	font-weight: bold;
-	line-height: 2.8;
-	height: 100%;
-	cursor: pointer;
-`;
-
 function IsJson(str) {
 	try {
 		JSON.parse(str);
@@ -361,16 +339,6 @@ class Calendar extends React.Component {
 					) : (
 							''
 						)}
-					<SignInWrapper>
-						<SignInWrapper.Button
-							onClick={() => {
-								openAddingAppointment({});
-								disable_Calendar(true);
-							}}
-						>
-							Check-In
-						</SignInWrapper.Button>
-					</SignInWrapper>
 				</RightSideBar>
 			</CalendarWrapper>
 		);

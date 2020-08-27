@@ -37,9 +37,9 @@ const NormalDay = styled.div`
     line-height : 1.5;
     letter-spacing : 0.3;
     font-weight : 500;
-    /* &:last-child {
+    &:last-child {
       border-right: none;
-    } */
+    }
 
     & div {
       white-space: normal;
@@ -66,7 +66,31 @@ const TodayDay = styled(NormalDay)`
 
 const WrapSlider = styled.div`
   width : calc(((100vw - 5.05rem)/10) * 7);
+`;
 
+const SignInWrapper = styled.div`
+	position: absolute;
+	bottom: 0.25rem;
+	width: calc((100vw - 5.05rem) / 10);
+	/* background: #fafafa; */
+	height: 4rem;
+	text-align: center;
+	padding: 0.5rem;
+`;
+
+SignInWrapper.Button = styled.div`
+	border-radius: 4px;
+	background: #1366ae;
+	color: #ffffff;
+	width: 100%;
+	font-size: 0.95rem;
+  display : flex;
+  justify-content : center;
+  align-items: center;
+	font-weight: bold;
+	line-height: 2.8;
+	height: 100%;
+	cursor: pointer;
 `;
 
 class DaySlider extends React.Component {
@@ -158,11 +182,10 @@ class DaySlider extends React.Component {
   }
 
   render() {
-    const { days } = this.props;
+    const { days, disable_Calendar, openAddingAppointment } = this.props;
     return (
       <DateSliderWrapper>
-        <NormalDay>
-        </NormalDay>
+        <NormalDay />
         <WrapSlider>
           <Carousel
             wrapAround
@@ -172,14 +195,14 @@ class DaySlider extends React.Component {
             renderCenterLeftControls={({ previousSlide }) => (
               <ButtonSplash
                 style={{
-                  left: -85,
+                  right : "calc((100vw - 5.05rem) / 24)"
                 }}
                 isLeft onClick={ev => this.onPrevClick(ev, previousSlide)} />
             )}
             renderCenterRightControls={({ nextSlide }) => (
               <ButtonSplash
                 style={{
-                  right: -85,
+                  left : "calc((100vw - 5.05rem) / 24)"
                 }}
                 onClick={ev => this.onNextClick(ev, nextSlide)} />
             )}
@@ -196,9 +219,20 @@ class DaySlider extends React.Component {
             </CarouselItem>
           </Carousel>
         </WrapSlider>
+        <NormalDay style={{
+          borderLeft : "1px solid #3883bb"
+        }} />
         <NormalDay>
-        </NormalDay>
-        <NormalDay>
+          <SignInWrapper>
+            <SignInWrapper.Button
+              onClick={() => {
+                openAddingAppointment({});
+                disable_Calendar(true);
+              }}
+            >
+              Check-In
+						</SignInWrapper.Button>
+          </SignInWrapper>
         </NormalDay>
 
       </DateSliderWrapper>

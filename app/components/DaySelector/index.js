@@ -41,7 +41,9 @@ class DaySelector extends React.Component {
       onChangeWeek,
       onChangeDayOnCalendar,
       loadingCalendar,
-      merchantInfo
+      merchantInfo,
+      disable_Calendar,
+      openAddingAppointment
     } = this.props;
     return (
       <DaySelectorWrapper>
@@ -56,6 +58,8 @@ class DaySelector extends React.Component {
           onChangeWeek={onChangeWeek}
           loadingCalendar={loadingCalendar}
           merchantInfo={merchantInfo}
+          openAddingAppointment={openAddingAppointment}
+          disable_Calendar={disable_Calendar}
         />
       </DaySelectorWrapper>
     );
