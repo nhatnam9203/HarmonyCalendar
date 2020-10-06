@@ -571,5 +571,13 @@ export function checkMerchantWorking(merchantInfo, fromTime) {
 		return false;
 	}
 	return true;
+}
 
+export function postMesageAssignAppointment(idAppointment , app) {
+	const data = JSON.stringify({
+		appointmentId: idAppointment ? idAppointment : 'web',
+		appointment: app,
+		action: 'checkout'
+	});
+	window.postMessage(data);
 }

@@ -36,7 +36,8 @@ import {
 	block,
 	addBlockAnyStaff,
 	new_total_duration,
-	checkMerchantWorking
+	checkMerchantWorking,
+	postMesageAssignAppointment
 } from './utilSaga';
 
 import { addEventsToCalendar, deleteEventFromCalendar } from '../../components/Calendar/constants';
@@ -455,6 +456,9 @@ export function* assignAppointment(action) {
 			const response = yield api(url, data, 'PUT', token);
 			if (response.codeStatus !== 1) return yield* checkResponse(response);
 			if (response.codeStatus === 1) {
+				postMesageAssignAppointment(appointment.id,appointment)
+			}else{
+				postMesageAssignAppointment(appointment.id,appointment)
 			}
 		}
 	} catch (err) {
@@ -575,7 +579,7 @@ export function* changeTimeAppointment(action) {
 			giftCards
 		}
 		if ((memberId === 0 && (moment(start_time).format("HH:mm A") !== moment(start).format("HH:mm A")))
-			|| memberId !== 0 && moment(start_time).isBefore(moment(now))
+			|| memberId !== 0 && moment(end_time).isBefore(moment(now))
 		) {
 			const text = memberId === 0 ? "This Any Staff appointment is set to begin at a different time. Do you want to change original time of appointment?" : 
 			"This appointment is set for a time that has already passed. Do you still want to set this appointment at this time?";

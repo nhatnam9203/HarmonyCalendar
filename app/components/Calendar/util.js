@@ -134,17 +134,16 @@ export const PromiseAction2 = async (action, data) => {
             resolve,
             rejects
         }
-        console.log({ body })
         action(body);
     });
 };
 
 
-export function checkDragWaitingInThePast(merchantInfo, start_time) {
+export function checkDragWaitingInThePast(merchantInfo, time) {
     const timezone = merchantInfo.timezone;
     let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment().local();
     timeNow = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
-    if (moment(start_time).isBefore(moment(timeNow))) {
+    if (moment(time).isBefore(moment(timeNow))) {
         if (window.confirm('This appointment is set for a time that has already passed. Do you still want to set this appointment at this time? ')) {
             return true;
         } else {

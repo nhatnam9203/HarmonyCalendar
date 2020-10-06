@@ -202,7 +202,7 @@ const WaitingHeader = styled.div`
 	font-weight: 500;
 	align-items: center;
 	line-height: 64px;
-	font-size: 18px;
+	font-size: 16px;
 	color: #333333;
 	background: #f4f4f5;
 	border-left: 1px solid #3883bb;

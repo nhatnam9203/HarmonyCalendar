@@ -168,7 +168,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 						const timezone = merchantInfo.timezone;
 						let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment();
 						timeNow = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
-						const _time = `${moment(start).format("YYYY-MM-DD")}T${moment(start).format('HH:mm:ss')}`
+						const _time = `${moment(start).format("YYYY-MM-DD")}T${moment(end).local().format('HH:mm:ss')}`
 
 						if (moment(_time).isBefore(timeNow)) {
 							if (window.confirm('This appointment is set for a time that has already passed. Do you still want to set this appointment at this time? ')) {
@@ -236,7 +236,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 						const timezone = merchantInfo.timezone;
 						let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment().local();
 						timeNow = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
-						const _time = `${moment(start).format("YYYY-MM-DD")}T${moment(start).format('HH:mm:ss')}`
+						const _time = `${moment(start).format("YYYY-MM-DD")}T${moment(end).local().format('HH:mm:ss')}`
 
 						if (moment(_time).isBefore(moment(timeNow))) {
 							if (window.confirm('This appointment is set for a time that has already passed. Do you still want to set this appointment at this time? ')) {
@@ -246,6 +246,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 							}
 							return;
 						}
+						
 						store.dispatch(disableCalendar(true));
 						store.dispatch(openAddingAppointment({}));
 						store.dispatch(TimeAndStaffID({ time: time, staffID: member.memberId }));
@@ -298,7 +299,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 			const pos = displayedMembers.findIndex((mem) => parseInt(mem.resourceId) === parseInt(resourceId));
 
 			/* MOVE APPOINTMET TRONG QUÁ KHỨ */
-			if(!checkDragWaitingInThePast(merchantInfo,start_time)){
+			if(!checkDragWaitingInThePast(merchantInfo,end_time)){
 				check = 1;
 			}
 			/* END */
@@ -397,6 +398,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 
 			const start_time = moment(event.start).local();
 			const end_time = moment(event.end).local();
+
 			let check = true;
 			let check_block_grey = false;
 			let member_clone = JSON.parse(JSON.stringify(memberdisplay));
@@ -584,7 +586,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 						const merchantInfo = store.getState().getIn(['appointment', 'merchantInfo']);
 						const timezone = merchantInfo.timezone;
 						let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment().local();
-						const _time = `${moment(start_time).format("YYYY-MM-DD")}T${moment(start_time).format('HH:mm:ss')}`
+						const _time = `${moment(end_time).format("YYYY-MM-DD")}T${moment(end_time).format('HH:mm:ss')}`
 						timeNow = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
 						if (moment(_time).isBefore(moment(timeNow))) {
 							const text = 'This appointment is set for a time that has already passed. Do you still want to set this appointment at this time?'
