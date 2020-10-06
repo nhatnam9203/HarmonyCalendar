@@ -238,9 +238,9 @@ export function checkTimeToAddAppointmdent() {
 	return time.format('YYYY-MM-DD HH:mm');
 }
 
-export function totalDuationChangeTime(appointment, extras,services) {
+export function totalDuationChangeTime(appointment, extras, services) {
 	let totalDuration = 0;
-	
+
 	services.forEach((app) => {
 		if (appointment.memberId === app.staffId) totalDuration += app.duration;
 		extras.forEach((ext) => {
@@ -573,11 +573,14 @@ export function checkMerchantWorking(merchantInfo, fromTime) {
 	return true;
 }
 
-export function postMesageAssignAppointment(idAppointment , app) {
-	const data = JSON.stringify({
-		appointmentId: idAppointment ? idAppointment : 'web',
-		appointment: app,
-		action: 'checkout'
-	});
-	window.postMessage(data);
+export function postMesageAssignAppointment(idAppointment, app) {
+	const { options, extras, products } = app;
+	if (options.length + extras.length + products.length === 0) {
+		const data = JSON.stringify({
+			appointmentId: idAppointment ? idAppointment : 'web',
+			appointment: app,
+			action: 'checkout'
+		});
+		window.postMessage(data);
+	}
 }
