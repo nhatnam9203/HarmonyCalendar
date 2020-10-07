@@ -2,7 +2,7 @@ import $ from 'jquery';
 import moment from 'moment';
 import moment_tz from "moment-timezone"
 import { store } from 'app';
-import {checkDragWaitingInThePast} from './util'
+import { checkDragWaitingInThePast } from './util'
 import {
 	assignAppointment,
 	moveAppointment,
@@ -38,7 +38,7 @@ const EVENT_RENDER_TEMPLATE = (event) => `
   </div>
 `;
 
-const resouceDesktop = [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }, { id: 6 }, { id: 7 } , { id : 8 }];
+const resouceDesktop = [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }, { id: 6 }, { id: 7 }, { id: 8 }];
 const resource = [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }];
 
 export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
@@ -246,7 +246,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 							}
 							return;
 						}
-						
+
 						store.dispatch(disableCalendar(true));
 						store.dispatch(openAddingAppointment({}));
 						store.dispatch(TimeAndStaffID({ time: time, staffID: member.memberId }));
@@ -299,7 +299,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 			const pos = displayedMembers.findIndex((mem) => parseInt(mem.resourceId) === parseInt(resourceId));
 
 			/* MOVE APPOINTMET TRONG QUÁ KHỨ */
-			if(!checkDragWaitingInThePast(merchantInfo,end_time)){
+			if (!checkDragWaitingInThePast(merchantInfo, end_time)) {
 				check = 1;
 			}
 			/* END */
@@ -319,11 +319,18 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 			} else if (check_workingStaff) {
 				all_appointments.forEach((app) => {
 					if (parseInt(app.memberId) === parseInt(displayedMembers[parseInt(resourceId)].id)) {
+						const tempEndTime = event.options.length > 0
+							? moment(start_time).add(totalDuration, 'minutes')
+							: moment(start_time).add(15, 'minutes');
 						if (
 							moment(start_time).isBetween(app.start, app.end) ||
-							moment(end_time).isBetween(app.start, app.end) ||
-							moment(app.start).isBetween(start_time, end_time) ||
-							moment(app.end).isBetween(start_time, end_time)
+							moment(tempEndTime).isBetween(app.start, app.end) ||
+							moment(app.start).isBetween(start_time, tempEndTime) ||
+							moment(app.end).isBetween(start_time, tempEndTime) ||
+							(
+								moment(app.start).format('HH:mm') === moment(start_time).format('HH:mm') &&
+								moment(app.end).format('HH:mm') === moment(tempEndTime).format('HH:mm')
+							)
 						) {
 							if (parseInt(app.id) !== parseInt(event.id)) {
 								if (app.status === 'BLOCK_TEMP') {
@@ -354,7 +361,6 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 				/* check appointment assign overlap */
 				// if (check === false && displayedMembers[parseInt(resourceId)].orderNumber !== 0) {
 				if (check === false) {
-					// const text =  "Are you sure want to assign appointment at this position ?";
 
 					const text = check_workingTime ? "Accept this appointment outside of business hours?" : "Are you sure want to assign appointment at this position ?";
 					if (window.confirm(text)) {
@@ -461,7 +467,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 			}
 			/* end move any staff */
 
-			if ((event.resourceId === '0' && event.data.memberId !== 0) || (staffAvailable  &&  staffAvailable.id === 0)) {
+			if ((event.resourceId === '0' && event.data.memberId !== 0) || (staffAvailable && staffAvailable.id === 0)) {
 				revertFunc();
 				return;
 			}

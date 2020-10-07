@@ -379,7 +379,7 @@ class Appointment extends Layout {
 	checkOut = async (idAppointment) => {
 		const { appointment } = this.props;
 
-		const app = await convertAppointment(appointment);ß
+		const app = await convertAppointment(appointment);
 
 		const data = await JSON.stringify({
 			appointmentId: idAppointment ? idAppointment : 'web',
