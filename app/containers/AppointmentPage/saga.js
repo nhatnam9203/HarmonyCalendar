@@ -743,7 +743,7 @@ export function* addNewCustomer(action) {
 			customerId,
 			merchantId: merchantId,
 			userId: user_Id,
-			status: !dataAnyStaff ? time ? 'checkin' : 'waiting' : 'unconfirm',
+			status: !dataAnyStaff ? time ? 'checkin' : 'waiting' : 'confirm',
 			services: [],
 			products: [],
 			extras: [],

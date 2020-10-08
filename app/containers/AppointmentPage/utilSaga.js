@@ -140,9 +140,9 @@ export function block(memberId, start, end) {
 	};
 }
 
-export function blockTemp(memberId, start, end, note, appointmentId) {
+export function blockTemp(memberId, start, end, note, appointmentId, status) {
 	return {
-		status: 'BLOCK_TEMP',
+		status,
 		memberId,
 		start,
 		end,
@@ -156,6 +156,20 @@ export function blockTemp(memberId, start, end, note, appointmentId) {
 		extras: [],
 		notes: []
 	};
+}
+
+function findApppointment(appointmentsMembers, appointmentId) {
+	let find = false;
+	appointmentsMembers.forEach((app) => {
+		app.appointments.forEach(appointment => {
+			if (appointment.id === appointmentId){
+				if(appointment.status === 'REFUND' || appointment.status === 'VOID' || appointment.status === 'PAID')
+					find = true;
+			}
+		})
+	})
+
+	return find
 }
 
 export function addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery) {
@@ -176,7 +190,12 @@ export function addBlockCalendar(appointmentsMembers, displayedMembers, currentD
 				'h:mm A'
 			]).format('HH:mm:ss')}`;
 			const note = blockTimeMember[i].note;
-			mem.appointments.push(blockTemp(memberId, start, end, note, blockTimeMember[i].appointmentId));
+			// mem.appointments.push(blockTemp(memberId, start, end, note, blockTimeMember[i].appointmentId, 'BLOCK_TEMP'));
+			if(findApppointment(appointmentsMembers,blockTimeMember[i].appointmentId)){
+				mem.appointments.push(blockTemp(memberId, start, end, note, blockTimeMember[i].appointmentId, 'BLOCK_TEMP_PAID'));
+			}else{
+				mem.appointments.push(blockTemp(memberId, start, end, note, blockTimeMember[i].appointmentId, 'BLOCK_TEMP'));
+			}
 		}
 	});
 

@@ -119,6 +119,11 @@ const GlobalStyle = createGlobalStyle`
     overflow : hidden;
   }
 
+  .event-block-temp-paid{
+    color : #ffffff !important;
+    overflow : hidden;
+  }
+
   .event-anystaff{
     font-weight : 500;
     color : #333;
@@ -274,6 +279,17 @@ const GlobalStyle = createGlobalStyle`
   letter-spacing : 0.6;
 }
 
+.event-assigned-anystaff , .event-confirmed-anystaff {
+  font-weight : 500;
+  color : #333;
+  letter-spacing : 0.6;
+  max-width : 50%;
+}
+
+.event-checkin-anystaff{
+  max-width : 50%;
+}
+
 .event-void{
   font-weight : 500;
   color : #ffffff;
@@ -310,7 +326,7 @@ const GlobalStyle = createGlobalStyle`
   padding-left : 10px !important;
 }
 
-.event-assigned:hover ,.event-confirmed:hover,.event-anystaff:hover{
+.event-assigned:hover ,.event-confirmed:hover,.event-anystaff:hover , .event-confirmed-anystaff:hover , .event-assigned-anystaff:hover{
   font-weight : 500;
   color : #333;
 }
