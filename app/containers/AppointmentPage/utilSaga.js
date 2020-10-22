@@ -162,9 +162,11 @@ function findApppointment(appointmentsMembers, appointmentId) {
 	let find = false;
 	appointmentsMembers.forEach((app) => {
 		app.appointments.forEach(appointment => {
-			if (appointment.id === appointmentId){
-				if(appointment.status === 'REFUND' || appointment.status === 'VOID' || appointment.status === 'PAID')
-					find = true;
+			if (appointment.id === appointmentId) {
+				if (appointment.status === 'PAID')
+					find = 1;
+				if (appointment.status === 'REFUND' || appointment.status === 'VOID')
+					find = 2
 			}
 		})
 	})
@@ -190,10 +192,12 @@ export function addBlockCalendar(appointmentsMembers, displayedMembers, currentD
 				'h:mm A'
 			]).format('HH:mm:ss')}`;
 			const note = blockTimeMember[i].note;
-			// mem.appointments.push(blockTemp(memberId, start, end, note, blockTimeMember[i].appointmentId, 'BLOCK_TEMP'));
-			if(findApppointment(appointmentsMembers,blockTimeMember[i].appointmentId)){
+			if (findApppointment(appointmentsMembers, blockTimeMember[i].appointmentId) === 1) {
 				mem.appointments.push(blockTemp(memberId, start, end, note, blockTimeMember[i].appointmentId, 'BLOCK_TEMP_PAID'));
-			}else{
+			} else if (findApppointment(appointmentsMembers, blockTimeMember[i].appointmentId) === 2) {
+				mem.appointments.push(blockTemp(memberId, start, end, note, blockTimeMember[i].appointmentId, 'BLOCK_TEMP_REFUND'));
+			}
+			else {
 				mem.appointments.push(blockTemp(memberId, start, end, note, blockTimeMember[i].appointmentId, 'BLOCK_TEMP'));
 			}
 		}

@@ -144,12 +144,14 @@ class Calendar extends React.Component {
 	}
 
 	async pushNotification(isNotification, appointment) {
-		const data = await JSON.stringify({
-			action: 'push_notification',
-			isNotification,
-			appointment
-		});
-		window.postMessage(data);
+		if(appointment.Status !== 'waiting'){
+			const data = await JSON.stringify({
+				action: 'push_notification',
+				isNotification,
+				appointment
+			});
+			window.postMessage(data);
+		}
 	}
 
 	runSignalR_Appointment() {
@@ -226,12 +228,7 @@ class Calendar extends React.Component {
 											.getIn(['appointment', 'appointments', 'allAppointment']);
 
 										const pos = allAppointment.findIndex((app) => app.id === appointment_R.id);
-										console.log({ pos })
 										if (pos === -1) {
-											console.log('add appointment');
-											console.log({
-												appointment_R
-											})
 											this.addAppointmentFromSignalr(appointment_R);
 										} else {
 											this.props.updateAppointmentPaid(appointment_R);

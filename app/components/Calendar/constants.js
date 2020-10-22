@@ -26,7 +26,7 @@ const EVENT_RENDER_TEMPLATE = (event) => `
     <div class="app-event__id-number">${event.code}</div>
     <div class="app-event__full-name">${event.userFullName}</div>
     <div class="app-event__phone-number">
-    ${event.status !== 'BLOCK' && event.status !== 'BLOCK_TEMP'
+    ${event.status !== 'BLOCK' && event.status !== 'BLOCK_TEMP' && event.status !== 'BLOCK_TEMP_PAID' && event.status !== 'BLOCK_TEMP_REFUND'
 		? event.status === 'CHECKED_IN' || event.status === 'PAID' || event.status === 'WAITING' || event.status === 'VOID' || event.status === 'REFUND'
 			? "<img class='icon-phone' src='" + call + "' width='17' height='17'>"
 			: "<img class='icon-phone2' src='" + call + "' width='17' height='17'>"
@@ -673,7 +673,7 @@ export const addEventsToCalendar = async (currentDate, appointmentsMembers) => {
 					data: appointment,
 					color: getAtrributeByStatus(appointment).eventColor,
 					rendering:
-						appointment.status === 'BLOCK' || appointment.status === 'BLOCK_TEMP' || appointment.status === 'BLOCK_TEMP_PAID' ? 'background' : '',
+						appointment.status === 'BLOCK' || appointment.status === 'BLOCK_TEMP' || appointment.status === 'BLOCK_TEMP_PAID' || appointment.status === 'BLOCK_TEMP_REFUND' ? 'background' : '',
 					className: getAtrributeByStatus(appointment).eventClass,
 					startEditable: !(appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND'),
 					resourceEditable: !(appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND')
@@ -695,7 +695,7 @@ export const addEventsToCalendar = async (currentDate, appointmentsMembers) => {
 			end: appointment.end,
 			data: appointment,
 			color: getAtrributeByStatus(appointment).eventColor,
-			rendering: appointment.status === 'BLOCK' || appointment.status === 'BLOCK_TEMP' || appointment.status === 'BLOCK_TEMP_PAID' ? 'background' : '',
+			rendering: appointment.status === 'BLOCK' || appointment.status === 'BLOCK_TEMP' || appointment.status === 'BLOCK_TEMP_PAID' || appointment.status === 'BLOCK_TEMP_REFUND' ? 'background' : '',
 			className: getAtrributeByStatus(appointment).eventClass,
 			startEditable: !(appointment.status === 'PAID'),
 			resourceEditable: !(appointment.status === 'PAID')
@@ -788,6 +788,11 @@ function getAtrributeByStatus(appointment) {
 		eventColor = '#38ff05';
 		eventClass = 'event-block-temp';
 	}
+	if (appointment.status === 'BLOCK_TEMP_REFUND') {
+		eventColor = '#38ff05';
+		eventClass = 'event-block-temp';
+	}
+	
 	if (appointment.status === 'VOID' || appointment.status === "REFUND") {
 		eventColor = '#FD594F';
 		eventClass = 'event-void';

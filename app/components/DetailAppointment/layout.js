@@ -8,7 +8,7 @@ import OutsideClickHandler from 'react-outside-click-handler';
 import { formatPhone } from '../../utils/helper';
 import { PopupTimePicker } from './widget';
 import NumberFormat from 'react-number-format';
-import { FooterAppointment, PopupPrice, Product, Extra, Service } from './widget'
+import { FooterAppointment, PopupPrice, Product, Extra, Service } from './widget';
 import ReactLoading from 'react-loading';
 
 const AppPopup = styled(Popup)`
@@ -23,17 +23,17 @@ const AppPopup = styled(Popup)`
 const AppPopupWrapper = styled.div`position: relative;`;
 
 const LoadingCompanion = styled.div`
-	position : absolute;
-	top : 0;
-	left : 0;
-	right : 0;
-	bottom : 0;
-	z-index : 9999;
-	border-radius : 25px;
-	background : rgba(255,255,255,0.4);
-	display : flex;
-	justify-content : center;
-	align-items : center;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 9999;
+	border-radius: 25px;
+	background: rgba(255, 255, 255, 0.4);
+	display: flex;
+	justify-content: center;
+	align-items: center;
 `;
 
 AppPopupWrapper.Header = styled.div`
@@ -69,9 +69,9 @@ const BtnClose = styled.div`
 	font-size: 2rem;
 	color: #ffffff;
 	cursor: pointer;
-	& > img{
-		width : 32px;
-		height : 32px;
+	& > img {
+		width: 32px;
+		height: 32px;
 	}
 `;
 
@@ -129,7 +129,7 @@ const UserInformation = styled.div`
 	justify-content: space-between;
 	align-items: center;
 	padding: 0.5rem;
-	margin-bottom : 0.5rem;
+	margin-bottom: 0.5rem;
 	& > div {
 		width: 50%;
 		display: flex;
@@ -145,7 +145,7 @@ const UserInformation = styled.div`
 		justify-content: space-between;
 		align-items: center;
 	}
-	& > div > span:nth-child(1){
+	& > div > span:nth-child(1) {
 		color: #333;
 		font-weight: 600;
 	}
@@ -176,14 +176,14 @@ NoteWrapper.Form = styled.form`
 		border-top-left-radius: 4px;
 		border-bottom-left-radius: 4px;
 		padding: 0 1rem;
-		-moz-appearance: none; 
+		-moz-appearance: none;
 		-webkit-appearance: none;
 	}
 	& > button {
 		width: 5rem;
 		border-top-right-radius: 4px;
 		border-bottom-right-radius: 4px;
-		background: #1366AE;
+		background: #1366ae;
 		color: #ffffff;
 		line-height: 2.8;
 		cursor: pointer;
@@ -233,7 +233,7 @@ const Button = styled.button`
 	text-align: center;
 	padding: 0 2rem;
 	width: 9rem;
-	height : 2.92rem;
+	height: 2.92rem;
 `;
 
 const ButtonChange = styled(Button)`
@@ -342,7 +342,7 @@ CalendarPopup.Heading = styled.div`
 	line-height: 2;
 	text-align: center;
 	padding-top: 0.3rem;
-	position : relative
+	position: relative;
 `;
 
 const LogoVip = styled.div`
@@ -372,7 +372,7 @@ const LogoVip2 = styled.div`
 	& > span {
 		color: white;
 		margin-left: 5px;
-		font-size : 13px
+		font-size: 13px;
 	}
 	& > img {
 		width: 13px;
@@ -400,81 +400,80 @@ const ButtonTime = styled.div`
 `;
 
 const ImageEnter = styled.img`
-    width : 1.3rem;
-    height : 1.3rem;
+	width: 1.3rem;
+	height: 1.3rem;
 `;
 
 const ImgButton = styled.img`
-	width : 12px;
-	height : 6px; 
-	margin-left : 8px; 
+	width: 12px;
+	height: 6px;
+	margin-left: 8px;
 `;
 
 CalendarPopup.Body = styled.div``;
 
 const CompanionWrapper = styled.div`
 	display: flex;
-	flex-direction : row;
-	width : 100%;
-	justify-content : space-between;
-	align-items : center;
-	& > div:nth-child(2){
-		justify-content : flex-end !important;
+	flex-direction: row;
+	width: 100%;
+	justify-content: space-between;
+	align-items: center;
+	& > div:nth-child(2) {
+		justify-content: flex-end !important;
 	}
 `;
 
 const CompanionWrapperName = styled.div`
 	display: flex;
-	flex-direction : row;
-	width : 100%;
-	justify-content : space-between;
-	align-items : center;
+	flex-direction: row;
+	width: 100%;
+	justify-content: space-between;
+	align-items: center;
 `;
 
 CompanionWrapper.Column = styled.div`
 	display: flex;
-	flex-direction : row;
-	width : 50%;
-	justify-content : space-between;
-	align-items : center;
+	flex-direction: row;
+	width: 50%;
+	justify-content: space-between;
+	align-items: center;
 	& > input {
-		width : 15rem;
-		height : 2.3rem;
-		border : 1px solid #dddddd;
-		border-radius : 3px;
-		background-color : #FAFAFA;
-		padding : 5px;
+		width: 15rem;
+		height: 2.3rem;
+		border: 1px solid #dddddd;
+		border-radius: 3px;
+		background-color: #fafafa;
+		padding: 5px;
 	}
 	& > img {
-		width : 35px;
-		height : 35px;
-		margin-left : 1rem;
+		width: 35px;
+		height: 35px;
+		margin-left: 1rem;
 	}
 	& > select {
-		border : 1px solid #dddddd;
-		border-radius : 3px;
-		background-color : #FAFAFA;
-		height : 2.3rem;
-		width : 4rem;
-		display : flex;
-		justify-content : center;
-		align-items : center;
-		padding-left : 0.8rem;
-		border-top-right-radius : 0;
-		border-bottom-right-radius : 0;
+		border: 1px solid #dddddd;
+		border-radius: 3px;
+		background-color: #fafafa;
+		height: 2.3rem;
+		width: 4rem;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding-left: 0.8rem;
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
 		border-right-width: 0;
 	}
 `;
 
 CompanionWrapper.ColumnName = styled.div`
 	display: flex;
-	flex-direction : row;
-	width : 50%;
-	align-items : center;
+	flex-direction: row;
+	width: 50%;
+	align-items: center;
 `;
 
 class Appointment extends React.Component {
-
 	renderNote = (note, index) => (
 		<NoteInformation key={index}>
 			<div>
@@ -525,11 +524,13 @@ class Appointment extends React.Component {
 					</Button>
 				);
 		} else {
-			return (
-				<ButtonChange onClick={() => this.ChangeAppointmentTime()} primary="true">
-					<strong>Change</strong>
-				</ButtonChange>
-			);
+			if (appointment.status !== 'WAITING') {
+				return (
+					<ButtonChange onClick={() => this.ChangeAppointmentTime()} primary="true">
+						<strong>Change</strong>
+					</ButtonChange>
+				);
+			}
 		}
 	}
 
@@ -557,7 +558,7 @@ class Appointment extends React.Component {
 		if (giftCard) {
 			const quantity =
 				giftCard.quantity.toString().length === 1 ? '0' + giftCard.quantity.toString() : giftCard.quantity;
-			let price = giftCard.price ? parseFloat(giftCard.price.toString().replace(/,/g, '')).toFixed(2) : "0.00";
+			let price = giftCard.price ? parseFloat(giftCard.price.toString().replace(/,/g, '')).toFixed(2) : '0.00';
 			return (
 				<tr key={index}>
 					<td>{giftCard.name ? giftCard.name : ''}</td>
@@ -575,7 +576,6 @@ class Appointment extends React.Component {
 		const { dayChange, isPopupDay } = this.state;
 		return (
 			<div style={{ position: 'relative', paddingTop: 3 }}>
-
 				<ButtonDayChange onClick={() => this.setState({ isPopupDay: !isPopupDay })}>
 					{moment(dayChange).format('MM/DD/YYYY')}
 					<ImgButton src={require('../../images/top_arrow@3x.png')} />
@@ -586,8 +586,8 @@ class Appointment extends React.Component {
 						<CalendarPopup>
 							<CalendarPopup.Heading>
 								Select Day
-							<BtnCloseSelectDay onClick={() => this.setState({ isPopupDay: !isPopupDay })}>
-									{<img src={require("../../images/close_white.png")} />}
+								<BtnCloseSelectDay onClick={() => this.setState({ isPopupDay: !isPopupDay })}>
+									{<img src={require('../../images/close_white.png')} />}
 								</BtnCloseSelectDay>
 							</CalendarPopup.Heading>
 							<CalendarPopup.Body>
@@ -612,7 +612,6 @@ class Appointment extends React.Component {
 		return (
 			<div style={{ paddingTop: 3, height: 42 }}>
 				<div style={{ position: 'relative' }}>
-
 					<ButtonTime onClick={() => this.openPopupTimePicker()}>
 						{moment(fromTime).format('hh:mm A').toString()}
 						<ImgButton src={require('../../images/top_arrow@3x.png')} />
@@ -643,38 +642,44 @@ class Appointment extends React.Component {
 						<tr>
 							<th width="25%" style={{ borderRight: 0 }}>
 								{' '}
-									Staff
-								</th>
+								Staff
+							</th>
 							<th width="25%" style={{ borderLeft: 0 }}>
 								Services
+							</th>
+							{appointment.status !== 'PAID' && (
+								<th width="25%" style={{ textAlign: 'center' }}>
+									Duration (min)
 								</th>
-							{appointment.status !== 'PAID' && <th width="25%" style={{ textAlign: 'center' }}>
-								Duration (min)
-								</th>}
-							{appointment.status === 'PAID' && <th width="25%" style={{ textAlign: 'center' }}>
-								Tip ($)
-								</th>}
+							)}
+							{appointment.status === 'PAID' && (
+								<th width="25%" style={{ textAlign: 'center' }}>
+									Tip ($)
+								</th>
+							)}
 							<th style={{ textAlign: 'center' }}>Price ($)</th>
 						</tr>
 					</thead>
-					<tbody>{services.map((s, i) =>
-						<Service
-							key={'service' + i}
-							service={s}
-							index={i}
-							appointment={appointment}
-							staffList={staffList}
-							prices={prices}
-							isPopupStaff={isPopupStaff}
-							indexPopupStaff={indexPopupStaff}
-							togglePopupStaff={(staff, index) => this.togglePopupStaff(staff, index)}
-							closePopupStaff={() => this.closePopupStaff()}
-							subtractService={(index) => this.subtractService(index)}
-							addService={(index) => this.addService(index)}
-							openPopupPrice={(price, index, key) => this.openPopupPrice(price, index, key)}
-							onChangePrice={(value, index) => this.onChangePrice(value, index)}
-						/>
-					)}</tbody>
+					<tbody>
+						{services.map((s, i) => (
+							<Service
+								key={'service' + i}
+								service={s}
+								index={i}
+								appointment={appointment}
+								staffList={staffList}
+								prices={prices}
+								isPopupStaff={isPopupStaff}
+								indexPopupStaff={indexPopupStaff}
+								togglePopupStaff={(staff, index) => this.togglePopupStaff(staff, index)}
+								closePopupStaff={() => this.closePopupStaff()}
+								subtractService={(index) => this.subtractService(index)}
+								addService={(index) => this.addService(index)}
+								openPopupPrice={(price, index, key) => this.openPopupPrice(price, index, key)}
+								onChangePrice={(value, index) => this.onChangePrice(value, index)}
+							/>
+						))}
+					</tbody>
 				</table>
 			);
 		}
@@ -690,14 +695,12 @@ class Appointment extends React.Component {
 					<thead>
 						<tr>
 							<th style={{ width: '50%' }}>Selected Products</th>
-							<th style={{ width: '25%', textAlign: 'center' }}>
-								Quantity
-							</th>
+							<th style={{ width: '25%', textAlign: 'center' }}>Quantity</th>
 							<th style={{ textAlign: 'center' }}>Price ($)</th>
 						</tr>
 					</thead>
 					<tbody>
-						{products.map((p, i) =>
+						{products.map((p, i) => (
 							<Product
 								key={'prpduct' + i}
 								product={p}
@@ -705,8 +708,8 @@ class Appointment extends React.Component {
 								appointment={appointment}
 								addProduct={(index) => this.addProduct(index)}
 								subtractProduct={(index) => this.subtractProduct(index)}
-							/>)
-						}
+							/>
+						))}
 						{appointment.giftCards && appointment.giftCards.map((p, i) => this.renderGiftCard(p, i))}
 					</tbody>
 				</table>
@@ -724,15 +727,13 @@ class Appointment extends React.Component {
 					<thead>
 						<tr>
 							<th style={{ width: '50%' }}>Selected Extras</th>
-							<th style={{ width: '25%', textAlign: 'center' }}>
-								Duration (min)
-							</th>
+							<th style={{ width: '25%', textAlign: 'center' }}>Duration (min)</th>
 							<th style={{ textAlign: 'center' }}>Price ($)</th>
 						</tr>
 					</thead>
 
 					<tbody>
-						{extras.map((ex, i) =>
+						{extras.map((ex, i) => (
 							<Extra
 								key={'extra' + i}
 								extra={ex}
@@ -742,7 +743,8 @@ class Appointment extends React.Component {
 								subtractExtra={(index) => this.subtractExtra(index)}
 								addExtra={(index) => this.addExtra(index)}
 								openPopupPrice={(price, index, key) => this.openPopupPrice(price, index, key)}
-							/>)}
+							/>
+						))}
 					</tbody>
 				</table>
 			);
@@ -794,6 +796,13 @@ class Appointment extends React.Component {
 					</AppointmentWrapper.Header>
 				);
 
+			case 'WAITING':
+				return (
+					<AppointmentWrapper.Header color={'#585858'} backgroundColor={'#f4f4f5'}>
+						{appointment.code} Waiting Appointment
+					</AppointmentWrapper.Header>
+				);
+
 			default:
 				return (
 					<AppointmentWrapper.Header backgroundColor="red">
@@ -830,7 +839,11 @@ class Appointment extends React.Component {
 					<CompanionWrapper style={{ marginTop: 15, marginBottom: 15 }}>
 						<CompanionWrapper.Column>
 							<span>Companion: </span>
-							<input onChange={(e) => this.onChangeCompanionName(e)} value={this.state.companionName} placeholder="Full Name" />
+							<input
+								onChange={(e) => this.onChangeCompanionName(e)}
+								value={this.state.companionName}
+								placeholder="Full Name"
+							/>
 						</CompanionWrapper.Column>
 
 						<CompanionWrapper.Column>
@@ -861,7 +874,7 @@ class Appointment extends React.Component {
 						</CompanionWrapper.Column>
 					</CompanionWrapper>
 				</React.Fragment>
-			)
+			);
 		} else {
 			return (
 				<UserInformation>
@@ -880,7 +893,7 @@ class Appointment extends React.Component {
 						)}
 					</div>
 				</UserInformation>
-			)
+			);
 		}
 	}
 
@@ -892,7 +905,10 @@ class Appointment extends React.Component {
 			<AppointmentWrapper.Body scroll={isPopupTimePicker ? false : true}>
 				{this.renderCustomerName()}
 
-				{appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' && this.renderChangeAppointTime()}
+				{appointment.status !== 'PAID' &&
+					appointment.status !== 'VOID' &&
+					appointment.status !== 'REFUND' &&
+					this.renderChangeAppointTime()}
 				{this.renderServices()}
 				{this.renderExtras()}
 				{this.renderProducts()}
@@ -911,7 +927,7 @@ class Appointment extends React.Component {
 		const { isPoupPrice, companionPhone, companionName, isLoadingCompanion } = this.state;
 		if (!appointment) return '';
 		if (appointmentDetail === '') return '';
-		let isCheckColor = appointment.status === 'ASSIGNED' || appointment.status === 'CONFIRMED' ? true : false;
+		let isCheckColor = appointment.status === 'ASSIGNED' || appointment.status === 'CONFIRMED'  || appointment.status === 'WAITING' ? true : false;
 
 		return (
 			<div>
@@ -923,19 +939,22 @@ class Appointment extends React.Component {
 					onClose={() => this.closeModal()}
 				>
 					<AppointmentWrapper>
-						{isLoadingCompanion &&
+						{isLoadingCompanion && (
 							<LoadingCompanion>
 								<ReactLoading type={'spin'} color={'#1B68AC'} height={50} width={50} />
-							</LoadingCompanion>}
+							</LoadingCompanion>
+						)}
 						<BtnClose onClick={() => this.closeModal()}>
-							{isCheckColor && <img src={require("../../images/close_black.png")} />}
-							{!isCheckColor && <img src={require("../../images/close_white.png")} />}
+							{isCheckColor && <img src={require('../../images/close_black.png')} />}
+							{!isCheckColor && <img src={require('../../images/close_white.png')} />}
 						</BtnClose>
 						{this.renderHeader()}
 						{this.renderBody()}
 
 						<AppointmentWrapper.Footer>
-							{(appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND') && (
+							{appointment.status !== 'PAID' &&
+							appointment.status !== 'VOID' &&
+							appointment.status !== 'REFUND' && (
 								<div>
 									<Button onClick={() => this.openConfirmationModal()}>Cancel</Button>
 								</div>
@@ -946,14 +965,10 @@ class Appointment extends React.Component {
 				</AppointmentPopup>
 
 				{/********************************** POPUP CONFIRM CANCEL APPOINTMENT *********************************/}
-				<ConfirmationPopup
-					onClose={() => this.closeConfirmationModal()}
-					open={this.state.confirmationModal}
-				>
+				<ConfirmationPopup onClose={() => this.closeConfirmationModal()} open={this.state.confirmationModal}>
 					<ConfirmationWrapper>
-
 						<BtnClose onClick={() => this.closeConfirmationModal()}>
-							<img src={require("../../images/close_white.png")} />
+							<img src={require('../../images/close_white.png')} />
 						</BtnClose>
 
 						<ConfirmationWrapper.Header backgroundColor="#1173C3">Confirmation</ConfirmationWrapper.Header>
@@ -985,6 +1000,5 @@ class Appointment extends React.Component {
 		);
 	}
 }
-
 
 export default Appointment;
