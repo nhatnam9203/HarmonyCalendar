@@ -58,7 +58,7 @@ export function* getMembers() {
 			}
 			if (resp.codeStatus === 1) {
 				const members = resp.data
-					? resp.data.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0)
+					? resp.data.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0 && mem.orderNumber !== 0)
 					: [];
 
 				if (members.length > 0) {
@@ -139,7 +139,7 @@ export function* reloadCalendarSaga() {
 			)
 		}));
 
-		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery);
+		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery,appointments);
 		yield put(actions.loadedAllAppointments(appointments));
 		yield put(actions.appointmentByMembersLoaded(appointmentsMembers));
 		yield put(actions.getBlockTime());
@@ -245,7 +245,7 @@ export function* getAppointmentsByMembersAndDate() {
 			)
 		}));
 
-		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery);
+		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery,appointments);
 
 		yield put(actions.appointmentByMembersLoaded(appointmentsMembers));
 		yield put(actions.loadedAllAppointments(appointments));
@@ -283,7 +283,7 @@ export function* reRenderAppointment() {
 			)
 		}));
 
-		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery);
+		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery , appointments);
 		yield put(actions.appointmentByMembersLoaded(appointmentsMembers));
 		addEventsToCalendar(currentDate, appointmentsMembers);
 	} catch (err) {
@@ -743,7 +743,7 @@ export function* addNewCustomer(action) {
 			customerId,
 			merchantId: merchantId,
 			userId: user_Id,
-			status: !dataAnyStaff ? time ? 'checkin' : 'waiting' : 'confirm',
+			status: !dataAnyStaff ? time ? 'confirm' : 'waiting' : 'confirm',
 			services: [],
 			products: [],
 			extras: [],
@@ -1045,7 +1045,7 @@ function* updateNextStaff_Saga() {
 			const response = yield api(url, '', 'GET', token);
 			if (response.codeStatus === 1) {
 				const members = response.data
-					? response.data.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0)
+					? response.data.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0 && mem.orderNumber !== 0)
 					: [];
 
 				const lastStaff = addLastStaff(members);

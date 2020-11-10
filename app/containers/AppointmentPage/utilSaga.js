@@ -158,23 +158,20 @@ export function blockTemp(memberId, start, end, note, appointmentId, status) {
 	};
 }
 
-function findApppointment(appointmentsMembers, appointmentId) {
+function checkStatusAppointment(appointmentId,appointments) {
 	let find = false;
-	appointmentsMembers.forEach((app) => {
-		app.appointments.forEach(appointment => {
-			if (appointment.id === appointmentId) {
-				if (appointment.status === 'PAID')
-					find = 1;
-				if (appointment.status === 'REFUND' || appointment.status === 'VOID')
-					find = 2
-			}
-		})
+	appointments.forEach(appointment => {
+		if (appointment.id === appointmentId) {
+			if (appointment.status === 'PAID')
+				find = 1;
+			if (appointment.status === 'REFUND' || appointment.status === 'VOID')
+				find = 2
+		}
 	})
-
 	return find
 }
 
-export function addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery) {
+export function addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery , appointments) {
 	const currentDayName = moment(currentDate).format('dddd');
 
 	/* ADD BLOCK TEMP ( YELLOW BLOCK ) */
@@ -192,13 +189,15 @@ export function addBlockCalendar(appointmentsMembers, displayedMembers, currentD
 				'h:mm A'
 			]).format('HH:mm:ss')}`;
 			const note = blockTimeMember[i].note;
-			if (findApppointment(appointmentsMembers, blockTimeMember[i].appointmentId) === 1) {
-				mem.appointments.push(blockTemp(memberId, start, end, note, blockTimeMember[i].appointmentId, 'BLOCK_TEMP_PAID'));
-			} else if (findApppointment(appointmentsMembers, blockTimeMember[i].appointmentId) === 2) {
-				mem.appointments.push(blockTemp(memberId, start, end, note, blockTimeMember[i].appointmentId, 'BLOCK_TEMP_REFUND'));
+			const appointmentId = blockTimeMember[i].appointmentId;
+
+			if (checkStatusAppointment(appointmentId , appointments) === 1) {
+				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_PAID'));
+			} else if (checkStatusAppointment(appointmentId,appointments) === 2) {
+				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_REFUND'));
 			}
 			else {
-				mem.appointments.push(blockTemp(memberId, start, end, note, blockTimeMember[i].appointmentId, 'BLOCK_TEMP'));
+				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP'));
 			}
 		}
 	});

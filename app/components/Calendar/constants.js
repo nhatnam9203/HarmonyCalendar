@@ -646,9 +646,38 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 					.find('div.app-event')
 					.prepend("<div class='app-event__full-name2'><img src='" + vip + "' width='18' height='18'></div>");
 			}
-			if (event.data.memberId === 0) {
-				if(event.data.status === 'ASSIGNED' || event.data.status === 'CONFIRMED' || event.data.status === 'CHECKED_IN'){
-					$(element).css('maxWidth', 50 + '%')
+			
+			if (event.data.status === 'BLOCK_TEMP_PAID' || event.data.status === 'BLOCK_TEMP_REFUND') {
+				const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
+				const allAppointments = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
+				if (event.data.memberId) {
+					const member = displayedMembers.find(mem => parseInt(mem.id) === parseInt(event.data.memberId));
+					if (member) {
+						const blockTime = member.blockTime ? member.blockTime : [];
+						let count = 0;
+						blockTime.forEach(block => {
+							const { appointmentId } = block;
+							if (parseInt(event.data.id) !== parseInt(appointmentId)) {
+								const { start, end } = event.data;
+								const app = allAppointments.find(obj => parseInt(obj.id) === parseInt(appointmentId))
+								if (moment(start).isAfter(app.start) && moment(start).isBefore(app.end) ||
+									moment(end).isAfter(app.start) && moment(end).isBefore(app.end)
+								) {
+									count += 1
+								}
+							}
+						});
+						if (count >= 2) {
+							$(element).css('width', 30 + '%');
+						}
+						else if(count === 1){
+							$(element).css('width', 40 + '%');
+						}
+					}else{
+						$(element).css('width', 50 + '%');
+					}
+				}else{
+					$(element).css('width', 50 + '%');
 				}
 			}
 		},
@@ -673,10 +702,10 @@ export const addEventsToCalendar = async (currentDate, appointmentsMembers) => {
 					data: appointment,
 					color: getAtrributeByStatus(appointment).eventColor,
 					rendering:
-						appointment.status === 'BLOCK' || appointment.status === 'BLOCK_TEMP' || appointment.status === 'BLOCK_TEMP_PAID' || appointment.status === 'BLOCK_TEMP_REFUND' ? 'background' : '',
+					appointment.status === 'BLOCK' || appointment.status === 'BLOCK_TEMP' ? 'background' : '',
 					className: getAtrributeByStatus(appointment).eventClass,
-					startEditable: !(appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND'),
-					resourceEditable: !(appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND')
+					startEditable: !(appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND' || appointment.status === "BLOCK_TEMP_PAID" || appointment.status === "BLOCK_TEMP_REFUND"),
+					resourceEditable: !(appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND' || appointment.status === "BLOCK_TEMP_PAID" || appointment.status === "BLOCK_TEMP_REFUND")
 				});
 			});
 		}
@@ -697,8 +726,8 @@ export const addEventsToCalendar = async (currentDate, appointmentsMembers) => {
 			color: getAtrributeByStatus(appointment).eventColor,
 			rendering: appointment.status === 'BLOCK' || appointment.status === 'BLOCK_TEMP' || appointment.status === 'BLOCK_TEMP_PAID' || appointment.status === 'BLOCK_TEMP_REFUND' ? 'background' : '',
 			className: getAtrributeByStatus(appointment).eventClass,
-			startEditable: !(appointment.status === 'PAID'),
-			resourceEditable: !(appointment.status === 'PAID')
+			startEditable: !(appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND' || appointment.status === "BLOCK_TEMP_PAID" || appointment.status === "BLOCK_TEMP_REFUND"),
+			resourceEditable: !(appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND' || appointment.status === "BLOCK_TEMP_PAID" || appointment.status === "BLOCK_TEMP_REFUND")
 		});
 	});
 	// viet ham render appointment cho cot any staff tai day
@@ -732,6 +761,14 @@ export const updateEventToCalendar = (fcEvent) => {
 		eventClass = 'event-paid';
 		startEditable = false;
 		resourceEditable = false;
+	}
+	if (appointment.status === 'BLOCK_TEMP_PAID') {
+		eventColor = '#38ff05';
+		eventClass = 'event-block-temp-paid';
+	}
+	if (appointment.status === 'BLOCK_TEMP_REFUND') {
+		eventColor = '#38ff05';
+		eventClass = 'event-block-temp';
 	}
 	if (!status) {
 		eventColor = 'red';
@@ -786,13 +823,12 @@ function getAtrributeByStatus(appointment) {
 	}
 	if (appointment.status === 'BLOCK_TEMP_PAID') {
 		eventColor = '#38ff05';
-		eventClass = 'event-block-temp';
+		eventClass = 'event-block-temp-paid';
 	}
 	if (appointment.status === 'BLOCK_TEMP_REFUND') {
 		eventColor = '#38ff05';
 		eventClass = 'event-block-temp';
 	}
-	
 	if (appointment.status === 'VOID' || appointment.status === "REFUND") {
 		eventColor = '#FD594F';
 		eventClass = 'event-void';

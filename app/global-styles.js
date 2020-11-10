@@ -185,6 +185,16 @@ const GlobalStyle = createGlobalStyle`
     fontFamily: 'Arial'
   }
 
+  .event-block-temp-paid{
+    color : #ffffff !important;
+    overflow : hidden;
+    background-color : #56CD36 !important;
+    opacity : 1 !important;
+    margin-right : 40%;
+    ${'' /* margin-right : 80px; */}
+  }
+
+
   .waiting-event{
     font-weight : 600 !important;
   }
@@ -478,6 +488,10 @@ const GlobalStyle = createGlobalStyle`
 
 .picker-item{
   font-size : 18px !important;
+}
+
+.fc-body .fc-time-grid .fc-content-skeleton table tbody tr td:nth-child(2) .fc-content-col .fc-event-container{
+  margin-right : 40% !important;
 }
 
 ::-webkit-scrollbar { 
