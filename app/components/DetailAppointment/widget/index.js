@@ -4,6 +4,7 @@ import PopupTimePicker from './PopupTimePicker'
 import Product from './Product'
 import Extra from './Extra'
 import Service from './Service'
+import PopupEditTip from './PopupEditTip/index';
 
 export {
     FooterAppointment,
@@ -11,5 +12,6 @@ export {
     PopupTimePicker,
     Product,
     Extra,
-    Service
+    Service,
+    PopupEditTip
 }

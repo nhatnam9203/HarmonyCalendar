@@ -105,5 +105,8 @@ export const initialState = {
 	companionName : '',
 	companionPhone : '',
 	companionPhoneHeader : "+1",
-	isLoadingCompanion : false 
+	isLoadingCompanion : false,
+	isPopupEditTip : false ,
+	staffEditPaid : '',
+	serviceEditPaid : ''
 };

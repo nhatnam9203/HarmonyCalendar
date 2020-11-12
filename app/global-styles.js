@@ -190,7 +190,7 @@ const GlobalStyle = createGlobalStyle`
     overflow : hidden;
     background-color : #56CD36 !important;
     opacity : 1 !important;
-    margin-right : 40%;
+    ${'' /* margin-right : 40%; */}
     ${'' /* margin-right : 80px; */}
   }
 

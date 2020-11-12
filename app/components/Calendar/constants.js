@@ -660,10 +660,12 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 							if (parseInt(event.data.id) !== parseInt(appointmentId)) {
 								const { start, end } = event.data;
 								const app = allAppointments.find(obj => parseInt(obj.id) === parseInt(appointmentId))
-								if (moment(start).isAfter(app.start) && moment(start).isBefore(app.end) ||
-									moment(end).isAfter(app.start) && moment(end).isBefore(app.end)
-								) {
-									count += 1
+								if (app) {
+									if (moment(start).isAfter(app.start) && moment(start).isBefore(app.end) ||
+										moment(end).isAfter(app.start) && moment(end).isBefore(app.end)
+									) {
+										count += 1
+									}
 								}
 							}
 						});
@@ -672,6 +674,8 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 						}
 						else if(count === 1){
 							$(element).css('width', 40 + '%');
+						}else{
+							$(element).css('width', 50 + '%');
 						}
 					}else{
 						$(element).css('width', 50 + '%');
@@ -762,11 +766,11 @@ export const updateEventToCalendar = (fcEvent) => {
 		startEditable = false;
 		resourceEditable = false;
 	}
-	if (appointment.status === 'BLOCK_TEMP_PAID') {
+	if (appointment && appointment.status === 'BLOCK_TEMP_PAID') {
 		eventColor = '#38ff05';
 		eventClass = 'event-block-temp-paid';
 	}
-	if (appointment.status === 'BLOCK_TEMP_REFUND') {
+	if (appointment && appointment.status === 'BLOCK_TEMP_REFUND') {
 		eventColor = '#38ff05';
 		eventClass = 'event-block-temp';
 	}

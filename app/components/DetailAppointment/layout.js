@@ -6,7 +6,7 @@ import moment from 'moment';
 import DayPicker from 'react-day-picker';
 import OutsideClickHandler from 'react-outside-click-handler';
 import { formatPhone } from '../../utils/helper';
-import { PopupTimePicker } from './widget';
+import { PopupTimePicker, PopupEditTip } from './widget';
 import NumberFormat from 'react-number-format';
 import { FooterAppointment, PopupPrice, Product, Extra, Service } from './widget';
 import ReactLoading from 'react-loading';
@@ -523,6 +523,12 @@ class Appointment extends React.Component {
 						Check-Out
 					</Button>
 				);
+			if (appointment.status === 'PAID' && appointment.memberId !== 0)
+				return (
+					<Button onClick={() => this.closeModal()} >
+						Edit
+					</Button>
+				);
 		} else {
 			if (appointment.status !== 'WAITING') {
 				return (
@@ -533,7 +539,6 @@ class Appointment extends React.Component {
 			}
 		}
 	}
-
 	/********************************* RENDER ROW CHANGE TIME *********************************/
 	renderChangeAppointTime() {
 		return (
@@ -677,6 +682,8 @@ class Appointment extends React.Component {
 								addService={(index) => this.addService(index)}
 								openPopupPrice={(price, index, key) => this.openPopupPrice(price, index, key)}
 								onChangePrice={(value, index) => this.onChangePrice(value, index)}
+								togglePopupEditTip={(staff, service, index) =>
+									this.openPopupEditTip(staff, service, index)}
 							/>
 						))}
 					</tbody>
@@ -923,11 +930,14 @@ class Appointment extends React.Component {
 	}
 
 	render() {
-		const { appointment, appointmentDetail } = this.props;
+		const { appointment, appointmentDetail , staffList} = this.props;
 		const { isPoupPrice, companionPhone, companionName, isLoadingCompanion } = this.state;
 		if (!appointment) return '';
 		if (appointmentDetail === '') return '';
-		let isCheckColor = appointment.status === 'ASSIGNED' || appointment.status === 'CONFIRMED'  || appointment.status === 'WAITING' ? true : false;
+		let isCheckColor =
+			appointment.status === 'ASSIGNED' || appointment.status === 'CONFIRMED' || appointment.status === 'WAITING'
+				? true
+				: false;
 
 		return (
 			<div>
@@ -939,6 +949,13 @@ class Appointment extends React.Component {
 					onClose={() => this.closeModal()}
 				>
 					<AppointmentWrapper>
+						<PopupEditTip
+							isPopupEditTip={this.state.isPopupEditTip}
+							onSubmit={(tipAmount, staff) => this.closePopupEditTip(tipAmount, staff)}
+							staffEditPaid={this.state.staffEditPaid}
+							serviceEditPaid={this.state.serviceEditPaid}
+							staffList={staffList}
+						/>
 						{isLoadingCompanion && (
 							<LoadingCompanion>
 								<ReactLoading type={'spin'} color={'#1B68AC'} height={50} width={50} />
@@ -952,11 +969,22 @@ class Appointment extends React.Component {
 						{this.renderBody()}
 
 						<AppointmentWrapper.Footer>
-							{appointment.status !== 'PAID' &&
-							appointment.status !== 'VOID' &&
+							{appointment.status !== 'VOID' &&
 							appointment.status !== 'REFUND' && (
-								<div>
-									<Button onClick={() => this.openConfirmationModal()}>Cancel</Button>
+								<div
+									style={{
+										opacity: appointment.status === 'PAID' ? 0 : 1
+									}}
+								>
+									<Button
+										onClick={() => {
+											if (appointment.status !== 'PAID') {
+												this.openConfirmationModal();
+											}
+										}}
+									>
+										Cancel
+									</Button>
 								</div>
 							)}
 							<div>{this.renderNextStatusButton()}</div>

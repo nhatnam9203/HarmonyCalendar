@@ -886,3 +886,10 @@ export function setToday(payload) {
 		payload
 	};
 }
+
+export function updateStaffAppointmentPaid(payload) {
+	return {
+		type: 'UPDATE_STAFF_APPOINTMENT_PAID',
+		payload
+	};
+}

@@ -165,6 +165,30 @@ class Appointment extends Layout {
 		});
 	}
 
+	closePopupEditTip(tipAmount, staff) {
+		if(staff){
+			if (staff.id) {
+				let { services , indexPopupStaff} = this.state;
+				services[indexPopupStaff].staffId = staff.id;
+				services[indexPopupStaff].tipAmount = tipAmount;
+				this.setState({ services });
+			}
+		}
+		this.setState({ isPopupEditTip: false });
+	}
+
+	openPopupEditTip(staff, service,index) {
+		this.setState({
+			isPopupEditTip: true,
+		}, () => {
+			this.setState({
+				staffEditPaid: staff,
+				serviceEditPaid: service,
+				indexPopupStaff : index
+			})
+		})
+	}
+
 	handleChange(e) {
 		const note = {
 			note: e.target.value
@@ -330,7 +354,10 @@ class Appointment extends Layout {
 			this.updateChangeAppointment('unconfirm');
 		} else if (appointment.status === 'CHECKED_IN') {
 			this.updateChangeAppointment('checkin');
-		} else {
+		}else if (appointment.status === 'PAID') {
+			this.updateStaffAppointmentPaid();
+		} 
+		else {
 			alert(`status appointment ${appointment.status} - id appointment ${appointment.id}`);
 		}
 		this.closeModal();
@@ -357,6 +384,12 @@ class Appointment extends Layout {
 		}
 
 		this.props.changeAppointmentTime(payload)
+	}
+
+	updateStaffAppointmentPaid() {
+		const { appointment } = this.props;
+		const { services } = this.state;
+		this.props.updateStaffAppointmentPaid({ appointment, services })
 	}
 
 	nextStatus() {

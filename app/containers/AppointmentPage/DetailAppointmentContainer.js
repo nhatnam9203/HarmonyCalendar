@@ -23,7 +23,8 @@ import {
 	updateNote,
 	updateCompanion,
 	loadingPopup,
-	searchPhoneCompanion
+	searchPhoneCompanion,
+	updateStaffAppointmentPaid
 } from './actions';
 
 export function mapDispatchToProps(dispatch) {
@@ -39,7 +40,9 @@ export function mapDispatchToProps(dispatch) {
 		updateNote: (data) => dispatch(updateNote(data)),
 		updateCompanion : (data)=>dispatch(updateCompanion(data)),
 		loadingPopup : (data)=>dispatch(loadingPopup(data)),
-		searchPhoneCompanion : (data) => dispatch(searchPhoneCompanion(data))
+		searchPhoneCompanion : (data) => dispatch(searchPhoneCompanion(data)),
+		updateStaffAppointmentPaid : (data) => dispatch(updateStaffAppointmentPaid(data))
+
 	};
 }
 

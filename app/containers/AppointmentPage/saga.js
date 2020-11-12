@@ -1,8 +1,8 @@
 import { delay } from 'redux-saga';
 import { fork, put, takeLatest, all, select } from 'redux-saga/effects';
 import moment from 'moment';
-import moment_tz from 'moment-timezone'
-import { api , scrollToNow } from '../../utils/helper';
+import moment_tz from 'moment-timezone';
+import { api, scrollToNow } from '../../utils/helper';
 import * as constants from './constants';
 import * as actions from './actions';
 import * as api_constants from '../../../app-constants';
@@ -15,7 +15,7 @@ import {
 	makeSelectAllAppointments,
 	makeSlideIndex,
 	makeSelectMembers,
-	makeMerchantInfo,
+	makeMerchantInfo
 } from './selectors';
 
 import { token, merchantId } from '../../../app-constants';
@@ -58,7 +58,9 @@ export function* getMembers() {
 			}
 			if (resp.codeStatus === 1) {
 				const members = resp.data
-					? resp.data.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0 && mem.orderNumber !== 0)
+					? resp.data
+							.map((member) => memberAdapter(member))
+							.filter((mem) => mem.isDisabled === 0 && mem.orderNumber !== 0)
 					: [];
 
 				if (members.length > 0) {
@@ -83,7 +85,6 @@ export function* getMembers() {
 	}
 }
 
-
 /********************************* GET APPOINMENT CALENDAR LIST *********************************/
 export function* reloadCalendarSaga() {
 	try {
@@ -107,7 +108,7 @@ export function* reloadCalendarSaga() {
 				return;
 			}
 
-			appointments = response && response.data.map((appointment) => appointmentAdapter(appointment))
+			appointments = response && response.data.map((appointment) => appointmentAdapter(appointment));
 			// .filter((app) => app.options.length > 0);
 
 			if (displayedMembers.length > 0 && merchantInfo) {
@@ -139,7 +140,7 @@ export function* reloadCalendarSaga() {
 			)
 		}));
 
-		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery,appointments);
+		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery, appointments);
 		yield put(actions.loadedAllAppointments(appointments));
 		yield put(actions.appointmentByMembersLoaded(appointmentsMembers));
 		yield put(actions.getBlockTime());
@@ -150,14 +151,12 @@ export function* reloadCalendarSaga() {
 				addEventsToCalendar(currentDate, appointmentsMembers);
 			}, 1000);
 			yield put(actions.loadingCalendar(false));
-
 		}
 	} catch (err) {
 		yield put(actions.loadingCalendar(false));
 		yield put(actions.appointmentByMemberLoadingError(err));
 	}
 }
-
 
 function* checkResponse(response) {
 	alert(response.message);
@@ -185,7 +184,7 @@ export function* getWaitingAppointments() {
 
 			yield put(actions.loadingWaiting(false));
 
-			const appointments = response && response.data.map((appointment) => appointmentAdapter(appointment))
+			const appointments = response && response.data.map((appointment) => appointmentAdapter(appointment));
 			// console.log({appointments})
 
 			localStorage.setItem('AppointmentWaiting', JSON.stringify(appointments));
@@ -202,7 +201,6 @@ export function* getWaitingAppointments() {
 	}
 }
 
-
 export function* getAppointmentsByMembersAndDate() {
 	try {
 		let appointments;
@@ -217,11 +215,14 @@ export function* getAppointmentsByMembersAndDate() {
 			const url = `${requestURL.toString()}/${apiDateQuery}`;
 			const response = yield api(url.toString(), '', 'GET', token);
 			if (response.codeStatus !== 1) {
-				console.log(response.message)
+				console.log(response.message);
 				return;
 			}
-			appointments = response && response.data.map((appointment) => appointmentAdapter(appointment))
-				.filter((app) => app.options.length > 0);
+			appointments =
+				response &&
+				response.data
+					.map((appointment) => appointmentAdapter(appointment))
+					.filter((app) => app.options.length > 0);
 
 			if (apiDateQuery === moment().format('YYYY-MM-DD')) {
 				localStorage.setItem('AppointmentCalendar', JSON.stringify(appointments));
@@ -245,7 +246,7 @@ export function* getAppointmentsByMembersAndDate() {
 			)
 		}));
 
-		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery,appointments);
+		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery, appointments);
 
 		yield put(actions.appointmentByMembersLoaded(appointmentsMembers));
 		yield put(actions.loadedAllAppointments(appointments));
@@ -261,7 +262,6 @@ export function* getAppointmentsByMembersAndDate() {
 		yield put(actions.appointmentByMemberLoadingError(err));
 	}
 }
-
 
 /********************************* RENDER APPOINTMENT IN CALENDAR *********************************/
 export function* reRenderAppointment() {
@@ -283,14 +283,13 @@ export function* reRenderAppointment() {
 			)
 		}));
 
-		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery , appointments);
+		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery, appointments);
 		yield put(actions.appointmentByMembersLoaded(appointmentsMembers));
 		addEventsToCalendar(currentDate, appointmentsMembers);
 	} catch (err) {
 		yield put(actions.appointmentByMemberLoadingError(err));
 	}
 }
-
 
 /********************************* MOVE APPOINTMENT *********************************/
 export function* moveAppointment(action) {
@@ -333,14 +332,13 @@ export function* moveAppointment(action) {
 	} else {
 		if (assignedMember && previousMemberId === 0) {
 			let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment();
-			let now = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
+			let now = `${moment(timeNow).format('YYYY-MM-DD')}T${moment(timeNow).format('HH:mm:ss')}`;
 			if (moment(now).isBefore(moment(appointment.end)) && moment(now).isAfter(appointment.start)) {
 				appointment.status = 'CHECKED_IN';
 			}
-		} else
-			if (!assignedMember) {
-				appointment.status = 'ASSIGNED';
-			}
+		} else if (!assignedMember) {
+			appointment.status = 'ASSIGNED';
+		}
 	}
 
 	const { memberId, start, end, status, options, products, extras, giftCards } = appointment;
@@ -349,8 +347,8 @@ export function* moveAppointment(action) {
 		sv.staffId = assignedMember ? assignedMember.id : 0;
 	});
 
-	let _end = moment(start).add("minutes", 15);
-	_end = `${_end.format('YYYY-MM-DD')}T${_end.format("HH:mm:ss")}`;
+	let _end = moment(start).add('minutes', 15);
+	_end = `${_end.format('YYYY-MM-DD')}T${_end.format('HH:mm:ss')}`;
 
 	const data = {
 		staffId: memberId,
@@ -381,7 +379,6 @@ export function* moveAppointment(action) {
 	}
 }
 
-
 /********************************* PUT BACK APPOINTMENT FROM CALENDAR TO WAITING LIST *********************************/
 export function* putBackAppointment(action) {
 	try {
@@ -401,12 +398,11 @@ export function* putBackAppointment(action) {
 				if (response.codeStatus === 1) {
 				}
 			}
-		} catch (err) { }
+		} catch (err) {}
 	} catch (err) {
 		yield put(actions.appointmentPuttingBackError(err));
 	}
 }
-
 
 /********************************* ASSIGN APPOINTMENT FROM WAITING LIST TO CALENDAR *********************************/
 export function* assignAppointment(action) {
@@ -456,16 +452,15 @@ export function* assignAppointment(action) {
 			const response = yield api(url, data, 'PUT', token);
 			if (response.codeStatus !== 1) return yield* checkResponse(response);
 			if (response.codeStatus === 1) {
-				postMesageAssignAppointment(appointment.id,appointment)
-			}else{
-				postMesageAssignAppointment(appointment.id,appointment)
+				postMesageAssignAppointment(appointment.id, appointment);
+			} else {
+				postMesageAssignAppointment(appointment.id, appointment);
 			}
 		}
 	} catch (err) {
 		// yield put(appointmentAssigningError(err));
 	}
 }
-
 
 /********************************* UPDATE STATUS APPOINTMENY CONFIRM, CHECK IN, CANCEL *********************************/
 export function* upddateAppointment(action) {
@@ -499,11 +494,22 @@ export function* upddateAppointment(action) {
 			const kq = yield api(url, { status }, 'PUT', token);
 
 			if (kq.codeStatus !== 1) {
-				return yield* checkResponse(kq)
+				return yield* checkResponse(kq);
 			} else return;
 		}
 
-		let data = dataUpdateAppointment(old_status, memberId, old_appointment, status, start, newDate, servicesUpdate, productsUpdate, extrasUpdate, giftCards);
+		let data = dataUpdateAppointment(
+			old_status,
+			memberId,
+			old_appointment,
+			status,
+			start,
+			newDate,
+			servicesUpdate,
+			productsUpdate,
+			extrasUpdate,
+			giftCards
+		);
 
 		yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
 		yield put(actions.renderAppointment());
@@ -520,12 +526,10 @@ export function* upddateAppointment(action) {
 			yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
 			yield put(actions.renderAppointment());
 		}
-
 	} catch (error) {
 		// yield put(actions.updateAppointmentError(error));
 	}
 }
-
 
 /********************************* CHANGE DURATION, STATUS, STAFF ... OF APPOINTMENT *********************************/
 export function* changeTimeAppointment(action) {
@@ -549,7 +553,7 @@ export function* changeTimeAppointment(action) {
 
 		let { memberId, options, products, extras, id, start, giftCards } = appointment;
 
-		let totalDuration = totalDuationChangeTime(appointment, extrasUpdate,servicesUpdate);
+		let totalDuration = totalDuationChangeTime(appointment, extrasUpdate, servicesUpdate);
 
 		const start_time = `${moment(dayPicker).format('YYYY-MM-DD')}T${moment(fromTime).format('HH:mm')}`;
 		const end_time =
@@ -558,9 +562,9 @@ export function* changeTimeAppointment(action) {
 				: moment(start_time).add(15, 'minutes').format('YYYY-MM-DD HH:mm');
 
 		let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment();
-		let now = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
+		let now = `${moment(timeNow).format('YYYY-MM-DD')}T${moment(timeNow).format('HH:mm:ss')}`;
 
-		if(!checkMerchantWorking(merchantInfo,start_time)){
+		if (!checkMerchantWorking(merchantInfo, start_time)) {
 			alert(`Merchant's not working on your selected date!`);
 			return;
 		}
@@ -577,24 +581,25 @@ export function* changeTimeAppointment(action) {
 			start,
 			selectedStaff,
 			giftCards
-		}
-		if ((memberId === 0 && (moment(start_time).format("HH:mm A") !== moment(start).format("HH:mm A")))
-			|| memberId !== 0 && moment(end_time).isBefore(moment(now))
+		};
+		if (
+			(memberId === 0 && moment(start_time).format('HH:mm A') !== moment(start).format('HH:mm A')) ||
+			(memberId !== 0 && moment(end_time).isBefore(moment(now)))
 		) {
-			const text = memberId === 0 ? "This Any Staff appointment is set to begin at a different time. Do you want to change original time of appointment?" : 
-			"This appointment is set for a time that has already passed. Do you still want to set this appointment at this time?";
+			const text =
+				memberId === 0
+					? 'This Any Staff appointment is set to begin at a different time. Do you want to change original time of appointment?'
+					: 'This appointment is set for a time that has already passed. Do you still want to set this appointment at this time?';
 			if (window.confirm(text)) {
-				yield put(actions.changeAppointment(payload))
+				yield put(actions.changeAppointment(payload));
 			}
 		} else {
-			yield put(actions.changeAppointment(payload))
+			yield put(actions.changeAppointment(payload));
 		}
 	} catch (error) {
 		yield put(actions.updateAppointmentError(error));
 	}
 }
-
-
 
 /********************************* CHANGE APPOINTMENT STEP 2 *********************************/
 export function* changeAppointmentSaga(action) {
@@ -603,7 +608,19 @@ export function* changeAppointmentSaga(action) {
 	// const currentDayName = moment(currentDate).format('dddd');
 	let isUpdate = true;
 
-	const { appointmentEdit, fcEvent, start_time, end_time, memberId, options, products, extras, start, selectedStaff, giftCards } = action.payload;
+	const {
+		appointmentEdit,
+		fcEvent,
+		start_time,
+		end_time,
+		memberId,
+		options,
+		products,
+		extras,
+		start,
+		selectedStaff,
+		giftCards
+	} = action.payload;
 	let appointment = {
 		...JSON.parse(JSON.stringify(appointmentEdit)),
 		memberId: options.length > 0 ? options[0].staffId : 0
@@ -618,43 +635,54 @@ export function* changeAppointmentSaga(action) {
 		}
 	}
 
-	let data = dataChangeTimeAppointment(selectedStaff, start_time, end_time, appointment, statusChange, options, products, extras, giftCards, memberId);
+	let data = dataChangeTimeAppointment(
+		selectedStaff,
+		start_time,
+		end_time,
+		appointment,
+		statusChange,
+		options,
+		products,
+		extras,
+		giftCards,
+		memberId
+	);
 
-	const staff = displayedMembers.find(s => s.id === data.staffId);
+	const staff = displayedMembers.find((s) => s.id === data.staffId);
 
 	/* check condition update to grey block */
-	const _duration = new_total_duration(data.services, data.extras, appointment, memberId)
+	const _duration = new_total_duration(data.services, data.extras, appointment, memberId);
 	let toTime = moment(data.fromTime).add(_duration, 'minutes');
 	toTime = `${moment(toTime).format('YYYY-MM-DD')}T${moment(toTime).format('HH:mm')}`;
 	const currentDayName = moment(data.fromTime).format('dddd');
 
 	if (staff) {
-		const timeWorking = Object.entries(staff.workingTimes).find(b => b[0] === currentDayName);
+		const timeWorking = Object.entries(staff.workingTimes).find((b) => b[0] === currentDayName);
 
 		const timeEnd = `${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(
 			timeWorking[1].timeEnd,
-			['h:mm A']
+			[ 'h:mm A' ]
 		).format('HH:mm:ss')}`;
 
 		const timeStart = `${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(
 			timeWorking[1].timeStart,
-			['h:mm A']
+			[ 'h:mm A' ]
 		).format('HH:mm:ss')}`;
 
 		if (
-			(moment(toTime).isSameOrAfter(timeEnd) || moment(data.fromTime).isBefore(timeStart))
-			&& moment(toTime).format('MM/DD/YYYY') == moment().format('MM/DD/YYYY')
+			(moment(toTime).isSameOrAfter(timeEnd) || moment(data.fromTime).isBefore(timeStart)) &&
+			moment(toTime).format('MM/DD/YYYY') == moment().format('MM/DD/YYYY')
 		) {
 			if (window.confirm('Accept this appointment outside of business hours?')) {
-				isUpdate = true
+				isUpdate = true;
 			} else {
-				isUpdate = false
+				isUpdate = false;
 			}
 		} else {
 			if (window.confirm('Accept changes?')) {
-				isUpdate = true
+				isUpdate = true;
 			} else {
-				isUpdate = false
+				isUpdate = false;
 			}
 		}
 	}
@@ -671,10 +699,10 @@ export function* changeAppointmentSaga(action) {
 			appointment: {
 				...data,
 				staffId: options.length > 0 ? options[0].staffId : _staffId,
-				toTime,
+				toTime
 			},
 			id: appointment.id
-		}
+		};
 
 		yield put(actions.updateAppointmentFrontend(data_update_frontend));
 		yield put(actions.renderAppointment());
@@ -695,10 +723,7 @@ export function* changeAppointmentSaga(action) {
 				actions.updateAppointmentFrontend({
 					appointment: {
 						...data,
-						toTime: moment(data.fromTime).add(
-							_duration,
-							'minutes'
-						)
+						toTime: moment(data.fromTime).add(_duration, 'minutes')
 					},
 					id: appointment.id
 				})
@@ -708,23 +733,54 @@ export function* changeAppointmentSaga(action) {
 	}
 }
 
-
 /********************************* ADD NEW CUSTOMER *********************************/
 export function* addNewCustomer(action) {
 	try {
-		const { first_name, last_name, phone, staffID, time, refPhone, note, email, referedBy, dataAnyStaff, isSendLink } = action.customer;
+		const {
+			first_name,
+			last_name,
+			phone,
+			staffID,
+			time,
+			refPhone,
+			note,
+			email,
+			referedBy,
+			dataAnyStaff,
+			isSendLink
+		} = action.customer;
 		if (navigator.onLine === false) {
-			window.postMessage(JSON.stringify({ first_name, last_name, phone, staffID, time, refPhone, note, email, action: 'signinAppointmentOffLine' }));
+			window.postMessage(
+				JSON.stringify({
+					first_name,
+					last_name,
+					phone,
+					staffID,
+					time,
+					refPhone,
+					note,
+					email,
+					action: 'signinAppointmentOffLine'
+				})
+			);
 			return;
 		}
 		const infoUser = yield select(makeInfoCheckPhone());
 		let customerId;
 		let user_Id;
 		if (infoUser === '') {
-			const data = { FirstName: first_name, LastName: last_name, Email: email, Phone: phone, referrerPhone: refPhone ? '+' + refPhone : '', favourite: note, ReferrerBy: referedBy };
+			const data = {
+				FirstName: first_name,
+				LastName: last_name,
+				Email: email,
+				Phone: phone,
+				referrerPhone: refPhone ? '+' + refPhone : '',
+				favourite: note,
+				ReferrerBy: referedBy
+			};
 			const response = yield api(new URL(api_constants.POST_ADD_CUSTOMER), data, 'POST', token);
 			if (parseInt(response.codeStatus) != 1) {
-				alert(response.message)
+				alert(response.message);
 				return;
 			}
 			customerId = response.data.customerId;
@@ -735,7 +791,7 @@ export function* addNewCustomer(action) {
 		}
 
 		if (isSendLink && parseInt(user_Id) === 0) {
-			yield put(actions.sendLinkCustomer({ phone }))
+			yield put(actions.sendLinkCustomer({ phone }));
 		}
 
 		const data = {
@@ -743,7 +799,7 @@ export function* addNewCustomer(action) {
 			customerId,
 			merchantId: merchantId,
 			userId: user_Id,
-			status: !dataAnyStaff ? time ? 'confirm' : 'waiting' : 'confirm',
+			status: !dataAnyStaff ? (time ? 'confirm' : 'waiting') : 'confirm',
 			services: [],
 			products: [],
 			extras: [],
@@ -757,24 +813,18 @@ export function* addNewCustomer(action) {
 			user_Id
 		};
 
-		yield put(actions.submitAddAppointment(data))
-
+		yield put(actions.submitAddAppointment(data));
 	} catch (error) {
 		yield put(actions.addCustomerError(error));
 	}
 }
 
-
 /********************************* ADD APPOINTMENT *********************************/
 function* addAppointmentSaga() {
-	yield takeLatest(constants.SUBMIT_ADD_APPOINTMENT, function* (action) {
+	yield takeLatest(constants.SUBMIT_ADD_APPOINTMENT, function*(action) {
 		try {
 			const data = action.payload;
-			const {
-				time,
-				staffID,
-				dataAnyStaff,
-			} = data;
+			const { time, staffID, dataAnyStaff } = data;
 
 			const response = yield api(new URL(api_constants.POST_ADD_APPOINTMENT).toString(), data, 'POST', token);
 
@@ -786,30 +836,28 @@ function* addAppointmentSaga() {
 					dataPush = JSON.stringify({
 						appointmentId,
 						dataAnyStaff,
-						action: 'addGroupAnyStaff',
-					})
+						action: 'addGroupAnyStaff'
+					});
 				} else {
 					dataPush = JSON.stringify({
 						appointmentId,
 						action: 'signinAppointment'
-					})
+					});
 				}
 
-				window.postMessage(dataPush)
+				window.postMessage(dataPush);
 
 				delay(2000);
 				yield put(actions.TimeAndStaffID(''));
 			} else {
-				alert(response.message)
+				alert(response.message);
 			}
-
 		} catch (err) {
-			console.log({ err })
+			console.log({ err });
 			// yield put(memberLoadingError(err));
 		}
 	});
 }
-
 
 /********************************* SEARCH PHONE CUSTOMER *********************************/
 export function* checkPhoneCustomer(action) {
@@ -837,15 +885,15 @@ export function* checkPhoneCustomer(action) {
 export function* sendLinkCustomerSaga(action) {
 	try {
 		const { phone } = action.payload;
-		let phoneUpdate = phone.toString().replace("+", "");
+		let phoneUpdate = phone.toString().replace('+', '');
 		const requestURL = new URL(api_constants.GET_SENDLINK_CUSTOMER);
 		const url = `${requestURL.toString()}${phoneUpdate}`;
 		const result = yield api(url, '', 'GET', token);
 		if (result.codeStatus !== 1) {
-			alert(response.message)
+			alert(response.message);
 		}
 	} catch (error) {
-		console.log({ error })
+		console.log({ error });
 	}
 }
 
@@ -857,27 +905,26 @@ export function* getDetailMerchantSaga(action) {
 
 		if (parseInt(response.codeNumber) === 200) {
 			let infoMerchant = { ...response.data };
-			if (response.data.timezone === "null") {
+			if (response.data.timezone === 'null') {
 				infoMerchant.timezone = null;
 			}
 			yield put(actions.setDetailMerchant(infoMerchant));
 			const isLoadData = action.payload && action.payload.isLoadData ? action.payload.isLoadData : '';
 			if (isLoadData) {
 				const { timezone } = response.data;
-				let timeNow = timezone && timezone !== "null" ? moment_tz.tz(timezone.substring(12)) : moment();
-				let day = `${moment(timeNow).format("DDMMYYYY")}`;
+				let timeNow = timezone && timezone !== 'null' ? moment_tz.tz(timezone.substring(12)) : moment();
+				let day = `${moment(timeNow).format('DDMMYYYY')}`;
 				yield put(actions.selectDay(day));
 				yield put(actions.setToday(day));
 				yield put(actions.selectWeek(day));
-				scrollToNow()
-				yield put(actions.updateNextStaff({ isReloadCalendar: true }))
+				scrollToNow();
+				yield put(actions.updateNextStaff({ isReloadCalendar: true }));
 			}
 		}
 	} catch (error) {
-		console.log({ error })
+		console.log({ error });
 	}
 }
-
 
 /********************************* CANCEL APPONTMENT IN WAITING LIST *********************************/
 export function* deleteEventInWaitingList(action) {
@@ -906,7 +953,6 @@ export function* deleteEventInWaitingList(action) {
 	}
 }
 
-
 /********************************* ADD BLOCK TIME *********************************/
 export function* addBlockTime(action) {
 	try {
@@ -927,9 +973,8 @@ export function* addBlockTime(action) {
 			// yield put(actions.loadMembers());
 			return;
 		}
-	} catch (error) { }
+	} catch (error) {}
 }
-
 
 /********************************* EDIT BLOCK TIME *********************************/
 export function* editBlockTime(action) {
@@ -950,9 +995,8 @@ export function* editBlockTime(action) {
 			// yield put(actions.loadMembers());
 			return;
 		}
-	} catch (error) { }
+	} catch (error) {}
 }
-
 
 /********************************* DELETE BLOCK TIME *********************************/
 export function* deleteBlockTime_Saga(action) {
@@ -964,9 +1008,8 @@ export function* deleteBlockTime_Saga(action) {
 			// yield put(actions.loadMembers());
 			yield put(actions.deleteBlockTimeSuccess({ staff, block }));
 		}
-	} catch (error) { }
+	} catch (error) {}
 }
-
 
 /********************************* GET BLOCK TIME LIST IN CALENDAR *********************************/
 export function* getBlockTimeSaga() {
@@ -980,31 +1023,30 @@ export function* getBlockTimeSaga() {
 			yield put(actions.renderAppointment());
 			return;
 		}
-	} catch (error) { }
+	} catch (error) {}
 }
-
 
 /********************************* GET DETAIL APPOINTMENT *********************************/
 export function* getAppointmentByIdSaga(action) {
 	try {
 		if (navigator.onLine) {
 			const { appointment, event } = action.data;
-			const { id, end } = appointment
+			const { id, end } = appointment;
 			const requestURL = new URL(`${api_constants.GET_APPOINTMENT_ID}/${id}`);
 			const response = yield api(requestURL.toString(), '', 'GET', token);
 			if (response.codeStatus === 1) {
-				let _data = { ...response.data, toTime: end }
+				let _data = { ...response.data, toTime: end };
 				yield put({ type: 'GET_APP_BY_ID_SUCCESS', data: _data });
-				yield put(actions.selectAppointment(appointmentAdapter(_data), event))
+				yield put(actions.selectAppointment(appointmentAdapter(_data), event));
 				return;
 			}
 			if (response.codeStatus !== 1) {
-				alert(response.message)
+				alert(response.message);
 				return;
 			}
 		} else {
 			const { appointment, event } = action.data;
-			yield put(actions.selectAppointment(appointment, event))
+			yield put(actions.selectAppointment(appointment, event));
 			yield put({ type: 'GET_APP_BY_ID_SUCCESS', data: appointment });
 		}
 	} catch (err) {
@@ -1012,7 +1054,6 @@ export function* getAppointmentByIdSaga(action) {
 		yield put({ type: 'GET_APP_BY_ID_SUCCESS', data: appointment });
 	}
 }
-
 
 /********************************* GET TIME STAFF LOGIN *********************************/
 export function* getTimeStaffLoginSaga(action) {
@@ -1029,13 +1070,12 @@ export function* getTimeStaffLoginSaga(action) {
 			alert('error from ' + api_constants.API_GET_TIME_STAFF_LOGIN);
 			return;
 		}
-	} catch (err) { }
+	} catch (err) {}
 }
-
 
 /********************************* RELOAD STAFF & GET BLOCK TIME *********************************/
 function* updateNextStaff_Saga() {
-	yield takeLatest(constants.UPDATE_NEXT_STAFF, function* (action) {
+	yield takeLatest(constants.UPDATE_NEXT_STAFF, function*(action) {
 		try {
 			const { isReloadCalendar } = action.payload;
 			const requestURL = new URL(`${api_constants.GET_MEMBER}`);
@@ -1045,7 +1085,9 @@ function* updateNextStaff_Saga() {
 			const response = yield api(url, '', 'GET', token);
 			if (response.codeStatus === 1) {
 				const members = response.data
-					? response.data.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0 && mem.orderNumber !== 0)
+					? response.data
+							.map((member) => memberAdapter(member))
+							.filter((mem) => mem.isDisabled === 0 && mem.orderNumber !== 0)
 					: [];
 
 				const lastStaff = addLastStaff(members);
@@ -1054,23 +1096,16 @@ function* updateNextStaff_Saga() {
 				yield put(actions.membersLoaded(members));
 				yield put(actions.setDisplayedMembers(members.slice(slideIndex * 8, slideIndex * 8 + 8)));
 
-				if (!isReloadCalendar)
-					yield put(actions.getBlockTime());
+				if (!isReloadCalendar) yield put(actions.getBlockTime());
 				else yield put(actions.reloadCalendar());
-
 			}
 		} catch (err) {
 			// yield put(memberLoadingError(err));
 		}
 
-
 		/* &&&&*76678678678678 */
-
 	});
 }
-
-
-
 
 /********************************* ADD NOTE APPOINTMENT *********************************/
 export function* updateNote_Saga(action) {
@@ -1089,7 +1124,7 @@ export function* updateNote_Saga(action) {
 		if (response.codeStatus !== 1) {
 			return yield* checkResponse(response);
 		}
-	} catch (err) { }
+	} catch (err) {}
 }
 
 /********************************* SEARCH PHONE COMPANION *********************************/
@@ -1106,9 +1141,9 @@ export function* searchPhoneCompanion_Saga(action) {
 			resolve({ success: true, data: `${firstName} ${lastName}` });
 		}
 		if (response.codeStatus !== 1) {
-			resolve({ success: false })
+			resolve({ success: false });
 		}
-	} catch (err) { }
+	} catch (err) {}
 }
 
 /********************************* UPDATE COMPANION *********************************/
@@ -1123,14 +1158,36 @@ export function* updateCompanion_Saga(action) {
 		};
 		const response = yield api(requestURL.toString(), body, 'PUT', token);
 		if (response.codeStatus === 1) {
-
 		}
-		resolve({ success: true })
+		resolve({ success: true });
 		if (response.codeStatus !== 1) {
-			resolve({ success: true })
+			resolve({ success: true });
 			return yield* checkResponse(response);
 		}
-	} catch (err) { }
+	} catch (err) {}
+}
+
+function mapServiceEditPaid(service) {
+	return {
+		bookingServiceId: service.bookingServiceId,
+		staffId: service.staffId,
+		"tipAmount": parseFloat(service.tipAmount)
+	};
+}
+
+export function* updateStaffAppointmentPaid(action) {
+	try {
+		let { appointment, services } = action.payload;
+		const { id } = appointment;
+		const requestURL = new URL(`${api_constants.UPDATE_STAFF_APPOINTMENT_PAID}/${id}`);
+		services = services.map((obj) => mapServiceEditPaid(obj));
+		const body = { services };
+		const response = yield api(requestURL.toString(), body, 'PUT', token);
+		if (response.codeStatus === 1) {
+		} else {
+			alert(response.message);
+		}
+	} catch (err) {}
 }
 
 /* **************************** Subroutines ******************************** */
@@ -1251,6 +1308,10 @@ export function* watch_getDetailMerchan() {
 	yield takeLatest(constants.GET_DETAIL_MERCHANT, getDetailMerchantSaga);
 }
 
+export function* watch_updateStaffAppointmentPaid() {
+	yield takeLatest(constants.UPDATE_STAFF_APPOINTMENT_PAID, updateStaffAppointmentPaid);
+}
+
 /**
  * Root saga manages watcher lifecycle
  */
@@ -1285,6 +1346,7 @@ export default function* root() {
 		fork(watch_sendLinkCustomer),
 		fork(watch_getDetailMerchan),
 		fork(watch_updateCompanion),
-		fork(watch_searchPhoneCompanion)
+		fork(watch_searchPhoneCompanion),
+		fork(watch_updateStaffAppointmentPaid)
 	]);
 }

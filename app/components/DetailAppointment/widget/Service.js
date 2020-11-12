@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import styled from 'styled-components';
 import NumberFormat from 'react-number-format';
 import PopupStaff from './PopupStaff';
+import { isEmpty } from 'lodash';
 
 const ButtonService = styled.button`
 	background: ${(props) => props.backgroundColor};
@@ -60,7 +61,9 @@ export default class Service extends Component {
                             {isPopupStaff &&
                                 index === indexPopupStaff && (
                                     <PopupStaff
-                                        togglePopupStaff={(staff) => this.props.togglePopupStaff(staff, index)}
+                                        togglePopupStaff={(staff) => {
+                                            this.props.togglePopupStaff(staff, index)
+                                        }}
                                         staffList={staffList.filter((s) => s.id !== 0)}
                                         closePopupStaff={() => this.props.closePopupStaff()}
                                     />
@@ -83,7 +86,7 @@ export default class Service extends Component {
                             >
                                 -5&#39;
 							</ButtonService>
-                                    {duration}
+                            {duration}
                             <ButtonService
                                 backgroundColor={this.getStyleService2(appointment, service, index)}
                                 disabled={appointment.status === 'PAID'}
@@ -107,23 +110,34 @@ export default class Service extends Component {
                     </td>
                 </tr>
             );
-        } else {
+        }
+        else {
             if (service.staff) {
+                let staffName = isEmpty(title) ? service.staff.displayName : title;
                 return (
                     <tr key={index}>
-                        <td style={{ borderRight: 0 }}>
+                        <td
+                            onClick={() => {
+                                if (appointment.status === 'PAID') {
+                                    this.props.togglePopupEditTip(staff,service,index)
+                                }
+                            }}
+                            style={{ borderRight: 0, position: 'relative' }}
+                        >
                             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                <img
-                                    src={service.staff.imageUrl}
-                                    style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 25 }}
-                                />
-                                <p style={{ marginLeft: 8 }}>{service.staff.displayName}</p>
+
+                                <p style={{ marginLeft: 8 , width : '100px'  }}>{staffName}</p>
+                                {
+                                    appointment.status === 'PAID'
+                                    &&
+                                    <ImgButton src={require('../../../images/top_arrow@3x.png')} />
+                                }
                             </div>
                         </td>
                         <td style={{ borderLeft: 0 }}>
                             <div style={style.serviceName}>{service.serviceName}</div>
                         </td>
-                        <td style={{ textAlign: 'center' }}>{service.staff.tip}</td>
+                        <td style={{ textAlign: 'center' }}>{service.tipAmount}</td>
                         <td>
                             <div style={{ textAlign: 'center' }}>{price}</div>
                         </td>

@@ -46,7 +46,8 @@ const API_GET_TIME_STAFF_LOGIN = `${API_BASE_URL}/staff/loginTime`;
 const PUT_UPDATE_NOTE = `${API_BASE_URL}/appointment/note`;
 const GET_SENDLINK_CUSTOMER = `${API_BASE_URL}/user/sendlink?phone=`;
 const GET_DETAIL_MERCHANT = `${API_BASE_URL}/merchant`
-const PUT_UPDATE_COMPANION = `${API_BASE_URL}/appointment/updateCompanion`
+const PUT_UPDATE_COMPANION = `${API_BASE_URL}/appointment/updateCompanion`;
+const UPDATE_STAFF_APPOINTMENT_PAID = `${API_BASE_URL}/appointment/updateStaffAppointmentPaid`
 
 const VAR_DEFAULT_AVATAR_PATH = `/upload/staff/avatar.svg`;
 
@@ -83,6 +84,7 @@ export {
   GET_DETAIL_MERCHANT,
   PUT_UPDATE_COMPANION,
   VAR_DEFAULT_AVATAR_PATH,
+  UPDATE_STAFF_APPOINTMENT_PAID,
   isDesktopOrLaptop,
 }
 
