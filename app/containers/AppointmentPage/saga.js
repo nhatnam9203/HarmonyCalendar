@@ -268,6 +268,7 @@ export function* reRenderAppointment() {
 		const displayedMembers = yield select(makeSelectDisplayedMembers());
 		const appointments = yield select(makeSelectAllAppointments());
 		const currentDate = yield select(makeCurrentDay());
+		const appointmentScroll = yield select(makeAppointmentScroll());
 		let apiDateQuery = currentDate.format('YYYY-MM-DD') || moment().format('YYYY-MM-DD');
 
 		const appointmentsMembers = displayedMembers.map((member) => ({
@@ -285,6 +286,10 @@ export function* reRenderAppointment() {
 		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery, appointments);
 		yield put(actions.appointmentByMembersLoaded(appointmentsMembers));
 		addEventsToCalendar(currentDate, appointmentsMembers);
+
+		if (!isEmpty(appointmentScroll)) {
+			yield put({ type: 'START_SCROLL_TO_APPOINTMENT', isScrollToAppointment: true });
+		}
 	} catch (err) {
 		yield put(actions.appointmentByMemberLoadingError(err));
 	}
@@ -1211,6 +1216,21 @@ export function* updateStaffAppointmentPaid(action) {
 	} catch (err) { }
 }
 
+export function* searchCustomerBox(action) {
+	try {
+		console.log('search box saga')
+		const requestURL = new URL(`${api_constants.SEARCH_CUSTOMER_BOX}${action.payload.data}`);
+		const response = yield api(requestURL.toString(), '', 'GET', token);
+		if (response.codeNumber == 200) {
+			yield put({ type: 'SET_APPOINTMENT_SEARCH_BOX', data: response.data });
+			action.payload.cb();
+		} else {
+			alert(response.message);
+		}
+	} catch (err) { }
+}
+
+
 /* **************************** Subroutines ******************************** */
 
 export function* selectDayAndWeek(action) {
@@ -1368,6 +1388,7 @@ export default function* root() {
 		fork(watch_getDetailMerchan),
 		fork(watch_updateCompanion),
 		fork(watch_searchPhoneCompanion),
-		fork(watch_updateStaffAppointmentPaid)
+		fork(watch_updateStaffAppointmentPaid),
+		takeLatest("SEARCH_CUSTOMER_BOX", searchCustomerBox),
 	]);
 }

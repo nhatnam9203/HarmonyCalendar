@@ -67,7 +67,11 @@ import {
 	SET_SLIDE_INDEX,
 	SET_DETAIL_MERCHANT,
 	IS_LOADING_POPUP,
-	SET_TODAY
+	SET_TODAY,
+	TOGGLE_SEARCH_BOX,
+	SET_APPOINTMENT_SEARCH_BOX,
+	SCROLL_TO_APPOINTMENT,
+	START_SCROLL_TO_APPOINTMENT,
 } from './constants';
 import { dataPutBackAppointment } from './utilSaga';
 import { unionBy } from 'lodash';
@@ -121,7 +125,11 @@ export const initialState = fromJS({
 	PopupPincode: false,
 	PinStaff: '',
 	slideIndex: 0,
-	isLoadingPopup: false
+	isLoadingPopup: false,
+	isPopupSearchBox: false,
+	appointmentSearchBox: [],
+	appointmentScroll: '',
+	isScrollToAppointment: false,
 });
 
 function saveAppointmentOffLine(app) {
@@ -132,7 +140,7 @@ function saveAppointmentOffLine(app) {
 			newAppointsTemp.push(app);
 			localStorage.setItem('AppointmentsOffline', JSON.stringify(newAppointsTemp));
 		} else {
-			const apps_temp = [ ...appointments ];
+			const apps_temp = [...appointments];
 			apps_temp.push(app);
 			localStorage.setItem('AppointmentsOffline', JSON.stringify(apps_temp));
 		}
@@ -162,6 +170,18 @@ function appointmentReducer(state = initialState, action) {
 				])
 			);
 
+		case TOGGLE_SEARCH_BOX:
+			return state.set('isPopupSearchBox', action.isPopupSearchBox).set('appointmentSearchBox', []);
+
+		case START_SCROLL_TO_APPOINTMENT:
+			return state.set('isScrollToAppointment', action.isScrollToAppointment);
+
+		case SET_APPOINTMENT_SEARCH_BOX:
+			return state.set('appointmentSearchBox', action.data);
+
+		case SCROLL_TO_APPOINTMENT:
+			return state.set('appointmentScroll', action.appointment);
+
 		case SELECT_APPOINTMENT:
 			return state.set('selectedAppointment', action.appointment).set('selectedFCEvent', {
 				...action.fcEvent
@@ -174,7 +194,7 @@ function appointmentReducer(state = initialState, action) {
 			return state
 				.set('selectedAppointment', null)
 				.set('selectedFCEvent', null)
-				.updateIn([ 'appointments', 'appointmentDetail' ], (app) => {
+				.updateIn(['appointments', 'appointmentDetail'], (app) => {
 					app = '';
 					return app;
 				});
@@ -186,13 +206,13 @@ function appointmentReducer(state = initialState, action) {
 			return state.set('addingAppointment', null);
 
 		case LOAD_MEMBERS:
-			return state.set('loading', true).set('error', false).setIn([ 'members', 'all' ], []);
+			return state.set('loading', true).set('error', false).setIn(['members', 'all'], []);
 
 		case 'LOAD_STAFF_SORT':
-			return state.setIn([ 'members', 'staffSort' ], action.staff);
+			return state.setIn(['members', 'staffSort'], action.staff);
 
 		case LOAD_MEMBERS_SUCCESS:
-			return state.setIn([ 'members', 'all' ], action.members).set('loading', false);
+			return state.setIn(['members', 'all'], action.members).set('loading', false);
 
 		case SET_DETAIL_MERCHANT:
 			return state.set('merchantInfo', action.payload);
@@ -212,89 +232,89 @@ function appointmentReducer(state = initialState, action) {
 				}
 			}
 
-			return state.setIn([ 'members', 'displayed' ], action.members);
+			return state.setIn(['members', 'displayed'], action.members);
 
 		case LOAD_WAITING_APPOINTMENT:
-			return state.setIn([ 'appointments', 'waiting' ], []);
+			return state.setIn(['appointments', 'waiting'], []);
 
 		case LOAD_WAITING_APPOINTMENT_SUCCESS:
-			const waitingApointments = action.appointments.sort(function(a, b) {
+			const waitingApointments = action.appointments.sort(function (a, b) {
 				var c = new Date(a.id);
 				var d = new Date(b.id);
 				return d - c;
 			});
-			return state.setIn([ 'appointments', 'waiting' ], waitingApointments);
+			return state.setIn(['appointments', 'waiting'], waitingApointments);
 
 		case LOAD_WAITING_APPOINTMENT_ERROR:
 			return state.set('error', action.error);
 
 		case LOAD_APPOINTMENTS_BY_MEMBERS:
-			return state.setIn([ 'appointments', 'calendar' ], []);
+			return state.setIn(['appointments', 'calendar'], []);
 
 		case LOAD_APPOINTMENTS_BY_MEMBERS_SUCCESS:
-			return state.setIn([ 'appointments', 'calendar' ], action.appointments);
+			return state.setIn(['appointments', 'calendar'], action.appointments);
 		case LOAD_ALL_APPOINTMENTS:
-			return state.setIn([ 'appointments', 'allAppointment' ], action.appointments);
+			return state.setIn(['appointments', 'allAppointment'], action.appointments);
 
 		case LOAD_APPOINTMENTS_BY_MEMBERS_ERROR:
 			return state.set('error', action.error);
 
 		case ASSIGN_APPOINTMENT_SUCCESS:
 			return state
-				.updateIn([ 'appointments', 'calendar' ], (arr) => {
+				.updateIn(['appointments', 'calendar'], (arr) => {
 					const assignedMember = arr.find((member) => member.memberId === action.appointment.memberId);
 					if (assignedMember) {
 						assignedMember.appointments.push(action.appointment);
 					}
-					return [ ...arr ];
+					return [...arr];
 				})
-				.updateIn([ 'appointments', 'waiting' ], (arr) => {
+				.updateIn(['appointments', 'waiting'], (arr) => {
 					const movedAppointmentIndex = arr.findIndex(
 						(appointment) => appointment.id === action.appointment.id
 					);
-					if (movedAppointmentIndex < 0) return [ ...arr ];
+					if (movedAppointmentIndex < 0) return [...arr];
 					arr.splice(movedAppointmentIndex, 1);
-					return [ ...arr ];
+					return [...arr];
 				});
 
 		case MOVE_APPOINTMENT_SUCCESS:
-			return state.updateIn([ 'appointments', 'calendar' ], (arr) => {
+			return state.updateIn(['appointments', 'calendar'], (arr) => {
 				const oldPosition = arr.find((member) =>
 					member.appointments.find((appointment) => appointment.id === action.appointment.id)
 				);
-				if (!oldPosition) return [ ...arr ];
+				if (!oldPosition) return [...arr];
 
 				const movedAppointmentIndex = oldPosition.appointments.findIndex(
 					(appointment) => appointment.id === action.appointment.id
 				);
-				if (movedAppointmentIndex < 0) return [ ...arr ];
+				if (movedAppointmentIndex < 0) return [...arr];
 
 				oldPosition.appointments.splice(movedAppointmentIndex, 1);
 
 				const newPositionIndex = arr.findIndex((member) => member.memberId === action.appointment.memberId);
 				arr[newPositionIndex].appointments.push(action.appointment);
 
-				return [ ...arr ];
+				return [...arr];
 			});
 
 		case PUT_BACK_APPOINTMENT_SUCCESS:
 			return state
-				.updateIn([ 'appointments', 'calendar' ], (arr) => {
+				.updateIn(['appointments', 'calendar'], (arr) => {
 					const oldPosition = arr.find((member) =>
 						member.appointments.find((appointment) => appointment.id === action.appointment.id)
 					);
-					if (!oldPosition) return [ ...arr ];
+					if (!oldPosition) return [...arr];
 
 					const movedAppointmentIndex = oldPosition.appointments.findIndex(
 						(appointment) => appointment.id === action.appointment.id
 					);
-					if (movedAppointmentIndex < 0) return [ ...arr ];
+					if (movedAppointmentIndex < 0) return [...arr];
 
 					oldPosition.appointments.splice(movedAppointmentIndex, 1);
 					saveAppointmentOffLine(action.appointment);
-					return [ ...arr ];
+					return [...arr];
 				})
-				.updateIn([ 'appointments', 'waiting' ], (arr) => {
+				.updateIn(['appointments', 'waiting'], (arr) => {
 					arr = [
 						{
 							...action.appointment,
@@ -304,12 +324,12 @@ function appointmentReducer(state = initialState, action) {
 						...arr
 					];
 					localStorage.setItem('AppointmentWaiting', JSON.stringify(arr));
-					return [ ...arr ];
+					return [...arr];
 				})
-				.updateIn([ 'appointments', 'allAppointment' ], (arr) => {
+				.updateIn(['appointments', 'allAppointment'], (arr) => {
 					const pos = arr.findIndex((app) => app.id === action.appointment.id);
 					const { memberId, start, end, options, products, extras, id } = action.appointment;
-					if (pos === -1) return [ ...arr ];
+					if (pos === -1) return [...arr];
 					arr.splice(pos, 1);
 					// if (navigator.onLine === false) {
 					const data = dataPutBackAppointment(memberId, start, end, options, products, extras);
@@ -319,37 +339,37 @@ function appointmentReducer(state = initialState, action) {
 					// });
 					// }
 					localStorage.setItem('AppointmentCalendar', JSON.stringify(arr));
-					return [ ...arr ];
+					return [...arr];
 				});
 
 		case CANCEL_APPOINTMENT_SUCCESS:
-			return state.updateIn([ 'appointments', 'calendar' ], (arr) => {
+			return state.updateIn(['appointments', 'calendar'], (arr) => {
 				const oldPosition = arr.find((member) =>
 					member.appointments.find((appointment) => appointment.id === action.appointmentId)
 				);
-				if (!oldPosition) return [ ...arr ];
+				if (!oldPosition) return [...arr];
 
 				const movedAppointmentIndex = oldPosition.appointments.findIndex(
 					(appointment) => appointment.id === action.appointmentId
 				);
-				if (movedAppointmentIndex < 0) return [ ...arr ];
+				if (movedAppointmentIndex < 0) return [...arr];
 
 				oldPosition.appointments.splice(movedAppointmentIndex, 1);
 
-				return [ ...arr ];
+				return [...arr];
 			});
 
 		case UPDATE_STATUS_APPOINTMENT_SUCCESS:
 			const { appointmentID, status, newDate, notes } = action.appointment;
-			return state.updateIn([ 'appointments', 'calendar' ], (arr) => {
+			return state.updateIn(['appointments', 'calendar'], (arr) => {
 				const member = arr.find((mem) =>
 					mem.appointments.find((app) => parseInt(app.id) === parseInt(appointmentID))
 				);
-				if (!member) return [ ...arr ];
+				if (!member) return [...arr];
 				const appointmentIndex = member.appointments.findIndex(
 					(app) => parseInt(app.id) === parseInt(appointmentID)
 				);
-				if (appointmentIndex < 0) return [ ...arr ];
+				if (appointmentIndex < 0) return [...arr];
 				member.appointments[appointmentIndex].end = newDate.substr(0, 19);
 				member.appointments[appointmentIndex].notes = [
 					...notes,
@@ -367,11 +387,11 @@ function appointmentReducer(state = initialState, action) {
 				if (status === 'paid') {
 					member.appointments[appointmentIndex].status = 'PAID';
 				}
-				return [ ...arr ];
+				return [...arr];
 			});
 
 		case CHANGE_APPOINTMENT_TIME_SUCCESS:
-			return state.updateIn([ 'appointments', 'calendar' ], (arr) => {
+			return state.updateIn(['appointments', 'calendar'], (arr) => {
 				const member = arr.find((mem) => parseInt(mem.memberId) === parseInt(action.appointment.memberId));
 				if (!member) return;
 				const status_app = action.appointment.status;
@@ -389,38 +409,38 @@ function appointmentReducer(state = initialState, action) {
 				}
 				member.appointments.push(action.appointment);
 
-				return [ ...arr ];
+				return [...arr];
 			});
 
 		case UPDATE_WAITING_APPOINTMENT:
-			return state.updateIn([ 'appointments', 'waiting' ], (arr) => {});
+			return state.updateIn(['appointments', 'waiting'], (arr) => { });
 
 		case ADD_APPOINTMENT_TO_WAITING:
-			return state.updateIn([ 'appointments', 'waiting' ], (arr) => {
+			return state.updateIn(['appointments', 'waiting'], (arr) => {
 				const pos_to_find = arr.findIndex((appointment) => appointment.id === action.data.id);
 
 				if (pos_to_find === -1) {
-					arr = [ action.data, ...arr ];
+					arr = [action.data, ...arr];
 				}
-				return [ ...arr ];
+				return [...arr];
 			});
 
 		case ADD_APPOINTMENT_RELOAD_CALENDAR:
 			var pos_add = '';
-			return state.updateIn([ 'appointments', 'calendar' ], (arr) => {
+			return state.updateIn(['appointments', 'calendar'], (arr) => {
 				for (let i = 0; i < arr.length; i++) {
 					if (parseInt(arr[i].memberId) === parseInt(action.data.memberId)) {
 						pos_add = i;
 					}
 				}
 				arr[pos_add].appointments.push(action.data);
-				return [ ...arr ];
+				return [...arr];
 			});
 
 		case ADD_APPOINTMENT_REALTIME:
 			var pos_add_r = '';
 			return state
-				.updateIn([ 'appointments', 'calendar' ], (arr) => {
+				.updateIn(['appointments', 'calendar'], (arr) => {
 					if (action.data.status === 'ASSIGNED' || action.data.status === 'CHECKED_IN') {
 						for (let i = 0; i < arr.length; i++) {
 							if (parseInt(arr[i].memberId) === parseInt(action.data.memberId)) {
@@ -431,9 +451,9 @@ function appointmentReducer(state = initialState, action) {
 							arr[pos_add_r].appointments.push(action.data);
 						}
 					}
-					return [ ...arr ];
+					return [...arr];
 				})
-				.updateIn([ 'appointments', 'allAppointment' ], (arr) => {
+				.updateIn(['appointments', 'allAppointment'], (arr) => {
 					if (action.data.status === 'ASSIGNED' || action.data.status === 'CHECKED_IN') {
 						let pos = arr.findIndex((app) => app.id === action.data.id);
 
@@ -442,11 +462,11 @@ function appointmentReducer(state = initialState, action) {
 						}
 					}
 
-					return [ ...arr ];
+					return [...arr];
 				});
 
 		case REMOVE_APPOINTMENT_WAITING:
-			return state.updateIn([ 'appointments', 'waiting' ], (arr) => {
+			return state.updateIn(['appointments', 'waiting'], (arr) => {
 				// if (navigator.onLine === false) {
 				// window.postMessage({
 				// 	data: { ...action.appointment },
@@ -460,31 +480,31 @@ function appointmentReducer(state = initialState, action) {
 					}
 				}
 				localStorage.setItem('AppointmentWaiting', JSON.stringify(arr));
-				return [ ...arr ];
+				return [...arr];
 			});
 
 		case UPDATE_APPOINTMENT_PAID_OFFLINE:
 			return state
-				.updateIn([ 'appointments', 'calendar' ], (arr) => {
+				.updateIn(['appointments', 'calendar'], (arr) => {
 					for (let i = 0; i < arr.length; i++) {
 						if (arr[i].id === action.idAppointment) {
 							arr[i].status = 'PAID';
 							//update paid offline
 						}
 					}
-					return [ ...arr ];
+					return [...arr];
 				})
-				.updateIn([ 'appointments', 'allAppointment' ], (arr) => {
+				.updateIn(['appointments', 'allAppointment'], (arr) => {
 					const pos = arr.findIndex((app) => app.id === action.idAppointment);
-					if (pos === -1) return [ ...arr ];
+					if (pos === -1) return [...arr];
 					arr[pos].status = 'PAID';
 					localStorage.setItem('allAppointment', JSON.stringify(arr));
-					return [ ...arr ];
+					return [...arr];
 				});
 
 		case UPDATE_APPOINTMENT_PAID:
 			return state
-				.updateIn([ 'appointments', 'calendar' ], (arr) => {
+				.updateIn(['appointments', 'calendar'], (arr) => {
 					const member = arr.find((mem) =>
 						mem.appointments.find((app) => parseInt(app.id) === parseInt(action.appointment.id))
 					);
@@ -493,9 +513,9 @@ function appointmentReducer(state = initialState, action) {
 						const memb = arr.find(
 							(mem) => parseInt(mem.memberId) === parseInt(action.appointment.memberId)
 						);
-						if (!memb) return [ ...arr ];
+						if (!memb) return [...arr];
 						memb.appointments.push(action.appointment);
-						return [ ...arr ];
+						return [...arr];
 					}
 					const appointmentIndex = member.appointments.findIndex(
 						(app) => parseInt(app.id) === parseInt(action.appointment.id)
@@ -505,7 +525,7 @@ function appointmentReducer(state = initialState, action) {
 						const newMember = arr.find(
 							(mem) => parseInt(mem.memberId) === parseInt(action.appointment.memberId)
 						);
-						if (!newMember) return [ ...arr ];
+						if (!newMember) return [...arr];
 						newMember.appointments.push(action.appointment);
 						member.appointments.splice(appointmentIndex, 1);
 					} else if (action.appointment.status === 'CANCEL') {
@@ -515,14 +535,14 @@ function appointmentReducer(state = initialState, action) {
 					} else {
 						member.appointments[appointmentIndex] = action.appointment;
 					}
-					return [ ...arr ];
+					return [...arr];
 				})
-				.updateIn([ 'appointments', 'allAppointment' ], (arr) => {
+				.updateIn(['appointments', 'allAppointment'], (arr) => {
 					const pos = arr.findIndex((app) => app.id === action.appointment.id);
-					if (pos === -1) return [ ...arr ];
+					if (pos === -1) return [...arr];
 					arr[pos] = action.appointment;
 					localStorage.setItem('allAppointment', JSON.stringify(arr));
-					return [ ...arr ];
+					return [...arr];
 				});
 
 		case INFO_CHECK_PHONE:
@@ -556,17 +576,17 @@ function appointmentReducer(state = initialState, action) {
 			return state.set('PopupPincode', action.data).set('PinStaff', action.pincode);
 
 		case UPDATE_STAFF:
-			return state.setIn([ 'members', 'all' ], (arr) => {
-				return [ ...arr ];
+			return state.setIn(['members', 'all'], (arr) => {
+				return [...arr];
 			});
 
 		case UPDATE_NEXT_STAFF_SUCCESS:
-			return state.setIn([ 'members', 'all' ], action.data);
+			return state.setIn(['members', 'all'], action.data);
 
 		case UPDATE_USER:
 			let userInfo = JSON.parse(action.data);
 			return state
-				.updateIn([ 'appointments', 'calendar' ], (arr) => {
+				.updateIn(['appointments', 'calendar'], (arr) => {
 					arr.forEach((element) => {
 						element.appointments.forEach((app) => {
 							if (app.phoneNumber === userInfo.Phone) {
@@ -575,22 +595,22 @@ function appointmentReducer(state = initialState, action) {
 							}
 						});
 					});
-					return [ ...arr ];
+					return [...arr];
 				})
-				.updateIn([ 'appointments', 'waiting' ], (arr) => {
+				.updateIn(['appointments', 'waiting'], (arr) => {
 					arr.forEach((app) => {
 						if (app.phoneNumber === userInfo.Phone) {
 							app.phoneNumber = userInfo.Phone;
 							app.userFullName = userInfo.FirstName + ' ' + userInfo.LastName;
 						}
 					});
-					return [ ...arr ];
+					return [...arr];
 				});
 
 		case ADD_APPOINTMENT_TO_CALENDAR:
 			var indexArr;
 			return state
-				.updateIn([ 'appointments', 'calendar' ], (arr) => {
+				.updateIn(['appointments', 'calendar'], (arr) => {
 					for (let i = 0; i < arr.length; i++) {
 						if (parseInt(arr[i].memberId) === parseInt(action.appointment.memberId)) {
 							indexArr = i;
@@ -598,9 +618,9 @@ function appointmentReducer(state = initialState, action) {
 					}
 					action.appointment.appointment.end = action.appointment.new_end_time;
 					arr[indexArr].appointments.push(action.appointment.appointment);
-					return [ ...arr ];
+					return [...arr];
 				})
-				.updateIn([ 'appointments', 'allAppointment' ], (arr) => {
+				.updateIn(['appointments', 'allAppointment'], (arr) => {
 					const pos = arr.findIndex((app) => app.id === action.appointment.appointment.id);
 					action.appointment.appointment.end = action.appointment.new_end_time;
 					if (pos === -1) {
@@ -613,39 +633,39 @@ function appointmentReducer(state = initialState, action) {
 					}
 					saveAppointmentOffLine(action.appointment.appointment);
 					localStorage.setItem('AppointmentCalendar', JSON.stringify(arr));
-					return [ ...arr ];
+					return [...arr];
 				});
 
 		case DELETE_APPOINTMENT_CALENDAR:
 			return state
-				.updateIn([ 'appointments', 'calendar' ], (arr) => {
+				.updateIn(['appointments', 'calendar'], (arr) => {
 					const oldPosition = arr.find((member) =>
 						member.appointments.find((appointment) => appointment.id === action.appointment.id)
 					);
-					if (!oldPosition) return [ ...arr ];
+					if (!oldPosition) return [...arr];
 
 					const appointmentIndex = oldPosition.appointments.findIndex(
 						(appointment) => appointment.id === action.appointment.id
 					);
-					if (appointmentIndex < 0) return [ ...arr ];
+					if (appointmentIndex < 0) return [...arr];
 					oldPosition.appointments.splice(appointmentIndex, 1);
-					return [ ...arr ];
+					return [...arr];
 				})
-				.updateIn([ 'appointments', 'allAppointment' ], (arr) => {
+				.updateIn(['appointments', 'allAppointment'], (arr) => {
 					const pos = arr.findIndex((app) => app.id === action.appointment.id);
-					if (pos === -1) return [ ...arr ];
+					if (pos === -1) return [...arr];
 					arr.splice(pos, 1);
 					saveAppointmentOffLine(action.appointment);
 					localStorage.setItem('AppointmentCalendar', JSON.stringify(arr));
-					return [ ...arr ];
+					return [...arr];
 				});
 
 		case UPDATE_APPOINTMENT_CALENDAR_FRONTEND:
-			return state.updateIn([ 'appointments', 'allAppointment' ], (arr) => {
+			return state.updateIn(['appointments', 'allAppointment'], (arr) => {
 				let { appointment, id } = action.data;
 				const { fromTime, toTime, extras, products, services, staffId, status } = appointment;
 				const pos = arr.findIndex((app) => parseInt(app.id) === parseInt(id));
-				if (pos === -1) return [ ...arr ];
+				if (pos === -1) return [...arr];
 				arr[pos].start = fromTime;
 				arr[pos].end = toTime;
 				arr[pos].extras = extras;
@@ -661,44 +681,44 @@ function appointmentReducer(state = initialState, action) {
 				// 	action: 'updateAppointmemtOffline'
 				// });
 				// }
-				return [ ...arr ];
+				return [...arr];
 			});
 
 		case DELETE_EVENT_WAITINGLIST_SUCCESS:
-			return state.updateIn([ 'appointments', 'waiting' ], (arr) => {
+			return state.updateIn(['appointments', 'waiting'], (arr) => {
 				let { appointment } = action;
 				const pos = arr.find((app) => app.id === appointment.id);
-				if (pos === -1) return [ ...arr ];
+				if (pos === -1) return [...arr];
 				arr.splice(pos, 1);
 				localStorage.setItem('AppointmentCalendar', JSON.stringify(arr));
 
-				return [ ...arr ];
+				return [...arr];
 			});
 
 		case DELETE_BLOCKTIME_SUCCESSS:
 			return state
-				.updateIn([ 'members', 'all' ], (arr) => {
+				.updateIn(['members', 'all'], (arr) => {
 					const { staff, block } = action.data;
 					const pos = arr.findIndex((s) => s.id === staff.id);
-					if (pos === -1) return [ ...arr ];
+					if (pos === -1) return [...arr];
 					const vt = arr[pos].blockTime.findIndex((b) => b.blockTimeId === block.blockTimeId);
-					if (vt === -1) return [ ...arr ];
+					if (vt === -1) return [...arr];
 					arr[pos].blockTime[vt].isDisabled = 1;
-					return [ ...arr ];
+					return [...arr];
 				})
-				.updateIn([ 'members', 'displayed' ], (arr) => {
+				.updateIn(['members', 'displayed'], (arr) => {
 					const { staff, block } = action.data;
 					const pos = arr.findIndex((s) => s.id === staff.id);
-					if (pos === -1) return [ ...arr ];
+					if (pos === -1) return [...arr];
 					const vt = arr[pos].blockTime.findIndex((b) => b.blockTimeId === block.blockTimeId);
-					if (vt === -1) return [ ...arr ];
+					if (vt === -1) return [...arr];
 					arr[pos].blockTime[vt].isDisabled = 1;
-					return [ ...arr ];
+					return [...arr];
 				});
 
 		case GET_BLOCKTIME_SUCCESS:
 			return state
-				.updateIn([ 'members', 'all' ], (arr) => {
+				.updateIn(['members', 'all'], (arr) => {
 					arr.forEach((staff) => {
 						staff.blockTime = [];
 					});
@@ -709,10 +729,10 @@ function appointmentReducer(state = initialState, action) {
 								arr_.push(blockTime);
 							}
 						});
-						staff.blockTime = [ ...arr_ ];
+						staff.blockTime = [...arr_];
 					});
 
-					if (moment(state.getIn([ 'currentDay' ])).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD')) {
+					if (moment(state.getIn(['currentDay'])).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD')) {
 						// window.postMessage({
 						// 	action: 'dataStaffList',
 						// 	staffList: arr
@@ -720,15 +740,15 @@ function appointmentReducer(state = initialState, action) {
 					}
 
 					localStorage.setItem('staffList', JSON.stringify(arr));
-					return [ ...arr ];
+					return [...arr];
 				})
-				.updateIn([ 'members', 'blockTime' ], (arr) => {
+				.updateIn(['members', 'blockTime'], (arr) => {
 					arr = action.data;
-					return [ ...arr ];
+					return [...arr];
 				});
 
 		case GET_APP_BY_ID_SUCCESS:
-			return state.updateIn([ 'appointments', 'appointmentDetail' ], (app) => {
+			return state.updateIn(['appointments', 'appointmentDetail'], (app) => {
 				if (navigator.onLine) {
 					const app = appointmentAdapter(action.data);
 					return { ...app };
@@ -740,17 +760,17 @@ function appointmentReducer(state = initialState, action) {
 
 		case GET_TIME_STAFF_LOGIN_SUCCESS:
 			return state
-				.updateIn([ 'members', 'all' ], (arr) => {
+				.updateIn(['members', 'all'], (arr) => {
 					const pos = arr.findIndex((staff) => staff.id === action.data.staffId);
 					if (pos === -1) return;
 					arr[pos].timeLogin = action.data.timeLogin;
-					return [ ...arr ];
+					return [...arr];
 				})
-				.updateIn([ 'members', 'displayed' ], (arr) => {
+				.updateIn(['members', 'displayed'], (arr) => {
 					const pos = arr.findIndex((staff) => staff.id === action.data.staffId);
 					if (pos === -1) return;
 					arr[pos].timeLogin = action.data.timeLogin;
-					return [ ...arr ];
+					return [...arr];
 				});
 
 		default:

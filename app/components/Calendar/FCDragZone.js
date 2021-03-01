@@ -28,9 +28,9 @@ const EventWrapper = styled.div`
 	background: #f4f4f5;
 	border: 0.5px solid #ffffff;
 	color: #333333;
-	height: calc((100vh - 8.8rem - 55px)/3);
+	height: calc((100vh - 8.8rem - 55px)/4);
 	@media (min-width: 1025px) {
-		height: calc((100vh - 10rem - 60px)/3);
+		height: calc((100vh - 10rem - 60px)/4);
 	}
 	overflow: hidden;
 	position: relative;
@@ -108,7 +108,7 @@ class FCDragZone extends React.PureComponent {
 		super(props);
 		this.state = {
 			slideIndex: 0,
-			slidesToShow: 3,
+			slidesToShow: 4,
 			event: ''
 		};
 	}
@@ -166,7 +166,7 @@ class FCDragZone extends React.PureComponent {
 			isActiveRight = false;
 		let { slideIndex } = this.state;
 		const { events } = this.props;
-		const totalSlide = events.length / 3;
+		const totalSlide = events.length / 4;
 
 		if (totalSlide <= 1) {
 			isActiveLeft = false;

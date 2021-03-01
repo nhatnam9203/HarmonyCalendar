@@ -24,7 +24,7 @@ const ResourceSelectorWrapper = styled.div`
 	}
 `;
 
-const TodayWrapper = styled.div`
+const BellButton = styled.div`
 	width: calc(5.05rem - 2px);
 	height: 100%;
 	text-align: center;
@@ -32,22 +32,10 @@ const TodayWrapper = styled.div`
 	display: flex;
 	justify-content: center;
 	align-items: center;
-`;
-
-TodayWrapper.Button = styled.div`
-	border-radius: 4px;
-	/* background: #0071c5; */
-	background: #1366ae;
-	color: #ffffff;
-	font-weight: 600;
-	width: 100%;
-	font-size: 0.95rem;
-	line-height: 2.8;
-	height: 3rem;
-	cursor: pointer;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+	& > img {
+		width: 30px;
+		height : 30px;
+	}
 `;
 
 const ResourceSliderWrapper = styled.div`
@@ -234,7 +222,53 @@ function chunk(array, size) {
 	return chunkedArr;
 }
 
+const qtyStaff = 8;
+
 class ResourceSelector extends React.Component {
+
+	constructor(props) {
+		super(props);
+		this.refPrevButton = React.createRef();
+		this.refNextButton = React.createRef();
+	}
+
+	async componentWillReceiveProps(nextProps) {
+		const { appointmentScroll, isScrollToAppointment } = nextProps;
+		if (isScrollToAppointment === true) {
+			const { appointmentId } = appointmentScroll;
+			await this.findSlideScroll(appointmentId);
+			this.resetScrollAppointment();
+		}
+	}
+
+	resetScrollAppointment = () => {
+		this.props.scrollToAppointment('');
+		this.props.startScrollToAppointment(false);
+	}
+
+	findSlideScroll = (appointmentId) => {
+		const { allAppointment, resources, slideIndex } = this.props;
+		let app = allAppointment.find(app => app.id === appointmentId);
+		const { memberId } = app;
+		let indexStaff = resources.findIndex(s => s.id === memberId);
+		let slideIndexAppointment = parseInt((indexStaff + 1) / qtyStaff);
+		let slideNeedToScroll = slideIndexAppointment - slideIndex;
+
+		this.scrollToAppointment(slideNeedToScroll);
+	}
+
+	scrollToAppointment(slideNeedToScroll) {
+		if (slideNeedToScroll > 0) {
+			for (let i = 1; i <= Math.abs(slideNeedToScroll); i++) {
+				this.refNextButton.current.click();
+			}
+		}
+		if (slideNeedToScroll < 0) {
+			for (let i = 1; i <= Math.abs(slideNeedToScroll); i++) {
+				this.refPrevButton.current.click();
+			}
+		}
+	}
 
 	componentWillMount() {
 		this.props.getDetailMerchant({ isFirstLoad: true });
@@ -253,12 +287,6 @@ class ResourceSelector extends React.Component {
 		this.props.setDisplayedMembers(resources.slice(index * 8, index * 8 + 8));
 		this.props.renderAppointment();
 		this.props.setSlideIndex(index);
-	}
-
-	onTodayClick() {
-		const { timezone } = this.props.merchantInfo;
-		let timeNow = timezone ? moment_tz.tz(timezone.substring(12)).format('DDMMYYYY') : moment().format('DDMMYYYY');
-		this.props.onChangeToday(timeNow);
 	}
 
 	openPincode(staff) {
@@ -290,6 +318,10 @@ class ResourceSelector extends React.Component {
 						isActiveRight = true;
 						isActiveLeft = true;
 					}
+				}
+				if (slideIndex === totalSlide) {
+					isActiveRight = false;
+					isActiveLeft = true;
 				}
 			} else {
 				isActiveLeft = false;
@@ -371,9 +403,9 @@ class ResourceSelector extends React.Component {
 		return (
 			<React.Fragment>
 				<ResourceSelectorWrapper>
-					<TodayWrapper>
-						<TodayWrapper.Button onClick={() => this.onTodayClick()}>Today</TodayWrapper.Button>
-					</TodayWrapper>
+					<BellButton onClick={() => this.refPrevButton.current.click()}>
+						<img src={require('../../images/bell.png')} />
+					</BellButton>
 
 					<AnyStaff>
 						<AnyStaff.Image>
@@ -397,6 +429,7 @@ class ResourceSelector extends React.Component {
 									} else
 										return (
 											<ButtonSplash
+												refButton={this.refPrevButton}
 												isLeft
 												onClick={(ev) => this.onPrevClick(ev, previousSlide)}
 											/>
@@ -409,8 +442,10 @@ class ResourceSelector extends React.Component {
 												<img src={require('../../images/arrow-right-grey.png')} />
 											</ButtonArrow>
 										);
-									} else return <ButtonSplash onClick={(ev) => this.onNextClick(ev, nextSlide)} />;
-								}}
+									} else return <ButtonSplash
+										refButton={this.refNextButton}
+										onClick={(ev) => this.onNextClick(ev, nextSlide)}
+									/>;								}}
 								afterSlide={(slideIndex) => this.afterSlide(slideIndex)}
 							>
 								{this.renderCarouselSlide()}

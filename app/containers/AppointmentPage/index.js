@@ -12,7 +12,7 @@ import CalendarContainer from './CalendarContainer';
 import DaySelectorContainer from './DaySelectorContainer';
 import DetailAppointmentContainer from './DetailAppointmentContainer';
 import AddAppointmentContainer from './AddAppointmentContainer';
-
+import SearchBoxCustomerContainer from './SearchBoxCustomerContainer';
 import GlobalStyle from '../../global-styles';
 
 import reducer from './reducer';
@@ -36,6 +36,7 @@ export class AppointmentPage extends React.PureComponent {
         <DaySelectorContainer />
         <DetailAppointmentContainer />
         <AddAppointmentContainer />
+        <SearchBoxCustomerContainer />
         <GlobalStyle />
       </AppointmentPageWrapper>
     );

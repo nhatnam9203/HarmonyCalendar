@@ -13,8 +13,12 @@ import {
   makeSelectPinCode,
   makeSelectPinStaff,
   makeSlideIndex,
-  makeMerchantInfo
+  makeMerchantInfo,
+  makeSelectAllAppointments,
+  makeAppointmentScroll,
+  makeIsScrollToAppointment,
 } from './selectors';
+
 import {
   selectDayOnCalendar,
   loadMembers,
@@ -28,7 +32,9 @@ import {
   getTimeStaffLogin,
   setSlideIndex,
   editBlockTime,
-  getDetailMerchant
+  getDetailMerchant,
+  scrollToAppointment,
+  startScrollToAppointment,
 } from './actions';
 
 export function mapDispatchToProps(dispatch) {
@@ -36,16 +42,18 @@ export function mapDispatchToProps(dispatch) {
     onChangeToday: day => dispatch(selectDayOnCalendar(day)),
     loadMembers: options => dispatch(loadMembers(options)),
     setDisplayedMembers: members => dispatch(setDisplayedMembers(members)),
-    togglePopupPincode: (status,pincode) => dispatch(togglePopupPincode(status,pincode)),
+    togglePopupPincode: (status, pincode) => dispatch(togglePopupPincode(status, pincode)),
     checkPinCode: pincode => dispatch(checkPinCode(pincode)),
     disableCalendar: status => dispatch(disableCalendar(status)),
     renderAppointment: () => dispatch(renderAppointment()),
-    SubmitEditBlockTime:(data)=>dispatch(SubmitEditBlockTime(data)),
-    deleteBlockTime:(data)=>dispatch(deleteBlockTime(data)),
-    getTimeStaffLogin:(staffId)=>dispatch(getTimeStaffLogin(staffId)),
-    setSlideIndex:(slideIndex)=>dispatch(setSlideIndex(slideIndex)),
-    editBlockTime:(data)=>dispatch(editBlockTime(data)),
-    getDetailMerchant : (data) => dispatch(getDetailMerchant(data))
+    SubmitEditBlockTime: (data) => dispatch(SubmitEditBlockTime(data)),
+    deleteBlockTime: (data) => dispatch(deleteBlockTime(data)),
+    getTimeStaffLogin: (staffId) => dispatch(getTimeStaffLogin(staffId)),
+    setSlideIndex: (slideIndex) => dispatch(setSlideIndex(slideIndex)),
+    editBlockTime: (data) => dispatch(editBlockTime(data)),
+    getDetailMerchant: (data) => dispatch(getDetailMerchant(data)),
+    scrollToAppointment: (app) => dispatch(scrollToAppointment(app)),
+    startScrollToAppointment: (status) => dispatch(startScrollToAppointment(status)),
   };
 }
 
@@ -54,11 +62,14 @@ const mapStateToProps = createStructuredSelector({
   error: makeSelectError(),
   resources: makeSelectMembers(),
   calendarMembers: makeSelectCalendarAppointments(),
-  currentDay : makeCurrentDay(),
-  popupPincode : makeSelectPinCode(),
-  PinStaff : makeSelectPinStaff(),
-  slideIndex : makeSlideIndex(),
-  merchantInfo : makeMerchantInfo(),
+  currentDay: makeCurrentDay(),
+  popupPincode: makeSelectPinCode(),
+  PinStaff: makeSelectPinStaff(),
+  slideIndex: makeSlideIndex(),
+  merchantInfo: makeMerchantInfo(),
+  allAppointment: makeSelectAllAppointments(),
+  appointmentScroll: makeAppointmentScroll(),
+  isScrollToAppointment: makeIsScrollToAppointment(),
 });
 
 const withConnect = connect(

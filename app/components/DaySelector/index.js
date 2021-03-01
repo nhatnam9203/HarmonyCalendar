@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import moment from 'moment';
-
-import MiniCalendar from './MiniCalendar';
+import SearchButton from './SearchButton';
+import ButtonCheckIn from './ButtonCheckIn';
 import DaySlider from './DaySlider';
 
 const DaySelectorWrapper = styled.div`
@@ -33,6 +33,10 @@ class DaySelector extends React.Component {
     }
   }
 
+  openPopupAddAppointment = () =>{
+    this.props.openAddingAppointment({});
+    this.props.disable_Calendar(true);  }
+
   render() {
     const {
       currentDay,
@@ -42,14 +46,14 @@ class DaySelector extends React.Component {
       onChangeDayOnCalendar,
       loadingCalendar,
       merchantInfo,
-      disable_Calendar,
-      openAddingAppointment
+      toggleSearchBox,
     } = this.props;
     return (
       <DaySelectorWrapper>
-        <MiniCalendar
+        <SearchButton
           selectedDay={currentDay}
           onChangeDay={onChangeDayOnCalendar}
+          onPress={()=>toggleSearchBox(true)}
         />
         <DaySlider
           days={weekDays.valueSeq().toArray()}
@@ -58,9 +62,8 @@ class DaySelector extends React.Component {
           onChangeWeek={onChangeWeek}
           loadingCalendar={loadingCalendar}
           merchantInfo={merchantInfo}
-          openAddingAppointment={openAddingAppointment}
-          disable_Calendar={disable_Calendar}
-        />
+        /> 
+        <ButtonCheckIn onPress={()=>this.openPopupAddAppointment()} />
       </DaySelectorWrapper>
     );
   }

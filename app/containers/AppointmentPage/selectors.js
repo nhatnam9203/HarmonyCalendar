@@ -9,7 +9,7 @@ const currentAppointment = (state) => state.get('appointment', initialState);
 
 const makeCurrentWeekDays = () =>
 	createSelector(currentAppointment, (appointmentState) => appointmentState.get('currentWeekDays'));
-	
+
 const makeMerchantInfo = () =>
 	createSelector(currentAppointment, (appointmentState) => appointmentState.get('merchantInfo'));
 
@@ -22,29 +22,29 @@ const makeSelectLoading = () =>
 const makeSelectError = () => createSelector(currentAppointment, (appointmentState) => appointmentState.get('error'));
 
 const makeSelectMembers = () =>
-	createSelector(currentAppointment, (appointmentState) => appointmentState.getIn([ 'members', 'all' ]));
+	createSelector(currentAppointment, (appointmentState) => appointmentState.getIn(['members', 'all']));
 
 const makeSelectDisplayedMembers = () =>
-	createSelector(currentAppointment, (appointmentState) => appointmentState.getIn([ 'members', 'displayed' ]));
+	createSelector(currentAppointment, (appointmentState) => appointmentState.getIn(['members', 'displayed']));
 
 const makeSelectStaffSort = () =>
-	createSelector(currentAppointment, (appointmentState) => appointmentState.getIn([ 'members', 'staffSort' ]));
+	createSelector(currentAppointment, (appointmentState) => appointmentState.getIn(['members', 'staffSort']));
 
 const makeSelectWaitingAppointments = () =>
-	createSelector(currentAppointment, (appointmentState) => appointmentState.getIn([ 'appointments', 'waiting' ]));
+	createSelector(currentAppointment, (appointmentState) => appointmentState.getIn(['appointments', 'waiting']));
 
 const makeSelectAllAppointments = () =>
 	createSelector(currentAppointment, (appointmentState) =>
-		appointmentState.getIn([ 'appointments', 'allAppointment' ])
+		appointmentState.getIn(['appointments', 'allAppointment'])
 	);
 
 const makeSelectWaitingIndexAppointments = () =>
 	createSelector(currentAppointment, (appointmentState) =>
-		appointmentState.getIn([ 'appointments', 'waitingIndex' ])
+		appointmentState.getIn(['appointments', 'waitingIndex'])
 	);
 
 const makeSelectCalendarAppointments = () =>
-	createSelector(currentAppointment, (appointmentState) => appointmentState.getIn([ 'appointments', 'calendar' ]));
+	createSelector(currentAppointment, (appointmentState) => appointmentState.getIn(['appointments', 'calendar']));
 
 const makeSelectAppointment = () =>
 	createSelector(currentAppointment, (appointmentState) => appointmentState.get('selectedAppointment'));
@@ -89,12 +89,12 @@ const makeSelectPinStaff = () =>
 
 const makeSelectAppointmentDetail = () =>
 	createSelector(currentAppointment, (appointmentState) =>
-		appointmentState.getIn([ 'appointments', 'appointmentDetail' ])
+		appointmentState.getIn(['appointments', 'appointmentDetail'])
 	);
 
 const makeSelectGroupAppointment = () =>
 	createSelector(currentAppointment, (appointmentState) =>
-		appointmentState.getIn([ 'appointments', 'groupAppointment' ])
+		appointmentState.getIn(['appointments', 'groupAppointment'])
 	);
 
 const makeSlideIndex = () =>
@@ -105,6 +105,18 @@ const makeLoadingPopup = () =>
 
 const makeToday = () =>
 	createSelector(currentAppointment, (appointmentState) => appointmentState.get('today'));
+
+const makeSearchBox = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.get('isPopupSearchBox'));
+
+const makeAppointmentSearchBox = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.get('appointmentSearchBox'));
+
+const makeAppointmentScroll = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.get('appointmentScroll'));
+
+const makeIsScrollToAppointment = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.get('isScrollToAppointment'));
 
 export {
 	currentAppointment,
@@ -138,5 +150,9 @@ export {
 	makeSlideIndex,
 	makeMerchantInfo,
 	makeLoadingPopup,
-	makeToday
+	makeToday,
+	makeSearchBox,
+	makeAppointmentSearchBox,
+	makeAppointmentScroll,
+	makeIsScrollToAppointment,
 };

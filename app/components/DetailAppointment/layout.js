@@ -6,11 +6,15 @@ import moment from 'moment';
 import DayPicker from 'react-day-picker';
 import OutsideClickHandler from 'react-outside-click-handler';
 import { formatPhone } from '../../utils/helper';
-import { role } from '../../../app-constants';
 import { PopupTimePicker } from './widget';
 import NumberFormat from 'react-number-format';
-import { FooterAppointment, PopupPrice, Product, Service, PopupTip } from './widget';
+import {
+	FooterAppointment, PopupPrice, Product, Service,
+	PopupTip, Header, PopupCancel, BottomButton
+} from './widget';
 import ReactLoading from 'react-loading';
+import closeBlack from '../../images/close_black.png';
+import closeWhite from '../../images/close_white.png'
 
 const AppPopup = styled(Popup)`
 	border-radius: 1.5rem;
@@ -108,23 +112,8 @@ const AppointmentWrapper = styled(AppPopupWrapper)`
 	//
 	`;
 
-AppointmentWrapper.Header = styled(AppPopupWrapper.Header)`
-	//
-	`;
-
-AppointmentWrapper.Close = styled(AppPopupWrapper.Close)`
-	//
-	`;
-
 AppointmentWrapper.Body = styled(AppPopupWrapper.Body)`
 	//
-	`;
-
-AppointmentWrapper.Footer = styled(AppPopupWrapper.Footer)`
-	width : 100%;
-	display : flex;
-	justify-content : center;
-	align-items : center;
 	`;
 
 const UserInformation = styled.div`
@@ -272,33 +261,6 @@ const TipPercent = styled.div`
 	}
 `;
 
-const Button = styled.button`
-	border-radius: 4px;
-	background: ${(props) => (props.primary ? '#0071c5' : '#eeeeee')};
-	color: ${(props) => (props.primary ? '#ffffff' : '#333333')};
-	border: 1px solid #dddddd;
-	font-size: 1rem;
-	line-height: 2.8;
-	height: 100%;
-	cursor: pointer;
-	text-align: center;
-	padding: 0 2rem;
-	width: 9rem;
-	height: 2.92rem;
-`;
-
-const ButtonChange = styled(Button)`
-	box-shadow: 0 0px #fff inset, 0 0.6px 10px #1FB5F4;
-	border: none !important;
-`;
-
-const WrapperTimeChange = styled.div`
-	width: 100%;
-	display: flex;
-	flex-direction: row;
-	margin-top: 1rem;
-`;
-
 const SelectDateWrapper = styled.div`
 	width: calc(100%/2);
 	float: left;
@@ -314,58 +276,6 @@ SelectDateWrapper.SelectDate = styled.div`
 `;
 SelectDateWrapper.SelectStaff = styled(SelectDateWrapper.SelectDate)`
 	padding-left : 50%;
-`;
-
-const ConfirmationPopup = styled(AppPopup)`
-	width: 30rem !important;
-	height: 10rem !important;
-	`;
-
-const ConfirmationWrapper = styled(AppPopupWrapper)`
-	//
-	`;
-
-ConfirmationWrapper.Header = styled(AppPopupWrapper.Header)`
-	//
-	`;
-
-ConfirmationWrapper.Body = styled(AppPopupWrapper.Body)`
-	text-align: center;
-	height: 150px;
-	border-bottom-left-radius: 1.5rem;
-	border-bottom-right-radius: 1.5rem;
-	font-size : 1rem;
-	@media (max-width: 1024px) {
-    	font-size : 1.1rem;
-  	}
-	`;
-
-ConfirmationWrapper.Close = styled(AppPopupWrapper.Close)`
-	//
-	`;
-
-ConfirmationWrapper.Footer = styled(AppPopupWrapper.Footer)`
-	//
-	`;
-
-const MiniCalendarWrapper = styled.div`
-	width: calc(5.05rem - 1px);
-	height: 100%;
-	text-align: center;
-	border-right: 1px solid #3883bb;
-	position: relative;
-	padding: 0.5rem;
-`;
-
-MiniCalendarWrapper.Button = styled.div`
-	border-radius: 4px;
-	background: #0071c5;
-	color: #ffffff;
-	width: 100%;
-	font-size: 1.5rem;
-	line-height: 1.5;
-	height: 100%;
-	cursor: pointer;
 `;
 
 const CalendarPopup = styled.div`
@@ -563,70 +473,6 @@ class Appointment extends React.Component {
 		);
 	}
 
-	/********************************* RENDER BUTTON BELONG TO STATUS *********************************/
-	renderNextStatusButton() {
-		const { appointment } = this.props;
-		if (this.conditionButtonChange() && appointment.status !== 'PAID') {
-			if (appointment.status === 'ASSIGNED')
-				return (
-					<Button onClick={() => this.nextStatus()} primary="true">
-						Confirm
-					</Button>
-				);
-			if (appointment.status === 'CONFIRMED' && appointment.memberId !== 0)
-				return (
-					<Button onClick={() => this.nextStatus()} primary="true">
-						Check-In
-					</Button>
-				);
-			if (appointment.status === 'CHECKED_IN' && appointment.memberId !== 0)
-				return (
-					<Button onClick={() => this.nextStatus()} primary="true">
-						Check-Out
-					</Button>
-				);
-		} else {
-			if (appointment.status === 'PAID' && appointment.memberId !== 0) {
-				const { isEditPaidAppointment } = this.state;
-				if (role === 'Admin') {
-					if (isEditPaidAppointment) {
-						return (
-							<Button
-								style={{
-									// marginLeft : '19.5rem',
-									fontWeight: '700'
-								}}
-								onClick={() => this.updateStaffAppointmentPaid()}
-								primary="true"
-							>
-								Submit
-							</Button>
-						);
-					} else {
-						return (
-							<Button
-								style={{
-									// marginLeft : '19.5rem'
-								}}
-								onClick={() => this.toggleEditPaidAppointment()}
-								primary="true"
-							>
-								Edit
-							</Button>
-						);
-					}
-				} else return null;
-			}
-			if (appointment.status !== 'WAITING') {
-				return (
-					<ButtonChange onClick={() => this.ChangeAppointmentTime()} primary="true">
-						<strong>Change</strong>
-					</ButtonChange>
-				);
-			}
-		}
-	}
-
 	/********************************* RENDER GIFT CARD *********************************/
 	renderGiftCard(giftCard, index) {
 		if (giftCard) {
@@ -816,145 +662,6 @@ class Appointment extends React.Component {
 			);
 		}
 	}
-	/********************************* RENDER HEADER APPOINTMENT *********************************/
-	renderHeader() {
-		const { appointment } = this.props;
-		switch (appointment.status) {
-			case 'ASSIGNED':
-				return (
-					<AppointmentWrapper.Header color="#585858" backgroundColor={'#ffe559'}>
-						<div
-							style={{
-								position: 'absolute',
-								left: 15,
-								fontSize: 18,
-								marginTop: 4
-							}}
-						>
-							{appointment.code}
-						</div>
-						Unconfirmed Appointment
-					</AppointmentWrapper.Header>
-				);
-			case 'CONFIRMED':
-				return (
-					<AppointmentWrapper.Header color="#585858" backgroundColor={'#c2f4ff'}>
-						<div
-							style={{
-								position: 'absolute',
-								left: 15,
-								fontSize: 18,
-								marginTop: 4
-							}}
-						>
-							{appointment.code}
-						</div>
-						Confirmed Appointment
-					</AppointmentWrapper.Header>
-				);
-
-			case 'CHECKED_IN':
-				return (
-					<AppointmentWrapper.Header color={'white'} backgroundColor={'#28AAE9'}>
-						<div
-							style={{
-								position: 'absolute',
-								left: 15,
-								fontSize: 18,
-								marginTop: 4
-							}}
-						>
-							{appointment.code}
-						</div>
-						Check-In Appointment
-					</AppointmentWrapper.Header>
-				);
-
-			case 'PAID':
-				return (
-					<AppointmentWrapper.Header color={'white'} backgroundColor={'#50CF25'}>
-						<div
-							style={{
-								position: 'absolute',
-								left: 15,
-								fontSize: 18,
-								marginTop: 4
-							}}
-						>
-							{appointment.code}
-						</div>
-						Paid Appointment
-					</AppointmentWrapper.Header>
-				);
-
-			case 'VOID':
-				return (
-					<AppointmentWrapper.Header color={'white'} backgroundColor={'#FD594F'}>
-						<div
-							style={{
-								position: 'absolute',
-								left: 15,
-								fontSize: 18,
-								marginTop: 4
-							}}
-						>
-							{appointment.code}
-						</div>
-						Void Appointment
-					</AppointmentWrapper.Header>
-				);
-
-			case 'REFUND':
-				return (
-					<AppointmentWrapper.Header color={'white'} backgroundColor={'#FD594F'}>
-						<div
-							style={{
-								position: 'absolute',
-								left: 15,
-								fontSize: 18,
-								marginTop: 4
-							}}
-						>
-							{appointment.code}
-						</div>
-						Refund Appointment
-					</AppointmentWrapper.Header>
-				);
-
-			case 'WAITING':
-				return (
-					<AppointmentWrapper.Header color={'#585858'} backgroundColor={'#f4f4f5'}>
-						<div
-							style={{
-								position: 'absolute',
-								left: 15,
-								fontSize: 18,
-								marginTop: 4
-							}}
-						>
-							{appointment.code}
-						</div>
-						Waiting Appointment
-					</AppointmentWrapper.Header>
-				);
-
-			default:
-				return (
-					<AppointmentWrapper.Header backgroundColor="red">
-						<div
-							style={{
-								position: 'absolute',
-								left: 15,
-								fontSize: 12
-							}}
-						>
-							{appointment.code}
-						</div>
-						Appointment
-					</AppointmentWrapper.Header>
-				);
-		}
-	}
 
 	renderCompanion() {
 		const { appointment } = this.props;
@@ -1085,6 +792,7 @@ class Appointment extends React.Component {
 		} = this.state;
 		if (!appointment) return '';
 		if (appointmentDetail === '') return '';
+
 		let isCheckColor =
 			appointment.status === 'ASSIGNED' ||
 				appointment.status === 'CONFIRMED' ||
@@ -1093,8 +801,7 @@ class Appointment extends React.Component {
 				? true
 				: false;
 		return (
-			<div>
-				{/********************************** POPUP DETAIL APPOINTMENT *********************************/}
+			<React.Fragment>
 				<AppointmentPopup
 					closeOnDocumentClick={false}
 					open
@@ -1108,55 +815,35 @@ class Appointment extends React.Component {
 							</LoadingCompanion>
 						)}
 						<BtnClose onClick={() => this.closeModal()}>
-							{isCheckColor && <img src={require('../../images/close_black.png')} />}
-							{!isCheckColor && <img src={require('../../images/close_white.png')} />}
+							{isCheckColor && <img src={closeBlack} />}
+							{!isCheckColor && <img src={closeWhite} />}
 						</BtnClose>
-						{this.renderHeader()}
+
+						<Header
+							appointment={appointment}
+						/>
+
 						{this.renderBody()}
 
-						<AppointmentWrapper.Footer>
-							{appointment.status !== 'VOID' &&
-								appointment.status !== 'REFUND' &&
-								appointment.status !== 'PAID' && (
-									<div>
-										<Button
-											onClick={() => {
-												this.openConfirmationModal();
-											}}
-										>
-											Cancel
-									</Button>
-									</div>
-								)}
-							<div>{this.renderNextStatusButton()}</div>
-						</AppointmentWrapper.Footer>
+						<BottomButton 
+							appointment={appointment}
+							openConfirmationModal={()=>this.openConfirmationModal()}
+							isEditPaidAppointment={this.state.isEditPaidAppointment}
+							isChange={this.conditionButtonChange()}
+							nextStatus={()=>this.nextStatus()}
+							updateStaffAppointmentPaid={()=>this.updateStaffAppointmentPaid()}
+							toggleEditPaidAppointment={()=>this.toggleEditPaidAppointment()}
+							changeAppointmentTime={()=>this.ChangeAppointmentTime()}
+						/>
+
 					</AppointmentWrapper>
 				</AppointmentPopup>
 
-				{/********************************** POPUP CONFIRM CANCEL APPOINTMENT *********************************/}
-				<ConfirmationPopup onClose={() => this.closeConfirmationModal()} open={this.state.confirmationModal}>
-					<ConfirmationWrapper>
-						<BtnClose onClick={() => this.closeConfirmationModal()}>
-							<img src={require('../../images/close_white.png')} />
-						</BtnClose>
-
-						<ConfirmationWrapper.Header backgroundColor="#1173C3">Confirmation</ConfirmationWrapper.Header>
-						<ConfirmationWrapper.Body>
-							Do you want to Cancel this Appointment?
-							<WrapperCancelAppointment>
-								<div style={{ width: '50%', textAlign: 'center' }}>
-									<Button onClick={() => this.closeConfirmationModal()}>No</Button>
-								</div>
-								<div style={{ width: '50%', textAlign: 'center' }}>
-									<Button primary onClick={() => this.confirmCancelAppointment()}>
-										Yes
-									</Button>
-								</div>
-							</WrapperCancelAppointment>
-						</ConfirmationWrapper.Body>
-					</ConfirmationWrapper>
-				</ConfirmationPopup>
-
+				<PopupCancel
+					onClose={() => this.closeConfirmationModal()}
+					isOpen={this.state.confirmationModal}
+					confirmCancelAppointment={() => this.confirmCancelAppointment()}
+				/>
 				<PopupPrice
 					indexPrice={this.state.indexPrice}
 					valuePriceIndex={this.state.valuePriceIndex}
@@ -1185,7 +872,7 @@ class Appointment extends React.Component {
 						services={services}
 					/>
 				)}
-			</div>
+			</React.Fragment>
 		);
 	}
 }

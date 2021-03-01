@@ -76,7 +76,6 @@ import {
 	UPDATE_APPOINTMENT_OFFLINE,
 	UPDATE_APPOINTMENT_OFFLINE_SUCCESS,
 	UPDATE_APPOINTMENT_OFFLINE_ERROR,
-	LOAD_APPOINTMENT_AGAIN,
 	ADD_APPOINTMENT_TO_WAITING,
 	ADD_APPOINTMENT_RELOAD_CALENDAR,
 	ADD_APPOINTMENT_REALTIME,
@@ -112,7 +111,6 @@ import {
 	EDIT_BLOCKTIME,
 	UPDATE_NOTE,
 	SUBMIT_ADD_APPOINTMENT,
-	GET_DETAIL_APP_AFTER_ADD,
 	CHANGE_APPOINTMENT,
 	SENDLINK_CUSTOMER,
 	GET_DETAIL_MERCHANT,
@@ -120,7 +118,10 @@ import {
 	UPDATE_COMPANION,
 	IS_LOADING_POPUP,
 	SEARCH_PHONE_COMPANION,
-	SET_TODAY
+	SET_TODAY,
+	TOGGLE_SEARCH_BOX,
+	SEARCH_CUSTOMER_BOX,
+	SCROLL_TO_APPOINTMENT,
 } from './constants';
 
 /**
@@ -131,7 +132,7 @@ import {
 export function selectDay(day) {
 	return {
 		type: SELECT_DAY,
-		day
+		day,
 	};
 }
 
@@ -892,5 +893,33 @@ export function updateStaffAppointmentPaid(payload) {
 	return {
 		type: 'UPDATE_STAFF_APPOINTMENT_PAID',
 		payload
+	};
+}
+
+export function toggleSearchBox(isPopupSearchBox) {
+	return {
+		type: TOGGLE_SEARCH_BOX,
+		isPopupSearchBox
+	};
+}
+
+export function searchCustomerBox(payload) {
+	return {
+		type: SEARCH_CUSTOMER_BOX,
+		payload,
+	};
+}
+
+export function scrollToAppointment(appointment) {
+	return {
+		type: SCROLL_TO_APPOINTMENT,
+		appointment
+	};
+}
+
+export function startScrollToAppointment(isScrollToAppointment) {
+	return {
+		type: 'START_SCROLL_TO_APPOINTMENT',
+		isScrollToAppointment
 	};
 }

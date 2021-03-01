@@ -1,250 +1,203 @@
 import React from 'react';
 import moment from 'moment';
 import moment_tz from 'moment'
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import Carousel from 'nuka-carousel';
-import ButtonSplash from "./ButtonPlash";
+import DayPicker from 'react-day-picker';
+import 'react-day-picker/lib/style.css';
+import OutsideClickHandler from 'react-outside-click-handler';
+import leftButton from '../../images/leftButton.png'
+import rightButton from '../../images/rightButton.png'
 
 const DateSliderWrapper = styled.div`
-    width: calc(100% - 5.05rem);
-    position: relative;
-    height : 4.4rem !important;
     display : flex;
     flex-direction : row;
+    flex : 9;
+    position: relative;
+    height : 4.4rem !important;
+    justify-content : center;
+    align-items: center;
+    position : relative;
     @media (min-width: 1025px) {
       height : 5rem !important;
 	  }
 `;
 
-const CarouselItem = styled.div`
+const WrapDaySlider = styled.div`
     display: flex;
-    flex : 1;
+    justify-content : center;
+    align-items: center;
 `;
 
-const NormalDay = styled.div`
-    border-right: 1px solid #3883bb;
-    padding: 0.5rem;
-    display : flex;
-    flex-direction : column;
-    align-items : center;
+const Picker = styled.div`
+    width : 18rem;
+    height : 3rem !important;
+    border : 1px solid #dddddd;
+    border-right-width : 0px;
+    border-left-width : 0px;
+    display: flex;
     justify-content : center;
-    overflow: hidden;
-    height : 4.4rem ;
-    width : calc((100vw - 5.05rem)/10);
-    padding-top : 0.6rem;
-    font-size : 0.9rem;
-    line-height : 1.5;
-    letter-spacing : 0.3;
-    font-weight : 500;
-    &:last-child {
-      border-right: none;
-    }
-
-    & div {
-      white-space: normal;
-      text-overflow: ellipsis;
-      overflow: hidden;
-    }
-
+    align-items : center;
+    color : #1B68AC;
+    font-weight : 600;
     @media (min-width: 1025px) {
-      height : 5rem;
-      font-size : 1.02rem;
+      height : 3.8rem !important;
 	  }
 `;
+Picker.Button = styled.div`
+      width : 4.6rem;
+      height : 3rem !important;
+      display: flex;
+      justify-content : center;
+      align-items : center;
+      border : 1px solid #dddddd;
+      @media (min-width: 1025px) {
+        height : 3.8rem !important;
+      }
+      & > img {
+        width : 30px;
+        height : 30px;
+      }
+  `;
 
-const ActiveDay = styled(NormalDay)`
+const CalendarPopup = styled.div`
+    top: -1rem;
+    left: calc(100%/2 - 9rem);
+    position: absolute;
+    transform: translate3d(0.5rem, calc(-18rem + 0.5rem), 0px);
+    will-change: transform;
+    z-index: 1;
+    background: #fff;
+    color: #000;
+    height: 18rem;
+    line-height: 1;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  `;
+
+CalendarPopup.Heading = styled.div`
     background: #1366AE;
     color: #ffffff;
-    font-weight : 600;
-`;
+    height: 3rem;
+    font-size: 1.5rem;
+    line-height: 2; 
+    padding-left : 1rem;
+  `;
 
-const TodayDay = styled(NormalDay)`
-    background: #00e260;
-    color: #ffffff;
-`;
+CalendarPopup.Body = styled.div``;
 
-const WrapSlider = styled.div`
-  width : calc(((100vw - 5.05rem)/10) * 7);
-`;
 
-const SignInWrapper = styled.div`
+const BtnClose = styled.div`
 	position: absolute;
-	bottom: 0.25rem;
-	width: calc((100vw - 5.05rem) / 10);
-	/* background: #fafafa; */
-	height: 4rem;
-	text-align: center;
-	padding: 0.5rem;
-`;
-
-SignInWrapper.Button = styled.div`
-	border-radius: 4px;
-	background: #1366ae;
+	right: 0.5rem;
+	top: 0.3rem;
+	line-height: 1;
+	font-size: 2rem;
 	color: #ffffff;
-	width: 100%;
-	font-size: 0.95rem;
-  display : flex;
-  justify-content : center;
-  align-items: center;
-	font-weight: bold;
-	line-height: 2.8;
-	height: 100%;
 	cursor: pointer;
+	& > img{
+		width : 27px;
+		height : 27px;
+	}
 `;
 
 class DaySlider extends React.Component {
 
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
     this.state = {
-      currentSlide: 0
+      isPopupOpen: false,
     }
-    this.refCarousel = React.createRef();
   }
 
-  componentDidMount() {
-
+  onClickButton() {
+    const { isPopupOpen } = this.state;
+    this.setState({
+      isPopupOpen: !isPopupOpen,
+    });
   }
 
-  onPrevClick(event, previousSlide) {
-    previousSlide(event);
+  onOutsideClickPopup() {
+    this.setState({
+      isPopupOpen: false,
+    });
   }
 
-  onNextClick(event, nextSlide) {
-    nextSlide(event);
-  }
+  changeDay(type) {
+    const { selectedDay } = this.props;
+    let day = selectedDay;
 
-  onDayClick(day) {
-    const { onChangeDay, loadingCalendar } = this.props;
-    onChangeDay(day.format('DDMMYYYY'));
-    loadingCalendar(true);
-  }
+    switch (type) {
+      case 'plus':
+        day = moment(selectedDay).add('days', 1).format('DDMMYYYY');
+        break;
 
-  renderDay(day) {
-    return (
-      <>
-        <div>{day.format('dddd')}</div>
-        <div>{day.format('MM/DD/YYYY')}</div>
-      </>
-    );
-  }
-
-  afterSlide(index) {
-    const { days, onChangeWeek } = this.props;
-    const { currentSlide } = this.state;
-    if (
-      (currentSlide === 0 && index === 1)
-      || (currentSlide === 1 && index === 2)
-      ||
-      (currentSlide === 2 && index === 0)
-    ) {
-      onChangeWeek(days[0].add(1, 'w').format('DDMMYYYY'));
+      case 'minus':
+        day = moment(selectedDay).subtract('days', 1).format('DDMMYYYY');
+        break;
+      default:
+        break;
     }
-    if (
-      (currentSlide === 1 && index === 0)
-      || (currentSlide === 0 && index === 2)
-      ||
-      (currentSlide === 2 && index === 1)
-    ) {
-      onChangeWeek(days[0].subtract(1, 'w').format('DDMMYYYY'));
-    }
-    this.setState({ currentSlide: index })
+    this.props.onChangeDay(day);
+    this.props.loadingCalendar(true);
   }
 
-  renderItems(day, index) {
-    const { selectedDay, merchantInfo } = this.props;
-    const { timezone } = merchantInfo;
+  onDaySelected(day) {
+    this.props.onChangeDay(moment(new Date(day)).format('DDMMYYYY'));
+  }
 
-    let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment();
-    let tz = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
-
-    if (moment(day).format('DDMMYYYY') === moment(selectedDay).format('DDMMYYYY')) {
-      return (
-        <ActiveDay key={index} onClick={() => this.onDayClick(day)}>
-          {this.renderDay(day)}
-        </ActiveDay>
+  renderPopup() {
+    const { selectedDay } = this.props;
+    const { isPopupOpen } = this.state;
+    return isPopupOpen ? (
+      <CalendarPopup>
+        <CalendarPopup.Heading>
+          Calendar
+          <BtnClose onClick={() => this.onOutsideClickPopup()}>
+            {<img src={require("../../images/close_white.png")} />}
+          </BtnClose>
+        </CalendarPopup.Heading>
+        <CalendarPopup.Body>
+          <DayPicker
+            firstDayOfWeek={1}
+            selectedDays={[selectedDay.toDate()]}
+            onDayClick={day => this.onDaySelected(day)}
+          />
+        </CalendarPopup.Body>
+      </CalendarPopup>
+    ) : (
+        ''
       );
-    }
-    if (moment(day).format('DDMMYYYY') === moment(tz).format('DDMMYYYY')) {
-      return (
-        <TodayDay key={index} onClick={() => this.onDayClick(day)}>
-          {this.renderDay(day)}
-        </TodayDay>
-      );
-    }
-
-    return (
-      <NormalDay key={index} onClick={() => this.onDayClick(day)}>
-        {this.renderDay(day)}
-      </NormalDay>
-    );
   }
 
   render() {
-    const { days, disable_Calendar, openAddingAppointment } = this.props;
+    const { selectedDay } = this.props;
     return (
       <DateSliderWrapper>
-        <NormalDay />
-        <WrapSlider>
-          <Carousel
-            wrapAround
-            innerRef={this.refCarousel}
-            dragging={true}
-            renderBottomCenterControls={() => ''}
-            renderCenterLeftControls={({ previousSlide }) => (
-              <ButtonSplash
-                style={{
-                  right : "calc((100vw - 5.05rem) / 24)"
-                }}
-                isLeft onClick={ev => this.onPrevClick(ev, previousSlide)} />
-            )}
-            renderCenterRightControls={({ nextSlide }) => (
-              <ButtonSplash
-                style={{
-                  left : "calc((100vw - 5.05rem) / 24)"
-                }}
-                onClick={ev => this.onNextClick(ev, nextSlide)} />
-            )}
-            afterSlide={slideIndex => this.afterSlide(slideIndex)}
+        <WrapDaySlider >
+          <Picker.Button
+            onClick={() => this.changeDay('minus')}
+            style={{ borderTopLeftRadius: 8, borderBottomLeftRadius: 8 }}
           >
-            <CarouselItem>
-              {days.map((day, index) => this.renderItems(day, index))}
-            </CarouselItem>
-            <CarouselItem>
-              {days.map((day, index) => this.renderItems(day, index))}
-            </CarouselItem>
-            <CarouselItem>
-              {days.map((day, index) => this.renderItems(day, index))}
-            </CarouselItem>
-          </Carousel>
-        </WrapSlider>
-        <NormalDay style={{
-          borderLeft : "1px solid #3883bb"
-        }} />
-        <NormalDay>
-          <SignInWrapper>
-            <SignInWrapper.Button
-              onClick={() => {
-                openAddingAppointment({});
-                disable_Calendar(true);
-              }}
-            >
-              Check-In
-						</SignInWrapper.Button>
-          </SignInWrapper>
-        </NormalDay>
+            <img src={leftButton} />
+          </Picker.Button>
+          <Picker onClick={() => this.onClickButton()}>
+            {moment(selectedDay).format('MMMM dddd DD, YYYY')}
+          </Picker>
+          <Picker.Button
+            onClick={() => this.changeDay('plus')}
+            style={{ borderTopRightRadius: 8, borderBottomRightRadius: 8 }}
+          >
+            <img src={rightButton} />
+          </Picker.Button>
+        </WrapDaySlider>
 
+        <OutsideClickHandler onOutsideClick={() => this.onOutsideClickPopup()}>
+          {this.renderPopup()}
+        </OutsideClickHandler>
       </DateSliderWrapper>
     );
   }
 }
-
-DaySlider.propTypes = {
-  selectedDay: PropTypes.object,
-  days: PropTypes.array,
-  onChangeDay: PropTypes.func,
-  onChangeWeek: PropTypes.func,
-};
 
 export default DaySlider;
