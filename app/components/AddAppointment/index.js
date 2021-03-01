@@ -20,7 +20,8 @@ const initialState = {
 	success_addApointment: '',
 	error_addApointment: '',
 	referedBy: '',
-	isSendLink: true
+	isSendLink: true,
+	isPopupCustomer: false,
 };
 
 class AddAppointment extends Layout {
@@ -29,13 +30,24 @@ class AddAppointment extends Layout {
 		this.state = initialState;
 	}
 
+	openPopupCustomer() {
+		this.setState({
+			isPopupCustomer: true,
+			isOpenSearchingPopup: false
+		});
+	}
+
+	closePopupCustomer() {
+		this.setState({ isPopupCustomer: false });
+	}
+
 
 	async componentWillReceiveProps(nextProps) {
 		if (nextProps.StateAddCustomerSuccess === true) {
 			this.showInsertCustomerSuccess();
 		}
 		if (nextProps.checkPhoneError === true) {
-			// phone is not exist
+			// phone exist
 			const { firstName, lastName, email, phone, referrerPhone, favourite, referrerBy } = nextProps.InfoAfterCheckPhone;
 			this.setState({
 				first_name: firstName,
@@ -46,10 +58,10 @@ class AddAppointment extends Layout {
 				notes: favourite ? favourite.split(',') : [],
 				referedBy: referrerBy
 			});
-			this.openFormInsertAfterCheckPhone();
+			this.openPopupCustomer();
 		}
 		if (nextProps.checkPhoneError === false) {
-			// phone exist
+			// phone is not exist
 			if (nextProps.checkPhoneSuccess === true) {
 				this.openFormInsertAfterCheckPhone();
 			}
@@ -70,45 +82,49 @@ class AddAppointment extends Layout {
 		this.props.closeTimeAndStaffID('');
 		this.props.infoCheckPhone('');
 		this.props.addCustomerSuccess(false);
+		this.closePopupCustomer();
 	}
 
 	async handleSubmitVerifyPhone() {
 		const { phoneNumber } = this.state;
-		const { time, staffID, dataAnyStaff } = this.props.TimeAndStaffID;
+		// const { time, staffID, dataAnyStaff } = this.props.TimeAndStaffID;
 		const phone = checkStringNumber2(phoneNumber.toString()); // lấy ra số phone , ex : 123-456-7890
 		await this.setState({ phoneNumber: phone });
-		if(phone.trim() !== ""){
+		if (phone.trim() !== "") {
 			const payload = {
 				phone: `${this.state.phoneCheck}${phone}`,
-				time,
-				staffID
 			}
 			this.props.checkPhoneNumberCustomer(payload);
 		}
 	}
 
-	handleSubmitAppointment = () => {
+	handleSubmitAppointment = (isPopupCustomer) => {
 		const { time, staffID, dataAnyStaff } = this.props.TimeAndStaffID;
 		const { first_name, last_name, phoneNumber, phone, notes, email, phoneCheck, refPhoneHeader, referedBy, isSendLink } = this.state;
 		const refFone = phone ? phone : '';
-		if (first_name.trim() !== '' && last_name.trim() !== '') {
-			const data = {
-				first_name,
-				last_name,
-				phone: `+${phoneCheck}${phoneNumber}`,
-				refPhone: refFone ? refPhoneHeader + checkStringNumber2(refFone.toString()) : "",
-				note: notes.toString(),
-				time,
-				staffID,
-				email,
-				referedBy,
-				isSendLink,
-				dataAnyStaff: dataAnyStaff ? dataAnyStaff : '',
-			}
+		const data = {
+			first_name,
+			last_name,
+			phone: `+${phoneCheck}${phoneNumber}`,
+			refPhone: refFone ? refPhoneHeader + checkStringNumber2(refFone.toString()) : "",
+			note: notes.toString(),
+			time,
+			staffID,
+			email,
+			referedBy,
+			isSendLink,
+			dataAnyStaff: dataAnyStaff ? dataAnyStaff : '',
+		}
+		if (isPopupCustomer == true) {
 			this.props.addCustomer(data);
 			this.props.infoCheckPhone('');
 			this.closeAllModal();
-		}
+		} else
+			if (first_name.trim() !== '' && last_name.trim() !== '') {
+				this.props.addCustomer(data);
+				this.props.infoCheckPhone('');
+				this.closeAllModal();
+			}
 	};
 
 	async handleChange(e) {

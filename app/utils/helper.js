@@ -58,19 +58,38 @@ export function formatPhone(phone) {
 	let phoneFotmat = '';
 	if (phone) {
 		if (phone.charAt(0) === '1') {
-			phoneFotmat = '(+1) ' + formatUsPhone(phone.substring(1));
+			phoneFotmat = '+1-' + formatUsPhone(phone.substring(1));
 		} else if (phone.charAt(0) === '8' && phone.charAt(1) === '4') {
-			phoneFotmat = '(+84) ' + formatUsPhone(phone.substring(2));
+			phoneFotmat = '+84-' + formatUsPhone(phone.substring(2));
 		} else if (phone.charAt(0) === '+' && phone.charAt(1) === '1') {
-			phoneFotmat = '(+1) ' + formatUsPhone(phone.substring(2));
+			phoneFotmat = '+1-' + formatUsPhone(phone.substring(2));
 		} else if (phone.charAt(0) === '+' && phone.charAt(1) === '8' && phone.charAt(2) === '4') {
-			phoneFotmat = '(+84) ' + formatUsPhone(phone.substring(3));
+			phoneFotmat = '+84-' + formatUsPhone(phone.substring(3));
 		} else {
 			return phone;
 		}
 	}
 	return phoneFotmat;
 }
+
+export function formatPhoneCalendar(phone){
+	let phoneFotmat = '';
+	if (phone) {
+		if (phone.charAt(0) === '1') {
+			phoneFotmat = formatUsPhone(phone.substring(1));
+		} else if (phone.charAt(0) === '8' && phone.charAt(1) === '4') {
+			phoneFotmat = formatUsPhone(phone.substring(2));
+		} else if (phone.charAt(0) === '+' && phone.charAt(1) === '1') {
+			phoneFotmat = formatUsPhone(phone.substring(2));
+		} else if (phone.charAt(0) === '+' && phone.charAt(1) === '8' && phone.charAt(2) === '4') {
+			phoneFotmat = formatUsPhone(phone.substring(3));
+		} else {
+			return phone;
+		}
+	}
+	return phoneFotmat;
+}
+
 
 export function api(path, params, method, token) {
 
@@ -106,5 +125,20 @@ export function scrollToNow(){
 		for (let i = 0; i < x.length; i++) {
 			x[i].scrollIntoView();
 		}
-	}, 300);
+	}, 600);
 }
+
+export function convertMinsToHrsMins(mins) {
+	let h = Math.floor(mins / 60);
+	let m = mins % 60;
+	// h = h < 10 ? '0' + h : h;
+	// m = m < 10 ? '0' + m : m;
+	if (h !== 0){
+		if(m !==0){
+			return `${h} hour ${m} min`;
+		}else{
+			return `${h} hour`;
+		}
+	}
+	return `${m} min`;
+  }

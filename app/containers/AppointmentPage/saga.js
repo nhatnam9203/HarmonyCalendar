@@ -37,7 +37,8 @@ import {
 	addBlockAnyStaff,
 	new_total_duration,
 	checkMerchantWorking,
-	postMesageAssignAppointment
+	postMesageAssignAppointment,
+	adapterServicesMoved
 } from './utilSaga';
 
 import { addEventsToCalendar, deleteEventFromCalendar } from '../../components/Calendar/constants';
@@ -58,9 +59,7 @@ export function* getMembers() {
 			}
 			if (resp.codeStatus === 1) {
 				const members = resp.data
-					? resp.data
-							.map((member) => memberAdapter(member))
-							.filter((mem) => mem.isDisabled === 0 && mem.orderNumber !== 0)
+					? resp.data.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0)
 					: [];
 
 				if (members.length > 0) {
@@ -303,10 +302,20 @@ export function* moveAppointment(action) {
 	const movedAppointment = allAppointment.find((app) => app.id === action.appointmentId);
 	if (!movedAppointment) return;
 
-	let new_endTime = moment(action.newTime).add(
-		totalDurationMoveAppointment(movedAppointment.options, movedAppointment.extras),
-		'minutes'
-	);
+	let new_endTime = moment(action.newEndTime);
+
+	if (action.appointment.status.toString().includes('BLOCK_TEMP')) {
+		yield put(
+			actions.editBlockTime({
+				start: moment(action.newTime).format('hh:mm A'),
+				end: `${moment(new_endTime).format('hh:mm A')}`,
+				note: action.appointment.code,
+				id: action.appointment.blockId,
+				staffId: assignedMember ? assignedMember.id : 0
+			})
+		);
+		return;
+	}
 
 	const previousMemberId = movedAppointment.memberId;
 
@@ -316,6 +325,8 @@ export function* moveAppointment(action) {
 		end: `${new_endTime.format('YYYY-MM-DD')}T${new_endTime.format('HH:mm:ss')}`,
 		memberId: assignedMember ? assignedMember.id : 0
 	};
+
+	console.log({ appointment })
 
 	if (assignedMember && previousMemberId !== 0) {
 		if (appointment.status !== 'CHECKED_IN') {
@@ -343,10 +354,6 @@ export function* moveAppointment(action) {
 
 	const { memberId, start, end, status, options, products, extras, giftCards } = appointment;
 
-	options.forEach((sv) => {
-		sv.staffId = assignedMember ? assignedMember.id : 0;
-	});
-
 	let _end = moment(start).add('minutes', 15);
 	_end = `${_end.format('YYYY-MM-DD')}T${_end.format('HH:mm:ss')}`;
 
@@ -361,14 +368,24 @@ export function* moveAppointment(action) {
 		giftCards
 	};
 
-	yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
+	const dt = JSON.parse(JSON.stringify(data));
+
+	yield put(
+		actions.updateAppointmentFrontend({
+			appointment: {
+				...data,
+				services: adapterServicesMoved(data.services, data.staffId)
+			},
+			id: appointment.id
+		})
+	);
 	yield put(actions.renderAppointment());
 
 	try {
 		if (navigator.onLine) {
 			const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
 			const url = `${requestURL.toString()}/${appointment.id}`;
-			const response = yield api(url, data, 'PUT', token);
+			const response = yield api(url, dt, 'PUT', token);
 			if (response.codeStatus !== 1) {
 				return yield* checkResponse(response);
 			}
@@ -398,7 +415,7 @@ export function* putBackAppointment(action) {
 				if (response.codeStatus === 1) {
 				}
 			}
-		} catch (err) {}
+		} catch (err) { }
 	} catch (err) {
 		yield put(actions.appointmentPuttingBackError(err));
 	}
@@ -661,12 +678,12 @@ export function* changeAppointmentSaga(action) {
 
 		const timeEnd = `${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(
 			timeWorking[1].timeEnd,
-			[ 'h:mm A' ]
+			['h:mm A']
 		).format('HH:mm:ss')}`;
 
 		const timeStart = `${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(
 			timeWorking[1].timeStart,
-			[ 'h:mm A' ]
+			['h:mm A']
 		).format('HH:mm:ss')}`;
 
 		if (
@@ -821,7 +838,7 @@ export function* addNewCustomer(action) {
 
 /********************************* ADD APPOINTMENT *********************************/
 function* addAppointmentSaga() {
-	yield takeLatest(constants.SUBMIT_ADD_APPOINTMENT, function*(action) {
+	yield takeLatest(constants.SUBMIT_ADD_APPOINTMENT, function* (action) {
 		try {
 			const data = action.payload;
 			const { time, staffID, dataAnyStaff } = data;
@@ -910,7 +927,8 @@ export function* getDetailMerchantSaga(action) {
 			}
 			yield put(actions.setDetailMerchant(infoMerchant));
 			const isLoadData = action.payload && action.payload.isLoadData ? action.payload.isLoadData : '';
-			if (isLoadData) {
+			const isFirstLoad = action.payload && action.payload.isFirstLoad ? action.payload.isFirstLoad : '';
+			if (isFirstLoad) {
 				const { timezone } = response.data;
 				let timeNow = timezone && timezone !== 'null' ? moment_tz.tz(timezone.substring(12)) : moment();
 				let day = `${moment(timeNow).format('DDMMYYYY')}`;
@@ -918,6 +936,8 @@ export function* getDetailMerchantSaga(action) {
 				yield put(actions.setToday(day));
 				yield put(actions.selectWeek(day));
 				scrollToNow();
+			}
+			if (isLoadData) {
 				yield put(actions.updateNextStaff({ isReloadCalendar: true }));
 			}
 		}
@@ -973,14 +993,14 @@ export function* addBlockTime(action) {
 			// yield put(actions.loadMembers());
 			return;
 		}
-	} catch (error) {}
+	} catch (error) { }
 }
 
 /********************************* EDIT BLOCK TIME *********************************/
 export function* editBlockTime(action) {
 	try {
 		const { payload } = action;
-		const { staff, start, end, note, id } = payload;
+		const { staff, start, end, note, id, staffId } = payload;
 		const currentDate = yield select(makeCurrentDay());
 		let apiDateQuery = currentDate.format('YYYY-MM-DD') || moment().format('YYYY-MM-DD');
 		const requestURL = new URL(`${api_constants.EDIT_BLOCKTIME_API}/${id}`);
@@ -988,14 +1008,16 @@ export function* editBlockTime(action) {
 			workingDate: apiDateQuery,
 			blockTimeStart: start,
 			blockTimeEnd: end,
-			note: note
+			note: note,
+			staffId
 		};
+
 		const response = yield api(requestURL.toString(), dataSubmit, 'PUT', token);
-		if (response.codeStatus === 1) {
-			// yield put(actions.loadMembers());
-			return;
+		if (response.codeStatus !== 1) {
+			alert(response.message);
+			return yield* checkResponse(response);
 		}
-	} catch (error) {}
+	} catch (error) { }
 }
 
 /********************************* DELETE BLOCK TIME *********************************/
@@ -1008,7 +1030,7 @@ export function* deleteBlockTime_Saga(action) {
 			// yield put(actions.loadMembers());
 			yield put(actions.deleteBlockTimeSuccess({ staff, block }));
 		}
-	} catch (error) {}
+	} catch (error) { }
 }
 
 /********************************* GET BLOCK TIME LIST IN CALENDAR *********************************/
@@ -1023,7 +1045,7 @@ export function* getBlockTimeSaga() {
 			yield put(actions.renderAppointment());
 			return;
 		}
-	} catch (error) {}
+	} catch (error) { }
 }
 
 /********************************* GET DETAIL APPOINTMENT *********************************/
@@ -1070,12 +1092,12 @@ export function* getTimeStaffLoginSaga(action) {
 			alert('error from ' + api_constants.API_GET_TIME_STAFF_LOGIN);
 			return;
 		}
-	} catch (err) {}
+	} catch (err) { }
 }
 
 /********************************* RELOAD STAFF & GET BLOCK TIME *********************************/
 function* updateNextStaff_Saga() {
-	yield takeLatest(constants.UPDATE_NEXT_STAFF, function*(action) {
+	yield takeLatest(constants.UPDATE_NEXT_STAFF, function* (action) {
 		try {
 			const { isReloadCalendar } = action.payload;
 			const requestURL = new URL(`${api_constants.GET_MEMBER}`);
@@ -1085,9 +1107,7 @@ function* updateNextStaff_Saga() {
 			const response = yield api(url, '', 'GET', token);
 			if (response.codeStatus === 1) {
 				const members = response.data
-					? response.data
-							.map((member) => memberAdapter(member))
-							.filter((mem) => mem.isDisabled === 0 && mem.orderNumber !== 0)
+					? response.data.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0)
 					: [];
 
 				const lastStaff = addLastStaff(members);
@@ -1124,7 +1144,7 @@ export function* updateNote_Saga(action) {
 		if (response.codeStatus !== 1) {
 			return yield* checkResponse(response);
 		}
-	} catch (err) {}
+	} catch (err) { }
 }
 
 /********************************* SEARCH PHONE COMPANION *********************************/
@@ -1143,7 +1163,7 @@ export function* searchPhoneCompanion_Saga(action) {
 		if (response.codeStatus !== 1) {
 			resolve({ success: false });
 		}
-	} catch (err) {}
+	} catch (err) { }
 }
 
 /********************************* UPDATE COMPANION *********************************/
@@ -1164,14 +1184,14 @@ export function* updateCompanion_Saga(action) {
 			resolve({ success: true });
 			return yield* checkResponse(response);
 		}
-	} catch (err) {}
+	} catch (err) { }
 }
 
 function mapServiceEditPaid(service) {
 	return {
 		bookingServiceId: service.bookingServiceId,
 		staffId: service.staffId,
-		"tipAmount": parseFloat(service.tipAmount)
+		tipAmount: parseFloat(service.tipAmount)
 	};
 }
 
@@ -1183,11 +1203,12 @@ export function* updateStaffAppointmentPaid(action) {
 		services = services.map((obj) => mapServiceEditPaid(obj));
 		const body = { services };
 		const response = yield api(requestURL.toString(), body, 'PUT', token);
+		console.log({ body, response });
 		if (response.codeStatus === 1) {
 		} else {
 			alert(response.message);
 		}
-	} catch (err) {}
+	} catch (err) { }
 }
 
 /* **************************** Subroutines ******************************** */
@@ -1234,7 +1255,7 @@ export function* appointmentsByMembersData() {
 
 	yield takeLatest(constants.SELECT_DAY, getMembers);
 
-	yield takeLatest(constants.UPDATE_CALENDAR_INTERVAL, getAppointmentsByMembersAndDate);
+	// yield takeLatest(constants.UPDATE_CALENDAR_INTERVAL, getAppointmentsByMembersAndDate);
 }
 
 export function* renderAppointmentSaga() {

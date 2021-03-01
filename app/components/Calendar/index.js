@@ -19,9 +19,8 @@ import FCDragZone from './FCDragZone';
 const signalR = require('@microsoft/signalr');
 const CalendarWrapper = styled.div`
 	display: flex;
-	border-left: 2px solid #3883bb;
-	border-right: 2px solid #3883bb;
-	border-bottom: 2px solid #3883bb;
+	border: 2px solid #3883bb;
+	/* margin-top : 50px; */
 	height: calc(100% - 8.8rem);
 	@media (min-width: 1025px) {
 		height: calc(100% - 10rem);
@@ -36,7 +35,6 @@ const MainCalendar = styled.div`
 
 const RightSideBar = styled.div`
 	width: calc((100vw - 5.05rem) / 10);
-	border-top: 2px solid #3883bb;
 	position: relative;
 `;
 

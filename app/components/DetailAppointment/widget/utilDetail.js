@@ -106,7 +106,10 @@ export const initialState = {
 	companionPhone : '',
 	companionPhoneHeader : "+1",
 	isLoadingCompanion : false,
-	isPopupEditTip : false ,
-	staffEditPaid : '',
-	serviceEditPaid : ''
+	isEditPaidAppointment : false,
+	isPopupTip : false,
+	indexPopupTip : '',
+	valueTip : '',
+	indexFromTime : '',
+	fromTimeService : '',
 };

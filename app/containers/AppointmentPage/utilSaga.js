@@ -1,5 +1,4 @@
 import moment from 'moment';
-import { uniqBy } from 'lodash'
 
 export const statusConvertData = {
 	ASSIGNED: 'unconfirm',
@@ -25,7 +24,6 @@ export const statusConvertKey = {
 };
 
 export const appointmentAdapter = (appointment) => {
-
 	return {
 		id: appointment.appointmentId,
 		code: `#${appointment.code}`,
@@ -33,21 +31,11 @@ export const appointmentAdapter = (appointment) => {
 		firstName: appointment.firstName,
 		lastName: appointment.lastName,
 		phoneNumber: appointment.phoneNumber,
-		options: appointment.services.sort(function (a, b) {
-			var c = a.bookingServiceId;
-			var d = b.bookingServiceId;
-			return d - c;
-		}),
-		products: appointment.products.sort(function (a, b) {
-			var c = a.bookingProductId;
-			var d = b.bookingProductId;
-			return d - c;
-		}),
-		extras: appointment.extras.sort(function (a, b) {
-			var c = a.bookingExtraId;
-			var d = b.bookingExtraId;
-			return d - c;
-		}),
+		options: appointment.services,
+		products: appointment.products,
+		extras: appointment.extras,
+		categories: appointment.categories,
+		customerNote: appointment.customerNote ? appointment.customerNote : '',
 		status: statusConvertKey[appointment.status],
 		memberId: appointment.staffId,
 		start: appointment.fromTime,
@@ -140,40 +128,70 @@ export function block(memberId, start, end) {
 	};
 }
 
-export function blockTemp(memberId, start, end, note, appointmentId, status) {
+const notesServices = (notes = []) => {
+	let noteServices = [];
+	for (let i = 0; i < notes.length; i++) {
+		if (notes[i].includes("- ")) {
+			noteServices.push(notes[i])
+		}
+	}
+	return noteServices;
+}
+
+const splitNotes = (note) => {
+	let tempNote = note.toString().replace("</br>", "<br>");
+	tempNote = tempNote.split("<br>");
+	return {
+		blockName: tempNote[0],
+		blockPhone: tempNote[1],
+		blockService: notesServices(tempNote)
+	}
+}
+
+export function blockTemp(memberId, start, end, note, appointmentId, status, blockId, isVip) {
+	let tempNote = splitNotes(note);
 	return {
 		status,
 		memberId,
 		start,
 		end,
+		isVip,
 		id: appointmentId ? appointmentId : 0,
-		// appointmentId : appointmentId ? appointmentId : 0,
 		code: note,
 		userFullName: '',
 		phoneNumber: '',
 		options: [],
 		products: [],
 		extras: [],
-		notes: []
+		notes: [],
+		blockId,
+		blockName: tempNote.blockName ? tempNote.blockName : "",
+		blockPhone: tempNote.blockPhone ? tempNote.blockPhone.toString().replace("+84", "").replace("+1", "") : "",
+		blockService: tempNote.blockService ? tempNote.blockService : ""
 	};
 }
 
-function checkStatusAppointment(appointmentId,appointments) {
+function checkStatusAppointment(appointmentId, appointments) {
 	let find = false;
 	appointments.forEach(appointment => {
 		if (appointment.id === appointmentId) {
 			if (appointment.status === 'PAID')
-				find = 1;
+				find = 'PAID';
 			if (appointment.status === 'REFUND' || appointment.status === 'VOID')
-				find = 2
+				find = 'REFUND'
+			if (appointment.status === 'ASSIGNED')
+				find = 'ASSIGNED'
+			if (appointment.status === 'CONFIRMED')
+				find = 'CONFIRMED'
+			if (appointment.status === 'CHECKED_IN')
+				find = 'CHECKED_IN'
 		}
 	})
 	return find
 }
 
-export function addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery , appointments) {
+export function addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery, appointments) {
 	const currentDayName = moment(currentDate).format('dddd');
-
 	/* ADD BLOCK TEMP ( YELLOW BLOCK ) */
 	appointmentsMembers.forEach((mem) => {
 		const memFind = displayedMembers.find((member) => member.id === mem.memberId);
@@ -190,14 +208,23 @@ export function addBlockCalendar(appointmentsMembers, displayedMembers, currentD
 			]).format('HH:mm:ss')}`;
 			const note = blockTimeMember[i].note;
 			const appointmentId = blockTimeMember[i].appointmentId;
+			const blockTimeId = blockTimeMember[i].blockTimeId;
+			const app = appointments.find(obj => obj.id === appointmentId);
+			const isVip = app ? app.isVip : 0
 
-			if (checkStatusAppointment(appointmentId , appointments) === 1) {
-				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_PAID'));
-			} else if (checkStatusAppointment(appointmentId,appointments) === 2) {
-				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_REFUND'));
+			if (checkStatusAppointment(appointmentId, appointments) === 'PAID') {
+				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_PAID', blockTimeId, isVip));
+			} else if (checkStatusAppointment(appointmentId, appointments) === 'REFUND') {
+				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_REFUND', blockTimeId, isVip));
+			} else if (checkStatusAppointment(appointmentId, appointments) === 'ASSIGNED') {
+				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_ASSIGNED', blockTimeId, isVip));
+			} else if (checkStatusAppointment(appointmentId, appointments) === 'CONFIRMED') {
+				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CONFIRMED', blockTimeId, isVip));
+			} else if (checkStatusAppointment(appointmentId, appointments) === 'CHECKED_IN') {
+				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CHECKED_IN', blockTimeId, isVip));
 			}
 			else {
-				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP'));
+				mem.appointments.push(blockTemp(memberId, start, end, [], appointmentId, 'BLOCK_TEMP', blockTimeId));
 			}
 		}
 	});
@@ -217,7 +244,6 @@ export function addBlockCalendar(appointmentsMembers, displayedMembers, currentD
 				]).format('HH:mm:ss')}`,
 				`${moment(currentDate).day(currentDayName).endOf('days').format('YYYY-MM-DD')}T${moment()
 					.endOf('days')
-					// .subtract(1, 'hours')
 					.subtract(1, 'seconds')
 					.format('HH:mm:ss')}`
 			);
@@ -225,7 +251,6 @@ export function addBlockCalendar(appointmentsMembers, displayedMembers, currentD
 				mem.memberId,
 				`${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment()
 					.startOf('days')
-					// .add(6, 'hours')
 					.format('HH:mm:ss')}`,
 				`${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(
 					checkWorkingTime[1].timeStart,
@@ -271,6 +296,23 @@ export function totalDuationChangeTime(appointment, extras, services) {
 	});
 
 	return totalDuration;
+}
+
+export function totalDuartionUpdateAppointment(services, extras, appointment) {
+	let total = 0;
+	const lastIndex = findLastIndex(services, appointment);
+	for (let i = 0; i < services.length; i++) {
+		total += services[i].duration;
+		const findExtra = extras.find((ex) => ex.bookingServiceId && ex.bookingServiceId === services[i].bookingServiceId);
+		if (findExtra) {
+			total += findExtra.duration;
+		}
+		if (i === lastIndex) {
+			break;
+		}
+	}
+
+	return total;
 }
 
 export function newDateUpdateAppointment(status, old_duration, new_total_duration, end) {
@@ -354,6 +396,14 @@ export function dataAssignAppointment(memberId, start, duration_total, status, o
 	};
 }
 
+const optionsAdataper = (options, fromTime) => {
+	let services = [...options];
+	for (let i = 0; i < services.length; i++) {
+		services[i].fromTime = moment(fromTime).format('MM/DD/YYYY') + ' ' + moment(services[i].fromTime).format('hh:mm A');
+	}
+	return services;
+}
+
 export function dataChangeTimeAppointment(
 	selectedStaff,
 	start_time,
@@ -367,6 +417,7 @@ export function dataChangeTimeAppointment(
 	memberId
 ) {
 	let status = 'unconfirm';
+	const services = optionsAdataper(options, start_time);
 	if (memberId !== 0) {
 		if (appointment.status === 'CHECKED_IN') {
 			status = statusChange;
@@ -393,7 +444,7 @@ export function dataChangeTimeAppointment(
 		fromTime: start_time,
 		toTime: end_time,
 		status,
-		services: options,
+		services,
 		products: products,
 		extras,
 		giftCards
@@ -543,46 +594,44 @@ export function addBlockAnyStaff(merchantInfo, currentDayName, currentDate, appo
 	}
 }
 
-export function new_total_duration(services, extras, appointment, memberId) {
+export function new_total_duration(services, extras) {
 	let total = 0;
-	let duplicate_arr = [];
-	if (memberId === 0 && appointment.memberId !== 0) {
-		for (let i = 0; i < services.length; i++) {
-			total += services[i].duration;
-		}
-		for (let i = 0; i < extras.length; i++) {
-			total += extras[i].duration;
+	if (services.length === 1) {
+		total += services[0].duration;
+		for (let j = 0; j < extras.length; j++) {
+			if (extras[j].bookingServiceId === services[0].bookingServiceId) {
+				total += extras[j].duration;
+			}
 		}
 	}
-	else {
-		const lastIndex = findLastIndexChangeTime(services, services[0]);
-		if (lastIndex !== -1) {
-			for (let i = 0; i < services.length; i++) {
-				total += services[i].duration;
-				const findExtra = extras.find((ex) => ex.bookingServiceId && ex.bookingServiceId === services[i].bookingServiceId);
-				if (findExtra) {
-					duplicate_arr.push(findExtra)
-				}
-				if (i === lastIndex) {
-					break;
+	if (services.length > 1) {
+		let servicesTemp = _servicesTemp(services);
+		for (let i = 0; i < servicesTemp.length; i++) {
+			total += servicesTemp[i].duration;
+			for (let j = 0; j < extras.length; j++) {
+				if (extras[j].bookingServiceId === servicesTemp[i].bookingServiceId) {
+					total += extras[j].duration;
 				}
 			}
-		} else {
-			total = 15;
 		}
 	}
-
-	const arr_extra = uniqBy(duplicate_arr, function (e) {
-		return e.serviceId;
-	});
-
-	if (arr_extra && arr_extra.length > 0) {
-		for (let i = 0; i < arr_extra.length; i++) {
-			total += arr_extra[i].duration;
-		}
-	}
-
 	return total;
+}
+
+const _servicesTemp = (services) => {
+	let firstServices = { ...services[0] };
+	let arrTemp = [];
+	for (let i = 0; i < services.length; i++) {
+		if (firstServices.staffId !== services[i].staffId) {
+			break;
+		} else {
+			arrTemp.push(services[i])
+		}
+	}
+	if (arrTemp.length > 1) {
+		arrTemp.pop();
+	}
+	return arrTemp;
 }
 
 export function checkMerchantWorking(merchantInfo, fromTime) {
@@ -605,4 +654,15 @@ export function postMesageAssignAppointment(idAppointment, app) {
 		});
 		window.postMessage(data);
 	}
+}
+
+
+export function adapterServicesMoved(services = [], staffId) {
+	let arrTemp = [];
+	for (let i = 0; i < services.length; i++) {
+		if (staffId)
+			services[i].staffId = staffId;
+		arrTemp.push(services[i]);
+	}
+	return arrTemp;
 }

@@ -5,7 +5,8 @@ import { convertAppointment, initialState } from './widget/utilDetail';
 import Layout from './layout'
 import { addLastStaff } from "../../containers/AppointmentPage/utilSaga"
 import { checkStringNumber2, PromiseAction } from "../../utils/helper"
-import { debounce } from 'lodash'
+import { staffId } from '../../../app-constants';
+import $ from 'jquery';
 
 class Appointment extends Layout {
 	constructor(props) {
@@ -83,29 +84,39 @@ class Appointment extends Layout {
 		});
 	}
 
-	subtractExtra(index) {
-		this.setState((state) => {
-			const { extras } = state;
-			if (extras[index].duration >= 5) {
-				extras[index].duration -= 5;
-			}
-			if (extras[index].duration < 5) {
-				extras[index].duration = 5;
-			}
-			return {
-				extras
-			};
-		});
+	subtractExtra(ex) {
+		const { bookingExtraId } = ex;
+		const { extras } = this.state;
+		const index = extras.findIndex(obj => obj.bookingExtraId === bookingExtraId);
+		if (index !== -1) {
+			this.setState((state) => {
+				const { extras } = state;
+				if (extras[index].duration >= 5) {
+					extras[index].duration -= 5;
+				}
+				if (extras[index].duration < 5) {
+					extras[index].duration = 5;
+				}
+				return {
+					extras
+				};
+			});
+		}
 	}
 
-	addExtra(index) {
-		this.setState((state) => {
-			const { extras } = state;
-			extras[index].duration += 5;
-			return {
-				extras
-			};
-		});
+	addExtra(ex) {
+		const { bookingExtraId } = ex;
+		const { extras } = this.state;
+		const index = extras.findIndex(obj => obj.bookingExtraId === bookingExtraId);
+		if (index !== -1) {
+			this.setState((state) => {
+				const { extras } = state;
+				extras[index].duration += 5;
+				return {
+					extras
+				};
+			});
+		}
 	}
 
 	async onChangePriceExtra(value, index) {
@@ -163,30 +174,6 @@ class Appointment extends Layout {
 				...notes
 			]
 		});
-	}
-
-	closePopupEditTip(tipAmount, staff) {
-		if(staff){
-			if (staff.id) {
-				let { services , indexPopupStaff} = this.state;
-				services[indexPopupStaff].staffId = staff.id;
-				services[indexPopupStaff].tipAmount = tipAmount;
-				this.setState({ services });
-			}
-		}
-		this.setState({ isPopupEditTip: false });
-	}
-
-	openPopupEditTip(staff, service,index) {
-		this.setState({
-			isPopupEditTip: true,
-		}, () => {
-			this.setState({
-				staffEditPaid: staff,
-				serviceEditPaid: service,
-				indexPopupStaff : index
-			})
-		})
 	}
 
 	handleChange(e) {
@@ -354,10 +341,7 @@ class Appointment extends Layout {
 			this.updateChangeAppointment('unconfirm');
 		} else if (appointment.status === 'CHECKED_IN') {
 			this.updateChangeAppointment('checkin');
-		}else if (appointment.status === 'PAID') {
-			this.updateStaffAppointmentPaid();
-		} 
-		else {
+		} else {
 			alert(`status appointment ${appointment.status} - id appointment ${appointment.id}`);
 		}
 		this.closeModal();
@@ -382,14 +366,21 @@ class Appointment extends Layout {
 			dayPicker: this.state.dayChange,
 			selectedStaff: selectedStaff
 		}
-
 		this.props.changeAppointmentTime(payload)
+	}
+
+	toggleEditPaidAppointment() {
+		const { isEditPaidAppointment } = this.state;
+		this.setState({
+			isEditPaidAppointment: !isEditPaidAppointment
+		})
 	}
 
 	updateStaffAppointmentPaid() {
 		const { appointment } = this.props;
 		const { services } = this.state;
-		this.props.updateStaffAppointmentPaid({ appointment, services })
+		this.props.updateStaffAppointmentPaid({ appointment, services });
+		this.closePopupTip();
 	}
 
 	nextStatus() {
@@ -473,9 +464,11 @@ class Appointment extends Layout {
 
 	}
 
-	openPopupTimePicker() {
+	openPopupTimePicker(indexFromTime, fromTimeService) {
 		this.setState({
-			isPopupTimePicker: true
+			isPopupTimePicker: true,
+			indexFromTime,
+			fromTimeService
 		});
 	}
 
@@ -486,9 +479,11 @@ class Appointment extends Layout {
 		});
 	}
 
-	doneTimePicker(time) {
+	doneTimePicker(time, index) {
+		const { services } = this.state;
+		services[index].fromTime = time;
 		this.setState({
-			fromTime: time
+			services
 		});
 		this.closePopupTimePicker();
 	}
@@ -522,6 +517,12 @@ class Appointment extends Layout {
 		await this.setState({ prices, services });
 	};
 
+	onChangeTip = async (value, index) => {
+		const { services } = this.state;
+		services[index].tipAmount = value;
+		await this.setState({ services });
+	};
+
 	togglePopupStaff = (staff, index) => {
 		if (staff.id) {
 			let { services } = this.state;
@@ -551,10 +552,29 @@ class Appointment extends Layout {
 		});
 	}
 
+	openPopupTip(tip, index) {
+		this.setState({
+			isPopupTip: true,
+			indexPopupTip: index,
+			valueTip: tip,
+		});
+	}
+
+	closePopupTip() {
+		this.setState({
+			isPopupTip: false
+		})
+	}
+
 	closePopupPrice() {
 		this.setState({
 			isPoupPrice: false
 		});
+	}
+
+	donePopupTip(price, index) {
+		this.onChangeTip(price, index);
+		this.closePopupTip();
 	}
 
 	donePopupPrice(price, index) {
@@ -581,17 +601,21 @@ class Appointment extends Layout {
 		}
 		const { newNotes, notes, noteValue } = await this.state;
 		if (noteValue.trim() !== '') {
-			const { appointment } = this.props;
+			const { appointment , staffList } = this.props;
+			const staff = staffList.find(obj=>parseInt(obj.id) === parseInt(staffId));
 			const note = await {
 				createDate: new Date(),
-				note: noteValue
+				note: noteValue,
+				staffName : staff ? staff.title : "",
 			};
 			if (noteValue.trim() !== '') {
+				$("#containerNotes").animate({ scrollTop: 0 }, "fast");
 				await this.setState({
 					notes: [note, ...notes],
 					newNotes: [note, ...newNotes],
 					noteValue: ''
 				});
+				
 			}
 
 			this.props.updateNote({ notes: noteValue, idAppointment: appointment.id });

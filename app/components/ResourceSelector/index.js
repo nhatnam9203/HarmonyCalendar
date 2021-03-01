@@ -76,14 +76,14 @@ const Resource = styled.div`
 
 const AnyStaff = styled(Resource)`
 	width : calc(100% - 5.05rem - ((calc((100vw - 5.05rem) / 10)) * 9) + 4px);
-	height : 5rem;
+	height : 4.2rem;
 	border-left: 1px solid #1173C3;
 	background-color : #F5F5F5;
 	display : flex;
 	justify-content : center;
 	align-items : center;
 	@media (min-width: 1025px) {
-		height: 5rem;
+		height: 4.85rem;
   	}
 `;
 
@@ -215,8 +215,8 @@ const ButtonArrow = styled.div`
 	& > img {
 		width: 19px;
 		height: 19px;
-		margin-left: ${(props) => (props.isLeft ? '8px' : '0px')};
-		margin-right: ${(props) => (props.isLeft ? '0px' : '8px')};
+		margin-left: ${(props) => (props.isLeft ? '-3px' : '0px')};
+		margin-right: ${(props) => (props.isLeft ? '0px' : '-3px')};
 		transform: ${(props) => (props.isLeft ? 'rotate(180deg)' : 'rotate(0deg)')};
 	}
 `;
@@ -226,7 +226,7 @@ function chunk(array, size) {
 	for (let i = 0; i < array.length; i += 1) {
 		const last = chunkedArr[chunkedArr.length - 1];
 		if (!last || last.length === size) {
-			chunkedArr.push([ array[i] ]);
+			chunkedArr.push([array[i]]);
 		} else {
 			last.push(array[i]);
 		}
@@ -235,12 +235,11 @@ function chunk(array, size) {
 }
 
 class ResourceSelector extends React.Component {
+
 	componentWillMount() {
-		this.props.getDetailMerchant({ isLoadData: true });
-		// setTimeout(() => {
-		// 	this.props.loadMembers();
-		// }, 500);
+		this.props.getDetailMerchant({ isFirstLoad: true });
 	}
+
 	onPrevClick(event, previousSlide) {
 		previousSlide(event);
 	}
@@ -343,7 +342,7 @@ class ResourceSelector extends React.Component {
 	renderCarouselSlide() {
 		const { loading, resources } = this.props;
 		if (loading) {
-			return [ 1 ].map((index) => this.renderLoadingResources(index));
+			return [1].map((index) => this.renderLoadingResources(index));
 		}
 		if (resources) {
 			return chunk(resources, 8).map((resource, index) => this.renderResources(resource, index));
@@ -392,7 +391,7 @@ class ResourceSelector extends React.Component {
 									if (!isActiveLett) {
 										return (
 											<ButtonArrow isLeft>
-												<img src={require('../../images/arrow-right.png')} />
+												<img src={require('../../images/arrow-right-grey.png')} />
 											</ButtonArrow>
 										);
 									} else
@@ -407,7 +406,7 @@ class ResourceSelector extends React.Component {
 									if (!isActiveRight) {
 										return (
 											<ButtonArrow>
-												<img src={require('../../images/arrow-right.png')} />
+												<img src={require('../../images/arrow-right-grey.png')} />
 											</ButtonArrow>
 										);
 									} else return <ButtonSplash onClick={(ev) => this.onNextClick(ev, nextSlide)} />;

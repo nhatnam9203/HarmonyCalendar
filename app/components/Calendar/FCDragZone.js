@@ -9,10 +9,7 @@ import { formatPhone } from '../../utils/helper';
 import call from '../../images/call.png';
 import ButtonSplash from './ButtonSplash';
 import { store } from 'app';
-import {
-  disableCalendar,
-  getApppointmentById
-} from '../../containers/AppointmentPage/actions';
+import { disableCalendar, getApppointmentById } from '../../containers/AppointmentPage/actions';
 
 const DragZoneWrapper = styled.div`
 	height: calc(100vh - 8.8rem);
@@ -20,15 +17,20 @@ const DragZoneWrapper = styled.div`
 	@media (min-width: 1025px) {
 		height: calc(100vh - 10rem);
 	}
+	-webkit-user-select: none; 
+	-moz-user-select: none; 
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none;
 `;
 
 const EventWrapper = styled.div`
 	background: #f4f4f5;
 	border: 0.5px solid #ffffff;
 	color: #333333;
-	height: calc((100vh - 8.8rem - 55px)/4);
+	height: calc((100vh - 8.8rem - 55px)/3);
 	@media (min-width: 1025px) {
-		height: calc((100vh - 10rem - 60px)/4);
+		height: calc((100vh - 10rem - 60px)/3);
 	}
 	overflow: hidden;
 	position: relative;
@@ -106,7 +108,7 @@ class FCDragZone extends React.PureComponent {
 		super(props);
 		this.state = {
 			slideIndex: 0,
-			slidesToShow: 4,
+			slidesToShow: 3,
 			event: ''
 		};
 	}
@@ -152,19 +154,19 @@ class FCDragZone extends React.PureComponent {
 		this.setState({ event });
 		const { deleteWaitingAppointment } = this.props;
 		deleteWaitingAppointment(true);
-  }
-  
-  selectAppointment(appointment) {
-    store.dispatch(getApppointmentById({ appointment, event: null }));
-    store.dispatch(disableCalendar(true));
-  }
+	}
+
+	selectAppointment(appointment) {
+		store.dispatch(getApppointmentById({ appointment, event: null }));
+		store.dispatch(disableCalendar(true));
+	}
 
 	getActiveArrow() {
 		let isActiveLeft = false,
 			isActiveRight = false;
 		let { slideIndex } = this.state;
 		const { events } = this.props;
-		const totalSlide = events.length / 4;
+		const totalSlide = events.length / 3;
 
 		if (totalSlide <= 1) {
 			isActiveLeft = false;
@@ -198,7 +200,7 @@ class FCDragZone extends React.PureComponent {
 		const { events, StatusDeleteWaiting, deleteWaitingAppointment, deleteEventWaitingList } = this.props;
 		const { slideIndex, slidesToShow } = this.state;
 		const displayedEvents = events
-			.sort(function(a, b) {
+			.sort(function (a, b) {
 				var c = new Date(a.id);
 				var d = new Date(b.id);
 				return c - d;
@@ -214,7 +216,7 @@ class FCDragZone extends React.PureComponent {
 					{/* Prev Button  */}
 					{isActiveLeft && <ButtonSplash isTop onClick={() => this.prevSlide()} />}
 					{!isActiveLeft && (
-						<PrevButton onClick={() => {}}>
+						<PrevButton onClick={() => { }}>
 							<img src={require('../../images/down-arrow-2.png')} />
 						</PrevButton>
 					)}
@@ -223,8 +225,8 @@ class FCDragZone extends React.PureComponent {
 						{displayedEvents.map((event) => (
 							<EventWrapper
 								className="app-event"
-                key={event.id}
-                onClick={() => this.selectAppointment(event)}
+								key={event.id}
+								onClick={() => this.selectAppointment(event)}
 								data-event-information={JSON.stringify(event)}
 							>
 								<BtnClose>
@@ -237,15 +239,21 @@ class FCDragZone extends React.PureComponent {
 									/>
 								</BtnClose>
 
-								<div className="app-event__id-number2">{event.code}</div>
 								<div className="app-event__full-name waiting-event">{event.firstName}</div>
 								<div className="app-event__phone-number4">
-									<img className="icon-phone3" src={call} width="15" height="15" />
-									{` ${formatPhone(event.phoneNumber)}`}
+								{` ${formatPhone(event.phoneNumber).toString().replace("(+84)","").replace("+84-","").replace("+1-","").replace("(+1)","")}`}
 								</div>
 								{event.options.map((option, index) => (
-									<div className="app-event__option" key={index}>
+									<div className="app-event__option option_waiting" key={index}>
 										- {option.serviceName}
+									</div>
+								))}
+								{event.categories && event.categories.map((option) => (
+									<div
+										className="app-event__option option_waiting option_categories"
+										key={option.bookingCategoryId}
+									>
+										- {option.categoryName}
 									</div>
 								))}
 							</EventWrapper>
@@ -255,7 +263,7 @@ class FCDragZone extends React.PureComponent {
 					{/* Next Button */}
 					{isActiveRight && <ButtonSplash onClick={() => this.nextSlide()} />}
 					{!isActiveRight && (
-						<NextButton onClick={() => {}}>
+						<NextButton onClick={() => { }}>
 							<img src={require('../../images/down-arrow-2.png')} />
 						</NextButton>
 					)}

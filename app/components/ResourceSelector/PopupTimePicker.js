@@ -3,17 +3,17 @@ import OutsideClickHandler from 'react-outside-click-handler';
 import styled from 'styled-components';
 import Picker from 'react-mobile-picker';
 import moment from 'moment';
-import Popup from 'reactjs-popup';
 
-const Container = styled(Popup)`
-    padding : 0 !important;
-    border-radius: 5px !important;
+const PopupTimePK = styled.div`
+	position: absolute;
+	top: 2.8rem;
+	left: 0rem;
 	background-color: #ffffff;
+	border-radius: 5px;
 	z-index: 999999999999999;
 	width: 22rem;
 	height: 17rem;
-	box-shadow: 0 3px 9px rgba(0, 0, 0, 0.15);    
-	width: 22rem !important;
+	box-shadow: 0 3px 9px rgba(0, 0, 0, 0.15);
 `;
 
 const Header = styled.div`
@@ -66,8 +66,6 @@ const Button = styled.div`
 	},
 `;
 
-const minutesArr = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55'];
-
 export default class PopupTimePicker extends Component {
 	constructor(props) {
 		super(props);
@@ -78,65 +76,51 @@ export default class PopupTimePicker extends Component {
 				localization: 'AM'
 			},
 			optionGroups: {
-				hour: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'],
-				minutes: minutesArr,
-				localization: ['AM', 'PM']
+				hour: [ '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12' ],
+				minutes: [ '00', '15', '30', '45' ],
+				localization: [ 'AM', 'PM' ]
 			}
 		};
 	}
 
-
 	componentDidMount() {
-		const { fromTimeService } = this.props;
+		const { fromTime } = this.props;
 		this.setState({
 			valueGroups: {
-				hour: moment(fromTimeService).format('hh'),
-				minutes: moment(fromTimeService).minutes().toString(),
-				localization: moment(fromTimeService).format('A')
+				hour: moment(fromTime).format('hh'),
+				minutes: moment(fromTime).minutes().toString(),
+				localization: moment(fromTime).format('A')
 			}
 		});
 	}
 
-	availableTime(){
-		const { services, indexFromTime } = this.props;
-		const activeService = {...services[indexFromTime]};
-		console.log({activeService})
-	}
-
 	componentWillReceiveProps(nextProps) {
-		const { fromTimeService } = nextProps;
+		const { fromTime } = nextProps;
 		this.setState({
 			valueGroups: {
-				hour: moment(fromTimeService).format('hh'),
-				minutes: moment(fromTimeService).minutes().toString(),
-				localization: moment(fromTimeService).format('A')
-			},
-
+				hour: moment(fromTime).format('hh'),
+				minutes: moment(fromTime).minutes().toString(),
+				localization: moment(fromTime).format('A')
+			}
 		});
 	}
 
 	handleChange = (name, value) => {
-		const { optionGroups } = this.state;
 		this.setState(({ valueGroups }) => ({
 			valueGroups: {
 				...valueGroups,
 				[name]: value
-			},
-			// optionGroups: {
-			// 	hour: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'],
-			// 	minutes: ['00', '05', '10'],
-			// 	localization: ['AM', 'PM']
-			// }
+			}
 		}));
 	};
 
 	done() {
 		const { valueGroups } = this.state;
 		const { hour, minutes, localization } = valueGroups;
-		const { currentDay, indexFromTime } = this.props;
+		const { currentDay } = this.props;
 
 		const time = `${moment(currentDay).format('MM/DD/YYYY')} ${hour}:${minutes} ${localization}`;
-		this.props.doneTimePicker(time, indexFromTime);
+		this.props.doneTimePicker(time);
 	}
 
 	cancel() {
@@ -144,11 +128,11 @@ export default class PopupTimePicker extends Component {
 	}
 
 	render() {
-		const { style, isPopupTimePicker } = this.props;
+		const { fromTime , style } = this.props;
 		const { optionGroups, valueGroups } = this.state;
 		return (
 			<OutsideClickHandler onOutsideClick={() => this.cancel()}>
-				<Container style={style} closeOnDocumentClick={false} open={isPopupTimePicker} position="right center">
+				<PopupTimePK style={style}>
 					<Header>Select Time</Header>
 					<Body>
 						<Picker
@@ -165,7 +149,7 @@ export default class PopupTimePicker extends Component {
 							<span>Done</span>
 						</Button>
 					</Footer>
-				</Container>
+				</PopupTimePK>
 			</OutsideClickHandler>
 		);
 	}

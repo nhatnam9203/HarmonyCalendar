@@ -33,7 +33,7 @@ const NormalDay = styled.div`
     height : 4.4rem ;
     width : calc((100vw - 5.05rem)/10);
     padding-top : 0.6rem;
-    font-size : 0.8rem;
+    font-size : 0.9rem;
     line-height : 1.5;
     letter-spacing : 0.3;
     font-weight : 500;

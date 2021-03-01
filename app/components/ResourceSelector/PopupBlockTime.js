@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Popup from 'reactjs-popup';
 import styled from 'styled-components';
-import { PopupTimePicker } from '../DetailAppointment/widget';
+import PopupTimePicker from './PopupTimePicker'
 import ConfirmDelete from './ConfirmDelete';
 import moment from 'moment';
 
@@ -155,10 +155,11 @@ const initialState = {
 	isEnd: false,
 	start: '02:00 PM',
 	end: '02:00 PM',
+	blockStaffId : '',
 	isPopupSelectTime: false,
 	blockTimeEdit: null,
 	isPopupDelete: false,
-	blockDelete: null
+	blockDelete: null,
 };
 
 class PopupBlockTime extends Component {
@@ -193,10 +194,10 @@ class PopupBlockTime extends Component {
 	}
 
 	editBlockTime() {
-		const { blockTimeEdit, start, end, note } = this.state;
+		const { blockTimeEdit, start, end, note , blockStaffId} = this.state;
 		if (blockTimeEdit) {
 			const noteSubmit = note.replace(/(\r\n|\n|\r)/gm, '<br>');
-			const data = { start, end, note: noteSubmit, id: blockTimeEdit.blockTimeId };
+			const data = { start, end, note: noteSubmit, id: blockTimeEdit.blockTimeId , staffId : blockStaffId};
 			this.props.editBlockTime(data);
 			this.closeModal();
 		}
@@ -213,7 +214,8 @@ class PopupBlockTime extends Component {
 				blockTimeEdit: blockTime,
 				note: blockTime.note.replace(/<br>/gm, '\n'),
 				start: blockTime.blockTimeStart,
-				end: blockTime.blockTimeEnd
+				end: blockTime.blockTimeEnd,
+				blockStaffId : blockTime.staffId
 			});
 		}
 	}
@@ -240,7 +242,7 @@ class PopupBlockTime extends Component {
 		} else {
 			if (!blockTimeEdit) {
 				const data = { staff, start, end, note: noteSubmit };
-				this.props.SubmitEditBlockTime(data);
+				this.props.SubmitEditBlockTime(data); // add block time
 				this.closeModal();
 			} else {
 				this.editBlockTime();
@@ -285,8 +287,8 @@ class PopupBlockTime extends Component {
 
 	renderBlockTimeList() {
 		const { blockTime } = this.props.staff;
-		return blockTime.filter((b) => b.isDisabled === 0).map((obj) => {
-			const notes_array = obj.note.split('<br>');
+		return blockTime.filter((b) => b.isDisabled === 0 && b.appointmentId === 0).map((obj) => {
+			let notes_array = obj.note.split('<br>');
 			return (
 				<div
 					onClick={() => this.openBlockTime(obj)}

@@ -373,13 +373,14 @@ export function appointmentAssigningError(error) {
  * @param  {object} newEndTime The url options
  * @return {object} An action object with a type of MOVE_APPOINTMENT
  */
-export function moveAppointment(appointmentId, newPositionIndex, newTime, newEndTime) {
+export function moveAppointment(appointmentId, newPositionIndex, newTime, newEndTime , appointment) {
 	return {
 		type: MOVE_APPOINTMENT,
 		appointmentId,
 		newPositionIndex,
 		newTime,
-		newEndTime
+		newEndTime,
+		appointment
 	};
 }
 

@@ -2,146 +2,128 @@ import React, { Component } from 'react'
 
 import styled from 'styled-components';
 import NumberFormat from 'react-number-format';
-import PopupStaff from './PopupStaff';
+import ExtraItem from './ExtraItem';
+import ExtraItemPaid from './ExtraItemPaid';
+import ServiceNormal from './ServiceNormal';
+import ServicePaid from './ServicePaid';
 import { isEmpty } from 'lodash';
 
-const ButtonService = styled.button`
-	background: ${(props) => props.backgroundColor};
-	color: #ffffff;
-	padding: 5px 15px;
-	margin: 0 10px;
-	width: 47px;
-	border-radius: 3px;
-	cursor: ${(props) => (props.active ? 'pointer' : 'initial')};
+const Row = styled.div`
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
 `;
-
-const ImgButton = styled.img`
-	width : 12px;
-	height : 6px; 
-	margin-left : 8px; 
-`;
-
 
 export default class Service extends Component {
 
-    getStyleService(appointment, service, index) {
-        let backgroundColor = '#dddddd';
-        if (appointment.status !== 'PAID' && service.duration > 5) backgroundColor = '#0071c5';
-        return backgroundColor;
-    }
-
-    getStyleService2(appointment, service, index) {
-        let backgroundColor = '#dddddd';
-        if (appointment.status !== 'PAID') backgroundColor = '#0071c5';
-        return backgroundColor;
-    }
-
     render() {
-        const { appointment, staffList, prices, isPopupStaff, indexPopupStaff, service, index } = this.props;
+        const {
+            appointment,
+            staffList,
+            prices,
+            isPopupStaff,
+            indexPopupStaff,
+            service,
+            index,
+            isEditPaidAppointment,
+            openPopupTimePicker,
+            extras,
+            togglePopupStaff,
+            closePopupStaff,
+            subtractService,
+            addService,
+            openPopupPrice,
+            openPopupTip
+        } = this.props;
 
         const staff = staffList.find((s) => parseInt(s.id) === parseInt(service.staffId));
-
         let price = prices[index] ? parseFloat(prices[index].replace(/,/g, '')).toFixed(2) : "0.00";
         price = price.toString().replace(/\d(?=(\d{3})+\.)/g, '$&,');
-
         const duration =
             service.duration.toString().length === 1 ? '0' + service.duration.toString() : service.duration;
-
         const title = staff ? staff.title.toString().length > 13 ?
             staff.title.toString().slice(0, 10) + "..." :
             staff.title : '';
+        const fromTime = service.fromTime && service.fromTime !== '0001-01-01T00:00:00' ? service.fromTime : appointment.start;
 
         if (appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND') {
             return (
-                <tr key={index}>
-                    <td style={{ borderRight: 0 }}>
-                        <div onClick={() => this.props.togglePopupStaff('', index)} style={style.staffService}>
-                            <p style={style.staffNameColumn}>{title}</p>
-                            <ImgButton src={require('../../../images/top_arrow@3x.png')} />
-                            {isPopupStaff &&
-                                index === indexPopupStaff && (
-                                    <PopupStaff
-                                        togglePopupStaff={(staff) => {
-                                            this.props.togglePopupStaff(staff, index)
-                                        }}
-                                        staffList={staffList.filter((s) => s.id !== 0)}
-                                        closePopupStaff={() => this.props.closePopupStaff()}
-                                    />
-                                )}
-                        </div>
-                    </td>
-
-                    <td style={{ borderLeft: 0 }}>
-                        <div style={style.serviceColumn}>
-                            <div style={style.serviceName}>{service.serviceName}</div>
-                        </div>
-                    </td>
-
-                    {appointment.status !== 'PAID' && (
-                        <td style={{ textAlign: 'center' }}>
-                            <ButtonService
-                                backgroundColor={this.getStyleService(appointment, service, index)}
-                                disabled={appointment.status === 'PAID' || service.duration <= 5}
-                                onClick={() => this.props.subtractService(index)}
-                            >
-                                -5&#39;
-							</ButtonService>
-                            {duration}
-                            <ButtonService
-                                backgroundColor={this.getStyleService2(appointment, service, index)}
-                                disabled={appointment.status === 'PAID'}
-                                onClick={() => this.props.addService(index)}
-                            >
-                                +5&#39;
-							</ButtonService>
-                        </td>
-                    )}
-                    <td>
-                        <div onClick={() => this.props.openPopupPrice(price, index, 'service')} style={style.row}>
-                            <div style={style.priceS}>{price}</div>
-                            <img
-                                src={require('../../../images/edit.png')}
-                                style={{
-                                    width: 16,
-                                    height: 16
-                                }}
-                            />
-                        </div>
-                    </td>
-                </tr>
+                <React.Fragment key={index}>
+                    <tr>
+                        <ServiceNormal
+                            service={service}
+                            openPopupTimePicker={openPopupTimePicker}
+                            fromTime={fromTime}
+                            index={index}
+                            togglePopupStaff={togglePopupStaff}
+                            title={title}
+                            isPopupStaff={isPopupStaff}
+                            indexPopupStaff={indexPopupStaff}
+                            staffList={staffList}
+                            closePopupStaff={closePopupStaff}
+                            subtractService={subtractService}
+                            addService={addService}
+                            duration={duration}
+                            appointment={appointment}
+                            price={price}
+                            openPopupPrice={openPopupPrice}
+                        />
+                    </tr>
+                    {
+                        extras.map((extra, i) => {
+                            return (
+                                <ExtraItem
+                                    key={'extra' + extra.bookingExtraId}
+                                    extra={extra}
+                                    appointment={appointment}
+                                    index={i}
+                                    openPopupPrice={this.props.openPopupPrice}
+                                    subtractExtra={(index) => this.props.subtractExtra(index)}
+                                    addExtra={(index) => this.props.addExtra(index)}
+                                    openPopupPrice={(price, index, key) => this.props.openPopupPriceExtra(price, index, key)}
+                                />
+                            )
+                        })
+                    }
+                </React.Fragment>
             );
         }
         else {
             if (service.staff) {
                 let staffName = isEmpty(title) ? service.staff.displayName : title;
                 return (
-                    <tr key={index}>
-                        <td
-                            onClick={() => {
-                                if (appointment.status === 'PAID') {
-                                    this.props.togglePopupEditTip(staff,service,index)
-                                }
-                            }}
-                            style={{ borderRight: 0, position: 'relative' }}
-                        >
-                            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-
-                                <p style={{ marginLeft: 8 , width : '100px'  }}>{staffName}</p>
-                                {
-                                    appointment.status === 'PAID'
-                                    &&
-                                    <ImgButton src={require('../../../images/top_arrow@3x.png')} />
-                                }
-                            </div>
-                        </td>
-                        <td style={{ borderLeft: 0 }}>
-                            <div style={style.serviceName}>{service.serviceName}</div>
-                        </td>
-                        <td style={{ textAlign: 'center' }}>{service.tipAmount}</td>
-                        <td>
-                            <div style={{ textAlign: 'center' }}>{price}</div>
-                        </td>
-                    </tr>
+                    <React.Fragment key={index}>
+                        <ServicePaid
+                            service={service}
+                            appointment={appointment}
+                            isEditPaidAppointment={isEditPaidAppointment}
+                            togglePopupStaff={togglePopupStaff}
+                            staffName={staffName}
+                            isPopupStaff={isPopupStaff}
+                            index={index}
+                            indexPopupStaff={indexPopupStaff}
+                            staffList={staffList}
+                            closePopupStaff={closePopupStaff}
+                            openPopupTip={openPopupTip}
+                            price={price}
+                        />
+                        {
+                            extras.map((extra, i) => {
+                                return (
+                                    <ExtraItemPaid
+                                        key={'extraPaid' + extra.bookingExtraId}
+                                        extra={extra}
+                                        appointment={appointment}
+                                        index={i}
+                                        openPopupPrice={this.props.openPopupPrice}
+                                        subtractExtra={(index) => this.props.subtractExtra(index)}
+                                        addExtra={(index) => this.props.addExtra(index)}
+                                        openPopupPrice={(price, index, key) => this.props.openPopupPriceExtra(price, index, key)}
+                                    />
+                                )
+                            })
+                        }
+                    </React.Fragment>
                 );
             } else {
                 return (
@@ -150,17 +132,22 @@ export default class Service extends Component {
                         <td>You're in Offline</td>
                         <td>You're in Offline</td>
                         <td>
-                            <div style={style.row}>
+                            <Row>
                                 <NumberFormat
                                     value={price}
                                     onValueChange={(value) => this.props.onChangePrice(value, index)}
                                     thousandSeparator={false}
                                     disabled={appointment.status === 'PAID'}
-                                    style={style.price}
+                                    style={{
+                                        fontWeight: '700',
+                                        color: '#1366AF',
+                                        width: 60,
+                                        textAlign: 'center'
+                                    }}
                                     type="tel"
                                 />
                                 <img src={require('../../../images/edit.png')} style={{ width: 16, height: 16 }} />
-                            </div>
+                            </Row>
                         </td>
                     </tr>
                 );
@@ -168,54 +155,3 @@ export default class Service extends Component {
         }
     }
 }
-
-const style = {
-    price: {
-        fontWeight: '700',
-        color: '#1366AF',
-        width: 60,
-        textAlign: 'center'
-    },
-
-    row: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'center'
-    },
-    staffService: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        position: 'relative',
-        backgroundColor: '#EEEEEE',
-        borderRadius: 5,
-        maxWidth: 120,
-        whiteSpace: 'nowrap',
-        textOverflow: 'ellipsis',
-        height: 40,
-        paddingRight: 10
-    },
-    serviceColumn: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center'
-    },
-    staffNameColumn: {
-        marginLeft: 8,
-        width: 50,
-        fontSize: 15,
-    },
-    serviceName: {
-        width: 150,
-        whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis'
-    },
-    priceS: {
-        color: '#1173C3',
-        fontWeight: 'bold',
-        marginRight: 5,
-        fontFamily: 'sans-serif'
-    }
-};

@@ -6,9 +6,10 @@ import moment from 'moment';
 import DayPicker from 'react-day-picker';
 import OutsideClickHandler from 'react-outside-click-handler';
 import { formatPhone } from '../../utils/helper';
-import { PopupTimePicker, PopupEditTip } from './widget';
+import { role } from '../../../app-constants';
+import { PopupTimePicker } from './widget';
 import NumberFormat from 'react-number-format';
-import { FooterAppointment, PopupPrice, Product, Extra, Service } from './widget';
+import { FooterAppointment, PopupPrice, Product, Service, PopupTip } from './widget';
 import ReactLoading from 'react-loading';
 
 const AppPopup = styled(Popup)`
@@ -120,34 +121,65 @@ AppointmentWrapper.Body = styled(AppPopupWrapper.Body)`
 	`;
 
 AppointmentWrapper.Footer = styled(AppPopupWrapper.Footer)`
-	//
+	width : 100%;
+	display : flex;
+	justify-content : center;
+	align-items : center;
 	`;
 
 const UserInformation = styled.div`
 	display: flex;
 	flex-direction: row;
-	justify-content: space-between;
 	align-items: center;
-	padding: 0.5rem;
+	justify-content: space-between;
 	margin-bottom: 0.5rem;
-	& > div {
-		width: 50%;
-		display: flex;
-		justify-content: space-between;
-	}
+	padding-bottom: 0.8rem;
+	border-bottom: 1px solid #eeeeee;
 	& > div:nth-child(1) {
-		width: 40%;
-	}
-	& > div:nth-child(2) {
-		width: 50%;
 		display: flex;
 		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-	}
-	& > div > span:nth-child(1) {
-		color: #333;
-		font-weight: 600;
+		& > div:nth-child(1) {
+			background-color: #e5e5e5;
+			width: 3.5rem;
+			height: 3.5rem;
+			border-radius: 50%;
+			display: flex;
+			padding: 0px !important;
+			justify-content: center;
+			align-items: center;
+			& > span:nth-child(1) {
+				color: #404040;
+				font-weight: 600;
+				font-size: 1.5rem;
+			}
+		}
+		& > div:nth-child(2) {
+			margin-left: 0.5rem;
+			& > div:nth-child(1) {
+				font-weight: 600;
+				font-size: 1.1rem;
+				color: #0764b0;
+			}
+			& > div:nth-child(2) {
+				font-size: 0.9rem;
+				width: 9rem;
+				color: #585858;
+				margin-top: 0.3rem;
+			}
+		}
+		& > div:nth-child(3) {
+			font-weight: 500;
+			font-size: 1rem;
+			color: #404040;
+			margin-left: 1rem;
+			display: flex;
+			flex-direction: row;
+			& > div:nth-child(2) {
+				margin-left: 1rem;
+				color: #585858;
+				width: 25rem;
+			}
+		}
 	}
 `;
 
@@ -162,8 +194,16 @@ const NoteWrapper = styled.div`
 	border: 1px solid #dddddd;
 	background: #eeeeee;
 	padding: 0.5rem;
-	overflow-x: scroll;
-	height: 10rem;
+	min-height: 10rem;
+	max-height : 14.5rem;
+`;
+
+const TextNoteAppointment = styled.div`
+	margin-top : 0.5rem;
+	margin-bottom : 0.5rem !important;
+	color : #585858;
+	font-size : 0.9rem;
+	font-weight : 600;
 `;
 
 NoteWrapper.Form = styled.form`
@@ -194,12 +234,23 @@ NoteWrapper.Form = styled.form`
 const NoteInformation = styled.div`
 	display: flex;
 	padding: 0.5rem;
-	& > div:nth-child(1),
-	& > div:nth-child(2) {
-		width: 20%;
+	& > div:nth-child(1) {
+		& > div:nth-child(1) {
+			color: #585858;
+		}
 	}
-	& > div:last-child {
-		width: 60%;
+	& > div:nth-child(2) {
+		margin-left: 3rem;
+		& > div:nth-child(1) {
+			color: #585858;
+			font-weight: 600;
+		}
+	}
+	& > div:nth-child(3) {
+		margin-left: 3rem;
+		& > div:nth-child(1) {
+			color: #585858;
+		}
 	}
 `;
 
@@ -347,7 +398,7 @@ CalendarPopup.Heading = styled.div`
 
 const LogoVip = styled.div`
 	border-radius: 100px;
-	padding: 6.7px 15px;
+	padding: 6.7px 22px;
 	background-color: #22da27;
 	align-items: center !important;
 	justify-content: center !important;
@@ -384,19 +435,10 @@ const ButtonDayChange = styled.div`
 	background-color: #eeeeee;
 	border-radius: 5px;
 	padding: 10px;
-	width: 130px;
+	width: 150px;
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-`;
-
-const ButtonTime = styled.div`
-	background-color: #eeeeee;
-	border-radius: 5px;
-	padding: 10px;
-	text-align: center;
-	width: 120px;
-	position: relative;
 `;
 
 const ImageEnter = styled.img`
@@ -473,30 +515,50 @@ CompanionWrapper.ColumnName = styled.div`
 	align-items: center;
 `;
 
+const IconCalendar = styled.img`
+	width: 22px;
+	height: 22px;
+	margin-right: 8px;
+`;
+
+const ContainerNotes = styled.div`
+	min-height : 3.5rem;
+	max-height : 7.5rem;
+	width: 100%;
+	overflow-y : scroll;
+`;
+
 class Appointment extends React.Component {
-	renderNote = (note, index) => (
-		<NoteInformation key={index}>
-			<div>
-				<strong>{moment(note.createDate).format('MM/DD/YYYY')}</strong>
-			</div>
-			<div>
-				<i>{note.note}</i>
-			</div>
-		</NoteInformation>
-	);
+	renderNote = (note, index) => {
+		return (
+			<NoteInformation key={index}>
+				<div>
+					<div>{moment(note.createDate).format('MM/DD/YYYY, hh:mm A')}</div>
+				</div>
+				<div style={{ width: 130 }}>
+					<div>{note.staffName}</div>
+				</div>
+				<div>
+					<div>{note.note}</div>
+				</div>
+			</NoteInformation>
+		);
+	};
 
 	renderNotes() {
 		const { notes } = this.state;
 		return (
 			<NoteWrapper>
+				<TextNoteAppointment>Appointment note:</TextNoteAppointment>
+				<ContainerNotes id='containerNotes'>
+					{notes.map(this.renderNote)}
+				</ContainerNotes>
 				<NoteWrapper.Form onSubmit={(e) => this.addNote(e)}>
 					<input value={this.state.noteValue} onChange={(e) => this.handleChange(e)} />
 					<button onClick={() => this.addNote()} type="button">
-						{/* <MdSubdirectoryArrowLeft style={{ width: 33, height: 33 }} /> */}
 						<ImageEnter src={require('../../images/enter@3x.png')} />
 					</button>
 				</NoteWrapper.Form>
-				{notes.map(this.renderNote)}
 			</NoteWrapper>
 		);
 	}
@@ -504,7 +566,7 @@ class Appointment extends React.Component {
 	/********************************* RENDER BUTTON BELONG TO STATUS *********************************/
 	renderNextStatusButton() {
 		const { appointment } = this.props;
-		if (this.conditionButtonChange()) {
+		if (this.conditionButtonChange() && appointment.status !== 'PAID') {
 			if (appointment.status === 'ASSIGNED')
 				return (
 					<Button onClick={() => this.nextStatus()} primary="true">
@@ -523,13 +585,38 @@ class Appointment extends React.Component {
 						Check-Out
 					</Button>
 				);
-			if (appointment.status === 'PAID' && appointment.memberId !== 0)
-				return (
-					<Button onClick={() => this.closeModal()} >
-						Edit
-					</Button>
-				);
 		} else {
+			if (appointment.status === 'PAID' && appointment.memberId !== 0) {
+				const { isEditPaidAppointment } = this.state;
+				if (role === 'Admin') {
+					if (isEditPaidAppointment) {
+						return (
+							<Button
+								style={{
+									// marginLeft : '19.5rem',
+									fontWeight: '700'
+								}}
+								onClick={() => this.updateStaffAppointmentPaid()}
+								primary="true"
+							>
+								Submit
+							</Button>
+						);
+					} else {
+						return (
+							<Button
+								style={{
+									// marginLeft : '19.5rem'
+								}}
+								onClick={() => this.toggleEditPaidAppointment()}
+								primary="true"
+							>
+								Edit
+							</Button>
+						);
+					}
+				} else return null;
+			}
 			if (appointment.status !== 'WAITING') {
 				return (
 					<ButtonChange onClick={() => this.ChangeAppointmentTime()} primary="true">
@@ -538,24 +625,6 @@ class Appointment extends React.Component {
 				);
 			}
 		}
-	}
-	/********************************* RENDER ROW CHANGE TIME *********************************/
-	renderChangeAppointTime() {
-		return (
-			<WrapperTimeChange>
-				<SelectDateWrapper>
-					<SelectDateWrapper.SelectDate>Date</SelectDateWrapper.SelectDate>
-					{this.renderSelectDay()}
-				</SelectDateWrapper>
-
-				<SelectDateWrapper>
-					<SelectDateWrapper.SelectDate>
-						<div>Time</div>
-					</SelectDateWrapper.SelectDate>
-					{this.renderTimeSelect()}
-				</SelectDateWrapper>
-			</WrapperTimeChange>
-		);
 	}
 
 	/********************************* RENDER GIFT CARD *********************************/
@@ -579,92 +648,95 @@ class Appointment extends React.Component {
 	/********************************* RENDER DAY PICKER  *********************************/
 	renderSelectDay() {
 		const { dayChange, isPopupDay } = this.state;
-		return (
-			<div style={{ position: 'relative', paddingTop: 3 }}>
-				<ButtonDayChange onClick={() => this.setState({ isPopupDay: !isPopupDay })}>
-					{moment(dayChange).format('MM/DD/YYYY')}
-					<ImgButton src={require('../../images/top_arrow@3x.png')} />
-				</ButtonDayChange>
-
-				{isPopupDay && (
-					<OutsideClickHandler onOutsideClick={() => this.setState({ isPopupDay: !isPopupDay })}>
-						<CalendarPopup>
-							<CalendarPopup.Heading>
-								Select Day
-								<BtnCloseSelectDay onClick={() => this.setState({ isPopupDay: !isPopupDay })}>
-									{<img src={require('../../images/close_white.png')} />}
-								</BtnCloseSelectDay>
-							</CalendarPopup.Heading>
-							<CalendarPopup.Body>
-								<DayPicker
-									firstDayOfWeek={1}
-									selectedDays={moment(dayChange).toDate()}
-									onDayClick={(day) => {
-										this.setState({ dayChange: day });
-									}}
-								/>
-							</CalendarPopup.Body>
-						</CalendarPopup>
-					</OutsideClickHandler>
-				)}
-			</div>
-		);
-	}
-
-	/********************************* RENDER SELECT TIME *********************************/
-	renderTimeSelect() {
-		const { fromTime, isPopupTimePicker } = this.state;
-		return (
-			<div style={{ paddingTop: 3, height: 42 }}>
-				<div style={{ position: 'relative' }}>
-					<ButtonTime onClick={() => this.openPopupTimePicker()}>
-						{moment(fromTime).format('hh:mm A').toString()}
+		const { appointment } = this.props;
+		if (appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND') {
+			return (
+				<div style={{ position: 'relative', paddingTop: 3, marginBottom: 15 }}>
+					<ButtonDayChange
+						onClick={() => {
+							this.setState({ isPopupDay: !isPopupDay });
+						}}
+					>
+						<IconCalendar src={require('../../images/iconCalendarGrey.png')} />
+						{moment(dayChange).format('MM/DD/YYYY')}
 						<ImgButton src={require('../../images/top_arrow@3x.png')} />
-					</ButtonTime>
+					</ButtonDayChange>
 
-					{isPopupTimePicker && (
-						<PopupTimePicker
-							cancelTimePicker={() => this.cancelTimePicker()}
-							doneTimePicker={(time) => this.doneTimePicker(time)}
-							currentDay={this.props.currentDay}
-							fromTime={fromTime}
-						/>
+					{isPopupDay && (
+						<OutsideClickHandler onOutsideClick={() => this.setState({ isPopupDay: !isPopupDay })}>
+							<CalendarPopup>
+								<CalendarPopup.Heading>
+									Select Day
+									<BtnCloseSelectDay onClick={() => this.setState({ isPopupDay: !isPopupDay })}>
+										{<img src={require('../../images/close_white.png')} />}
+									</BtnCloseSelectDay>
+								</CalendarPopup.Heading>
+								<CalendarPopup.Body>
+									<DayPicker
+										firstDayOfWeek={1}
+										selectedDays={moment(dayChange).toDate()}
+										onDayClick={(day) => {
+											this.setState({ dayChange: day });
+										}}
+									/>
+								</CalendarPopup.Body>
+							</CalendarPopup>
+						</OutsideClickHandler>
 					)}
 				</div>
-			</div>
-		);
+			);
+		}
+	}
+
+	renderTileColumn() {
+		const { appointment } = this.props;
+		if (appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND') {
+			return (
+				<tr>
+					<th width="25%" style={{ borderRight: 0 }}>
+						{' '}
+						Services
+					</th>
+					<th width="25%">Staff</th>
+					{(appointment.status === 'PAID' ||
+						appointment.status === 'VOID' ||
+						appointment.status === 'REFUND') && (
+							<th width="25%" style={{ textAlign: 'center' }}>
+								Tip ($)
+							</th>
+						)}
+					<th style={{ textAlign: 'center' }}>Price ($)</th>
+				</tr>
+			);
+		} else {
+			return (
+				<tr>
+					<th width="20%" style={{ borderRight: 0 }}>
+						{' '}
+						Servives
+					</th>
+					<th width="20%">Start time</th>
+					<th width="20%" style={{ borderLeft: 0 }}>
+						Staff
+					</th>
+					<th width="20%" style={{ borderLeft: 0, textAlign: 'center' }}>
+						Duration (min)
+					</th>
+					<th style={{ textAlign: 'center' }}>Price ($)</th>
+				</tr>
+			);
+		}
 	}
 
 	/********************************* RENDER SERVICES *********************************/
 	renderServices() {
 		const { services } = this.state;
-		const { prices, isPopupStaff, indexPopupStaff } = this.state;
+		const { prices, isPopupStaff, indexPopupStaff, extras } = this.state;
 		const { appointment, staffList } = this.props;
 		if (services.length > 0) {
 			return (
 				<table>
-					<thead>
-						<tr>
-							<th width="25%" style={{ borderRight: 0 }}>
-								{' '}
-								Staff
-							</th>
-							<th width="25%" style={{ borderLeft: 0 }}>
-								Services
-							</th>
-							{appointment.status !== 'PAID' && (
-								<th width="25%" style={{ textAlign: 'center' }}>
-									Duration (min)
-								</th>
-							)}
-							{appointment.status === 'PAID' && (
-								<th width="25%" style={{ textAlign: 'center' }}>
-									Tip ($)
-								</th>
-							)}
-							<th style={{ textAlign: 'center' }}>Price ($)</th>
-						</tr>
-					</thead>
+					<thead>{this.renderTileColumn()}</thead>
 					<tbody>
 						{services.map((s, i) => (
 							<Service
@@ -682,8 +754,14 @@ class Appointment extends React.Component {
 								addService={(index) => this.addService(index)}
 								openPopupPrice={(price, index, key) => this.openPopupPrice(price, index, key)}
 								onChangePrice={(value, index) => this.onChangePrice(value, index)}
-								togglePopupEditTip={(staff, service, index) =>
-									this.openPopupEditTip(staff, service, index)}
+								isEditPaidAppointment={this.state.isEditPaidAppointment}
+								openPopupTip={(price, index) => this.openPopupTip(price, index)}
+								openPopupTimePicker={(indexFromTime, fromTimeService) =>
+									this.openPopupTimePicker(indexFromTime, fromTimeService)}
+								extras={extras.filter((obj) => obj.bookingServiceId === s.bookingServiceId)}
+								subtractExtra={(extra) => this.subtractExtra(extra)}
+								addExtra={(extra) => this.addExtra(extra)}
+								openPopupPriceExtra={(price, index, key) => this.openPopupPrice(price, index, key)}
 							/>
 						))}
 					</tbody>
@@ -696,13 +774,28 @@ class Appointment extends React.Component {
 	renderProducts() {
 		const { products } = this.state;
 		const { appointment } = this.props;
+		const { status } = appointment;
 		if (products.length > 0 || (appointment.giftCards && appointment.giftCards.length > 0)) {
 			return (
 				<table>
 					<thead>
 						<tr>
-							<th style={{ width: '50%' }}>Selected Products</th>
-							<th style={{ width: '25%', textAlign: 'center' }}>Quantity</th>
+							<th
+								style={{
+									width: status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' ? '63%' : '50%'
+								}}
+							>
+								Selected Products
+							</th>
+							<th
+								style={{
+									width:
+										status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' ? '20%' : '25%',
+									textAlign: 'center'
+								}}
+							>
+								Quantity
+							</th>
 							<th style={{ textAlign: 'center' }}>Price ($)</th>
 						</tr>
 					</thead>
@@ -723,41 +816,6 @@ class Appointment extends React.Component {
 			);
 		}
 	}
-
-	/********************************* RENDER EXTRAS *********************************/
-	renderExtras() {
-		const { extras } = this.state;
-		const { appointment } = this.props;
-		if (extras.length > 0) {
-			return (
-				<table>
-					<thead>
-						<tr>
-							<th style={{ width: '50%' }}>Selected Extras</th>
-							<th style={{ width: '25%', textAlign: 'center' }}>Duration (min)</th>
-							<th style={{ textAlign: 'center' }}>Price ($)</th>
-						</tr>
-					</thead>
-
-					<tbody>
-						{extras.map((ex, i) => (
-							<Extra
-								key={'extra' + i}
-								extra={ex}
-								index={i}
-								appointment={appointment}
-								pricesExtras={this.state.pricesExtras}
-								subtractExtra={(index) => this.subtractExtra(index)}
-								addExtra={(index) => this.addExtra(index)}
-								openPopupPrice={(price, index, key) => this.openPopupPrice(price, index, key)}
-							/>
-						))}
-					</tbody>
-				</table>
-			);
-		}
-	}
-
 	/********************************* RENDER HEADER APPOINTMENT *********************************/
 	renderHeader() {
 		const { appointment } = this.props;
@@ -765,140 +823,230 @@ class Appointment extends React.Component {
 			case 'ASSIGNED':
 				return (
 					<AppointmentWrapper.Header color="#585858" backgroundColor={'#ffe559'}>
-						{appointment.code} Unconfirmed Appointment
+						<div
+							style={{
+								position: 'absolute',
+								left: 15,
+								fontSize: 18,
+								marginTop: 4
+							}}
+						>
+							{appointment.code}
+						</div>
+						Unconfirmed Appointment
 					</AppointmentWrapper.Header>
 				);
 			case 'CONFIRMED':
 				return (
 					<AppointmentWrapper.Header color="#585858" backgroundColor={'#c2f4ff'}>
-						{appointment.code} Confirmed Appointment
+						<div
+							style={{
+								position: 'absolute',
+								left: 15,
+								fontSize: 18,
+								marginTop: 4
+							}}
+						>
+							{appointment.code}
+						</div>
+						Confirmed Appointment
 					</AppointmentWrapper.Header>
 				);
 
 			case 'CHECKED_IN':
 				return (
 					<AppointmentWrapper.Header color={'white'} backgroundColor={'#28AAE9'}>
-						{appointment.code} Check-In Appointment
+						<div
+							style={{
+								position: 'absolute',
+								left: 15,
+								fontSize: 18,
+								marginTop: 4
+							}}
+						>
+							{appointment.code}
+						</div>
+						Check-In Appointment
 					</AppointmentWrapper.Header>
 				);
 
 			case 'PAID':
 				return (
 					<AppointmentWrapper.Header color={'white'} backgroundColor={'#50CF25'}>
-						{appointment.code} Paid Appointment
+						<div
+							style={{
+								position: 'absolute',
+								left: 15,
+								fontSize: 18,
+								marginTop: 4
+							}}
+						>
+							{appointment.code}
+						</div>
+						Paid Appointment
 					</AppointmentWrapper.Header>
 				);
 
 			case 'VOID':
 				return (
 					<AppointmentWrapper.Header color={'white'} backgroundColor={'#FD594F'}>
-						{appointment.code} Void Appointment
+						<div
+							style={{
+								position: 'absolute',
+								left: 15,
+								fontSize: 18,
+								marginTop: 4
+							}}
+						>
+							{appointment.code}
+						</div>
+						Void Appointment
 					</AppointmentWrapper.Header>
 				);
 
 			case 'REFUND':
 				return (
 					<AppointmentWrapper.Header color={'white'} backgroundColor={'#FD594F'}>
-						{appointment.code} Refund Appointment
+						<div
+							style={{
+								position: 'absolute',
+								left: 15,
+								fontSize: 18,
+								marginTop: 4
+							}}
+						>
+							{appointment.code}
+						</div>
+						Refund Appointment
 					</AppointmentWrapper.Header>
 				);
 
 			case 'WAITING':
 				return (
 					<AppointmentWrapper.Header color={'#585858'} backgroundColor={'#f4f4f5'}>
-						{appointment.code} Waiting Appointment
+						<div
+							style={{
+								position: 'absolute',
+								left: 15,
+								fontSize: 18,
+								marginTop: 4
+							}}
+						>
+							{appointment.code}
+						</div>
+						Waiting Appointment
 					</AppointmentWrapper.Header>
 				);
 
 			default:
 				return (
 					<AppointmentWrapper.Header backgroundColor="red">
-						{appointment.code} Appointment
+						<div
+							style={{
+								position: 'absolute',
+								left: 15,
+								fontSize: 12
+							}}
+						>
+							{appointment.code}
+						</div>
+						Appointment
 					</AppointmentWrapper.Header>
 				);
 		}
 	}
 
+	renderCompanion() {
+		const { appointment } = this.props;
+		const { isVip } = appointment;
+		return (
+			<React.Fragment>
+				<CompanionWrapperName>
+					<CompanionWrapper.ColumnName>
+						<span>Main Customer: </span>
+						<span style={{ marginLeft: 35 }}>{`${appointment.firstName} ${appointment.lastName}`}</span>
+					</CompanionWrapper.ColumnName>
+
+					<CompanionWrapper.ColumnName>
+						<span style={{ marginLeft: 20 }}>{formatPhone(appointment.phoneNumber)}</span>
+						{isVip === 1 && (
+							<LogoVip2 style={{ marginLeft: 15 }}>
+								<img src={require('../../images/vip.png')} />
+								<span>VIP</span>
+							</LogoVip2>
+						)}
+					</CompanionWrapper.ColumnName>
+				</CompanionWrapperName>
+
+				<CompanionWrapper style={{ marginTop: 15, marginBottom: 15 }}>
+					<CompanionWrapper.Column>
+						<span>Companion: </span>
+						<input
+							onChange={(e) => this.onChangeCompanionName(e)}
+							value={this.state.companionName}
+							placeholder="Full Name"
+						/>
+					</CompanionWrapper.Column>
+
+					<CompanionWrapper.Column>
+						<select
+							value={this.state.companionPhoneHeader}
+							onChange={(e) => this.setState({ companionPhoneHeader: e.target.value })}
+						>
+							<option value="+1">+1</option>
+							<option value="+84">+84</option>
+							<option />
+						</select>
+						<NumberFormat
+							format="###-###-####"
+							mask="_"
+							style={{
+								borderTopLeftRadius: 0,
+								borderBottomLeftRadius: 0,
+								borderLeftWidth: 0,
+								width: 250
+							}}
+							value={this.state.companionPhone}
+							onChange={(e) => this.onChangeCompanionPhone(e)}
+							placeholder="Phone Number"
+							// onBlur={()=>this.searchPhoneCompanion()}
+							type="tel"
+						/>
+						<img onClick={() => this.updateCompanion()} src={require('../../images/buttonSave.png')} />
+					</CompanionWrapper.Column>
+				</CompanionWrapper>
+			</React.Fragment>
+		);
+	}
+
 	renderCustomerName() {
 		const { appointment } = this.props;
-		const { bookingGroupId, isMainBookingGroup, isVip } = appointment;
+		const { bookingGroupId, isMainBookingGroup, isVip, customerNote } = appointment;
 
 		if (parseInt(bookingGroupId) > 0 && parseInt(isMainBookingGroup) === 0) {
-			return (
-				<React.Fragment>
-					<CompanionWrapperName>
-						<CompanionWrapper.ColumnName>
-							<span>Main Customer: </span>
-							<span style={{ marginLeft: 35 }}>{`${appointment.firstName} ${appointment.lastName}`}</span>
-						</CompanionWrapper.ColumnName>
-
-						<CompanionWrapper.ColumnName>
-							<span style={{ marginLeft: 20 }}>{formatPhone(appointment.phoneNumber)}</span>
-							{isVip === 1 && (
-								<LogoVip2 style={{ marginLeft: 15 }}>
-									<img src={require('../../images/vip.png')} />
-									<span>VIP</span>
-								</LogoVip2>
-							)}
-						</CompanionWrapper.ColumnName>
-					</CompanionWrapperName>
-
-					<CompanionWrapper style={{ marginTop: 15, marginBottom: 15 }}>
-						<CompanionWrapper.Column>
-							<span>Companion: </span>
-							<input
-								onChange={(e) => this.onChangeCompanionName(e)}
-								value={this.state.companionName}
-								placeholder="Full Name"
-							/>
-						</CompanionWrapper.Column>
-
-						<CompanionWrapper.Column>
-							<select
-								value={this.state.companionPhoneHeader}
-								onChange={(e) => this.setState({ companionPhoneHeader: e.target.value })}
-							>
-								<option value="+1">+1</option>
-								<option value="+84">+84</option>
-								<option />
-							</select>
-							<NumberFormat
-								format="###-###-####"
-								mask="_"
-								style={{
-									borderTopLeftRadius: 0,
-									borderBottomLeftRadius: 0,
-									borderLeftWidth: 0,
-									width: 250
-								}}
-								value={this.state.companionPhone}
-								onChange={(e) => this.onChangeCompanionPhone(e)}
-								placeholder="Phone Number"
-								// onBlur={()=>this.searchPhoneCompanion()}
-								type="tel"
-							/>
-							<img onClick={() => this.updateCompanion()} src={require('../../images/buttonSave.png')} />
-						</CompanionWrapper.Column>
-					</CompanionWrapper>
-				</React.Fragment>
-			);
+			return this.renderCompanion();
 		} else {
 			return (
 				<UserInformation>
 					<div>
-						<span>Customer Name: </span>
-						<span>{`${appointment.firstName} ${appointment.lastName}`}</span>
+						<div>
+							<span>{appointment.firstName.toString().charAt(0)}</span>
+						</div>
+						<div>
+							<div>{`${appointment.firstName} ${appointment.lastName}`}</div>
+							<div>{formatPhone(appointment.phoneNumber)}</div>
+						</div>
+						<div>
+							<div>Note:</div>
+							<div>{customerNote}</div>
+						</div>
 					</div>
-					<div>
-						<span>Phone Number: </span>
-						<span>{formatPhone(appointment.phoneNumber)}</span>
-						{isVip === 1 && (
-							<LogoVip>
-								<img src={require('../../images/vip.png')} />
-								<span>VIP</span>
-							</LogoVip>
-						)}
-					</div>
+					{isVip === 1 && (
+						<LogoVip>
+							<img src={require('../../images/vip.png')} />
+							<span>VIP</span>
+						</LogoVip>
+					)}
 				</UserInformation>
 			);
 		}
@@ -906,18 +1054,14 @@ class Appointment extends React.Component {
 
 	/********************************* RENDER BODY APPOINTMENT *********************************/
 	renderBody() {
-		const { appointment, currentDay } = this.props;
+		const { appointment } = this.props;
 		const { isPopupTimePicker } = this.state;
 		return (
 			<AppointmentWrapper.Body scroll={isPopupTimePicker ? false : true}>
 				{this.renderCustomerName()}
 
-				{appointment.status !== 'PAID' &&
-					appointment.status !== 'VOID' &&
-					appointment.status !== 'REFUND' &&
-					this.renderChangeAppointTime()}
+				{this.renderSelectDay()}
 				{this.renderServices()}
-				{this.renderExtras()}
 				{this.renderProducts()}
 				{this.renderNotes()}
 
@@ -930,32 +1074,34 @@ class Appointment extends React.Component {
 	}
 
 	render() {
-		const { appointment, appointmentDetail , staffList} = this.props;
-		const { isPoupPrice, companionPhone, companionName, isLoadingCompanion } = this.state;
+		const { appointment, appointmentDetail } = this.props;
+		const {
+			isPoupPrice,
+			isLoadingCompanion,
+			isPopupTimePicker,
+			indexFromTime,
+			fromTimeService,
+			services
+		} = this.state;
 		if (!appointment) return '';
 		if (appointmentDetail === '') return '';
 		let isCheckColor =
-			appointment.status === 'ASSIGNED' || appointment.status === 'CONFIRMED' || appointment.status === 'WAITING'
+			appointment.status === 'ASSIGNED' ||
+				appointment.status === 'CONFIRMED' ||
+				appointment.status === 'ASSIGNED' ||
+				appointment.status === 'WAITING'
 				? true
 				: false;
-
 		return (
 			<div>
 				{/********************************** POPUP DETAIL APPOINTMENT *********************************/}
 				<AppointmentPopup
-					closeOnDocumentClick
+					closeOnDocumentClick={false}
 					open
 					onOpen={() => this.openModal()}
 					onClose={() => this.closeModal()}
 				>
 					<AppointmentWrapper>
-						<PopupEditTip
-							isPopupEditTip={this.state.isPopupEditTip}
-							onSubmit={(tipAmount, staff) => this.closePopupEditTip(tipAmount, staff)}
-							staffEditPaid={this.state.staffEditPaid}
-							serviceEditPaid={this.state.serviceEditPaid}
-							staffList={staffList}
-						/>
 						{isLoadingCompanion && (
 							<LoadingCompanion>
 								<ReactLoading type={'spin'} color={'#1B68AC'} height={50} width={50} />
@@ -970,23 +1116,18 @@ class Appointment extends React.Component {
 
 						<AppointmentWrapper.Footer>
 							{appointment.status !== 'VOID' &&
-							appointment.status !== 'REFUND' && (
-								<div
-									style={{
-										opacity: appointment.status === 'PAID' ? 0 : 1
-									}}
-								>
-									<Button
-										onClick={() => {
-											if (appointment.status !== 'PAID') {
+								appointment.status !== 'REFUND' &&
+								appointment.status !== 'PAID' && (
+									<div>
+										<Button
+											onClick={() => {
 												this.openConfirmationModal();
-											}
-										}}
-									>
-										Cancel
+											}}
+										>
+											Cancel
 									</Button>
-								</div>
-							)}
+									</div>
+								)}
 							<div>{this.renderNextStatusButton()}</div>
 						</AppointmentWrapper.Footer>
 					</AppointmentWrapper>
@@ -1024,6 +1165,26 @@ class Appointment extends React.Component {
 					closePopupPrice={() => this.closePopupPrice()}
 					onChangePrice={(value, index) => this.onChangePrice(value, index)}
 				/>
+
+				<PopupTip
+					indexPopupTip={this.state.indexPopupTip}
+					valueTip={this.state.valueTip}
+					isPopupTip={this.state.isPopupTip}
+					donePopupPrice={(price, index) => this.donePopupTip(price, index)}
+					closePopupPrice={() => this.closePopupTip()}
+				/>
+				{isPopupTimePicker && (
+					<PopupTimePicker
+						cancelTimePicker={() => this.cancelTimePicker()}
+						doneTimePicker={(time, indexFromTime) => this.doneTimePicker(time, indexFromTime)}
+						currentDay={this.props.currentDay}
+						fromTime={appointment.fromTime}
+						isPopupTimePicker={isPopupTimePicker}
+						indexFromTime={indexFromTime}
+						fromTimeService={fromTimeService}
+						services={services}
+					/>
+				)}
 			</div>
 		);
 	}

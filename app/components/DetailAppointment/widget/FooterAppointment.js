@@ -5,6 +5,7 @@ const WrapperFooterPaid = styled.div`
     padding: 10px;
     display: flex;
     flex-direction: row;
+    color : #585858;
 `;
 WrapperFooterPaid.Item = styled.div`
     display: flex;
@@ -98,16 +99,16 @@ export default class FooterAppointment extends Component {
             return (
                 <React.Fragment>
                     <div>
-                        <span>Arriving : </span>
-                        <strong>{moment(appointment.start).fromNow()}</strong>
+                        <span style={{ color : '#585858' }}>Arriving : </span>
+                        <strong style={{ color : '#585858' }}>{moment(appointment.start).fromNow()}</strong>
                     </div>
                     <div>
-                        <span>Tip : </span>
-                        <strong>$ {tipAmount}</strong>
+                        <span style={{ color : '#585858' }}>Tip : </span>
+                        <strong style={{ color : '#585858' }}>$ {tipAmount}</strong>
                     </div>
                     <div>
-                        <span>Total : </span>
-                        <strong>$ {subTotal}</strong>
+                        <span style={{ color : '#585858' }}>Total : </span>
+                        <strong style={{ color : '#585858' }}>$ {subTotal}</strong>
                     </div>
                 </React.Fragment>
             );

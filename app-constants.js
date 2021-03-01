@@ -5,6 +5,7 @@ const storeid = getURLParam('storeid');
 const merchantId = getURLParam('merchantid');
 const staffId = getURLParam('staffId');
 const deviceId = getURLParam('deviceId');
+const role = getURLParam('role');
 
 const API_PORT = 8010;
 
@@ -57,6 +58,7 @@ export {
   merchantId,
   staffId,
   deviceId,
+  role,
   API_PORT,
   API_BASE_URL,
   BASE_URL,

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Popup from 'reactjs-popup';
 import { formatUsPhone } from '../../utils/helper';
 import NumberFormat from 'react-number-format';
+import PopupCustomer from './PopupCustomer';
 
 const AppPopup = styled(Popup)`
   border-radius: 1.5rem;
@@ -323,9 +324,10 @@ class AddAppointment extends React.Component {
                             onClick={() => this.handleSubmitVerifyPhone()}
                             id="submit-create-appointment"
                             primary
+                            style={{ fontWeight: '600' }}
                         >
                             Next
-                    </Button>
+                        </Button>
                         {error_phone && <p style={{ color: 'red' }}>{error_phone}</p>}
                     </FooterChekPhone>
                 </SearchingWrapper>
@@ -371,8 +373,6 @@ class AddAppointment extends React.Component {
 
                     <AddingWrapper.Body>
                         <Form onSubmit={(e) => e.preventDefault()}>
-                            {success_addApointment && <p style={{ color: '#8D9440' }}>{success_addApointment}</p>}
-                            {checkPhoneError && <Label style={{ textAlign: 'center' }}>Phone Number</Label>}
                             <input style={{ textAlign: 'center' }} value={PhoneShow} type="text" disabled />
                         </Form>
 
@@ -380,14 +380,12 @@ class AddAppointment extends React.Component {
                             <Label>Customer Name*</Label>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <input
-                                    disabled={InfoAfterCheckPhone !== ''}
                                     value={this.state.first_name || ''}
                                     onChange={(e) => this.setState({ first_name: e.target.value })}
                                     placeholder="First Name"
                                     className="w-50"
                                 />
                                 <input
-                                    disabled={InfoAfterCheckPhone !== ''}
                                     value={this.state.last_name || ''}
                                     onChange={(e) => this.setState({ last_name: e.target.value })}
                                     placeholder="Last Name"
@@ -400,7 +398,6 @@ class AddAppointment extends React.Component {
                             <Label>Email</Label>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <input
-                                    disabled={InfoAfterCheckPhone !== ''}
                                     type="email"
                                     value={this.state.email || ''}
                                     onChange={(e) => this.setState({ email: e.target.value })}
@@ -447,7 +444,6 @@ class AddAppointment extends React.Component {
                         <Form className="left" onSubmit={(e) => e.preventDefault()}>
                             <Label>Referred by</Label>
                             <input
-                                disabled={InfoAfterCheckPhone !== ''}
                                 value={this.state.referedBy || ''}
                                 onChange={(e) => this.handleChangeReferedBy(e)}
                                 placeholder="Referred by"
@@ -459,7 +455,6 @@ class AddAppointment extends React.Component {
                             {!InfoAfterCheckPhone.favourite && <NoteWrapper.Form onSubmit={(e) => e.preventDefault()}>
                                 <input
                                     value={this.state.noteValue || ''}
-                                    disabled={InfoAfterCheckPhone !== ''}
                                     onChange={(e) => this.handleChangeNote(e)}
                                 />
                                 <button disabled={InfoAfterCheckPhone.favourite ? true : false} type="submit" onClick={() => this.addNotes()}>
@@ -494,6 +489,7 @@ class AddAppointment extends React.Component {
                                 disabled={StateAddCustomerSuccess}
                                 type="button"
                                 primary
+                                style={{ fontWeight: '600' }}
                             >
                                 Next
                         </Button>
@@ -505,13 +501,23 @@ class AddAppointment extends React.Component {
     }
 
     render() {
-        const { appointment } = this.props;
+        const { appointment, InfoAfterCheckPhone } = this.props;
+        const condition = this.checkConditionSendLink();
         if (!appointment) return '';
 
         return (
             <div>
                 {this.renderPopupSearch()}
                 {this.renderPopupAddCustomer()}
+                <PopupCustomer
+                    close={() => this.closeAllModal()}
+                    isPopupCustomer={this.state.isPopupCustomer}
+                    InfoAfterCheckPhone={InfoAfterCheckPhone}
+                    toggleSendLink={() => this.toggleSendLink()}
+                    isSendLink={this.state.isSendLink}
+                    condition={condition}
+                    onSubmit={this.handleSubmitAppointment}
+                />
             </div>
         );
     }

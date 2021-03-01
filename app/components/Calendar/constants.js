@@ -1,45 +1,36 @@
 import $ from 'jquery';
 import moment from 'moment';
-import moment_tz from "moment-timezone"
+import moment_tz from 'moment-timezone';
 import { store } from 'app';
-import { checkDragWaitingInThePast } from './util'
+import {
+	checkDragWaitingInThePast,
+	EVENT_RENDER_TEMPLATE,
+	EVENT_RENDER_TEMPLATE_BLOCK,
+	checkAnyStaffFuture,
+	extrasRender,
+} from './util';
 import {
 	assignAppointment,
 	moveAppointment,
 	putBackAppointment,
-	selectAppointment,
 	openAddingAppointment,
 	disableCalendar,
 	TimeAndStaffID,
 	getApppointmentById
 } from '../../containers/AppointmentPage/actions';
-import { formatPhone } from '../../utils/helper';
 import vip from '../../images/vip.png';
-import call from '../../images/call.png';
 
-const OPTION_RENDER_TEMPLATE = (option) => `<div class="app-event__option">- ${option.serviceName}</div>`;
-const PRODUCT_RENDER_TEMPLATE = (product) => `<div class="app-event__option">- ${product.productName}</div>`;
-const EXTRAS_RENDER_TEMPLATE = (extra) => `<div class="app-event__option">- ${extra.extraName}</div>`;
-
-const EVENT_RENDER_TEMPLATE = (event) => `
-  <div class="app-event">
-    <div class="app-event__id-number">${event.code}</div>
-    <div class="app-event__full-name">${event.userFullName}</div>
-    <div class="app-event__phone-number">
-    ${event.status !== 'BLOCK' && event.status !== 'BLOCK_TEMP' && event.status !== 'BLOCK_TEMP_PAID' && event.status !== 'BLOCK_TEMP_REFUND'
-		? event.status === 'CHECKED_IN' || event.status === 'PAID' || event.status === 'WAITING' || event.status === 'VOID' || event.status === 'REFUND'
-			? "<img class='icon-phone' src='" + call + "' width='17' height='17'>"
-			: "<img class='icon-phone2' src='" + call + "' width='17' height='17'>"
-		: ''}
-    ${formatPhone(event.phoneNumber)}</div>
-    ${event.options.map((option) => OPTION_RENDER_TEMPLATE(option)).join('')}
-    ${event.products.map((product) => PRODUCT_RENDER_TEMPLATE(product)).join('')}
-    ${event.extras.map((extra) => EXTRAS_RENDER_TEMPLATE(extra)).join('')}
-  </div>
-`;
-
-const resouceDesktop = [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }, { id: 6 }, { id: 7 }, { id: 8 }];
-const resource = [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }];
+const resouceDesktop = [
+	{ id: 0 },
+	{ id: 1 },
+	{ id: 2 },
+	{ id: 3 },
+	{ id: 4 },
+	{ id: 5 },
+	{ id: 6 },
+	{ id: 7 },
+	{ id: 8 }
+];
 
 export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 	return {
@@ -71,8 +62,8 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 
 			/* book any staff */
 			if (parseInt(resource.id) === 0) {
-				const allAppointment = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
-				let allMember = store.getState().getIn(['appointment', 'members', 'all']);
+				const allAppointment = store.getState().getIn([ 'appointment', 'appointments', 'allAppointment' ]);
+				let allMember = store.getState().getIn([ 'appointment', 'members', 'all' ]);
 				let count = 0;
 				let countAppAnyStaff = 0;
 
@@ -84,21 +75,25 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 				});
 
 				displayAllMember.forEach((el) => {
-					if (el.member.id !== 0) { // bỏ duyệt cột any staff
-						if (el.member.orderNumber === 0) { // đếm staff chưa login
+					if (el.member.id !== 0) {
+						// bỏ duyệt cột any staff
+						if (el.member.orderNumber === 0) {
+							// đếm staff chưa login
 							count = count + 1;
-						}
-						else {
+						} else {
 							let _i = 0;
 							let _j = 0;
-							el.member.blockTime.forEach(b => {
-								const timeStart = `${moment(b.workingDate).format('YYYY-MM-DD')}T${moment(b.blockTimeStart, ['h:mm A']).format('HH:mm:ss')}`;
-								const timeEnd = `${moment(b.workingDate).format('YYYY-MM-DD')}T${moment(b.blockTimeEnd, ['h:mm A']).format('HH:mm:ss')}`;
+							el.member.blockTime.forEach((b) => {
+								const timeStart = `${moment(b.workingDate).format(
+									'YYYY-MM-DD'
+								)}T${moment(b.blockTimeStart, [ 'h:mm A' ]).format('HH:mm:ss')}`;
+								const timeEnd = `${moment(b.workingDate).format(
+									'YYYY-MM-DD'
+								)}T${moment(b.blockTimeEnd, [ 'h:mm A' ]).format('HH:mm:ss')}`;
 								if (
-									// check block time 
+									// check block time
 									moment(start).isBefore(moment(timeEnd)) &&
 									moment(start).isSameOrAfter(moment(timeStart))
-
 								) {
 									if (_i === 0) {
 										count = count + 1;
@@ -112,7 +107,9 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 										// check appointment available ở các cột staff
 										moment(start).isBefore(moment(app.end)) &&
 										moment(start).isSameOrAfter(moment(app.start)) &&
-										(app.status === 'CHECKED_IN' || app.status === 'CONFIRMED' || app.status === 'BLOCK_TEMP')
+										(app.status === 'CHECKED_IN' ||
+											app.status === 'CONFIRMED' ||
+											app.status === 'BLOCK_TEMP')
 										// (app.memberId !== 0)
 									) {
 										if (_j === 0) {
@@ -136,12 +133,17 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 				});
 
 				if (count >= allMember.length - 1) {
-					alert('There is no staff available at this time.');
-					return;
+					if (checkAnyStaffFuture() == false){
+						alert('There is no staff available at this time.');
+						return;
+					}
 				}
 
 				if (countAppAnyStaff > 0 && countAppAnyStaff >= count && count > 0) {
-					alert('There is no staff available at this time.');
+					if (checkAnyStaffFuture() == false){
+						alert('There is no staff available at this time.');
+						return;
+					}
 				} else {
 					const data = {
 						fromTime: start,
@@ -149,47 +151,55 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 						staffId: 0,
 						action: 'addGroupAnyStaff'
 					};
-					const currentDay = store.getState().getIn(['appointment', 'currentDay']);
-					const merchantInfo = store.getState().getIn(['appointment', 'merchantInfo'])
+					const currentDay = store.getState().getIn([ 'appointment', 'currentDay' ]);
+					const merchantInfo = store.getState().getIn([ 'appointment', 'merchantInfo' ]);
 					const currentDayName = moment(currentDay).format('dddd');
-					const businessHour = Object.entries(merchantInfo.businessHour).find(b => b[0] === currentDayName);
+					const businessHour = Object.entries(merchantInfo.businessHour).find((b) => b[0] === currentDayName);
 
-					const start_bussiness = `${moment(currentDay).format('YYYY-MM-DD')}T${moment(businessHour[1].timeStart, [
-						'h:mm A'
-					]).format('HH:mm:ss')}`;
-					const end_bussiness = `${moment(currentDay).format('YYYY-MM-DD')}T${moment(businessHour[1].timeEnd, [
-						'h:mm A'
-					]).format('HH:mm:ss')}`;
+					const start_bussiness = `${moment(currentDay).format('YYYY-MM-DD')}T${moment(
+						businessHour[1].timeStart,
+						[ 'h:mm A' ]
+					).format('HH:mm:ss')}`;
+					const end_bussiness = `${moment(currentDay).format('YYYY-MM-DD')}T${moment(
+						businessHour[1].timeEnd,
+						[ 'h:mm A' ]
+					).format('HH:mm:ss')}`;
 
-					if (moment(start).isSameOrAfter(moment(start_bussiness)) && moment(start).isBefore(moment(end_bussiness))) {
+					if (
+						moment(start).isSameOrAfter(moment(start_bussiness)) &&
+						moment(start).isBefore(moment(end_bussiness))
+					) {
 						// window.postMessage(JSON.stringify(data));
 						const time = moment(start._d.toString().substr(0, 24));
-						const merchantInfo = store.getState().getIn(['appointment', 'merchantInfo']);
+						const merchantInfo = store.getState().getIn([ 'appointment', 'merchantInfo' ]);
 						const timezone = merchantInfo.timezone;
 						let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment();
-						timeNow = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
-						const _time = `${moment(start).format("YYYY-MM-DD")}T${moment(end).local().format('HH:mm:ss')}`
+						timeNow = `${moment(timeNow).format('YYYY-MM-DD')}T${moment(timeNow).format('HH:mm:ss')}`;
+						const _time = `${moment(start).format('YYYY-MM-DD')}T${moment(end).local().format('HH:mm:ss')}`;
 
 						if (moment(_time).isBefore(timeNow)) {
-							if (window.confirm('This appointment is set for a time that has already passed. Do you still want to set this appointment at this time? ')) {
+							if (
+								window.confirm(
+									'This appointment is set for a time that has already passed. Do you still want to set this appointment at this time? '
+								)
+							) {
 								store.dispatch(disableCalendar(true));
 								store.dispatch(openAddingAppointment({}));
 								store.dispatch(TimeAndStaffID({ time: time, staffID: 0, dataAnyStaff: data }));
+							} else {
+								return;
 							}
-							return;
 						}
 						store.dispatch(disableCalendar(true));
 						store.dispatch(openAddingAppointment({}));
 						store.dispatch(TimeAndStaffID({ time: time, staffID: 0, dataAnyStaff: data }));
 					}
-
 				}
 			}
 			/* end book any staff */
 
-
 			if (parseInt(resource.id) !== 0) {
-				const displayedAppointments = store.getState().getIn(['appointment', 'appointments', 'calendar']);
+				const displayedAppointments = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
 
 				const member = displayedAppointments[parseInt(resource.id) - 1];
 				if (!member || member.memberId === 0) return;
@@ -204,9 +214,9 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 					}
 				});
 
-				const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
+				const displayedMembers = store.getState().getIn([ 'appointment', 'members', 'displayed' ]);
 
-				let currentDay = store.getState().getIn(['appointment', 'currentDay']);
+				let currentDay = store.getState().getIn([ 'appointment', 'currentDay' ]);
 
 				const staffAvailable = displayedMembers[parseInt(resource.id) - 1]
 					? displayedMembers[parseInt(resource.id) - 1]
@@ -214,15 +224,17 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 
 				if (staffAvailable) {
 					const currentDayName = moment(currentDay).format('dddd');
-					const checkWorkingTime = Object.entries(staffAvailable.workingTimes).find(b => b[0] === currentDayName);
-					timeEnd = `${moment(currentDay).day(currentDayName).format('YYYY-MM-DD')}T${moment(
-						checkWorkingTime[1].timeEnd,
-						['h:mm A']
-					).format('HH:mm:ss')}`;
-					timeStart = `${moment(currentDay).day(currentDayName).format('YYYY-MM-DD')}T${moment(
-						checkWorkingTime[1].timeStart,
-						['h:mm A']
-					).format('HH:mm:ss')}`;
+					const checkWorkingTime = Object.entries(staffAvailable.workingTimes).find(
+						(b) => b[0] === currentDayName
+					);
+					timeEnd = `${moment(currentDay)
+						.day(currentDayName)
+						.format('YYYY-MM-DD')}T${moment(checkWorkingTime[1].timeEnd, [ 'h:mm A' ]).format('HH:mm:ss')}`;
+					timeStart = `${moment(currentDay)
+						.day(currentDayName)
+						.format('YYYY-MM-DD')}T${moment(checkWorkingTime[1].timeStart, [ 'h:mm A' ]).format(
+						'HH:mm:ss'
+					)}`;
 					isCheckWorking = checkWorkingTime[1].isCheck;
 				}
 
@@ -230,21 +242,25 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 
 				if (Boolean(isCheckWorking) === true && check_block_temp === false) {
 					if (moment(time).isBefore(timeEnd) && moment(time).isSameOrAfter(timeStart)) {
-
 						/* Get timenow merchant's timezone */
-						const merchantInfo = store.getState().getIn(['appointment', 'merchantInfo']);
+						const merchantInfo = store.getState().getIn([ 'appointment', 'merchantInfo' ]);
 						const timezone = merchantInfo.timezone;
 						let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment().local();
-						timeNow = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
-						const _time = `${moment(start).format("YYYY-MM-DD")}T${moment(end).local().format('HH:mm:ss')}`
+						timeNow = `${moment(timeNow).format('YYYY-MM-DD')}T${moment(timeNow).format('HH:mm:ss')}`;
+						const _time = `${moment(start).format('YYYY-MM-DD')}T${moment(end).local().format('HH:mm:ss')}`;
 
 						if (moment(_time).isBefore(moment(timeNow))) {
-							if (window.confirm('This appointment is set for a time that has already passed. Do you still want to set this appointment at this time? ')) {
+							if (
+								window.confirm(
+									'This appointment is set for a time that has already passed. Do you still want to set this appointment at this time? '
+								)
+							) {
 								store.dispatch(disableCalendar(true));
 								store.dispatch(openAddingAppointment({}));
 								store.dispatch(TimeAndStaffID({ time: time, staffID: member.memberId }));
+							} else {
+								return;
 							}
-							return;
 						}
 
 						store.dispatch(disableCalendar(true));
@@ -256,7 +272,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 		},
 
 		eventClick: (event) => {
-			const allAppointment = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
+			const allAppointment = store.getState().getIn([ 'appointment', 'appointments', 'allAppointment' ]);
 			const appointment = allAppointment.find((app) => parseInt(app.id) === parseInt(event.data.id));
 			if (!appointment) return;
 			store.dispatch(getApppointmentById({ appointment, event }));
@@ -266,14 +282,14 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 		drop(date_time, jsEvent, ui, idResource) {
 			let date = moment(date_time).local();
 			const event = $(this).data().event.data;
-			const merchantInfo = store.getState().getIn(['appointment', 'merchantInfo']);
+			const merchantInfo = store.getState().getIn([ 'appointment', 'merchantInfo' ]);
 			let check = true;
 			let check_workingStaff = '';
 			let check_staff_drop = false;
 			let time_working_start = '';
 			let time_working_end = '';
 			let totalDuration = 0;
-			let check_workingTime = false
+			let check_workingTime = false;
 
 			event.options.forEach((evt) => {
 				totalDuration += evt.duration;
@@ -285,15 +301,15 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 					? moment(start_time).add(totalDuration, 'minutes')
 					: moment(start_time).add(90, 'minutes');
 
-			const memberdisplay = store.getState().getIn(['appointment', 'appointments', 'calendar']);
+			const memberdisplay = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
 			let member_clone = JSON.parse(JSON.stringify(memberdisplay));
 			member_clone.forEach((element) => {
 				delete element.memberId;
 			});
-			const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
+			const displayedMembers = store.getState().getIn([ 'appointment', 'members', 'displayed' ]);
 			let all_appointments = [];
 			member_clone.forEach((apps) => {
-				all_appointments = [...all_appointments, ...apps.appointments];
+				all_appointments = [ ...all_appointments, ...apps.appointments ];
 			});
 			const resourceId = parseInt(idResource) - 1;
 			const pos = displayedMembers.findIndex((mem) => parseInt(mem.resourceId) === parseInt(resourceId));
@@ -304,11 +320,12 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 			}
 			/* END */
 
-
 			if (pos !== -1) {
-				const currentDay = store.getState().getIn(['appointment', 'currentDay']);
+				const currentDay = store.getState().getIn([ 'appointment', 'currentDay' ]);
 				const currentDayName = moment(currentDay).format('dddd');
-				const checkWorkingTime = Object.entries(displayedMembers[parseInt(resourceId)].workingTimes).find(b => b[0] === currentDayName)
+				const checkWorkingTime = Object.entries(displayedMembers[parseInt(resourceId)].workingTimes).find(
+					(b) => b[0] === currentDayName
+				);
 				check_workingStaff = checkWorkingTime[1].isCheck;
 				time_working_start = checkWorkingTime[1].timeStart;
 				time_working_end = checkWorkingTime[1].timeEnd;
@@ -319,18 +336,17 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 			} else if (check_workingStaff) {
 				all_appointments.forEach((app) => {
 					if (parseInt(app.memberId) === parseInt(displayedMembers[parseInt(resourceId)].id)) {
-						const tempEndTime = event.options.length > 0
-							? moment(start_time).add(totalDuration, 'minutes')
-							: moment(start_time).add(15, 'minutes');
+						const tempEndTime =
+							event.options.length > 0
+								? moment(start_time).add(totalDuration, 'minutes')
+								: moment(start_time).add(15, 'minutes');
 						if (
 							moment(start_time).isBetween(app.start, app.end) ||
 							moment(tempEndTime).isBetween(app.start, app.end) ||
 							moment(app.start).isBetween(start_time, tempEndTime) ||
 							moment(app.end).isBetween(start_time, tempEndTime) ||
-							(
-								moment(app.start).format('HH:mm') === moment(start_time).format('HH:mm') &&
-								moment(app.end).format('HH:mm') === moment(tempEndTime).format('HH:mm')
-							)
+							(moment(app.start).format('HH:mm') === moment(start_time).format('HH:mm') &&
+								moment(app.end).format('HH:mm') === moment(tempEndTime).format('HH:mm'))
 						) {
 							if (parseInt(app.id) !== parseInt(event.id)) {
 								if (app.status === 'BLOCK_TEMP') {
@@ -349,20 +365,24 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 
 			if (check_workingStaff) {
 				if (displayedMembers[parseInt(resourceId)] && displayedMembers[parseInt(resourceId)].id === 0) {
-					check_staff_drop = false
+					check_staff_drop = false;
 				} else {
 					check_staff_drop = true;
 				}
 			}
 
 			if (pos === -1 || check_staff_drop === false || check === 1) {
-				$('#full-calendar').fullCalendar('removeEvents', (event) => event.data.id === $(this).data().event.data.id);
+				$('#full-calendar').fullCalendar(
+					'removeEvents',
+					(event) => event.data.id === $(this).data().event.data.id
+				);
 			} else {
 				/* check appointment assign overlap */
 				// if (check === false && displayedMembers[parseInt(resourceId)].orderNumber !== 0) {
 				if (check === false) {
-
-					const text = check_workingTime ? "Accept this appointment outside of business hours?" : "Are you sure want to assign appointment at this position ?";
+					const text = check_workingTime
+						? 'Accept this appointment outside of business hours?'
+						: 'Are you sure want to assign appointment at this position ?';
 					if (window.confirm(text)) {
 						store.dispatch(
 							assignAppointment({
@@ -399,8 +419,8 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 		},
 
 		eventDrop: (event, delta, revertFunc, jsEvent, ui, view) => {
-			const memberdisplay = store.getState().getIn(['appointment', 'appointments', 'calendar']);
-			const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
+			const memberdisplay = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
+			const displayedMembers = store.getState().getIn([ 'appointment', 'members', 'displayed' ]);
 
 			const start_time = moment(event.start).local();
 			const end_time = moment(event.end).local();
@@ -412,7 +432,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 				delete element.memberId;
 			});
 
-			const currentDay = store.getState().getIn(['appointment', 'currentDay']);
+			const currentDay = store.getState().getIn([ 'appointment', 'currentDay' ]);
 			let check_workingStaff = '';
 
 			const staffAvailable = displayedMembers[parseInt(event.resourceId) - 1];
@@ -421,10 +441,10 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 			if (!staffAvailable) {
 				if (event.data.memberId === 0) {
 					let isTest = false;
-					const currentDay = store.getState().getIn(['appointment', 'currentDay']);
-					const merchantInfo = store.getState().getIn(['appointment', 'merchantInfo'])
+					const currentDay = store.getState().getIn([ 'appointment', 'currentDay' ]);
+					const merchantInfo = store.getState().getIn([ 'appointment', 'merchantInfo' ]);
 					const currentDayName = moment(currentDay).format('dddd');
-					const businessHour = Object.entries(merchantInfo.businessHour).find(b => b[0] === currentDayName);
+					const businessHour = Object.entries(merchantInfo.businessHour).find((b) => b[0] === currentDayName);
 
 					const endTime =
 						event.end !== null
@@ -439,27 +459,33 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 						'h:mm A'
 					]).format('HH:mm:ss')}`;
 
-
 					if (moment(startTime).isBefore(start) || moment(endTime).isAfter(end)) {
-						isTest = true
+						isTest = true;
 					}
 
 					if (isTest) {
 						if (window.confirm('Accept this appointment outside of business hours?')) {
-							store.dispatch(moveAppointment(event.data.id, 0, startTime, endTime));
+							store.dispatch(moveAppointment(event.data.id, 0, startTime, endTime, event.data));
 							return;
 						} else {
 							revertFunc();
 							return;
 						}
 					}
-					if ((moment(event.data.start).format("HH:mm A") === moment(startTime).format("HH:mm A"))) {
-						store.dispatch(moveAppointment(event.data.id, 0, startTime, endTime));
+					if (moment(event.data.start).format('HH:mm A') === moment(startTime).format('HH:mm A')) {
+						store.dispatch(moveAppointment(event.data.id, 0, startTime, endTime, event.data));
+						return;
 					} else {
-						if (window.confirm(" This Any Staff appointment is set to begin at a different time. Do you want to change original time of appointment? ")) {
-							store.dispatch(moveAppointment(event.data.id, 0, startTime, endTime));
+						if (
+							window.confirm(
+								' This Any Staff appointment is set to begin at a different time. Do you want to change original time of appointment? '
+							)
+						) {
+							store.dispatch(moveAppointment(event.data.id, 0, startTime, endTime, event.data));
+							return;
 						} else {
 							revertFunc();
+							return;
 						}
 					}
 					return;
@@ -467,7 +493,10 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 			}
 			/* end move any staff */
 
-			if ((event.resourceId === '0' && event.data.memberId !== 0) || (staffAvailable && staffAvailable.id === 0)) {
+			if (
+				(event.resourceId === '0' && event.data.memberId !== 0) ||
+				(staffAvailable && staffAvailable.id === 0)
+			) {
 				revertFunc();
 				return;
 			}
@@ -511,7 +540,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 
 			let all_appointments = []; // tất cả appointment trên calendar
 			member_clone.forEach((apps) => {
-				all_appointments = [...all_appointments, ...apps.appointments];
+				all_appointments = [ ...all_appointments, ...apps.appointments ];
 			});
 
 			if (!staffAvailable) {
@@ -535,7 +564,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 									}
 								} else {
 									if (app.status === 'BLOCK') {
-										check_block_grey = true
+										check_block_grey = true;
 									}
 									check = false;
 								}
@@ -564,45 +593,99 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 			if (pos === -1 || event.data.status === 'PAID' || check === 1) {
 				revertFunc();
 			} else {
-				const start_time = `${moment(event.start).local().format('YYYY-MM-DD')}T${moment(event.start).local().format('HH:mm:ss')}`;
+				const start_time = `${moment(event.start).local().format('YYYY-MM-DD')}T${moment(event.start)
+					.local()
+					.format('HH:mm:ss')}`;
 				const endTime =
 					event.end !== null
-						? `${moment(event.end).local().format('YYYY-MM-DD')}T${moment(event.end).local().format('HH:mm:ss')}`
+						? `${moment(event.end).local().format('YYYY-MM-DD')}T${moment(event.end)
+								.local()
+								.format('HH:mm:ss')}`
 						: moment(start_time).add(90, 'minutes').format('YYYY-MM-DD HH:mm:ss');
 
 				if (check === false) {
-					const text = check_block_grey ? 'Accept this appointment outside of business hours?' : 'Accept overlapping appointments?';
+					const text = check_block_grey
+						? 'Accept this appointment outside of business hours?'
+						: 'Accept overlapping appointments?';
 					if (window.confirm(text)) {
-						store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId), start_time, endTime));
+						store.dispatch(
+							moveAppointment(event.data.id, parseInt(event.resourceId), start_time, endTime, event.data)
+						);
+						return;
 					} else {
 						revertFunc();
+						return;
 					}
 				} else {
-					if (event.data.memberId === 0) { // move appointment từ cột any staff qua cột khác
-						if (moment(event.data.start).format("HH:mm A") === moment(start_time).format("HH:mm A")) {
-							store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId), start_time, endTime));
+					if (event.data.memberId === 0) {
+						// move appointment từ cột any staff qua cột khác
+						if (moment(event.data.start).format('HH:mm A') === moment(start_time).format('HH:mm A')) {
+							store.dispatch(
+								moveAppointment(
+									event.data.id,
+									parseInt(event.resourceId),
+									start_time,
+									endTime,
+									event.data
+								)
+							);
+							return;
 						} else {
-							if (window.confirm(" This Any Staff appointment is set to begin at a different time. Do you want to change original time of appointment? ")) {
-								store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId), start_time, endTime));
+							if (
+								window.confirm(
+									' This Any Staff appointment is set to begin at a different time. Do you want to change original time of appointment? '
+								)
+							) {
+								store.dispatch(
+									moveAppointment(
+										event.data.id,
+										parseInt(event.resourceId),
+										start_time,
+										endTime,
+										event.data
+									)
+								);
+								return;
 							} else {
 								revertFunc();
+								return;
 							}
 						}
 					} else {
-						const merchantInfo = store.getState().getIn(['appointment', 'merchantInfo']);
+						const merchantInfo = store.getState().getIn([ 'appointment', 'merchantInfo' ]);
 						const timezone = merchantInfo.timezone;
 						let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment().local();
-						const _time = `${moment(end_time).format("YYYY-MM-DD")}T${moment(end_time).format('HH:mm:ss')}`
-						timeNow = `${moment(timeNow).format("YYYY-MM-DD")}T${moment(timeNow).format('HH:mm:ss')}`;
+						const _time = `${moment(end_time).format('YYYY-MM-DD')}T${moment(end_time).format('HH:mm:ss')}`;
+						timeNow = `${moment(timeNow).format('YYYY-MM-DD')}T${moment(timeNow).format('HH:mm:ss')}`;
 						if (moment(_time).isBefore(moment(timeNow))) {
-							const text = 'This appointment is set for a time that has already passed. Do you still want to set this appointment at this time?'
+							const text =
+								'This appointment is set for a time that has already passed. Do you still want to set this appointment at this time?';
 							if (window.confirm(text)) {
-								store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId), start_time, endTime));
+								store.dispatch(
+									moveAppointment(
+										event.data.id,
+										parseInt(event.resourceId),
+										start_time,
+										endTime,
+										event.data
+									)
+								);
+								return;
 							} else {
 								revertFunc();
+								return;
 							}
 						} else {
-							store.dispatch(moveAppointment(event.data.id, parseInt(event.resourceId), start_time, endTime));
+							store.dispatch(
+								moveAppointment(
+									event.data.id,
+									parseInt(event.resourceId),
+									start_time,
+									endTime,
+									event.data
+								)
+							);
+							return;
 						}
 						//move appointment từ staff này qua staff khác
 					}
@@ -612,6 +695,9 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 		},
 		/* eslint no-param-reassign: "error" */
 		eventDragStop: (event, jsEvent) => {
+			if (event.data.status.toString().includes('BLOCK')) {
+				return;
+			}
 			if (parseInt(event.resourceId) !== 0) {
 				const trashEl = $('#drag-zone');
 				if (jsEvent) {
@@ -624,7 +710,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 					if (jsEvent.pageX >= x1 && jsEvent.pageX <= x2 && jsEvent.pageY >= y1 && jsEvent.pageY <= y2) {
 						/* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
 						$('#full-calendar').fullCalendar('removeEvents', event._id);
-						const displayedMembers = store.getState().getIn(['appointment', 'appointments', 'calendar']);
+						const displayedMembers = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
 						const override = displayedMembers[parseInt(event.resourceId) - 1];
 						store.dispatch(
 							putBackAppointment({
@@ -638,49 +724,61 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 		},
 		/* eslint no-param-reassign: "error" */
 		eventRender: (event, element) => {
-			const displayedMembers = store.getState().getIn(['appointment', 'members', 'all']);
-			const percent = 100 / displayedMembers.length;
-			element[0].innerHTML = EVENT_RENDER_TEMPLATE(event.data);
-			if (event.data.isVip === 1) {
-				element
-					.find('div.app-event')
-					.prepend("<div class='app-event__full-name2'><img src='" + vip + "' width='18' height='18'></div>");
+			if (!event.data.status.toString().includes('BLOCK')) {
+				let options = event.data.options.filter(obj=>obj.staffId === event.data.memberId);
+				let _extrasRender = extrasRender(options,event.data.extras);
+				let dataEvent = {
+					...event.data,
+					extrasRender : _extrasRender
+				}
+				element[0].innerHTML = EVENT_RENDER_TEMPLATE(dataEvent);
+				if (event.data.isVip === 1) {
+					element
+						.find('div.app-event')
+						.prepend("<div class='app-event__full-name2'><img src='" + vip + "' width='18' height='18'></div>");
+				}
+			} else {
+				element[0].innerHTML = EVENT_RENDER_TEMPLATE_BLOCK(event.data);
+				if (event.data.isVip === 1) {
+					element
+						.find('div.app-event')
+						.prepend("<div class='app-event__vipBlock'><img src='" + vip + "' width='18' height='18'></div>");
+				}
 			}
-			
+
 			if (event.data.status === 'BLOCK_TEMP_PAID' || event.data.status === 'BLOCK_TEMP_REFUND') {
-				const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
-				const allAppointments = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
+				const displayedMembers = store.getState().getIn([ 'appointment', 'members', 'displayed' ]);
+				const allAppointments = store.getState().getIn([ 'appointment', 'appointments', 'allAppointment' ]);
 				if (event.data.memberId) {
-					const member = displayedMembers.find(mem => parseInt(mem.id) === parseInt(event.data.memberId));
+					const member = displayedMembers.find((mem) => parseInt(mem.id) === parseInt(event.data.memberId));
 					if (member) {
 						const blockTime = member.blockTime ? member.blockTime : [];
 						let count = 0;
-						blockTime.forEach(block => {
+						blockTime.forEach((block) => {
 							const { appointmentId } = block;
 							if (parseInt(event.data.id) !== parseInt(appointmentId)) {
 								const { start, end } = event.data;
-								const app = allAppointments.find(obj => parseInt(obj.id) === parseInt(appointmentId))
-								if (app) {
-									if (moment(start).isAfter(app.start) && moment(start).isBefore(app.end) ||
-										moment(end).isAfter(app.start) && moment(end).isBefore(app.end)
+								const app = allAppointments.find((obj) => parseInt(obj.id) === parseInt(appointmentId));
+								if (app)
+									if (
+										(moment(start).isAfter(app.start) && moment(start).isBefore(app.end)) ||
+										(moment(end).isAfter(app.start) && moment(end).isBefore(app.end))
 									) {
-										count += 1
+										count += 1;
 									}
-								}
 							}
 						});
 						if (count >= 2) {
 							$(element).css('width', 30 + '%');
-						}
-						else if(count === 1){
+						} else if (count === 1) {
 							$(element).css('width', 40 + '%');
-						}else{
+						} else {
 							$(element).css('width', 50 + '%');
 						}
-					}else{
+					} else {
 						$(element).css('width', 50 + '%');
 					}
-				}else{
+				} else {
 					$(element).css('width', 50 + '%');
 				}
 			}
@@ -688,7 +786,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 		resourceRender: (resourceObj, labelTds) => {
 			labelTds[0].innerHTML = '';
 		}
-	}
+	};
 };
 
 export const addEventsToCalendar = async (currentDate, appointmentsMembers) => {
@@ -706,16 +804,28 @@ export const addEventsToCalendar = async (currentDate, appointmentsMembers) => {
 					data: appointment,
 					color: getAtrributeByStatus(appointment).eventColor,
 					rendering:
-					appointment.status === 'BLOCK' || appointment.status === 'BLOCK_TEMP' ? 'background' : '',
+						appointment.status === 'BLOCK' || appointment.status === 'BLOCK_TEMP' ? 'background' : '',
 					className: getAtrributeByStatus(appointment).eventClass,
-					startEditable: !(appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND' || appointment.status === "BLOCK_TEMP_PAID" || appointment.status === "BLOCK_TEMP_REFUND"),
-					resourceEditable: !(appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND' || appointment.status === "BLOCK_TEMP_PAID" || appointment.status === "BLOCK_TEMP_REFUND")
+					startEditable: !(
+						appointment.status === 'PAID' ||
+						appointment.status === 'VOID' ||
+						appointment.status === 'REFUND' ||
+						appointment.status === 'BLOCK_TEMP_PAID' ||
+						appointment.status === 'BLOCK_TEMP_REFUND'
+					),
+					resourceEditable: !(
+						appointment.status === 'PAID' ||
+						appointment.status === 'VOID' ||
+						appointment.status === 'REFUND' ||
+						appointment.status === 'BLOCK_TEMP_PAID' ||
+						appointment.status === 'BLOCK_TEMP_REFUND'
+					)
 				});
 			});
 		}
 	});
 
-	const allAppointments = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
+	const allAppointments = store.getState().getIn([ 'appointment', 'appointments', 'allAppointment' ]);
 
 	const app_in_anystaff = allAppointments
 		? allAppointments.filter((app) => app.memberId === 0 && app.status !== 'WAITING')
@@ -728,10 +838,22 @@ export const addEventsToCalendar = async (currentDate, appointmentsMembers) => {
 			end: appointment.end,
 			data: appointment,
 			color: getAtrributeByStatus(appointment).eventColor,
-			rendering: appointment.status === 'BLOCK' || appointment.status === 'BLOCK_TEMP' || appointment.status === 'BLOCK_TEMP_PAID' || appointment.status === 'BLOCK_TEMP_REFUND' ? 'background' : '',
+			rendering: appointment.status === 'BLOCK' || appointment.status === 'BLOCK_TEMP' ? 'background' : '',
 			className: getAtrributeByStatus(appointment).eventClass,
-			startEditable: !(appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND' || appointment.status === "BLOCK_TEMP_PAID" || appointment.status === "BLOCK_TEMP_REFUND"),
-			resourceEditable: !(appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND' || appointment.status === "BLOCK_TEMP_PAID" || appointment.status === "BLOCK_TEMP_REFUND")
+			startEditable: !(
+				appointment.status === 'PAID' ||
+				appointment.status === 'VOID' ||
+				appointment.status === 'REFUND' ||
+				appointment.status === 'BLOCK_TEMP_PAID' ||
+				appointment.status === 'BLOCK_TEMP_REFUND'
+			),
+			resourceEditable: !(
+				appointment.status === 'PAID' ||
+				appointment.status === 'VOID' ||
+				appointment.status === 'REFUND' ||
+				appointment.status === 'BLOCK_TEMP_PAID' ||
+				appointment.status === 'BLOCK_TEMP_REFUND'
+			)
 		});
 	});
 	// viet ham render appointment cho cot any staff tai day
@@ -739,7 +861,7 @@ export const addEventsToCalendar = async (currentDate, appointmentsMembers) => {
 };
 
 export const deleteEventFromCalendar = (eventId) => {
-	$('#full-calendar').fullCalendar('removeEvents', [eventId]);
+	$('#full-calendar').fullCalendar('removeEvents', [ eventId ]);
 };
 
 export const updateEventToCalendar = (fcEvent) => {
@@ -766,19 +888,39 @@ export const updateEventToCalendar = (fcEvent) => {
 		startEditable = false;
 		resourceEditable = false;
 	}
-	if (appointment && appointment.status === 'BLOCK_TEMP_PAID') {
+	if (appointment.status === 'BLOCK') {
+		eventColor = '#DDDDDD';
+		eventClass = 'event-block';
+	}
+	if (appointment.status === 'BLOCK_TEMP') {
+		eventColor = '#DDDDDD';
+		eventClass = 'event-block-temp';
+	}
+	if (appointment.status === 'BLOCK_TEMP_ASSIGNED') {
+		eventColor = '#ffe559';
+		eventClass = 'event-block-temp-assigned';
+	}
+	if (appointment.status === 'BLOCK_TEMP_CONFIMED') {
+		eventColor = '#baedf7';
+		eventClass = 'event-block-temp-confirmed';
+	}
+	if (appointment.status === 'BLOCK_TEMP_CHECKED_IN') {
+		eventColor = '#28AAE9';
+		eventClass = 'event-block-temp-check-in';
+	}
+	if (appointment.status === 'BLOCK_TEMP_PAID') {
 		eventColor = '#38ff05';
 		eventClass = 'event-block-temp-paid';
 	}
-	if (appointment && appointment.status === 'BLOCK_TEMP_REFUND') {
-		eventColor = '#38ff05';
+	if (appointment.status === 'BLOCK_TEMP_REFUND') {
+		eventColor = '#FB5B54';
 		eventClass = 'event-block-temp';
 	}
 	if (!status) {
 		eventColor = 'red';
 		eventClass = 'event-checkin';
 	}
-	const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
+	const displayedMembers = store.getState().getIn([ 'appointment', 'members', 'displayed' ]);
 
 	const resourceId = displayedMembers.findIndex((mem) => mem.id === fcEvent.memberId);
 
@@ -795,7 +937,7 @@ export const updateEventToCalendar = (fcEvent) => {
 
 	//viet them ham update cho event o cot any staff tai day
 
-	$('#full-calendar').fullCalendar('addEventSource', [data]);
+	$('#full-calendar').fullCalendar('addEventSource', [ data ]);
 };
 
 function getAtrributeByStatus(appointment) {
@@ -822,18 +964,30 @@ function getAtrributeByStatus(appointment) {
 		eventClass = 'event-block';
 	}
 	if (appointment.status === 'BLOCK_TEMP') {
-		eventColor = 'yellow';
+		eventColor = '#DDDDDD';
 		eventClass = 'event-block-temp';
+	}
+	if (appointment.status === 'BLOCK_TEMP_ASSIGNED') {
+		eventColor = '#ffe559';
+		eventClass = 'event-block-temp-assigned';
+	}
+	if (appointment.status === 'BLOCK_TEMP_CONFIRMED') {
+		eventColor = '#baedf7';
+		eventClass = 'event-block-temp-confirmed';
+	}
+	if (appointment.status === 'BLOCK_TEMP_CHECKED_IN') {
+		eventColor = '#28AAE9';
+		eventClass = 'event-block-temp-check-in';
 	}
 	if (appointment.status === 'BLOCK_TEMP_PAID') {
 		eventColor = '#38ff05';
 		eventClass = 'event-block-temp-paid';
 	}
 	if (appointment.status === 'BLOCK_TEMP_REFUND') {
-		eventColor = '#38ff05';
+		eventColor = '#FB5B54';
 		eventClass = 'event-block-temp';
 	}
-	if (appointment.status === 'VOID' || appointment.status === "REFUND") {
+	if (appointment.status === 'VOID' || appointment.status === 'REFUND') {
 		eventColor = '#FD594F';
 		eventClass = 'event-void';
 	}

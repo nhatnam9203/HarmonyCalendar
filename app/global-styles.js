@@ -82,7 +82,7 @@ const GlobalStyle = createGlobalStyle`
     border-color : #dddddd;
 }
   .fc-unthemed th, .fc-unthemed td {
-    border-color: #1484c0;
+    ${'' /* border-color: #1484c0; */}
     border-width: 1px;
   }
   .fc-unthemed th:first-child, .fc-unthemed td:first-child {
@@ -117,6 +117,7 @@ const GlobalStyle = createGlobalStyle`
 
   .event-block-temp{
     overflow : hidden;
+    color : #333 !important;
   }
 
   .event-block-temp-paid{
@@ -158,10 +159,9 @@ const GlobalStyle = createGlobalStyle`
     margin-top : -3px;
   }
   .app-event__id-number {
-    font-size: 12px;
+    font-size : 0.72rem;
     line-height : 1.5;
-    font-weight: bold;
-    margin-bottom: 2px;
+    margin-top : -10px;
     margin-left : 5px;
     letter-spacing : 0.3;
   }
@@ -179,9 +179,10 @@ const GlobalStyle = createGlobalStyle`
     font-size: 18px;
     font-weight: 900;
     margin-left: 8px;
-    margin-top : 5px;
+    margin-top : 10px;
     ${'' /* margin-bottom: 4px; */}
     line-height: 1.3;
+    color : '#585858';
     fontFamily: 'Arial'
   }
 
@@ -197,13 +198,26 @@ const GlobalStyle = createGlobalStyle`
 
   .waiting-event{
     font-weight : 600 !important;
+    margin-top : 15px !important;
+    color : '#585858' !important;
+    overflow : hidden !important;
+  }
+
+  .option_waiting{
+    // width : calc((100vw - 5.05rem) / 10);
   }
 
 
   .app-event__full-name2 {
     position : absolute;
     right: 5px;
-    top : 10px;
+    top : -2px;
+  }
+
+  .app-event__vipBlock{
+    position : absolute;
+    right: 5px;
+    top : 5px;
   }
 
   .app-event__full-name3 {
@@ -222,12 +236,10 @@ const GlobalStyle = createGlobalStyle`
   }
 
   .app-event__phone-number {
-    font-size: 13px;
-    margin-left: 7px;
-    ${'' /* margin-bottom: 8px;
-    margin-top : 8px; */}
-    margin-top : -7px;
-    margin-bottom: -6px;
+    font-size : 0.72rem;
+    margin-top : -13px;
+    margin-bottom : -13px;
+    margin-left : -8px;
     line-height: 1.8;
     font-style: italic;
     font-weight : 500;
@@ -237,8 +249,8 @@ const GlobalStyle = createGlobalStyle`
   .app-event__phone-number4{
     font-size: 13px;
     margin-left: 7px;
-    margin-bottom: 8px;
-    margin-top : 8px;
+    margin-bottom: 4px;
+    margin-top : 4px;
     line-height: 1.8;
     font-style: italic;
     font-weight : 500;
@@ -259,7 +271,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   .app-event__option {
-    font-size: 0.8rem;
+    font-size : 0.72rem;
     margin-left: 8px;
     margin-bottom : 5px;
     line-height: 1.2;
@@ -271,27 +283,58 @@ const GlobalStyle = createGlobalStyle`
       height : 1.75rem !important;
   }
 
-  .timeline {
-    position: absolute;    
-    border-top: 2px dashed red;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    z-index: 999;
-  }
-
-  .fc-event {
-    border: 1px solid ;
+.app-event__note {
+  font-size : 0.73rem;
+  padding : 10px;
+  font-weight : 900;
 }
-.event-assigned, .event-confirmed{
+
+.app-event__blockName{
+  font-size : 1.1rem;
+  padding : 10px;
+  font-weight : 900;
+}
+
+.app-event__blockPhone{
+  font-size : 0.72rem;
+  font-style : italic;
+  margin-top: -12px;
+  padding : 10px;
+  padding-left : 5px;
+}
+
+.app-event__blockService{
+  font-size : 0.8rem;
+  padding : 10px;
+  margin-top: -12px;
+  font-style : italic;
+}
+
+.timeline {
+  position: absolute;    
+  border-top: 2px dashed red;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  z-index: 999;
+}
+
+.fc-event {
+  border: 1px solid ;
+}
+.event-assigned, .event-confirmed,.event-block-temp-assigned,.event-block-temp-confirmed{
   font-weight : 500;
-  color : #333;
+  color : #585858;
   letter-spacing : 0.6;
+}
+
+.option_categories{
+  color: #0764B0;
 }
 
 .event-assigned-anystaff , .event-confirmed-anystaff {
   font-weight : 500;
-  color : #333;
+  color : #585858;
   letter-spacing : 0.6;
   max-width : 50%;
 }
@@ -307,7 +350,7 @@ const GlobalStyle = createGlobalStyle`
 }
 
 
-.event-checkin,.event-confirmed,.event-paid,.event-anystaff,.event-void,.event-assigned{
+.event-checkin,.event-confirmed,.event-paid,.event-anystaff,.event-void,.event-assigned,.event-block-temp-assigned,.event-block-temp-confirmed,.event-block-temp-check-in{
   border : 1px solid #ffffff !important;
   overflow: hidden !important;
 }
@@ -336,37 +379,12 @@ const GlobalStyle = createGlobalStyle`
   padding-left : 10px !important;
 }
 
-.event-assigned:hover ,.event-confirmed:hover,.event-anystaff:hover , .event-confirmed-anystaff:hover , .event-assigned-anystaff:hover{
+.event-assigned:hover ,.event-confirmed:hover,.event-anystaff:hover , .event-confirmed-anystaff:hover , .event-assigned-anystaff:hover , .event-block-temp-assigned:hover , .event-block-temp-confirmed:hover{
   font-weight : 500;
   color : #333;
 }
 .event-assigned{
-  background: linear-gradient(
-        to right,
-        #873f72,
-        #ed3144,
-        #f20920,
-        #b9ce2b,
-        #873f72
-      )
-      160%
-      0
-      repeat-x,
-    linear-gradient(to top, #873f72, #ed3144, #f20920, #b9ce2b, #873f72)
-      100%
-      20%
-      repeat-y,
-    linear-gradient(to left, #873f72, #ed3144, #f20920, #b9ce2b, #873f72)
-      10%
-      100%
-      repeat-x,
-    linear-gradient(to bottom, #873f72, #ed3144, #f20920, #b9ce2b, #873f72)
-      0%
-      10%
-      repeat-y;
 
-  background-size: 300% 1.4px, 1.2px 300%;/* increase size to show at once the bit from 2 gradient colors */
-  animation: bd 5s infinite linear;
 }
 .DayPickerInput input{
   color : #333 !important;
@@ -467,6 +485,10 @@ const GlobalStyle = createGlobalStyle`
 
 }
 
+.app-event__option-container{
+  margin-top : -0.85rem;
+}
+
 
 .selectRef{
     width : 4rem;
@@ -500,19 +522,27 @@ const GlobalStyle = createGlobalStyle`
 
   @media only screen and (min-width: 1025px) {
     .app-event__option{
-      font-size : 0.95rem !important;
+      font-size : 0.77rem !important;
     }
     .app-event__full-name{
       font-size : 1.2rem !important;
     }
+
+    .app-event__blockService{
+      font-size : 0.77rem !important;
+    }
+    .app-event__blockPhone{
+      font-size : 0.77rem !important;
+    }  
+
     .app-event__phone-number{
-      font-size : 1rem !important;
+      font-size : 0.74rem !important;
     }
     .app-event__phone-number4{
       font-size : 1rem !important;
     }
     .app-event__id-number{
-      font-size : 0.8rem !important;
+      font-size : 0.74rem !important;
     }
     .app-event__id-number2{
       font-size : 0.8rem !important;

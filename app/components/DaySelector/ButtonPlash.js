@@ -5,8 +5,8 @@ const Button = styled.div`
 	position : absolute;
 	top : -0.7rem;
 	& > img {
-	width: 24px;
-	height: 24px;
+	width: 20px;
+	height: 20px;
 	opacity:  ${(props) => props.isSplash ? 1 : 0.5};
 	transform : ${(props) => props.isLeft ? "rotate(180deg)" : "rotate(0deg)"};
 	}

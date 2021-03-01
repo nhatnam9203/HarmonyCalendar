@@ -44,7 +44,7 @@ export default class Extra extends Component {
                     <ButtonExtra
                         backgroundColor={this.getStyleExtra(appointment, extra, index)}
                         disabled={appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND' || extra.duration <= 5}
-                        onClick={() => this.props.subtractExtra(index)}
+                        onClick={() => this.props.subtractExtra(extra)}
                     >
                         -5&#39;
 					</ButtonExtra>
@@ -52,7 +52,7 @@ export default class Extra extends Component {
                     <ButtonExtra
                         backgroundColor={this.getStyleExtra2(appointment, extra, index)}
                         disabled={appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND'}
-                        onClick={() => this.props.addExtra(index)}
+                        onClick={() => this.props.addExtra(extra)}
                     >
                         +5&#39;
 					</ButtonExtra>
