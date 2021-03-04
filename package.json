@@ -77,6 +77,7 @@
     "lodash": "^4.17.11",
     "minimist": "1.2.0",
     "moment": "^2.24.0",
+    "moment-timezone": "^0.5.33",
     "nuka-carousel": "^4.4.8",
     "prop-types": "15.6.2",
     "react": "16.6.0",
