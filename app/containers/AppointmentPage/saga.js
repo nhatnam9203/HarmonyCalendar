@@ -1218,7 +1218,6 @@ export function* updateStaffAppointmentPaid(action) {
 
 export function* searchCustomerBox(action) {
 	try {
-		console.log('search box saga')
 		const requestURL = new URL(`${api_constants.SEARCH_CUSTOMER_BOX}${action.payload.data}`);
 		const response = yield api(requestURL.toString(), '', 'GET', token);
 		if (response.codeNumber == 200) {
