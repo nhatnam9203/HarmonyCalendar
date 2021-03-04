@@ -33,9 +33,12 @@ import {
   reloadStaff,
   reloadCalendar,
   deselectAppointment,
+  selectAppointment,
   renderAppointment,
   getDetailMerchant,
-  loadingPopup
+  loadingPopup,
+  getBlockTime,
+  countNotificationUnread,
 } from './actions';
 import {
   makeSelectWaitingAppointments,
@@ -81,10 +84,13 @@ export function mapDispatchToProps(dispatch) {
     setDisplayedMembers:(members)=>dispatch(setDisplayedMembers(members)),
     updateAppointmentPaidOffline:(idAppointment)=>dispatch(updateAppointmentPaidOffline(idAppointment)),
     deselectAppointment: () => dispatch(deselectAppointment()),
+    selectAppointment : (appointment,fcEvent) => dispatch(selectAppointment(appointment,fcEvent)),
     renderAppointment: () => dispatch(renderAppointment()),
     getApppointmentById : ()=>dispatch(getApppointmentById()),
     getDetailMerchant : (data)=>dispatch(getDetailMerchant(data)),
-    loadingPopup : (data)=>dispatch(loadingPopup(data))
+    loadingPopup : (data)=>dispatch(loadingPopup(data)),
+    getBlockTime : ()=>dispatch(getBlockTime()),
+    countNotificationUnread: () => dispatch(countNotificationUnread()),
   };
 }
 

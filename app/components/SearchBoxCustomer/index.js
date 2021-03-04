@@ -149,13 +149,13 @@ export default class SearchBoxCustomer extends React.Component {
 
     closeSearchBox = () => {
         this.props.toggleSearchBox(false);
-        this.setState({ valueInput: '', indexActive: '' , isLoading : '' });
+        this.setState({ valueInput: '', indexActive: '', isLoading: '' });
     }
 
     selectItem = (date, appointment) => {
         this.setState({ indexActive: appointment.appointmentId });
         this.props.onChangeDay(moment(date).format('DDMMYYYY'));
-        this.props.scrollToAppointment(appointment);
+        this.props.scrollToAppointment(appointment.appointmentId);
         setTimeout(() => {
             this.closeSearchBox();
         }, 500);
@@ -188,7 +188,7 @@ export default class SearchBoxCustomer extends React.Component {
                     <BtnClose onClick={this.closeSearchBox}>
                         {<img src={closeBlack} />}
                     </BtnClose>
-                    
+
                     <Title>Search</Title>
 
                     <Row style={{ marginLeft: '2rem', marginRight: '2rem' }}>
@@ -218,7 +218,7 @@ export default class SearchBoxCustomer extends React.Component {
 
                     <Subtitle>Upcoming appointment</Subtitle>
                     {
-                        isEmpty(appointmentSearchBox) && isLoading !== '' && 
+                        isEmpty(appointmentSearchBox) && isLoading !== '' &&
                         <NoAppointment>
                             No appointments
                         </NoAppointment>

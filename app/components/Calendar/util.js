@@ -2,42 +2,8 @@
 import { statusConvertKey } from '../../containers/AppointmentPage/utilSaga';
 import moment from 'moment'
 import moment_tz from 'moment-timezone'
-import { formatPhone, formatPhoneCalendar } from '../../utils/helper';
+import { formatPhoneCalendar } from '../../utils/helper';
 import { store } from 'app';
-
-
-const servicesAdapter = (service) => {
-    return {
-        appointmentId: service.AppointmentId,
-        bookingServiceId: service.BookingServiceId,
-        duration: service.Duration,
-        price: service.Price,
-        serviceId: service.ServiceId,
-        serviceName: service.ServiceName,
-        staffId: service.StaffId
-    };
-};
-const productsAdapter = (product) => {
-    return {
-        appointmentId: product.AppointmentId,
-        bookingProductId: product.BookingProductId,
-        productId: product.ProductId,
-        productName: product.ProductName,
-        quantity: product.Quantity,
-        price: product.Price
-    };
-};
-const extrasAdapter = (extra) => {
-    return {
-        appointmentId: extra.AppointmentId,
-        bookingExtraId: extra.BookingExtraId,
-        bookingServiceId: extra.BookingServiceId,
-        duration: extra.Duration,
-        extraId: extra.ExtraId,
-        extraName: extra.ExtraName,
-        price: extra.Price
-    };
-};
 
 const notesAdapter = (notes) => {
     return {
@@ -168,7 +134,7 @@ const BLOCK_RENDER_SERVICE = (obj) => `<div class="app-event__option">${obj}</di
 
 
 export const EVENT_RENDER_TEMPLATE = (event) => `
-  <div class="app-event">
+  <div class="app-event222 apppointment-calendar">
     <div class="app-event__full-name">${event.userFullName}</div>
     <div class="app-event__phone-number">
     ${formatPhoneCalendar(event.phoneNumber)}</div>
@@ -182,11 +148,12 @@ export const EVENT_RENDER_TEMPLATE = (event) => `
         ${event.extrasRender.map((extra) => EXTRAS_RENDER_TEMPLATE(extra)).join('')}
     </div>
     <div class="app-event__id-number">${event.code}</div>
+    <div class="app-event__appointmentId">${event.id}</div>
   </div>
 `;
 
 export const EVENT_RENDER_TEMPLATE_BLOCK = (event) => `
-  <div class="app-event">
+  <div class="app-event apppointment-calendar">
     <div class="app-event__blockName">${event.blockName ? event.blockName : ""}</div>
     <div class="app-event__blockPhone">${event.blockPhone ? event.blockPhone : ""}</div>
     <div class="app-event__blockService">
@@ -194,6 +161,7 @@ export const EVENT_RENDER_TEMPLATE_BLOCK = (event) => `
         event.blockService.map(obj => BLOCK_RENDER_SERVICE(obj)).join('') :
         ""}
     </div>
+    <div class="app-event__appointmentId">${event.id}</div>
   </div>
 `;
 

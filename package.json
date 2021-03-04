@@ -86,6 +86,7 @@
     "react-dom": "16.6.0",
     "react-helmet": "5.2.0",
     "react-icons": "^3.4.0",
+    "react-infinite-scroll-component": "^6.0.0",
     "react-intl": "2.7.2",
     "react-loading": "^2.0.3",
     "react-mobile-picker": "^0.1.12",

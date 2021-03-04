@@ -17,6 +17,7 @@ import {
   makeSelectAllAppointments,
   makeAppointmentScroll,
   makeIsScrollToAppointment,
+  makeCountNotificationUnread,
 } from './selectors';
 
 import {
@@ -35,6 +36,9 @@ import {
   getDetailMerchant,
   scrollToAppointment,
   startScrollToAppointment,
+  toggleNotification,
+  countNotificationUnread,
+  getNotification,
 } from './actions';
 
 export function mapDispatchToProps(dispatch) {
@@ -54,6 +58,9 @@ export function mapDispatchToProps(dispatch) {
     getDetailMerchant: (data) => dispatch(getDetailMerchant(data)),
     scrollToAppointment: (app) => dispatch(scrollToAppointment(app)),
     startScrollToAppointment: (status) => dispatch(startScrollToAppointment(status)),
+    toggleNotification: (status) => dispatch(toggleNotification(status)),
+    countNotificationUnread: () => dispatch(countNotificationUnread()),
+    getNotification: (page) => dispatch(getNotification(page)),
   };
 }
 
@@ -70,6 +77,7 @@ const mapStateToProps = createStructuredSelector({
   allAppointment: makeSelectAllAppointments(),
   appointmentScroll: makeAppointmentScroll(),
   isScrollToAppointment: makeIsScrollToAppointment(),
+  notificationUnreadQuantity : makeCountNotificationUnread(),
 });
 
 const withConnect = connect(
