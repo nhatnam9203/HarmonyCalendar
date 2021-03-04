@@ -122,6 +122,10 @@ import {
 	TOGGLE_SEARCH_BOX,
 	SEARCH_CUSTOMER_BOX,
 	SCROLL_TO_APPOINTMENT,
+	TOGGLE_NOTIFICATION,
+	COUNT_NOTIFICATION_UNREAD,
+	GET_NOTIFICATION,
+	READ_NOTIFICATION,
 } from './constants';
 
 /**
@@ -921,5 +925,32 @@ export function startScrollToAppointment(isScrollToAppointment) {
 	return {
 		type: 'START_SCROLL_TO_APPOINTMENT',
 		isScrollToAppointment
+	};
+}
+
+export function toggleNotification(isPopupNotification) {
+	return {
+		type: TOGGLE_NOTIFICATION,
+		isPopupNotification
+	};
+}
+
+export function countNotificationUnread() {
+	return {
+		type: COUNT_NOTIFICATION_UNREAD,
+	};
+}
+
+export function getNotification(payload) {
+	return {
+		type: GET_NOTIFICATION,
+		payload,
+	};
+}
+
+export function readNotification(payload) {
+	return {
+		type: READ_NOTIFICATION,
+		payload,
 	};
 }

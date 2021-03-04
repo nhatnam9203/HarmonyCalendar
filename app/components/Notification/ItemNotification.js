@@ -46,6 +46,8 @@ Item.Date = styled.div`
 
 const ItemNotification = ({ item, icon, onClick }) => {
 
+    console.log({item});
+
     const rawMarkup = (content) => {
         return { __html: content };
     }

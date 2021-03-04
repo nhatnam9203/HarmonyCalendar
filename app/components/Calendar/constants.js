@@ -12,11 +12,11 @@ import {
 import {
 	assignAppointment,
 	moveAppointment,
-	putBackAppointment,
 	openAddingAppointment,
 	disableCalendar,
 	TimeAndStaffID,
-	getApppointmentById
+	getApppointmentById,
+	editBlockTime,
 } from '../../containers/AppointmentPage/actions';
 import vip from '../../images/vip.png';
 
@@ -62,8 +62,8 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 
 			/* book any staff */
 			if (parseInt(resource.id) === 0) {
-				const allAppointment = store.getState().getIn([ 'appointment', 'appointments', 'allAppointment' ]);
-				let allMember = store.getState().getIn([ 'appointment', 'members', 'all' ]);
+				const allAppointment = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
+				let allMember = store.getState().getIn(['appointment', 'members', 'all']);
 				let count = 0;
 				let countAppAnyStaff = 0;
 
@@ -86,10 +86,10 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 							el.member.blockTime.forEach((b) => {
 								const timeStart = `${moment(b.workingDate).format(
 									'YYYY-MM-DD'
-								)}T${moment(b.blockTimeStart, [ 'h:mm A' ]).format('HH:mm:ss')}`;
+								)}T${moment(b.blockTimeStart, ['h:mm A']).format('HH:mm:ss')}`;
 								const timeEnd = `${moment(b.workingDate).format(
 									'YYYY-MM-DD'
-								)}T${moment(b.blockTimeEnd, [ 'h:mm A' ]).format('HH:mm:ss')}`;
+								)}T${moment(b.blockTimeEnd, ['h:mm A']).format('HH:mm:ss')}`;
 								if (
 									// check block time
 									moment(start).isBefore(moment(timeEnd)) &&
@@ -133,14 +133,14 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 				});
 
 				if (count >= allMember.length - 1) {
-					if (checkAnyStaffFuture() == false){
+					if (checkAnyStaffFuture() == false) {
 						alert('There is no staff available at this time.');
 						return;
 					}
 				}
 
 				if (countAppAnyStaff > 0 && countAppAnyStaff >= count && count > 0) {
-					if (checkAnyStaffFuture() == false){
+					if (checkAnyStaffFuture() == false) {
 						alert('There is no staff available at this time.');
 						return;
 					}
@@ -151,18 +151,18 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 						staffId: 0,
 						action: 'addGroupAnyStaff'
 					};
-					const currentDay = store.getState().getIn([ 'appointment', 'currentDay' ]);
-					const merchantInfo = store.getState().getIn([ 'appointment', 'merchantInfo' ]);
+					const currentDay = store.getState().getIn(['appointment', 'currentDay']);
+					const merchantInfo = store.getState().getIn(['appointment', 'merchantInfo']);
 					const currentDayName = moment(currentDay).format('dddd');
 					const businessHour = Object.entries(merchantInfo.businessHour).find((b) => b[0] === currentDayName);
 
 					const start_bussiness = `${moment(currentDay).format('YYYY-MM-DD')}T${moment(
 						businessHour[1].timeStart,
-						[ 'h:mm A' ]
+						['h:mm A']
 					).format('HH:mm:ss')}`;
 					const end_bussiness = `${moment(currentDay).format('YYYY-MM-DD')}T${moment(
 						businessHour[1].timeEnd,
-						[ 'h:mm A' ]
+						['h:mm A']
 					).format('HH:mm:ss')}`;
 
 					if (
@@ -171,7 +171,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 					) {
 						// window.postMessage(JSON.stringify(data));
 						const time = moment(start._d.toString().substr(0, 24));
-						const merchantInfo = store.getState().getIn([ 'appointment', 'merchantInfo' ]);
+						const merchantInfo = store.getState().getIn(['appointment', 'merchantInfo']);
 						const timezone = merchantInfo.timezone;
 						let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment();
 						timeNow = `${moment(timeNow).format('YYYY-MM-DD')}T${moment(timeNow).format('HH:mm:ss')}`;
@@ -199,7 +199,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 			/* end book any staff */
 
 			if (parseInt(resource.id) !== 0) {
-				const displayedAppointments = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
+				const displayedAppointments = store.getState().getIn(['appointment', 'appointments', 'calendar']);
 
 				const member = displayedAppointments[parseInt(resource.id) - 1];
 				if (!member || member.memberId === 0) return;
@@ -214,9 +214,9 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 					}
 				});
 
-				const displayedMembers = store.getState().getIn([ 'appointment', 'members', 'displayed' ]);
+				const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
 
-				let currentDay = store.getState().getIn([ 'appointment', 'currentDay' ]);
+				let currentDay = store.getState().getIn(['appointment', 'currentDay']);
 
 				const staffAvailable = displayedMembers[parseInt(resource.id) - 1]
 					? displayedMembers[parseInt(resource.id) - 1]
@@ -229,12 +229,12 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 					);
 					timeEnd = `${moment(currentDay)
 						.day(currentDayName)
-						.format('YYYY-MM-DD')}T${moment(checkWorkingTime[1].timeEnd, [ 'h:mm A' ]).format('HH:mm:ss')}`;
+						.format('YYYY-MM-DD')}T${moment(checkWorkingTime[1].timeEnd, ['h:mm A']).format('HH:mm:ss')}`;
 					timeStart = `${moment(currentDay)
 						.day(currentDayName)
-						.format('YYYY-MM-DD')}T${moment(checkWorkingTime[1].timeStart, [ 'h:mm A' ]).format(
-						'HH:mm:ss'
-					)}`;
+						.format('YYYY-MM-DD')}T${moment(checkWorkingTime[1].timeStart, ['h:mm A']).format(
+							'HH:mm:ss'
+						)}`;
 					isCheckWorking = checkWorkingTime[1].isCheck;
 				}
 
@@ -243,7 +243,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 				if (Boolean(isCheckWorking) === true && check_block_temp === false) {
 					if (moment(time).isBefore(timeEnd) && moment(time).isSameOrAfter(timeStart)) {
 						/* Get timenow merchant's timezone */
-						const merchantInfo = store.getState().getIn([ 'appointment', 'merchantInfo' ]);
+						const merchantInfo = store.getState().getIn(['appointment', 'merchantInfo']);
 						const timezone = merchantInfo.timezone;
 						let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment().local();
 						timeNow = `${moment(timeNow).format('YYYY-MM-DD')}T${moment(timeNow).format('HH:mm:ss')}`;
@@ -272,7 +272,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 		},
 
 		eventClick: (event) => {
-			const allAppointment = store.getState().getIn([ 'appointment', 'appointments', 'allAppointment' ]);
+			const allAppointment = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
 			const appointment = allAppointment.find((app) => parseInt(app.id) === parseInt(event.data.id));
 			if (!appointment) return;
 			store.dispatch(getApppointmentById({ appointment, event }));
@@ -282,7 +282,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 		drop(date_time, jsEvent, ui, idResource) {
 			let date = moment(date_time).local();
 			const event = $(this).data().event.data;
-			const merchantInfo = store.getState().getIn([ 'appointment', 'merchantInfo' ]);
+			const merchantInfo = store.getState().getIn(['appointment', 'merchantInfo']);
 			let check = true;
 			let check_workingStaff = '';
 			let check_staff_drop = false;
@@ -301,15 +301,15 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 					? moment(start_time).add(totalDuration, 'minutes')
 					: moment(start_time).add(90, 'minutes');
 
-			const memberdisplay = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
+			const memberdisplay = store.getState().getIn(['appointment', 'appointments', 'calendar']);
 			let member_clone = JSON.parse(JSON.stringify(memberdisplay));
 			member_clone.forEach((element) => {
 				delete element.memberId;
 			});
-			const displayedMembers = store.getState().getIn([ 'appointment', 'members', 'displayed' ]);
+			const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
 			let all_appointments = [];
 			member_clone.forEach((apps) => {
-				all_appointments = [ ...all_appointments, ...apps.appointments ];
+				all_appointments = [...all_appointments, ...apps.appointments];
 			});
 			const resourceId = parseInt(idResource) - 1;
 			const pos = displayedMembers.findIndex((mem) => parseInt(mem.resourceId) === parseInt(resourceId));
@@ -321,7 +321,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 			/* END */
 
 			if (pos !== -1) {
-				const currentDay = store.getState().getIn([ 'appointment', 'currentDay' ]);
+				const currentDay = store.getState().getIn(['appointment', 'currentDay']);
 				const currentDayName = moment(currentDay).format('dddd');
 				const checkWorkingTime = Object.entries(displayedMembers[parseInt(resourceId)].workingTimes).find(
 					(b) => b[0] === currentDayName
@@ -419,8 +419,8 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 		},
 
 		eventDrop: (event, delta, revertFunc, jsEvent, ui, view) => {
-			const memberdisplay = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
-			const displayedMembers = store.getState().getIn([ 'appointment', 'members', 'displayed' ]);
+			const memberdisplay = store.getState().getIn(['appointment', 'appointments', 'calendar']);
+			const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
 
 			const start_time = moment(event.start).local();
 			const end_time = moment(event.end).local();
@@ -432,7 +432,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 				delete element.memberId;
 			});
 
-			const currentDay = store.getState().getIn([ 'appointment', 'currentDay' ]);
+			const currentDay = store.getState().getIn(['appointment', 'currentDay']);
 			let check_workingStaff = '';
 
 			const staffAvailable = displayedMembers[parseInt(event.resourceId) - 1];
@@ -441,8 +441,8 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 			if (!staffAvailable) {
 				if (event.data.memberId === 0) {
 					let isTest = false;
-					const currentDay = store.getState().getIn([ 'appointment', 'currentDay' ]);
-					const merchantInfo = store.getState().getIn([ 'appointment', 'merchantInfo' ]);
+					const currentDay = store.getState().getIn(['appointment', 'currentDay']);
+					const merchantInfo = store.getState().getIn(['appointment', 'merchantInfo']);
 					const currentDayName = moment(currentDay).format('dddd');
 					const businessHour = Object.entries(merchantInfo.businessHour).find((b) => b[0] === currentDayName);
 
@@ -540,7 +540,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 
 			let all_appointments = []; // tất cả appointment trên calendar
 			member_clone.forEach((apps) => {
-				all_appointments = [ ...all_appointments, ...apps.appointments ];
+				all_appointments = [...all_appointments, ...apps.appointments];
 			});
 
 			if (!staffAvailable) {
@@ -599,8 +599,8 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 				const endTime =
 					event.end !== null
 						? `${moment(event.end).local().format('YYYY-MM-DD')}T${moment(event.end)
-								.local()
-								.format('HH:mm:ss')}`
+							.local()
+							.format('HH:mm:ss')}`
 						: moment(start_time).add(90, 'minutes').format('YYYY-MM-DD HH:mm:ss');
 
 				if (check === false) {
@@ -652,7 +652,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 							}
 						}
 					} else {
-						const merchantInfo = store.getState().getIn([ 'appointment', 'merchantInfo' ]);
+						const merchantInfo = store.getState().getIn(['appointment', 'merchantInfo']);
 						const timezone = merchantInfo.timezone;
 						let timeNow = timezone ? moment_tz.tz(timezone.substring(12)) : moment().local();
 						const _time = `${moment(end_time).format('YYYY-MM-DD')}T${moment(end_time).format('HH:mm:ss')}`;
@@ -693,13 +693,13 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 			}
 			// }
 		},
-		/* eslint no-param-reassign: "error" */
 		eventDragStop: (event, jsEvent) => {
-			if (event.data.status.toString().includes('BLOCK')) {
-				return;
-			}
+			// if (event.data.status.toString().includes('BLOCK')) {
+			// 	return;
+			// }
 			if (parseInt(event.resourceId) !== 0) {
 				const trashEl = $('#drag-zone');
+
 				if (jsEvent) {
 					const ofs = trashEl.offset();
 					const x1 = ofs.left;
@@ -708,14 +708,16 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 					const y2 = ofs.top + trashEl.outerHeight(true);
 
 					if (jsEvent.pageX >= x1 && jsEvent.pageX <= x2 && jsEvent.pageY >= y1 && jsEvent.pageY <= y2) {
+
 						/* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
 						$('#full-calendar').fullCalendar('removeEvents', event._id);
-						const displayedMembers = store.getState().getIn([ 'appointment', 'appointments', 'calendar' ]);
-						const override = displayedMembers[parseInt(event.resourceId) - 1];
 						store.dispatch(
-							putBackAppointment({
-								...event.data,
-								memberId: override.memberId
+							editBlockTime({
+								start: event.data.start,
+								end: event.data.end,
+								note: event.data.code,
+								id: event.data.blockId,
+								staffId: -1
 							})
 						);
 					}
@@ -725,11 +727,11 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 		/* eslint no-param-reassign: "error" */
 		eventRender: (event, element) => {
 			if (!event.data.status.toString().includes('BLOCK')) {
-				let options = event.data.options.filter(obj=>obj.staffId === event.data.memberId);
-				let _extrasRender = extrasRender(options,event.data.extras);
+				let options = event.data.options.filter(obj => obj.staffId === event.data.memberId);
+				let _extrasRender = extrasRender(options, event.data.extras);
 				let dataEvent = {
 					...event.data,
-					extrasRender : _extrasRender
+					extrasRender: _extrasRender
 				}
 				element[0].innerHTML = EVENT_RENDER_TEMPLATE(dataEvent);
 				if (event.data.isVip === 1) {
@@ -747,8 +749,8 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 			}
 
 			if (event.data.status === 'BLOCK_TEMP_PAID' || event.data.status === 'BLOCK_TEMP_REFUND') {
-				const displayedMembers = store.getState().getIn([ 'appointment', 'members', 'displayed' ]);
-				const allAppointments = store.getState().getIn([ 'appointment', 'appointments', 'allAppointment' ]);
+				const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
+				const allAppointments = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
 				if (event.data.memberId) {
 					const member = displayedMembers.find((mem) => parseInt(mem.id) === parseInt(event.data.memberId));
 					if (member) {
@@ -796,7 +798,7 @@ export const addEventsToCalendar = async (currentDate, appointmentsMembers) => {
 	const events = [];
 	appointmentsMembers.forEach((member, index) => {
 		if (member.memberId !== 0) {
-			member.appointments.forEach((appointment) => {
+			member.appointments.filter(app => app.isBlock).forEach((appointment) => {
 				events.push({
 					resourceId: index + 1,
 					start: appointment.start,
@@ -825,7 +827,7 @@ export const addEventsToCalendar = async (currentDate, appointmentsMembers) => {
 		}
 	});
 
-	const allAppointments = store.getState().getIn([ 'appointment', 'appointments', 'allAppointment' ]);
+	const allAppointments = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
 
 	const app_in_anystaff = allAppointments
 		? allAppointments.filter((app) => app.memberId === 0 && app.status !== 'WAITING')
@@ -861,7 +863,7 @@ export const addEventsToCalendar = async (currentDate, appointmentsMembers) => {
 };
 
 export const deleteEventFromCalendar = (eventId) => {
-	$('#full-calendar').fullCalendar('removeEvents', [ eventId ]);
+	$('#full-calendar').fullCalendar('removeEvents', [eventId]);
 };
 
 export const updateEventToCalendar = (fcEvent) => {
@@ -920,7 +922,7 @@ export const updateEventToCalendar = (fcEvent) => {
 		eventColor = 'red';
 		eventClass = 'event-checkin';
 	}
-	const displayedMembers = store.getState().getIn([ 'appointment', 'members', 'displayed' ]);
+	const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
 
 	const resourceId = displayedMembers.findIndex((mem) => mem.id === fcEvent.memberId);
 
@@ -937,7 +939,7 @@ export const updateEventToCalendar = (fcEvent) => {
 
 	//viet them ham update cho event o cot any staff tai day
 
-	$('#full-calendar').fullCalendar('addEventSource', [ data ]);
+	$('#full-calendar').fullCalendar('addEventSource', [data]);
 };
 
 function getAtrributeByStatus(appointment) {

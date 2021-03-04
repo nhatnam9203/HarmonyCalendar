@@ -36,7 +36,25 @@ const BellButton = styled.div`
 		width: 30px;
 		height : 30px;
 	}
+	position : relative;
 `;
+
+BellButton.Icon = styled.div`
+	background : red;
+	width : 1.5rem;
+	height : 1.5rem;
+	display: flex;
+	justify-content : center;
+	align-items : center;
+	position : absolute;
+	top : 0.8rem;
+	right : 1.2rem;
+	color : white;
+	font-size : 0.6rem;
+	font-weight : 600;
+	border-radius : 300rem;
+`;
+
 
 const ResourceSliderWrapper = styled.div`
 	width: calc(100% - 5.05rem - (calc((100vw - 5.05rem) / 10)) - (calc((100vw - 5.05rem) / 10)) + 1px);
@@ -225,18 +243,22 @@ function chunk(array, size) {
 const qtyStaff = 8;
 
 class ResourceSelector extends React.Component {
-
 	constructor(props) {
 		super(props);
 		this.refPrevButton = React.createRef();
 		this.refNextButton = React.createRef();
 	}
 
+	toggleNotification = () => {
+		this.props.toggleNotification(true);
+		this.props.getNotification({ page: 1 });
+	}
+
 	async componentWillReceiveProps(nextProps) {
 		const { appointmentScroll, isScrollToAppointment } = nextProps;
-		if (isScrollToAppointment === true) {
-			const { appointmentId } = appointmentScroll;
-			await this.findSlideScroll(appointmentId);
+		if (isScrollToAppointment === true && isScrollToAppointment !== this.props.isScrollToAppointment) {
+			await this.findSlideScroll(appointmentScroll);
+			await this.verticalScrollToAppointment(appointmentScroll);
 			this.resetScrollAppointment();
 		}
 	}
@@ -250,11 +272,20 @@ class ResourceSelector extends React.Component {
 		const { allAppointment, resources, slideIndex } = this.props;
 		let app = allAppointment.find(app => app.id === appointmentId);
 		const { memberId } = app;
-		let indexStaff = resources.findIndex(s => s.id === memberId);
+		let indexStaff = resources.findIndex(s => parseInt(s.id) === parseInt(memberId));
 		let slideIndexAppointment = parseInt((indexStaff + 1) / qtyStaff);
 		let slideNeedToScroll = slideIndexAppointment - slideIndex;
-
 		this.scrollToAppointment(slideNeedToScroll);
+	}
+
+	verticalScrollToAppointment(appointmentId) {
+		var els = document.getElementsByClassName("apppointment-calendar");
+		Array.prototype.forEach.call(els, function (el) {
+			let text = el.outerText;
+			if (text.toString().includes(appointmentId.toString())) {
+				el.scrollIntoView();
+			}
+		});
 	}
 
 	scrollToAppointment(slideNeedToScroll) {
@@ -272,7 +303,9 @@ class ResourceSelector extends React.Component {
 
 	componentWillMount() {
 		this.props.getDetailMerchant({ isFirstLoad: true });
+		this.props.countNotificationUnread();
 	}
+
 
 	onPrevClick(event, previousSlide) {
 		previousSlide(event);
@@ -394,7 +427,8 @@ class ResourceSelector extends React.Component {
 			deleteBlockTime,
 			currentDay,
 			editBlockTime,
-			resources
+			resources,
+			notificationUnreadQuantity
 		} = this.props;
 
 		const isActiveLett = this.getActiveArrow().isActiveLeft;
@@ -403,9 +437,16 @@ class ResourceSelector extends React.Component {
 		return (
 			<React.Fragment>
 				<ResourceSelectorWrapper>
-					<BellButton onClick={() => this.refPrevButton.current.click()}>
+					<BellButton onClick={this.toggleNotification}>
 						<img src={require('../../images/bell.png')} />
+						{
+							parseInt(notificationUnreadQuantity) > 0 &&
+							<BellButton.Icon>
+								{parseInt(notificationUnreadQuantity) > 99 ? '99+' : notificationUnreadQuantity}
+							</BellButton.Icon>
+						}
 					</BellButton>
+
 
 					<AnyStaff>
 						<AnyStaff.Image>
@@ -445,7 +486,8 @@ class ResourceSelector extends React.Component {
 									} else return <ButtonSplash
 										refButton={this.refNextButton}
 										onClick={(ev) => this.onNextClick(ev, nextSlide)}
-									/>;								}}
+									/>;
+								}}
 								afterSlide={(slideIndex) => this.afterSlide(slideIndex)}
 							>
 								{this.renderCarouselSlide()}

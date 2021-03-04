@@ -207,6 +207,7 @@ export default class index extends Component {
                                 {
                                     !isEmpty(notifications) && notifications.map(item => (
                                         <ItemNotification
+                                            key={item.merchantNotificationId+'notify'}
                                             item={item}
                                             icon={this.checkIcon(item.type, item.view)}
                                             onClick={() => this.readNotification(item)}

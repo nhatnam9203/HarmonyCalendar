@@ -13,6 +13,7 @@ import {
     searchCustomerBox,
     selectDay,
     scrollToAppointment,
+    getNotification,
 } from './actions';
 
 export function mapDispatchToProps(dispatch) {
@@ -21,6 +22,7 @@ export function mapDispatchToProps(dispatch) {
     searchCustomerBox : (data) => dispatch(searchCustomerBox(data)),
     onChangeDay: (day) => dispatch(selectDay(day)),
     scrollToAppointment: (app) => dispatch(scrollToAppointment(app)),
+    getNotification: (page) => dispatch(getNotification(page)),
   };
 }
 

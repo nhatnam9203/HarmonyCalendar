@@ -14,8 +14,8 @@ import {
 	makeInfoCheckPhone,
 	makeSelectAllAppointments,
 	makeSlideIndex,
-	makeSelectMembers,
-	makeMerchantInfo
+	makeMerchantInfo,
+	makeAppointmentScroll
 } from './selectors';
 
 import { token, merchantId } from '../../../app-constants';
@@ -27,13 +27,10 @@ import {
 	dataUpdateAppointment,
 	totalDurationAssignAppointment,
 	dataChangeTimeAppointment,
-	dataPutBackAppointment,
 	statusConvertData,
 	appointmentAdapter,
 	memberAdapter,
-	totalDurationMoveAppointment,
 	addLastStaff,
-	block,
 	addBlockAnyStaff,
 	new_total_duration,
 	checkMerchantWorking,
@@ -139,7 +136,7 @@ export function* reloadCalendarSaga() {
 			)
 		}));
 
-		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery, appointments);
+		// addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery, appointments);
 		yield put(actions.loadedAllAppointments(appointments));
 		yield put(actions.appointmentByMembersLoaded(appointmentsMembers));
 		yield put(actions.getBlockTime());
@@ -269,8 +266,8 @@ export function* reRenderAppointment() {
 		const appointments = yield select(makeSelectAllAppointments());
 		const currentDate = yield select(makeCurrentDay());
 		const appointmentScroll = yield select(makeAppointmentScroll());
-		let apiDateQuery = currentDate.format('YYYY-MM-DD') || moment().format('YYYY-MM-DD');
 
+		let apiDateQuery = currentDate.format('YYYY-MM-DD') || moment().format('YYYY-MM-DD');
 		const appointmentsMembers = displayedMembers.map((member) => ({
 			memberId: member.id,
 			appointments: appointments.filter(
@@ -286,8 +283,7 @@ export function* reRenderAppointment() {
 		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery, appointments);
 		yield put(actions.appointmentByMembersLoaded(appointmentsMembers));
 		addEventsToCalendar(currentDate, appointmentsMembers);
-
-		if (!isEmpty(appointmentScroll)) {
+		if (appointmentScroll && appointmentScroll !== '') {
 			yield put({ type: 'START_SCROLL_TO_APPOINTMENT', isScrollToAppointment: true });
 		}
 	} catch (err) {
@@ -330,8 +326,6 @@ export function* moveAppointment(action) {
 		end: `${new_endTime.format('YYYY-MM-DD')}T${new_endTime.format('HH:mm:ss')}`,
 		memberId: assignedMember ? assignedMember.id : 0
 	};
-
-	console.log({ appointment })
 
 	if (assignedMember && previousMemberId !== 0) {
 		if (appointment.status !== 'CHECKED_IN') {
@@ -398,31 +392,6 @@ export function* moveAppointment(action) {
 	} catch (err) {
 		yield put(actions.updateAppointmentFrontend({ appointment: data, id: appointment.id }));
 		yield put(actions.renderAppointment());
-	}
-}
-
-/********************************* PUT BACK APPOINTMENT FROM CALENDAR TO WAITING LIST *********************************/
-export function* putBackAppointment(action) {
-	try {
-		const { appointment } = action;
-		let { memberId, start, end, options, products, extras, giftCards } = appointment;
-
-		const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
-		const url = `${requestURL.toString()}/${appointment.id}`;
-		yield put(actions.appointmentPutBack(action.appointment));
-
-		const data = dataPutBackAppointment(memberId, start, end, options, products, extras, giftCards);
-
-		try {
-			if (navigator.onLine) {
-				const response = yield api(url, data, 'PUT', token);
-				if (response.codeStatus !== 1) return yield* checkResponse(response);
-				if (response.codeStatus === 1) {
-				}
-			}
-		} catch (err) { }
-	} catch (err) {
-		yield put(actions.appointmentPuttingBackError(err));
 	}
 }
 
@@ -1045,6 +1014,7 @@ export function* getBlockTimeSaga() {
 		let apiDateQuery = currentDate.format('YYYY-MM-DD') || moment().format('YYYY-MM-DD');
 		const requestURL = new URL(`${api_constants.GET_WORKINGTIME_MERCHANT}${apiDateQuery}`);
 		const response = yield api(requestURL.toString(), '', 'GET', token);
+
 		if (response.codeStatus === 1) {
 			yield put(actions.getBlockTime_Success(response.data));
 			yield put(actions.renderAppointment());
@@ -1229,6 +1199,47 @@ export function* searchCustomerBox(action) {
 	} catch (err) { }
 }
 
+export function* countNotificationUnread(action) {
+	try {
+		const requestURL = new URL(`${api_constants.NOTIFICATION_COUNT_UNREAD}`);
+		const response = yield api(requestURL.toString(), '', 'GET', token);
+		if (response.codeNumber == 200) {
+			yield put({ type: 'SET_COUNT_NOTIFICATION_UNREAD', payload: response.data });
+		} else {
+			alert(response.message);
+		}
+	} catch (err) { }
+}
+
+export function* getNotification(action) {
+	try {
+		const requestURL = new URL(`${api_constants.NOTIFICATION_GET_BY_PAGE}?page=${action.payload.page}&row=10`);
+		const response = yield api(requestURL.toString(), '', 'GET', token);
+
+		if (response.codeNumber == 200) {
+			if (response.data.length > 0) {
+				yield put({
+					type: 'SET_NOTIFICATION',
+					payload: response.data,
+					page: action.payload.page
+				});
+				if (action.payload.cb) {
+					action.payload.cb(true);
+				}
+			}
+		} else {
+			alert(response.message);
+		}
+	} catch (err) { }
+}
+
+export function* readNotification(action) {
+	try {
+		const requestURL = new URL(`${api_constants.NOTIFICATION_MASK_READ}/${action.payload}`);;
+		const response = yield api(requestURL.toString(), '', 'PUT', token);
+	} catch (err) { }
+}
+
 
 /* **************************** Subroutines ******************************** */
 
@@ -1287,10 +1298,6 @@ export function* assignAppointmentData() {
 
 export function* moveAppointmentData() {
 	yield takeLatest(constants.MOVE_APPOINTMENT, moveAppointment);
-}
-
-export function* putBackAppointmentData() {
-	yield takeLatest(constants.PUT_BACK_APPOINTMENT, putBackAppointment);
 }
 
 export function* updateAppointmentStatus() {
@@ -1364,8 +1371,6 @@ export default function* root() {
 		fork(appointmentsByMembersData),
 		fork(assignAppointmentData),
 		fork(moveAppointmentData),
-		fork(putBackAppointmentData),
-		// fork(cancelAppointmentData),
 		fork(updateAppointmentStatus),
 		fork(add_Customer),
 		fork(check_Phone),
@@ -1376,7 +1381,6 @@ export default function* root() {
 		fork(getBlockTime_),
 		fork(watch_getAppointmentById),
 		fork(watch_getTimeStaffLogin),
-		// fork(reloadStaffWatch),
 		fork(reloadCalendarWatch),
 		fork(updateNextStaff_Saga),
 		fork(watch_editBlockTime),
@@ -1389,5 +1393,8 @@ export default function* root() {
 		fork(watch_searchPhoneCompanion),
 		fork(watch_updateStaffAppointmentPaid),
 		takeLatest("SEARCH_CUSTOMER_BOX", searchCustomerBox),
+		takeLatest("COUNT_NOTIFICATION_UNREAD", countNotificationUnread),
+		takeLatest("GET_NOTIFICATION", getNotification),
+		takeLatest("READ_NOTIFICATION", readNotification),
 	]);
 }

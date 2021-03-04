@@ -72,6 +72,10 @@ import {
 	SET_APPOINTMENT_SEARCH_BOX,
 	SCROLL_TO_APPOINTMENT,
 	START_SCROLL_TO_APPOINTMENT,
+	TOGGLE_NOTIFICATION,
+	SET_COUNT_NOTIFICATION_UNREAD,
+	SET_NOTIFICATION,
+	READ_NOTIFICATION,
 } from './constants';
 import { dataPutBackAppointment } from './utilSaga';
 import { unionBy } from 'lodash';
@@ -130,6 +134,9 @@ export const initialState = fromJS({
 	appointmentSearchBox: [],
 	appointmentScroll: '',
 	isScrollToAppointment: false,
+	isPopupNotification: false,
+	notificationUnreadQuantity: 0,
+	notifications: [],
 });
 
 function saveAppointmentOffLine(app) {
@@ -169,6 +176,30 @@ function appointmentReducer(state = initialState, action) {
 					startOfWeek.clone().add(6, 'd')
 				])
 			);
+
+		case READ_NOTIFICATION:
+			let index = state.get('notifications').findIndex(app => app.merchantNotificationId === action.payload);
+			let arrTemp = state.get('notifications');
+			arrTemp[index].view = 1;
+
+			return state.set('notifications', arrTemp);
+
+		case SET_NOTIFICATION:
+			if (action.page !== 1) {
+				let tempArr = [
+					...state.get('notifications'),
+					...action.payload
+				];
+				return state.set('notifications', tempArr);
+			} else {
+				return state.set('notifications', action.payload);
+			}
+
+		case SET_COUNT_NOTIFICATION_UNREAD:
+			return state.set('notificationUnreadQuantity', action.payload);
+
+		case TOGGLE_NOTIFICATION:
+			return state.set('isPopupNotification', action.isPopupNotification);
 
 		case TOGGLE_SEARCH_BOX:
 			return state.set('isPopupSearchBox', action.isPopupSearchBox).set('appointmentSearchBox', []);

@@ -107,7 +107,8 @@ export function addFullBlock(memberId, currentDate, day) {
 		options: [],
 		products: [],
 		extras: [],
-		notes: []
+		notes: [],
+		isBlock : true,
 	};
 }
 
@@ -124,7 +125,8 @@ export function block(memberId, start, end) {
 		options: [],
 		products: [],
 		extras: [],
-		notes: []
+		notes: [],
+		isBlock : true,
 	};
 }
 
@@ -167,7 +169,8 @@ export function blockTemp(memberId, start, end, note, appointmentId, status, blo
 		blockId,
 		blockName: tempNote.blockName ? tempNote.blockName : "",
 		blockPhone: tempNote.blockPhone ? tempNote.blockPhone.toString().replace("+84", "").replace("+1", "") : "",
-		blockService: tempNote.blockService ? tempNote.blockService : ""
+		blockService: tempNote.blockService ? tempNote.blockService : "",
+		isBlock : true
 	};
 }
 

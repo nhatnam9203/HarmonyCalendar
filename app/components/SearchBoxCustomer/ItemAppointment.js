@@ -54,6 +54,7 @@ const ImgExtra = styled.img`
 `;
 
 const ItemAppointment = ({ item, selectItem, indexActive }) => {
+
     return (
         <Item
             isActive={item.appointmentId === indexActive}

@@ -118,6 +118,17 @@ const makeAppointmentScroll = () =>
 const makeIsScrollToAppointment = () =>
 	createSelector(currentAppointment, (appointmentState) => appointmentState.get('isScrollToAppointment'));
 
+const makeIsPopupNotification = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.get('isPopupNotification'));
+
+const makeCountNotificationUnread = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.get('notificationUnreadQuantity'));
+
+createSelector(currentAppointment, (appointmentState) => appointmentState.get('isPopupNotification'));
+
+const makeNotifications = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.get('notifications'));
+
 export {
 	currentAppointment,
 	makeCurrentDay,
@@ -155,4 +166,7 @@ export {
 	makeAppointmentSearchBox,
 	makeAppointmentScroll,
 	makeIsScrollToAppointment,
+	makeIsPopupNotification,
+	makeCountNotificationUnread,
+	makeNotifications,
 };
