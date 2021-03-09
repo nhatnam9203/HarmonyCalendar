@@ -12,11 +12,11 @@ export const API_PORT = 8010;
 // const DEV_API_BASE_URL = `https://api.harmonypayment.com`;
 // const PROD_API_BASE_URL = `https://api.harmonypayment.com`;
 
-export const DEV_API_BASE_URL = `https://dev.harmonypayment.com`;
-export const PROD_API_BASE_URL = `https://dev.harmonypayment.com`;
+// export const DEV_API_BASE_URL = `https://dev.harmonypayment.com`;
+// export const PROD_API_BASE_URL = `https://dev.harmonypayment.com`;
 
-// export const DEV_API_BASE_URL = `https://staging.harmonypayment.com`;
-// export const PROD_API_BASE_URL = `https://staging.harmonypayment.com`;
+export const DEV_API_BASE_URL = `https://staging.harmonypayment.com`;
+export const PROD_API_BASE_URL = `https://staging.harmonypayment.com`;
 
 export const isDesktopOrLaptop = window.innerWidth > 1000 ? true : false;
 
@@ -45,7 +45,7 @@ export const PUT_CHECKOUT = `${API_BASE_URL}/appointment/checkout`;
 export const API_GET_TIME_STAFF_LOGIN = `${API_BASE_URL}/staff/loginTime`;
 export const PUT_UPDATE_NOTE = `${API_BASE_URL}/appointment/note`;
 export const GET_SENDLINK_CUSTOMER = `${API_BASE_URL}/user/sendlink?phone=`;
-export const GET_DETAIL_MERCHANT = `${API_BASE_URL}/merchant`
+export const GET_DETAIL_MERCHANT = `${API_BASE_URL}/merchant/brief`
 export const PUT_UPDATE_COMPANION = `${API_BASE_URL}/appointment/updateCompanion`
 export const UPDATE_STAFF_APPOINTMENT_PAID = `${API_BASE_URL}/appointment/updateStaffAppointmentPaid`;
 export const SEARCH_CUSTOMER_BOX = `${API_BASE_URL}/appointment/search?key=`;

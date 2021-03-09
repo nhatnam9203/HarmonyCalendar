@@ -14,6 +14,7 @@ import {
     selectDay,
     scrollToAppointment,
     getNotification,
+    getApppointmentById
 } from './actions';
 
 export function mapDispatchToProps(dispatch) {
@@ -23,6 +24,7 @@ export function mapDispatchToProps(dispatch) {
     onChangeDay: (day) => dispatch(selectDay(day)),
     scrollToAppointment: (app) => dispatch(scrollToAppointment(app)),
     getNotification: (page) => dispatch(getNotification(page)),
+    getApppointmentById: (id) => dispatch(getApppointmentById(id)),
   };
 }
 

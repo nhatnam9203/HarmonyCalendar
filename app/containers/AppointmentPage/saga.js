@@ -35,7 +35,8 @@ import {
 	new_total_duration,
 	checkMerchantWorking,
 	postMesageAssignAppointment,
-	adapterServicesMoved
+	adapterServicesMoved,
+	blockTempFrontEnd
 } from './utilSaga';
 
 import { addEventsToCalendar, deleteEventFromCalendar } from '../../components/Calendar/constants';
@@ -397,7 +398,9 @@ export function* moveAppointment(action) {
 
 /********************************* ASSIGN APPOINTMENT FROM WAITING LIST TO CALENDAR *********************************/
 export function* assignAppointment(action) {
+	console.log('assign appointyment')
 	const displayedMembers = yield select(makeSelectDisplayedMembers());
+
 	const assignedMember = displayedMembers[action.resourceId];
 	const appointment = {
 		...action.eventData,
@@ -412,6 +415,10 @@ export function* assignAppointment(action) {
 		});
 		let duration_total = totalDurationAssignAppointment(extras, appointment);
 
+		let new_end_time = duration_total > 0
+			? moment(start).add(duration_total, 'minutes').format().substr(0, 19)
+			: moment(start).add(15, 'minutes').format().substr(0, 19);
+
 		yield put(
 			actions.addAppointmentToCalendar({
 				appointment: appointment,
@@ -422,6 +429,11 @@ export function* assignAppointment(action) {
 				memberId: appointment.memberId
 			})
 		);
+		console.log('assign appointyment 2')
+
+		const tempBlock = blockTempFrontEnd(appointment,new_end_time);
+		yield put(actions.addBlockTempFrontEnd(tempBlock));
+		yield put(actions.renderAppointment());
 
 		let data = {
 			staffId: memberId,
@@ -441,12 +453,14 @@ export function* assignAppointment(action) {
 			const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
 			const url = `${requestURL.toString()}/${appointment.id}`;
 			const response = yield api(url, data, 'PUT', token);
+			console.log('assign appointyment 3')
+
 			if (response.codeStatus !== 1) return yield* checkResponse(response);
 			if (response.codeStatus === 1) {
-				postMesageAssignAppointment(appointment.id, appointment);
-			} else {
-				postMesageAssignAppointment(appointment.id, appointment);
+				postMesageAssignAppointment(appointment.id, appointment)
 			}
+		} else {
+			postMesageAssignAppointment(appointment.id, appointment)
 		}
 	} catch (err) {
 		// yield put(appointmentAssigningError(err));
@@ -832,6 +846,7 @@ function* addAppointmentSaga() {
 				} else {
 					dataPush = JSON.stringify({
 						appointmentId,
+						staffId : data.staffId,
 						action: 'signinAppointment'
 					});
 				}
@@ -1237,8 +1252,12 @@ export function* readNotification(action) {
 	try {
 		const requestURL = new URL(`${api_constants.NOTIFICATION_MASK_READ}/${action.payload}`);;
 		const response = yield api(requestURL.toString(), '', 'PUT', token);
+		if(response.codeNumber == 200){
+			yield put({ type : 'COUNT_NOTIFICATION_UNREAD' });
+		}
 	} catch (err) { }
 }
+
 
 
 /* **************************** Subroutines ******************************** */

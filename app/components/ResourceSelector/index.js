@@ -227,6 +227,37 @@ const ButtonArrow = styled.div`
 	}
 `;
 
+
+const WrapButtonToday = styled.div`
+	width: calc(5.05rem - 2px);
+	height: 100%;
+	text-align: center;
+	padding: 0.2rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position : relative;
+`;
+
+const ButtonToday = styled.div`
+	width : 4.4rem;
+	height : 3.2rem;
+	border-radius : 5px;
+	display : flex;
+	flex-direction : row;
+	justify-content : center;
+	align-items : center;
+	background : #136AB7;
+	cursor: pointer;
+`;
+
+ButtonToday.Text = styled.div`
+	font-size : 0.94rem;
+	font-weight : 600;
+	color : white;
+`;
+
+
 function chunk(array, size) {
 	const chunkedArr = [];
 	for (let i = 0; i < array.length; i += 1) {
@@ -320,6 +351,12 @@ class ResourceSelector extends React.Component {
 		this.props.setDisplayedMembers(resources.slice(index * 8, index * 8 + 8));
 		this.props.renderAppointment();
 		this.props.setSlideIndex(index);
+	}
+
+	onTodayClick() {
+		const { timezone } = this.props.merchantInfo;
+		let timeNow = timezone ? moment_tz.tz(timezone.substring(12)).format('DDMMYYYY') : moment().format('DDMMYYYY');
+		this.props.onChangeToday(timeNow);
 	}
 
 	openPincode(staff) {
@@ -437,15 +474,11 @@ class ResourceSelector extends React.Component {
 		return (
 			<React.Fragment>
 				<ResourceSelectorWrapper>
-					<BellButton onClick={this.toggleNotification}>
-						<img src={require('../../images/bell.png')} />
-						{
-							parseInt(notificationUnreadQuantity) > 0 &&
-							<BellButton.Icon>
-								{parseInt(notificationUnreadQuantity) > 99 ? '99+' : notificationUnreadQuantity}
-							</BellButton.Icon>
-						}
-					</BellButton>
+					<WrapButtonToday>
+						<ButtonToday onClick={() => this.onTodayClick()}>
+							<ButtonToday.Text>Today</ButtonToday.Text>
+						</ButtonToday>
+					</WrapButtonToday>
 
 
 					<AnyStaff>

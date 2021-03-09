@@ -5,6 +5,7 @@ import AppointmentList from './AppointmentList';
 import { isEmpty } from 'lodash'
 import closeGrey from '../../images/closeGrey.png';
 import closeBlack from '../../images/close_black.png';
+import searchIcon from '../../images/searchIcon.png';
 import moment from 'moment';
 import ReactLoading from 'react-loading';
 
@@ -156,6 +157,7 @@ export default class SearchBoxCustomer extends React.Component {
         this.setState({ indexActive: appointment.appointmentId });
         this.props.onChangeDay(moment(date).format('DDMMYYYY'));
         this.props.scrollToAppointment(appointment.appointmentId);
+        this.props.getApppointmentById({ appointment: app });
         setTimeout(() => {
             this.closeSearchBox();
         }, 500);
@@ -198,9 +200,15 @@ export default class SearchBoxCustomer extends React.Component {
                                 onChange={e => this.onChangeInput(e)}
                                 placeholder={`Enter customer name / phone number`}
                             />
-                            <div onClick={() => this.setState({ valueInput: '' })}>
-                                <img src={closeGrey} />
-                            </div>
+                            {
+                                this.state.valueInput.length > 0 ?
+                                    <div onClick={() => this.setState({ valueInput: '' })}>
+                                        <img src={closeGrey} />
+                                    </div> : 
+                                    <div>
+                                        <img src={searchIcon} />
+                                    </div>
+                            }
                         </WrapInput>
 
                         <ButtonSearch

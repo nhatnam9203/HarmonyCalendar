@@ -27,7 +27,7 @@ const ButtonCheckIn = styled.div`
 
 ButtonCheckIn.Text = styled.div`
     color : white;
-    font-size : 1.1rem;
+    font-size : 1rem;
     font-weight : 700;
 `;
 

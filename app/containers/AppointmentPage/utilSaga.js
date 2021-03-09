@@ -108,7 +108,7 @@ export function addFullBlock(memberId, currentDate, day) {
 		products: [],
 		extras: [],
 		notes: [],
-		isBlock : true,
+		isBlock: true,
 	};
 }
 
@@ -126,7 +126,7 @@ export function block(memberId, start, end) {
 		products: [],
 		extras: [],
 		notes: [],
-		isBlock : true,
+		isBlock: true,
 	};
 }
 
@@ -170,7 +170,7 @@ export function blockTemp(memberId, start, end, note, appointmentId, status, blo
 		blockName: tempNote.blockName ? tempNote.blockName : "",
 		blockPhone: tempNote.blockPhone ? tempNote.blockPhone.toString().replace("+84", "").replace("+1", "") : "",
 		blockService: tempNote.blockService ? tempNote.blockService : "",
-		isBlock : true
+		isBlock: true
 	};
 }
 
@@ -379,8 +379,9 @@ export function totalDurationAssignAppointment(extras, appointment) {
 		if (appointment.memberId === el.staffId) duration_total += parseInt(el.duration);
 	});
 	extras.forEach((ext) => {
-		if (appointment.memberId === ext.staffId) duration_total += parseInt(ext.duration);
+		duration_total += parseInt(ext.duration);
 	});
+
 	return duration_total;
 }
 
@@ -668,4 +669,35 @@ export function adapterServicesMoved(services = [], staffId) {
 		arrTemp.push(services[i]);
 	}
 	return arrTemp;
+}
+
+export const blockTempFrontEnd = (appointment, newEndTime) => {
+	const { memberId, start, firstName , phoneNumber, createdDate, options, products, extras } = appointment;
+	return {
+		appointmentId: appointment.id,
+		blockTimeEnd: moment(newEndTime).format('hh:mm A'),
+		blockTimeId: "",
+		blockTimeStart: moment(start).format('hh:mm A'),
+		bookingServiceId: "",
+		createdDate,
+		editable: false,
+		isDisabled: 0,
+		isPaid: false,
+		merchantId: "",
+		note: `${firstName}<br>${phoneNumber}<br>${tempServices(options)}${tempProducts(products)}${tempExtras(extras)}`,
+		staffId: memberId,
+		workingDate: `${moment(start).format('YYYY-MM-DD')}T00:00:00`
+	}
+}
+
+const tempServices = (services) => {
+	return services.map(sv => "- " + sv.serviceName + "<br>");
+}
+
+const tempExtras = (extras) => {
+	return extras.map(ex => "- " + ex.extraName + "<br>");
+}
+
+const tempProducts = (products) => {
+	return products.map(p => "- " + p.productName + "<br>");
 }

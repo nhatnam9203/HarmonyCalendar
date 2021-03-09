@@ -126,6 +126,8 @@ import {
 	COUNT_NOTIFICATION_UNREAD,
 	GET_NOTIFICATION,
 	READ_NOTIFICATION,
+	UPDATE_BLOCKTIME_FRONTEND,
+	ADD_BLOCK_TEMP_FRONTEND,
 } from './constants';
 
 /**
@@ -951,6 +953,20 @@ export function getNotification(payload) {
 export function readNotification(payload) {
 	return {
 		type: READ_NOTIFICATION,
+		payload,
+	};
+}
+
+export function updateBlockTimeFrontEnd(payload) {
+	return {
+		type: UPDATE_BLOCKTIME_FRONTEND,
+		payload,
+	};
+}
+
+export function addBlockTempFrontEnd(payload) {
+	return {
+		type: ADD_BLOCK_TEMP_FRONTEND,
 		payload,
 	};
 }

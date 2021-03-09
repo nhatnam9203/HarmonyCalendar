@@ -76,6 +76,8 @@ import {
 	SET_COUNT_NOTIFICATION_UNREAD,
 	SET_NOTIFICATION,
 	READ_NOTIFICATION,
+	UPDATE_BLOCKTIME_FRONTEND,
+	ADD_BLOCK_TEMP_FRONTEND,
 } from './constants';
 import { dataPutBackAppointment } from './utilSaga';
 import { unionBy } from 'lodash';
@@ -194,6 +196,22 @@ function appointmentReducer(state = initialState, action) {
 			} else {
 				return state.set('notifications', action.payload);
 			}
+
+		case ADD_BLOCK_TEMP_FRONTEND:
+			return state
+				.updateIn(['members', 'all'], (arr) => {
+					const staffIndex = arr.findIndex(s => s.id === action.payload.staffId);
+					arr[staffIndex].blockTime.push(action.payload);
+					localStorage.setItem('staffList', JSON.stringify(arr));
+					return [...arr];
+				})
+				.updateIn(['members', 'blockTime'], (arr) => {
+					arr.push(action.payload);
+					return [...arr];
+				});
+
+		case UPDATE_BLOCKTIME_FRONTEND:
+			return state;
 
 		case SET_COUNT_NOTIFICATION_UNREAD:
 			return state.set('notificationUnreadQuantity', action.payload);
