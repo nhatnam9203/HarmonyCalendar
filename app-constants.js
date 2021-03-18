@@ -9,14 +9,14 @@ export const role = getURLParam('role');
 
 export const API_PORT = 8010;
 
-// const DEV_API_BASE_URL = `https://api.harmonypayment.com`;
-// const PROD_API_BASE_URL = `https://api.harmonypayment.com`;
+export const DEV_API_BASE_URL = `https://api.harmonypayment.com`;
+export const PROD_API_BASE_URL = `https://api.harmonypayment.com`;
 
 // export const DEV_API_BASE_URL = `https://dev.harmonypayment.com`;
 // export const PROD_API_BASE_URL = `https://dev.harmonypayment.com`;
 
-export const DEV_API_BASE_URL = `https://staging.harmonypayment.com`;
-export const PROD_API_BASE_URL = `https://staging.harmonypayment.com`;
+// export const DEV_API_BASE_URL = `https://staging.harmonypayment.com`;
+// export const PROD_API_BASE_URL = `https://staging.harmonypayment.com`;
 
 export const isDesktopOrLaptop = window.innerWidth > 1000 ? true : false;
 

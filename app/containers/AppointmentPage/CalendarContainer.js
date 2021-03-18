@@ -39,6 +39,8 @@ import {
   loadingPopup,
   getBlockTime,
   countNotificationUnread,
+  scrollToAppointment,
+  selectDay,
 } from './actions';
 import {
   makeSelectWaitingAppointments,
@@ -86,11 +88,13 @@ export function mapDispatchToProps(dispatch) {
     deselectAppointment: () => dispatch(deselectAppointment()),
     selectAppointment : (appointment,fcEvent) => dispatch(selectAppointment(appointment,fcEvent)),
     renderAppointment: () => dispatch(renderAppointment()),
-    getApppointmentById : ()=>dispatch(getApppointmentById()),
+    getApppointmentById: (id) => dispatch(getApppointmentById(id)),
     getDetailMerchant : (data)=>dispatch(getDetailMerchant(data)),
     loadingPopup : (data)=>dispatch(loadingPopup(data)),
     getBlockTime : ()=>dispatch(getBlockTime()),
     countNotificationUnread: () => dispatch(countNotificationUnread()),
+    scrollToAppointment: (appointmentId) => dispatch(scrollToAppointment(appointmentId)),
+    onChangeDay: (day) => dispatch(selectDay(day)),
   };
 }
 

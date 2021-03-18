@@ -26,6 +26,7 @@ const DragZoneWrapper = styled.div`
 
 const EventWrapper = styled.div`
 	background: #f4f4f5;
+	width: calc((100vw - 5.05rem) / 10);
 	border: 0.5px solid #ffffff;
 	color: #333333;
 	height: calc((100vh - 8.8rem - 55px)/4);
@@ -34,6 +35,14 @@ const EventWrapper = styled.div`
 	}
 	overflow: hidden;
 	position: relative;
+`;
+
+const WaitingEvent = styled.div`
+  -webkit-user-select: none; 
+  -moz-user-select: none; 
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
 `;
 
 const BtnClose = styled.div`
@@ -221,7 +230,7 @@ class FCDragZone extends React.PureComponent {
 						</PrevButton>
 					)}
 
-					<div id="waiting-events">
+					<WaitingEvent id="waiting-events">
 						{displayedEvents.map((event) => (
 							<EventWrapper
 								className="app-event"
@@ -258,7 +267,7 @@ class FCDragZone extends React.PureComponent {
 								))}
 							</EventWrapper>
 						))}
-					</div>
+					</WaitingEvent>
 
 					{/* Next Button */}
 					{isActiveRight && <ButtonSplash onClick={() => this.nextSlide()} />}

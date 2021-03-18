@@ -36,6 +36,11 @@ const MainCalendar = styled.div`
 const RightSideBar = styled.div`
 	width: calc((100vw - 5.05rem) / 10);
 	position: relative;
+	-webkit-user-select: none; 
+	-moz-user-select: none; 
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none;
 `;
 
 function IsJson(str) {
@@ -85,6 +90,17 @@ class Calendar extends React.Component {
 						window.location.reload();
 					}, 300);
 				}
+			}
+
+			if(action === 'appointmentNotification'){
+				this.props.onChangeDay(moment(data.data.appointmentDate).format('DDMMYYYY'));
+				this.props.scrollToAppointment(data.data.appointmentId);
+				let app = {
+					...data.data,
+					id : data.data.appointmentId,
+					end : data.data.createdDate,
+				}
+				this.props.getApppointmentById({ appointment: app });
 			}
 		}
 	};
@@ -152,13 +168,20 @@ class Calendar extends React.Component {
 		}
 	}
 
+	updateNotification(){
+		const data = JSON.stringify({
+			action: 'update_notification',
+		});
+		window.postMessage(data);
+	}
+
 	runSignalR_Appointment() {
 		const url = `${PROD_API_BASE_URL}/notification/?merchantId=${merchantId}&Title=Merchant&kind=calendar&deviceId=${deviceId}`;
 		let connection = new signalR.HubConnectionBuilder().withUrl(url).withAutomaticReconnect().build();
 		connection.serverTimeoutInMilliseconds = 6000000;
 
 		connection.on('ListWaNotification', async (data) => {
-			this.props.countNotificationUnread();
+			this.updateNotification();
 			let app = JSON.parse(data);
 			if (app.data) {
 				let type = app.data.Type;

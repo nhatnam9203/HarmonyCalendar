@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 import { role } from '../../../../app-constants';
+import { appointmentMoved } from '../../../containers/AppointmentPage/actions';
 
 const Footer = styled.div`
 	display: flex;
@@ -81,7 +82,7 @@ export default class BottomButton extends Component {
                     }
                 } else return null;
             }
-            if (appointment.status !== 'WAITING') {
+            if (appointment.status !== 'WAITING' && appointment.status !== 'CANCEL') {
                 return (
                     <ButtonChange onClick={() => this.props.changeAppointmentTime()} primary="true">
                         <strong>Change</strong>
@@ -97,7 +98,8 @@ export default class BottomButton extends Component {
             <Footer>
                 {appointment.status !== 'VOID' &&
                     appointment.status !== 'REFUND' &&
-                    appointment.status !== 'PAID' && (
+                    appointment.status !== 'PAID' &&
+                    appointment.status !== 'CANCEL' && (
                         <div>
                             <Button
                                 onClick={() => {

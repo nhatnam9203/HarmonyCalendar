@@ -117,7 +117,7 @@ const GlobalStyle = createGlobalStyle`
 
   .event-block-temp{
     overflow : hidden;
-    color : #333 !important;
+    color : white !important;
   }
 
   .event-block-temp-paid{
@@ -142,6 +142,10 @@ const GlobalStyle = createGlobalStyle`
     margin-top: -10px;
     padding: 1px 10px;
     z-index: 9;
+  }
+
+  .app-event__appointmentId{
+    opacity : 0;
   }
 
   .fc-time-grid-container::-webkit-scrollbar { width: 0 !important }

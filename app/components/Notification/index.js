@@ -93,7 +93,7 @@ export default class index extends Component {
 	}
 
 	componentDidMount() {
-		this.props.getNotification({ page: 1 });
+		// this.props.getNotification({ page: 1 });
 	}
 
 	getMoreData = () => {

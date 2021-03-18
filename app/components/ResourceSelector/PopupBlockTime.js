@@ -189,9 +189,17 @@ class PopupBlockTime extends Component {
 		let count = 0;
 		const memApp = calendarMembers.find((mem) => parseInt(mem.memberId) === parseInt(staff.id));
 		if (!memApp) return 0;
-		count = memApp.appointments.filter((app) => app.status !== 'BLOCK' && app.status !== 'BLOCK_TEMP').length;
+
+		count = memApp.appointments.filter((app) =>
+			app.status === 'BLOCK_TEMP_PAID' ||
+			app.status === 'BLOCK_TEMP_REFUND' ||
+			app.status === 'BLOCK_TEMP_ASSIGNED' ||
+			app.status === 'BLOCK_TEMP_CHECKED_IN' ||
+			app.status === 'BLOCK_TEMP_PAID').length;
+
 		return count ? count.toString() : 0;
 	}
+
 
 	editBlockTime() {
 		const { blockTimeEdit, start, end, note , blockStaffId} = this.state;

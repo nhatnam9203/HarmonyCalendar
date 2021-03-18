@@ -342,7 +342,7 @@ class Appointment extends Layout {
 		} else if (appointment.status === 'CHECKED_IN') {
 			this.updateChangeAppointment('checkin');
 		} else {
-			alert(`status appointment ${appointment.status} - id appointment ${appointment.id}`);
+			// alert(`status appointment ${appointment.status} - id appointment ${appointment.id}`);
 		}
 		this.closeModal();
 	}
@@ -413,6 +413,18 @@ class Appointment extends Layout {
 
 		window.postMessage(data);
 	};
+
+	addMore = () => {
+		const { appointment } = this.props;
+		const data = JSON.stringify({
+			appointmentId: appointment.id,
+			staffId : appointment.memberId,
+			action : (parseInt(appointment.memberId) === 0) ? 'addMoreAnyStaff' : 'addMore'
+		});
+
+		window.postMessage(data);
+	};
+
 
 	updateStatus(status, servicesUpdate) {
 		const { products, services, extras, newNotes, cloneAppointment } = this.state;
@@ -601,12 +613,12 @@ class Appointment extends Layout {
 		}
 		const { newNotes, notes, noteValue } = await this.state;
 		if (noteValue.trim() !== '') {
-			const { appointment , staffList } = this.props;
-			const staff = staffList.find(obj=>parseInt(obj.id) === parseInt(staffId));
+			const { appointment, staffList } = this.props;
+			const staff = staffList.find(obj => parseInt(obj.id) === parseInt(staffId));
 			const note = await {
 				createDate: new Date(),
 				note: noteValue,
-				staffName : staff ? staff.title : "",
+				staffName: staff ? staff.title : "",
 			};
 			if (noteValue.trim() !== '') {
 				$("#containerNotes").animate({ scrollTop: 0 }, "fast");
@@ -615,7 +627,7 @@ class Appointment extends Layout {
 					newNotes: [note, ...newNotes],
 					noteValue: ''
 				});
-				
+
 			}
 
 			this.props.updateNote({ notes: noteValue, idAppointment: appointment.id });

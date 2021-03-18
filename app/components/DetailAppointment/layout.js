@@ -438,6 +438,24 @@ const ContainerNotes = styled.div`
 	overflow-y : scroll;
 `;
 
+const ContainerAddMore = styled.div`
+	display : flex;
+	flex-direction : row;
+	align-items : center;
+	margin : 1rem 0px;
+	&>img{
+		width : 22px;
+		height : 22px;
+	}
+	&>div{
+		font-size : 1rem;
+		font-weight : 600;
+		color : #136AB7;
+		margin-left : 5px;
+		margin-top : 2px;
+	}
+`;
+
 class Appointment extends React.Component {
 	renderNote = (note, index) => {
 		return (
@@ -759,6 +777,19 @@ class Appointment extends React.Component {
 		}
 	}
 
+	renderAddMore() {
+		const { appointment } = this.props;
+		const { status } = appointment;
+		if (status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' && status !== 'CANCEL') {
+			return (
+				<ContainerAddMore onClick={this.addMore}>
+					<img src={require('../../images/addIcon.png')} />
+					<div>Add more service or product</div>
+				</ContainerAddMore>
+			)
+		}
+	}
+
 	/********************************* RENDER BODY APPOINTMENT *********************************/
 	renderBody() {
 		const { appointment } = this.props;
@@ -770,6 +801,7 @@ class Appointment extends React.Component {
 				{this.renderSelectDay()}
 				{this.renderServices()}
 				{this.renderProducts()}
+				{this.renderAddMore()}
 				{this.renderNotes()}
 
 				<AppointmentInformation>
@@ -825,15 +857,15 @@ class Appointment extends React.Component {
 
 						{this.renderBody()}
 
-						<BottomButton 
+						<BottomButton
 							appointment={appointment}
-							openConfirmationModal={()=>this.openConfirmationModal()}
+							openConfirmationModal={() => this.openConfirmationModal()}
 							isEditPaidAppointment={this.state.isEditPaidAppointment}
 							isChange={this.conditionButtonChange()}
-							nextStatus={()=>this.nextStatus()}
-							updateStaffAppointmentPaid={()=>this.updateStaffAppointmentPaid()}
-							toggleEditPaidAppointment={()=>this.toggleEditPaidAppointment()}
-							changeAppointmentTime={()=>this.ChangeAppointmentTime()}
+							nextStatus={() => this.nextStatus()}
+							updateStaffAppointmentPaid={() => this.updateStaffAppointmentPaid()}
+							toggleEditPaidAppointment={() => this.toggleEditPaidAppointment()}
+							changeAppointmentTime={() => this.ChangeAppointmentTime()}
 						/>
 
 					</AppointmentWrapper>

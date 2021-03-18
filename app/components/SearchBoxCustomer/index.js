@@ -157,12 +157,15 @@ export default class SearchBoxCustomer extends React.Component {
         this.setState({ indexActive: appointment.appointmentId });
         this.props.onChangeDay(moment(date).format('DDMMYYYY'));
         this.props.scrollToAppointment(appointment.appointmentId);
+        let app = {
+            ...appointment,
+            id : appointment.appointmentId
+        }
         this.props.getApppointmentById({ appointment: app });
         setTimeout(() => {
             this.closeSearchBox();
         }, 500);
     }
-
     render() {
         const { isPopupSearchBox, appointmentSearchBox } = this.props;
         const { isLoading } = this.state;

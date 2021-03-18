@@ -146,12 +146,13 @@ export default class Header extends Component {
                             style={{
                                 position: 'absolute',
                                 left: 15,
-                                fontSize: 12
+                                fontSize: 18,
+                                marginTop: 4
                             }}
                         >
                             {appointment.code}
                         </div>
-						Appointment
+						Appointment Canceled
                     </HeaderAppointment>
                 );
         }
