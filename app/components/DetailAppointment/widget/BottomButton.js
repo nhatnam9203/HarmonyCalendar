@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 import { role } from '../../../../app-constants';
-import { appointmentMoved } from '../../../containers/AppointmentPage/actions';
 
 const Footer = styled.div`
 	display: flex;
@@ -18,6 +17,7 @@ const Button = styled.button`
 	color: ${(props) => (props.primary ? '#ffffff' : '#333333')};
 	border: 1px solid #dddddd;
 	font-size: 1rem;
+    font-weight : 500;
 	line-height: 2.8;
 	height: 100%;
 	cursor: pointer;
@@ -81,8 +81,7 @@ export default class BottomButton extends Component {
                         );
                     }
                 } else return null;
-            }
-            if (appointment.status !== 'WAITING' && appointment.status !== 'CANCEL') {
+            }else if (appointment.status !== 'WAITING' && appointment.status !== 'CANCEL' && appointment.status !== 'PAID' && appointment.status !== 'REFUND' && appointment.status !== 'VOID') {
                 return (
                     <ButtonChange onClick={() => this.props.changeAppointmentTime()} primary="true">
                         <strong>Change</strong>

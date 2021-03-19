@@ -172,13 +172,6 @@ const UserInformation = styled.div`
 	}
 `;
 
-const WrapperCancelAppointment = styled.div`
-	display: flex;
-	width: 100%;
-	justify-content: row;
-	margin-top: 50px;
-`;
-
 const NoteWrapper = styled.div`
 	border: 1px solid #dddddd;
 	background: #eeeeee;
@@ -789,7 +782,6 @@ class Appointment extends React.Component {
 			)
 		}
 	}
-
 	/********************************* RENDER BODY APPOINTMENT *********************************/
 	renderBody() {
 		const { appointment } = this.props;

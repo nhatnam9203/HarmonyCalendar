@@ -5,7 +5,7 @@ import AppointmentList from './AppointmentList';
 import { isEmpty } from 'lodash'
 import closeGrey from '../../images/closeGrey.png';
 import closeBlack from '../../images/close_black.png';
-import searchIcon from '../../images/searchIcon.png';
+import searchIconGrey from '../../images/searchIconGrey.png';
 import moment from 'moment';
 import ReactLoading from 'react-loading';
 
@@ -14,9 +14,15 @@ const AppPopup = styled(Popup)`
   border: none !important;
   overflow: hidden;
   border-radius : 8px;
-  width : 45rem !important;
-
+  width : 48rem !important;
 `;
+
+const Subtitle = styled.div`
+    color : #757575;
+    font-size : 1rem;
+    margin-left : 2rem;
+`;
+
 
 const Container = styled.div`
     padding : 2rem 0px;
@@ -94,12 +100,6 @@ ButtonSearch.Text = styled.div`
     font-weight : ${(props) => props.isActive ? '600' : '500'};
 `;
 
-const Subtitle = styled.div`
-    color : #757575;
-    font-size : 1rem;
-    margin-left : 2rem;
-`;
-
 const NoAppointment = styled.div`
     color : #585858;
     font-size : 1rem;
@@ -138,9 +138,10 @@ export default class SearchBoxCustomer extends React.Component {
 
     onClickSearch = () => {
         const { valueInput } = this.state;
+        const data = encodeURIComponent(valueInput);
         if (valueInput.length > 0) {
             this.setState({ isLoading: true })
-            this.props.searchCustomerBox({ data: valueInput, cb: this.stopLoading });
+            this.props.searchCustomerBox({ data, cb: this.stopLoading });
         }
     }
 
@@ -159,13 +160,14 @@ export default class SearchBoxCustomer extends React.Component {
         this.props.scrollToAppointment(appointment.appointmentId);
         let app = {
             ...appointment,
-            id : appointment.appointmentId
+            id: appointment.appointmentId
         }
         this.props.getApppointmentById({ appointment: app });
         setTimeout(() => {
             this.closeSearchBox();
         }, 500);
     }
+
     render() {
         const { isPopupSearchBox, appointmentSearchBox } = this.props;
         const { isLoading } = this.state;
@@ -201,15 +203,15 @@ export default class SearchBoxCustomer extends React.Component {
                             <input
                                 value={this.state.valueInput}
                                 onChange={e => this.onChangeInput(e)}
-                                placeholder={`Enter customer name / phone number`}
+                                placeholder={`Search by Customer / Phone / Invoice ID / Appointment number`}
                             />
                             {
                                 this.state.valueInput.length > 0 ?
                                     <div onClick={() => this.setState({ valueInput: '' })}>
                                         <img src={closeGrey} />
-                                    </div> : 
+                                    </div> :
                                     <div>
-                                        <img src={searchIcon} />
+                                        <img src={searchIconGrey} />
                                     </div>
                             }
                         </WrapInput>
@@ -226,10 +228,9 @@ export default class SearchBoxCustomer extends React.Component {
                         </ButtonSearch>
                     </Row>
                     <Line />
-
-                    <Subtitle>Upcoming appointment</Subtitle>
+                    <Subtitle>Search results : </Subtitle>
                     {
-                        isEmpty(appointmentSearchBox) && isLoading !== '' &&
+                        isEmpty(appointmentSearchBox) && isLoading !== '' && isLoading !== true &&
                         <NoAppointment>
                             No appointments
                         </NoAppointment>

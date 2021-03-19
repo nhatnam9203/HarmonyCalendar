@@ -276,7 +276,7 @@ const GlobalStyle = createGlobalStyle`
 
   .app-event__option {
     font-size : 0.72rem;
-    margin-left: 8px;
+    margin-left: -5px;
     margin-bottom : 5px;
     line-height: 1.2;
     font-style: italic;

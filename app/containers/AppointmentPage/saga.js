@@ -398,7 +398,6 @@ export function* moveAppointment(action) {
 
 /********************************* ASSIGN APPOINTMENT FROM WAITING LIST TO CALENDAR *********************************/
 export function* assignAppointment(action) {
-	console.log('assign appointyment')
 	const displayedMembers = yield select(makeSelectDisplayedMembers());
 
 	const assignedMember = displayedMembers[action.resourceId];
@@ -429,7 +428,6 @@ export function* assignAppointment(action) {
 				memberId: appointment.memberId
 			})
 		);
-		console.log('assign appointyment 2')
 
 		const tempBlock = blockTempFrontEnd(appointment,new_end_time);
 		yield put(actions.addBlockTempFrontEnd(tempBlock));
@@ -453,14 +451,13 @@ export function* assignAppointment(action) {
 			const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
 			const url = `${requestURL.toString()}/${appointment.id}`;
 			const response = yield api(url, data, 'PUT', token);
-			console.log('assign appointyment 3')
 
 			if (response.codeStatus !== 1) return yield* checkResponse(response);
 			if (response.codeStatus === 1) {
-				postMesageAssignAppointment(appointment.id, appointment)
+				postMesageAssignAppointment(appointment.id, appointment , memberId)
 			}
 		} else {
-			postMesageAssignAppointment(appointment.id, appointment)
+			postMesageAssignAppointment(appointment.id, appointment , memberId)
 		}
 	} catch (err) {
 		// yield put(appointmentAssigningError(err));

@@ -15,13 +15,14 @@ const ResourceSelectorWrapper = styled.div`
 	border-right: 2px solid #3883bb;
 	border-top: 2px solid #3883bb;
 	display: flex;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
 	@media (min-width: 1025px) {
 		height: 5rem;
 	}
+	-webkit-user-select: none; 
+	-moz-user-select: none; 
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none;
 `;
 
 const BellButton = styled.div`

@@ -26,11 +26,21 @@ const CalendarWrapper = styled.div`
 		height: calc(100% - 10rem);
 	}
 	overflow: hidden;
+	-webkit-user-select: none; 
+	-moz-user-select: none; 
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none;
 `;
 
 const MainCalendar = styled.div`
 	flex: 1 0;
 	border-right: 1px solid #3883bb;
+	-webkit-user-select: none; 
+	-moz-user-select: none; 
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none;
 `;
 
 const RightSideBar = styled.div`

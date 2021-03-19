@@ -408,6 +408,7 @@ class Appointment extends Layout {
 		const data = await JSON.stringify({
 			appointmentId: idAppointment ? idAppointment : 'web',
 			appointment: app,
+			staffId : appointment.memberId,
 			action: 'checkout'
 		});
 
