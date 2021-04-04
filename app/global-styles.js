@@ -354,7 +354,7 @@ const GlobalStyle = createGlobalStyle`
 }
 
 
-.event-checkin,.event-confirmed,.event-paid,.event-anystaff,.event-void,.event-assigned,.event-block-temp-assigned,.event-block-temp-confirmed,.event-block-temp-check-in{
+.event-checkin,.event-confirmed,.event-paid,.event-anystaff,.event-void,.event-assigned,.event-block-temp-assigned,.event-block-temp-confirmed,.event-block-temp-check-in,.event-block-temp{
   border : 1px solid #ffffff !important;
   overflow: hidden !important;
 }

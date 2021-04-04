@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { isEqual } from 'lodash'
-import { convertAppointment, initialState } from './widget/utilDetail';
+import { convertAppointment, initialState , statusConvertData } from './widget/utilDetail';
 import Layout from './layout'
 import { addLastStaff } from "../../containers/AppointmentPage/utilSaga"
 import { checkStringNumber2, PromiseAction } from "../../utils/helper"
@@ -415,11 +415,13 @@ class Appointment extends Layout {
 		window.postMessage(data);
 	};
 
+
 	addMore = () => {
 		const { appointment } = this.props;
 		const data = JSON.stringify({
 			appointmentId: appointment.id,
 			staffId : appointment.memberId,
+			status : statusConvertData[appointment.status],
 			action : (parseInt(appointment.memberId) === 0) ? 'addMoreAnyStaff' : 'addMore'
 		});
 

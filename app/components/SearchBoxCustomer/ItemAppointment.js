@@ -18,18 +18,26 @@ Item.Row = styled.div`
     flex-direction : row;
     align-items: 'center';
     justify-content : space-between;
-    margin-bottom : 0.3rem;
+`;
+
+Item.RowExtra = styled.div`
+    display: flex;
+    flex-direction : row;
+    align-items: 'center';
+    justify-content : space-between;
 `;
 
 const RowInfo = styled.div`
     display: flex;
     flex-direction : row;
-    align-items: 'center';
+    align-items: flex-end;
+    margin-bottom : 0.3rem;
+    margin-top : 0.3rem;
     margin-bottom : 0.3rem;
 `;
 
 Item.Date = styled.div`
-    font-size : 1.15rem;
+    font-size : 1rem;
     color : #585858;
     font-weight : 600;
 `;
@@ -41,15 +49,15 @@ Item.Code = styled.div`
 `;
 
 Item.Name = styled.div`
-    font-size : 1.3rem;
+    font-size : 1.2rem;
     color : #136AB7;
     font-weight : 600;
 `;
 
 Item.PhoneNumber = styled.div`
-    font-size : 1.3rem;
+    font-size : 1.2rem;
     color : #585858;
-    margin-left : 1.5rem;
+    margin-left : 0.5rem;
 `;
 
 Item.Status = styled.div`
@@ -76,11 +84,11 @@ const ImgExtra = styled.img`
 	height: 14px;
 	margin-right: 10px;
     margin-top : 4px;
-    margin-left : 1rem;
+    /* margin-left : 1rem; */
 `;
 
 const InvoiceNumber = styled.div`
-    font-size : 1.1rem;
+    font-size : 1rem;
     font-weight : 600;
     color : #585858;
 `;
@@ -94,6 +102,15 @@ const RowTotal = styled.div`
 
 const ContainerItem = styled.div`
     margin-top : 1rem;
+`;
+
+const RowExtra = styled.div`
+    display: flex;
+    flex-direction : row;
+    width : 70%;
+    padding-left : 1.15rem;
+    padding-right : 1rem;
+    margin-bottom : 0 !important;
 `;
 
 const ItemAppointment = ({ item, selectItem, indexActive }) => {
@@ -114,7 +131,7 @@ const ItemAppointment = ({ item, selectItem, indexActive }) => {
                 <Item.Name>{`${item.firstName}`}</Item.Name>
                 <Item.PhoneNumber>{`${item.phoneNumber}`}</Item.PhoneNumber>
             </RowInfo>
-            <Item.Date style={{ marginBottom : 18 }}>
+            <Item.Date style={{ marginBottom: 18 }}>
                 {moment(item.fromTime).format('MMMM DD dddd, YYYY')}
             </Item.Date>
             {
@@ -122,6 +139,7 @@ const ItemAppointment = ({ item, selectItem, indexActive }) => {
                     return (
                         <ItemService
                             service={service}
+                            item={item}
                             key={service.bookingServiceId}
                             extras={item.extras.filter(ex => ex.bookingServiceId === service.bookingServiceId)}
                         />
@@ -156,16 +174,16 @@ const ItemAppointment = ({ item, selectItem, indexActive }) => {
     )
 }
 
-const ItemService = ({ service, extras }) => {
+const ItemService = ({ service, extras , item }) => {
     return (
         <ContainerItem>
             <Item.Row key={service.bookingServiceId}>
                 <Item.Text weight width='30%'>{service.serviceName}</Item.Text>
                 <Item.Text width='15%'>
-                    {moment(service.fromTime).format('hh:mm A')}
+                    {item.status !== 'waiting' ? moment(service.fromTime).format('hh:mm A') : ' '}
                 </Item.Text>
                 <Item.Text width='25%'>{service.staff.displayName}</Item.Text>
-                <Item.Text width='20%'>{convertMinsToHrsMins(service.duration)}</Item.Text>
+                <Item.Text width='20%'>{`${convertMinsToHrsMins(service.duration)}`}</Item.Text>
                 <Item.Text width='15%' right>{`$ ${service.price}`}</Item.Text>
             </Item.Row>
             {
@@ -177,44 +195,38 @@ const ItemService = ({ service, extras }) => {
 
 const Product = ({ product }) => {
     return (
-        <Item.Row>
-            <Item.Text weight width='30%'>{product.productName}</Item.Text>
-            <Item.Text width='15%'>
-                {''}
-            </Item.Text>
-            <Item.Text width='25%'>{''}</Item.Text>
-            <Item.Text width='20%'>{`${product.quantity} items`}</Item.Text>
-            <Item.Text width='15%' right>{`$ ${product.price}`}</Item.Text>
-        </Item.Row>
+        <ContainerItem>
+            <Item.Row>
+                <Item.Text weight width='70%'>{product.productName}</Item.Text>
+                <Item.Text width='20%'>{`${product.quantity} items`}</Item.Text>
+                <Item.Text width='15%' right>{`$ ${product.price}`}</Item.Text>
+            </Item.Row>
+        </ContainerItem>
     )
 }
 
 const Giftcard = ({ gift }) => {
     return (
-        <Item.Row>
-            <Item.Text weight width='30%'>{gift.name}</Item.Text>
-            <Item.Text width='15%'>
-                {''}
-            </Item.Text>
-            <Item.Text width='25%'>{''}</Item.Text>
-            <Item.Text width='20%'>{`${gift.quantity} items`}</Item.Text>
-            <Item.Text width='15%' right>{`$ ${gift.price}`}</Item.Text>
-        </Item.Row>
+        <ContainerItem>
+            <Item.Row>
+                <Item.Text weight width='70%'>{gift.name}</Item.Text>
+                <Item.Text width='20%'>{`${gift.quantity} items`}</Item.Text>
+                <Item.Text width='15%' right>{`$ ${gift.price}`}</Item.Text>
+            </Item.Row>
+        </ContainerItem>
     )
 }
 
 const Extra = ({ extra }) => {
     return (
-        <Item.Row>
-            <ImgExtra src={require('../../images/iconExtra.png')} />
-            <Item.Text width='30%'>{extra.extraName}</Item.Text>
-            <Item.Text width='11.5%'>
-                {''}
-            </Item.Text>
-            <Item.Text width='25%'>{''}</Item.Text>
+        <Item.RowExtra>
+            <RowExtra>
+                <ImgExtra src={require('../../images/iconExtra.png')} />
+                <Item.Text width='100%'>{extra.extraName}</Item.Text>
+            </RowExtra>
             <Item.Text width='20%'>{convertMinsToHrsMins(extra.duration)}</Item.Text>
             <Item.Text width='15%' right>{`$ ${extra.price}`}</Item.Text>
-        </Item.Row>
+        </Item.RowExtra>
     )
 }
 

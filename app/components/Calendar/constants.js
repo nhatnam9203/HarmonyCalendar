@@ -962,11 +962,11 @@ function getAtrributeByStatus(appointment) {
 		eventClass = 'event-paid';
 	}
 	if (appointment.status === 'BLOCK') {
-		eventColor = '#DDDDDD';
+		eventColor = '#b5b5b5';
 		eventClass = 'event-block';
 	}
 	if (appointment.status === 'BLOCK_TEMP') {
-		eventColor = '#DDDDDD';
+		eventColor = '#b5b5b5';
 		eventClass = 'event-block-temp';
 	}
 	if (appointment.status === 'BLOCK_TEMP_ASSIGNED') {

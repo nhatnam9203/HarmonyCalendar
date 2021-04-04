@@ -32,6 +32,13 @@ const ButtonChange = styled(Button)`
 	border: none !important;
 `;
 
+const WrapButton = styled.div`
+    display : flex;
+    justify-content : center;
+    align-items : center;
+    width : 200%;
+`;
+
 
 export default class BottomButton extends Component {
 
@@ -62,26 +69,30 @@ export default class BottomButton extends Component {
                 if (role === 'Admin') {
                     if (isEditPaidAppointment) {
                         return (
-                            <Button
-                                style={{ fontWeight: '700' }}
-                                onClick={() => this.props.updateStaffAppointmentPaid()}
-                                primary="true"
-                            >
-                                Submit
-                            </Button>
+                            <WrapButton>
+                                <Button
+                                    style={{ fontWeight: '700' }}
+                                    onClick={() => this.props.updateStaffAppointmentPaid()}
+                                    primary="true"
+                                >
+                                    Submit
+                                </Button>
+                            </WrapButton>
                         );
                     } else {
                         return (
-                            <Button
-                                onClick={() => this.props.toggleEditPaidAppointment()}
-                                primary="true"
-                            >
-                                Edit
-                            </Button>
+                            <WrapButton>
+                                <Button
+                                    onClick={() => this.props.toggleEditPaidAppointment()}
+                                    primary="true"
+                                >
+                                    Edit
+                                </Button>
+                            </WrapButton>
                         );
                     }
                 } else return null;
-            }else if (appointment.status !== 'WAITING' && appointment.status !== 'CANCEL' && appointment.status !== 'PAID' && appointment.status !== 'REFUND' && appointment.status !== 'VOID') {
+            } else if (appointment.status !== 'WAITING' && appointment.status !== 'CANCEL' && appointment.status !== 'PAID' && appointment.status !== 'REFUND' && appointment.status !== 'VOID') {
                 return (
                     <ButtonChange onClick={() => this.props.changeAppointmentTime()} primary="true">
                         <strong>Change</strong>
