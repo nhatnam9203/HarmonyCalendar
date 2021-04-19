@@ -129,6 +129,21 @@ createSelector(currentAppointment, (appointmentState) => appointmentState.get('i
 const makeNotifications = () =>
 	createSelector(currentAppointment, (appointmentState) => appointmentState.get('notifications'));
 
+const makeQtyResource = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.get('qtyResource'));
+
+const makeResourceWidth = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.get('resourceWidth'));
+
+const makeAppointmentAnyStaff = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.get('appointmentAnyStaff'));
+
+const makeAssignAnyStaffToStaff = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.get('isAssignAnyStaffToStaff'));
+
+const makeFirstReload = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.get('isFirstLoadCalendar'));
+
 export {
 	currentAppointment,
 	makeCurrentDay,
@@ -169,4 +184,9 @@ export {
 	makeIsPopupNotification,
 	makeCountNotificationUnread,
 	makeNotifications,
+	makeQtyResource,
+	makeAppointmentAnyStaff,
+	makeResourceWidth,
+	makeAssignAnyStaffToStaff,
+	makeFirstReload,
 };

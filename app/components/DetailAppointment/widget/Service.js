@@ -28,12 +28,13 @@ export default class Service extends Component {
             isEditPaidAppointment,
             openPopupTimePicker,
             extras,
+            extraAll,
             togglePopupStaff,
             closePopupStaff,
             subtractService,
             addService,
             openPopupPrice,
-            openPopupTip
+            openPopupTip,
         } = this.props;
 
         const staff = staffList.find((s) => parseInt(s.id) === parseInt(service.staffId));
@@ -75,11 +76,12 @@ export default class Service extends Component {
                                 <ExtraItem
                                     key={'extra' + extra.bookingExtraId}
                                     extra={extra}
+                                    extraAll={extraAll}
                                     appointment={appointment}
                                     index={i}
                                     openPopupPrice={this.props.openPopupPrice}
-                                    subtractExtra={(index) => this.props.subtractExtra(index)}
-                                    addExtra={(index) => this.props.addExtra(index)}
+                                    subtractExtra={(ex) => this.props.subtractExtra(ex)}
+                                    addExtra={(ex) => this.props.addExtra(ex)}
                                     openPopupPrice={(price, index, key) => this.props.openPopupPriceExtra(price, index, key)}
                                 />
                             )
@@ -116,8 +118,8 @@ export default class Service extends Component {
                                         appointment={appointment}
                                         index={i}
                                         openPopupPrice={this.props.openPopupPrice}
-                                        subtractExtra={(index) => this.props.subtractExtra(index)}
-                                        addExtra={(index) => this.props.addExtra(index)}
+                                        subtractExtra={(ex) => this.props.subtractExtra(ex)}
+                                        addExtra={(ex) => this.props.addExtra(ex)}
                                         openPopupPrice={(price, index, key) => this.props.openPopupPriceExtra(price, index, key)}
                                     />
                                 )

@@ -52,6 +52,7 @@ class DaySelector extends React.Component {
       loadingCalendar,
       merchantInfo,
       toggleSearchBox,
+      countAppointmentAnyStaff
     } = this.props;
     return (
       <DaySelectorWrapper>
@@ -67,6 +68,7 @@ class DaySelector extends React.Component {
           onChangeWeek={onChangeWeek}
           loadingCalendar={loadingCalendar}
           merchantInfo={merchantInfo}
+          countAppointmentAnyStaff={countAppointmentAnyStaff}
         /> 
         <ButtonCheckIn onPress={()=>this.openPopupAddAppointment()} />
       </DaySelectorWrapper>

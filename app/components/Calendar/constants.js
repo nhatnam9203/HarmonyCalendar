@@ -890,31 +890,31 @@ export const updateEventToCalendar = (fcEvent) => {
 		startEditable = false;
 		resourceEditable = false;
 	}
-	if (appointment.status === 'BLOCK') {
+	if (status === 'BLOCK') {
 		eventColor = '#DDDDDD';
 		eventClass = 'event-block';
 	}
-	if (appointment.status === 'BLOCK_TEMP') {
+	if (status === 'BLOCK_TEMP') {
 		eventColor = '#DDDDDD';
 		eventClass = 'event-block-temp';
 	}
-	if (appointment.status === 'BLOCK_TEMP_ASSIGNED') {
+	if (status === 'BLOCK_TEMP_ASSIGNED') {
 		eventColor = '#ffe559';
 		eventClass = 'event-block-temp-assigned';
 	}
-	if (appointment.status === 'BLOCK_TEMP_CONFIMED') {
+	if (status === 'BLOCK_TEMP_CONFIMED') {
 		eventColor = '#baedf7';
 		eventClass = 'event-block-temp-confirmed';
 	}
-	if (appointment.status === 'BLOCK_TEMP_CHECKED_IN') {
+	if (status === 'BLOCK_TEMP_CHECKED_IN') {
 		eventColor = '#28AAE9';
 		eventClass = 'event-block-temp-check-in';
 	}
-	if (appointment.status === 'BLOCK_TEMP_PAID') {
+	if (status === 'BLOCK_TEMP_PAID') {
 		eventColor = '#38ff05';
 		eventClass = 'event-block-temp-paid';
 	}
-	if (appointment.status === 'BLOCK_TEMP_REFUND') {
+	if (status === 'BLOCK_TEMP_REFUND') {
 		eventColor = '#FB5B54';
 		eventClass = 'event-block-temp';
 	}

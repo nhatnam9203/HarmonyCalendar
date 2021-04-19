@@ -15,6 +15,8 @@ import {
 import ReactLoading from 'react-loading';
 import closeBlack from '../../images/close_black.png';
 import closeWhite from '../../images/close_white.png'
+import iconCalendarGrey from '../../images/iconCalendarGrey.png';
+import topArrow from '../../images/top_arrow@3x.png';
 
 const AppPopup = styled(Popup)`
 	border-radius: 1.5rem;
@@ -475,8 +477,14 @@ class Appointment extends React.Component {
 					{notes.map(this.renderNote)}
 				</ContainerNotes>
 				<NoteWrapper.Form onSubmit={(e) => this.addNote(e)}>
-					<input value={this.state.noteValue} onChange={(e) => this.handleChange(e)} />
-					<button onClick={() => this.addNote()} type="button">
+					<input
+						value={this.state.noteValue}
+						onChange={(e) => this.handleChange(e)}
+					/>
+					<button
+						onClick={() => this.addNote()}
+						type="button"
+					>
 						<ImageEnter src={require('../../images/enter@3x.png')} />
 					</button>
 				</NoteWrapper.Form>
@@ -506,7 +514,8 @@ class Appointment extends React.Component {
 	renderSelectDay() {
 		const { dayChange, isPopupDay } = this.state;
 		const { appointment } = this.props;
-		if (appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND') {
+		const { status } = appointment;
+		if (status !== 'PAID' && status !== 'VOID' && status !== 'REFUND') {
 			return (
 				<div style={{ position: 'relative', paddingTop: 3, marginBottom: 15 }}>
 					<ButtonDayChange
@@ -514,18 +523,22 @@ class Appointment extends React.Component {
 							this.setState({ isPopupDay: !isPopupDay });
 						}}
 					>
-						<IconCalendar src={require('../../images/iconCalendarGrey.png')} />
+						<IconCalendar src={iconCalendarGrey} />
 						{moment(dayChange).format('MM/DD/YYYY')}
-						<ImgButton src={require('../../images/top_arrow@3x.png')} />
+						<ImgButton src={topArrow} />
 					</ButtonDayChange>
 
 					{isPopupDay && (
-						<OutsideClickHandler onOutsideClick={() => this.setState({ isPopupDay: !isPopupDay })}>
+						<OutsideClickHandler
+							onOutsideClick={() => this.setState({ isPopupDay: !isPopupDay })}
+						>
 							<CalendarPopup>
 								<CalendarPopup.Heading>
 									Select Day
-									<BtnCloseSelectDay onClick={() => this.setState({ isPopupDay: !isPopupDay })}>
-										{<img src={require('../../images/close_white.png')} />}
+									<BtnCloseSelectDay
+										onClick={() => this.setState({ isPopupDay: !isPopupDay })}
+									>
+										{<img src={closeWhite} />}
 									</BtnCloseSelectDay>
 								</CalendarPopup.Heading>
 								<CalendarPopup.Body>
@@ -547,7 +560,8 @@ class Appointment extends React.Component {
 
 	renderTileColumn() {
 		const { appointment } = this.props;
-		if (appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND') {
+		const { status } = appointment;
+		if (status === 'PAID' || status === 'VOID' || status === 'REFUND') {
 			return (
 				<tr>
 					<th width="25%" style={{ borderRight: 0 }}>
@@ -555,9 +569,8 @@ class Appointment extends React.Component {
 						Services
 					</th>
 					<th width="25%">Staff</th>
-					{(appointment.status === 'PAID' ||
-						appointment.status === 'VOID' ||
-						appointment.status === 'REFUND') && (
+					{(status === 'PAID' || status === 'VOID' || status === 'REFUND') &&
+						(
 							<th width="25%" style={{ textAlign: 'center' }}>
 								Tip ($)
 							</th>
@@ -616,6 +629,7 @@ class Appointment extends React.Component {
 								openPopupTimePicker={(indexFromTime, fromTimeService) =>
 									this.openPopupTimePicker(indexFromTime, fromTimeService)}
 								extras={extras.filter((obj) => obj.bookingServiceId === s.bookingServiceId)}
+								extraAll={extras}
 								subtractExtra={(extra) => this.subtractExtra(extra)}
 								addExtra={(extra) => this.addExtra(extra)}
 								openPopupPriceExtra={(price, index, key) => this.openPopupPrice(price, index, key)}
@@ -727,7 +741,6 @@ class Appointment extends React.Component {
 							value={this.state.companionPhone}
 							onChange={(e) => this.onChangeCompanionPhone(e)}
 							placeholder="Phone Number"
-							// onBlur={()=>this.searchPhoneCompanion()}
 							type="tel"
 						/>
 						<img onClick={() => this.updateCompanion()} src={require('../../images/buttonSave.png')} />

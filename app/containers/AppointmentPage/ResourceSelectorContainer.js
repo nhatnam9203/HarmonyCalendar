@@ -18,6 +18,10 @@ import {
   makeAppointmentScroll,
   makeIsScrollToAppointment,
   makeCountNotificationUnread,
+  makeResourceWidth,
+  makeQtyResource,
+  makeAssignAnyStaffToStaff,
+  makeFirstReload,
 } from './selectors';
 
 import {
@@ -39,6 +43,10 @@ import {
   toggleNotification,
   countNotificationUnread,
   getNotification,
+  getApppointmentById,
+  countAppointmentAnyStaff,
+  getAppointmentAnyStaff,
+  anystaffAssignStaff,
 } from './actions';
 
 export function mapDispatchToProps(dispatch) {
@@ -61,6 +69,10 @@ export function mapDispatchToProps(dispatch) {
     toggleNotification: (status) => dispatch(toggleNotification(status)),
     countNotificationUnread: () => dispatch(countNotificationUnread()),
     getNotification: (page) => dispatch(getNotification(page)),
+    getApppointmentById : (appointment) =>dispatch(getApppointmentById(appointment)),
+    countAppointmentAnyStaff : (payload) =>dispatch(countAppointmentAnyStaff(payload)),
+    getAppointmentAnyStaff : (payload) =>dispatch(getAppointmentAnyStaff(payload)),
+    anystaffAssignStaff : (payload) =>dispatch(anystaffAssignStaff(payload)),
   };
 }
 
@@ -78,6 +90,10 @@ const mapStateToProps = createStructuredSelector({
   appointmentScroll: makeAppointmentScroll(),
   isScrollToAppointment: makeIsScrollToAppointment(),
   notificationUnreadQuantity : makeCountNotificationUnread(),
+  resourceWidth : makeResourceWidth(),
+  qtyResources : makeQtyResource(),
+  isAssignAnyStaffToStaff : makeAssignAnyStaffToStaff(),
+  isFirstReloadCalendar : makeFirstReload(),
 });
 
 const withConnect = connect(

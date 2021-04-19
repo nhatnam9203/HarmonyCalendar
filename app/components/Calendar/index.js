@@ -205,6 +205,10 @@ class Calendar extends React.Component {
 
 					case 'appointment_add':
 						const appointment = app.data.Appointment;
+						if (appointment.StaffId == 0) {
+							const date = moment(appointment.FromTime).format('YYYY-MM-DD');
+							this.props.countAppointmentAnyStaff({ date, appointment, fromTime: appointment.FromTime });
+						}
 						if (appointment) {
 							let appointment_R = returnAppointment(appointment);
 							this.pushNotification(app.data.IsNotification, appointment);
@@ -223,6 +227,24 @@ class Calendar extends React.Component {
 						const { isLoadingPopup } = this.props;
 						if (app_update) {
 							let appointment = JSON.parse(app_update);
+							const date = moment(appointment.FromTime).format('YYYY-MM-DD');
+
+							if (parseInt(appointment.StaffId) === 0 && appointment.Status !== 'waiting' && appointment.Status !== 'checkin') {
+								this.props.countAppointmentAnyStaff({
+									date,
+									appointment,
+									fromTime: appointment.FromTime,
+									isReloadCalendar: true
+								});
+								return;
+							} else {
+								this.props.countAppointmentAnyStaff({
+									date,
+									appointment,
+									fromTime: appointment.FromTime,
+								});
+							}
+
 							let _appointment = returnAppointment(appointment);
 							let appointment_R = await this.getDataAppointment(_appointment);
 							appointment_R = appointment_R !== 0 ? appointment_R : _appointment;

@@ -3,6 +3,8 @@ import React, { Component } from 'react'
 import styled from 'styled-components';
 import PopupStaff from './PopupStaff';
 import moment from 'moment';
+import edit from '../../../images/edit.png';
+import topArrow from '../../../images/top_arrow@3x.png';
 
 const ButtonService = styled.button`
 	background: ${(props) => props.backgroundColor};
@@ -56,6 +58,14 @@ const ServiceName = styled.div`
     -webkit-box-orient: vertical;
 `;
 
+const ContainerButton = styled.div`
+    width: 100% ;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+`;
+
 export default class ServiceNormal extends Component {
     render() {
         const {
@@ -76,6 +86,7 @@ export default class ServiceNormal extends Component {
             openPopupPrice,
             price
         } = this.props;
+        const { status } = appointment;
         return (
             <React.Fragment>
                 <td>
@@ -89,49 +100,50 @@ export default class ServiceNormal extends Component {
                 <td>
                     <ButtonTime onClick={() => openPopupTimePicker(index, fromTime)}>
                         {moment(fromTime).format('hh:mm A').toString()}
-                        <ImgButton src={require('../../../images/top_arrow@3x.png')} />
+                        <ImgButton src={topArrow} />
                     </ButtonTime>
                 </td>
 
                 <td style={{ borderRight: 0 }}>
                     <div onClick={() => togglePopupStaff('', index)} style={style.staffService}>
                         <p style={style.staffNameColumn}>{title}</p>
-                        <ImgButton src={require('../../../images/top_arrow@3x.png')} />
-                        {isPopupStaff && index === indexPopupStaff && (
-                            <PopupStaff
-                                togglePopupStaff={(staff) => {
-                                    this.props.togglePopupStaff(staff, index)
-                                }}
-                                staffList={staffList.filter((s) => s.id !== 0)}
-                                closePopupStaff={() => closePopupStaff()}
-                            />
-                        )}
+                        <ImgButton src={topArrow} />
+                        {isPopupStaff && index === indexPopupStaff &&
+                            (
+                                <PopupStaff
+                                    togglePopupStaff={(staff) => {
+                                        this.props.togglePopupStaff(staff, index)
+                                    }}
+                                    staffList={staffList.filter((s) => s.id !== 0)}
+                                    closePopupStaff={() => closePopupStaff()}
+                                />
+                            )}
                     </div>
                 </td>
                 <td style={{ textAlign: 'center' }}>
-                    <div style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
+                    <ContainerButton>
                         <ButtonService
-                            backgroundColor={(appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' && service.duration > 5) ? '#0071c5' : '#dddddd'}
-                            disabled={appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND' || service.duration <= 5}
+                            backgroundColor={(status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' && service.duration > 5) ? '#0071c5' : '#dddddd'}
+                            disabled={status === 'PAID' || status === 'VOID' || status === 'REFUND' || service.duration <= 5}
                             onClick={() => subtractService(index)}
                         >
                             -5&#39;
 						</ButtonService>
                         {duration}
                         <ButtonService
-                            backgroundColor={(appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND') ? '#0071c5' : '#dddddd'}
-                            disabled={appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND'}
+                            backgroundColor={(status !== 'PAID' && status !== 'VOID' && status !== 'REFUND') ? '#0071c5' : '#dddddd'}
+                            disabled={status === 'PAID' || status === 'VOID' || status === 'REFUND'}
                             onClick={() => addService(index)}
                         >
                             +5&#39;
 						</ButtonService>
-                    </div>
+                    </ContainerButton>
                 </td>
 
                 <td>
                     <Row onClick={() => openPopupPrice(price, index, 'service')}>
                         <Price>{price}</Price>
-                        <IconEdit src={require('../../../images/edit.png')} />
+                        <IconEdit src={edit} />
                     </Row>
                 </td>
 

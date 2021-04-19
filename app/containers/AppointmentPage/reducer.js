@@ -78,6 +78,11 @@ import {
 	READ_NOTIFICATION,
 	UPDATE_BLOCKTIME_FRONTEND,
 	ADD_BLOCK_TEMP_FRONTEND,
+	SET_APPOINTMENT_ANY_STAFF,
+	UPDATE_RESOURCE_WIDTH,
+	UPDATE_QUANTITY_RESOURCE,
+	ANYSTAFF_ASSIGN_TO_STAFF,
+	FIRST_LOAD_CALENDAR,
 } from './constants';
 import { dataPutBackAppointment } from './utilSaga';
 import { unionBy } from 'lodash';
@@ -139,6 +144,11 @@ export const initialState = fromJS({
 	isPopupNotification: false,
 	notificationUnreadQuantity: 0,
 	notifications: [],
+	appointmentAnyStaff: 0,
+	resourceWidth: 8,
+	qtyResource: 8,
+	isAssignAnyStaffToStaff: false,
+	isFirstLoadCalendar: true,
 });
 
 function saveAppointmentOffLine(app) {
@@ -178,6 +188,21 @@ function appointmentReducer(state = initialState, action) {
 					startOfWeek.clone().add(6, 'd')
 				])
 			);
+
+		case FIRST_LOAD_CALENDAR:
+			return state.set('isFirstLoadCalendar', action.payload);
+
+		case ANYSTAFF_ASSIGN_TO_STAFF:
+			return state.set('isAssignAnyStaffToStaff', action.payload);
+
+		case UPDATE_QUANTITY_RESOURCE:
+			return state.set('qtyResource', action.payload);
+
+		case UPDATE_RESOURCE_WIDTH:
+			return state.set('resourceWidth', action.payload);
+
+		case SET_APPOINTMENT_ANY_STAFF:
+			return state.set('appointmentAnyStaff', action.payload);
 
 		case READ_NOTIFICATION:
 			let index = state.get('notifications').findIndex(app => app.merchantNotificationId === action.payload);
@@ -273,14 +298,14 @@ function appointmentReducer(state = initialState, action) {
 
 		case SET_DISPLAYED_MEMBERS:
 			let resourceId = 0;
+			const qtyResources = state.get('qtyResource');
 			for (let index = 0; index < action.members.length; index++) {
 				action.members[index].resourceId = resourceId;
 				resourceId = resourceId + 1;
-				if (resourceId === 8) {
+				if (parseInt(resourceId) === parseInt(qtyResources)) {
 					resourceId = 0;
 				}
 			}
-
 			return state.setIn(['members', 'displayed'], action.members);
 
 		case LOAD_WAITING_APPOINTMENT:

@@ -14,8 +14,13 @@ import {
 	makeInfoCheckPhone,
 	makeSelectAllAppointments,
 	makeSlideIndex,
+	makeSelectMembers,
 	makeMerchantInfo,
-	makeAppointmentScroll
+	makeAppointmentScroll,
+	makeAppointmentAnyStaff,
+	makeQtyResource,
+	makeResourceWidth,
+	makeFirstReload,
 } from './selectors';
 
 import { token, merchantId } from '../../../app-constants';
@@ -36,8 +41,10 @@ import {
 	checkMerchantWorking,
 	postMesageAssignAppointment,
 	adapterServicesMoved,
-	blockTempFrontEnd
+	blockTempFrontEnd,
 } from './utilSaga';
+
+import { helperAnyStaffWidth } from './utilAnyStaff';
 
 import { addEventsToCalendar, deleteEventFromCalendar } from '../../components/Calendar/constants';
 
@@ -45,6 +52,8 @@ import { addEventsToCalendar, deleteEventFromCalendar } from '../../components/C
 export function* getMembers() {
 	if (navigator.onLine === true) {
 		try {
+			let qtyResources = yield select(makeQtyResource());
+			qtyResources = parseInt(qtyResources);
 			const requestURL = new URL(`${api_constants.GET_MEMBER}`);
 			const currentDate = yield select(makeCurrentDay());
 			const url = `${requestURL.toString()}${currentDate.format('YYYY-MM-DD')}`;
@@ -55,11 +64,11 @@ export function* getMembers() {
 				console.log('error from api ' + url);
 				return;
 			}
+
 			if (resp.codeStatus === 1) {
 				const members = resp.data
 					? resp.data.map((member) => memberAdapter(member)).filter((mem) => mem.isDisabled === 0)
 					: [];
-
 				if (members.length > 0) {
 					const lastStaff = addLastStaff(members);
 					members.push(lastStaff);
@@ -68,7 +77,7 @@ export function* getMembers() {
 				const slideIndex = yield select(makeSlideIndex());
 				localStorage.setItem('staffList', JSON.stringify(members));
 				yield put(actions.membersLoaded(members));
-				yield put(actions.setDisplayedMembers(members.slice(slideIndex * 8, slideIndex * 8 + 8)));
+				yield put(actions.setDisplayedMembers(members.slice(slideIndex * qtyResources, slideIndex * qtyResources + qtyResources)));
 				yield put(actions.reloadCalendar());
 			}
 		} catch (err) {
@@ -77,10 +86,11 @@ export function* getMembers() {
 	} else {
 		const members = JSON.parse(localStorage.getItem('staffList'));
 		yield put(actions.membersLoaded(members));
-		yield put(actions.setDisplayedMembers(members.slice(slideIndex * 8, slideIndex * 8 + 8)));
+		yield put(actions.setDisplayedMembers(members.slice(slideIndex * qtyResources, slideIndex * qtyResources + qtyResources)));
 		yield put(actions.reloadCalendar());
 	}
 }
+
 
 /********************************* GET APPOINMENT CALENDAR LIST *********************************/
 export function* reloadCalendarSaga() {
@@ -90,6 +100,8 @@ export function* reloadCalendarSaga() {
 		const merchantInfo = yield select(makeMerchantInfo());
 		const currentDate = yield select(makeCurrentDay());
 		const currentDayName = moment(currentDate).format('dddd');
+		const resourceWidth = yield select(makeResourceWidth());
+		const isFirstLoadCalendar = yield select(makeFirstReload());
 
 		let apiDateQuery = currentDate.format('YYYY-MM-DD') || moment().format('YYYY-MM-DD');
 
@@ -143,6 +155,10 @@ export function* reloadCalendarSaga() {
 		yield put(actions.getBlockTime());
 		if (navigator.onLine) {
 			addEventsToCalendar(currentDate, appointmentsMembers);
+
+			if (!isFirstLoadCalendar) {
+				helperAnyStaffWidth(resourceWidth);
+			}
 		} else {
 			setTimeout(() => {
 				addEventsToCalendar(currentDate, appointmentsMembers);
@@ -267,6 +283,8 @@ export function* reRenderAppointment() {
 		const appointments = yield select(makeSelectAllAppointments());
 		const currentDate = yield select(makeCurrentDay());
 		const appointmentScroll = yield select(makeAppointmentScroll());
+		const isFirstLoadCalendar = yield select(makeFirstReload());
+		const resourceWidth = yield select(makeResourceWidth());
 
 		let apiDateQuery = currentDate.format('YYYY-MM-DD') || moment().format('YYYY-MM-DD');
 		const appointmentsMembers = displayedMembers.map((member) => ({
@@ -284,12 +302,44 @@ export function* reRenderAppointment() {
 		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery, appointments);
 		yield put(actions.appointmentByMembersLoaded(appointmentsMembers));
 		addEventsToCalendar(currentDate, appointmentsMembers);
+
+		if (isFirstLoadCalendar) {
+			yield* reRenderAnyStaffColumn(resourceWidth);
+		}
+
 		if (appointmentScroll && appointmentScroll !== '') {
 			yield put({ type: 'START_SCROLL_TO_APPOINTMENT', isScrollToAppointment: true });
 		}
 	} catch (err) {
 		yield put(actions.appointmentByMemberLoadingError(err));
 	}
+}
+
+
+function* reRenderAnyStaffColumn(resourceWidth) {
+	let tempWidth = 7;
+	let temResourceWidth = resourceWidth;
+	if (temResourceWidth == 9) {
+		tempWidth = 10.1;
+	} else if (temResourceWidth == 10) {
+		tempWidth = 7.4;
+	} else if (temResourceWidth == 11) {
+		tempWidth = 6.05;
+	} else if (temResourceWidth == 12) {
+		tempWidth = 4.025;
+	}
+
+	let width = `calc(((100vw - 5.05rem - ((100vw - 5.05rem) / 10)) / 9)`;
+	if (temResourceWidth !== 8) {
+		width = `calc(((100vw - 5.05rem - ((100vw - 5.05rem) / 10)) / ${tempWidth}) * 2)`;
+	}
+
+	const ths = document.querySelectorAll(".fc-bg table tbody tr td");
+	ths[1].style.width = width;
+	const tds = document.querySelectorAll(".fc-body .fc-time-grid .fc-content-skeleton table tbody tr td");
+	tds[1].style.width = width;
+
+	yield put({ type: 'FIRST_LOAD_CALENDAR', payload: false });
 }
 
 /********************************* MOVE APPOINTMENT *********************************/
@@ -429,7 +479,7 @@ export function* assignAppointment(action) {
 			})
 		);
 
-		const tempBlock = blockTempFrontEnd(appointment,new_end_time);
+		const tempBlock = blockTempFrontEnd(appointment, new_end_time);
 		yield put(actions.addBlockTempFrontEnd(tempBlock));
 		yield put(actions.renderAppointment());
 
@@ -454,10 +504,10 @@ export function* assignAppointment(action) {
 
 			if (response.codeStatus !== 1) return yield* checkResponse(response);
 			if (response.codeStatus === 1) {
-				postMesageAssignAppointment(appointment.id, appointment , memberId)
+				postMesageAssignAppointment(appointment.id, appointment, memberId)
 			}
 		} else {
-			postMesageAssignAppointment(appointment.id, appointment , memberId)
+			postMesageAssignAppointment(appointment.id, appointment, memberId)
 		}
 	} catch (err) {
 		// yield put(appointmentAssigningError(err));
@@ -843,7 +893,7 @@ function* addAppointmentSaga() {
 				} else {
 					dataPush = JSON.stringify({
 						appointmentId,
-						staffId : data.staffId,
+						staffId: data.staffId,
 						action: 'signinAppointment'
 					});
 				}
@@ -902,33 +952,58 @@ export function* sendLinkCustomerSaga(action) {
 
 export function* getDetailMerchantSaga(action) {
 	try {
+		// const currentDay = yield select(makeCurrentDay());
 		const requestURL = new URL(api_constants.GET_DETAIL_MERCHANT);
 		const url = `${requestURL.toString()}/${merchantId}`;
 		const response = yield api(url, '', 'GET', token);
 
 		if (parseInt(response.codeNumber) === 200) {
 			let infoMerchant = { ...response.data };
-			if (response.data.timezone === 'null') {
+			if (response.data.timezone === "null") {
 				infoMerchant.timezone = null;
 			}
 			yield put(actions.setDetailMerchant(infoMerchant));
 			const isLoadData = action.payload && action.payload.isLoadData ? action.payload.isLoadData : '';
 			const isFirstLoad = action.payload && action.payload.isFirstLoad ? action.payload.isFirstLoad : '';
+
 			if (isFirstLoad) {
 				const { timezone } = response.data;
-				let timeNow = timezone && timezone !== 'null' ? moment_tz.tz(timezone.substring(12)) : moment();
-				let day = `${moment(timeNow).format('DDMMYYYY')}`;
+				let timeNow = timezone && timezone !== "null" ? moment_tz.tz(timezone.substring(12)) : moment();
+				let day = `${moment(timeNow).format("DDMMYYYY")}`;
+
+				const dateCalendar = JSON.parse(localStorage.getItem('date'));
+				if (dateCalendar) {
+					day = moment(dateCalendar, ['YYYY-MM-DD']).format('DDMMYYYY');
+				}
+
 				yield put(actions.selectDay(day));
 				yield put(actions.setToday(day));
 				yield put(actions.selectWeek(day));
-				scrollToNow();
+
+				if (!dateCalendar) {
+					scrollToNow();
+				}
+				// yield* getCountInAnyStaffColumn(currentDay, dateCalendar);
+
 			}
 			if (isLoadData) {
-				yield put(actions.updateNextStaff({ isReloadCalendar: true }));
+				yield put(actions.updateNextStaff({ isReloadCalendar: true }))
 			}
 		}
 	} catch (error) {
-		console.log({ error });
+		console.log({ error })
+	}
+}
+
+
+function* getCountInAnyStaffColumn(currentDay, dateCalendar) {
+	const date = moment(currentDay).format('YYYY-MM-DD');
+	if (dateCalendar) {
+		yield put({ type: 'GET_APPOINTMENT_ANY_STAFF', date: dateCalendar });
+		yield delay(500);
+		yield localStorage.removeItem('date');
+	} else {
+		yield put({ type: 'GET_APPOINTMENT_ANY_STAFF', date });
 	}
 }
 
@@ -1023,18 +1098,52 @@ export function* deleteBlockTime_Saga(action) {
 export function* getBlockTimeSaga() {
 	try {
 		const currentDate = yield select(makeCurrentDay());
+		const count = yield select(makeAppointmentAnyStaff());
+		const isFirstLoadCalendar = yield select(makeFirstReload());
 		let apiDateQuery = currentDate.format('YYYY-MM-DD') || moment().format('YYYY-MM-DD');
 		const requestURL = new URL(`${api_constants.GET_WORKINGTIME_MERCHANT}${apiDateQuery}`);
 		const response = yield api(requestURL.toString(), '', 'GET', token);
 
 		if (response.codeStatus === 1) {
+			if (isFirstLoadCalendar) {
+				if (count < 4) {
+					yield put({ type: 'UPDATE_RESOURCE_WIDTH', payload: 8 });
+					yield put({ type: 'UPDATE_QUANTITY_RESOURCE', payload: 8 });
+				} else if (count >= 4 && count < 8) {
+					yield* increaseResource(8, 8);
+				}
+				else if (count >= 8 && count < 12) {
+					yield* increaseResource(9, 7);
+				}
+				else if (count >= 12) {
+					yield* increaseResource(10, 4);
+				}
+			}
 			yield put(actions.getBlockTime_Success(response.data));
 			yield put(actions.renderAppointment());
+			const app = JSON.parse(localStorage.getItem('appointmentExpand'));
+			if (app) {
+				setTimeout(() => {
+					verticalScrollToAppointment(app.AppointmentId);
+					setTimeout(() => {
+						localStorage.removeItem('appointmentExpand');
+					}, 1500);
+				}, 1500);
+			}
 			return;
 		}
 	} catch (error) { }
 }
 
+function verticalScrollToAppointment(appointmentId) {
+	var els = document.getElementsByClassName("apppointment-calendar");
+	Array.prototype.forEach.call(els, function (el) {
+		let text = el.outerText;
+		if (text.toString().includes(appointmentId.toString())) {
+			el.scrollIntoView();
+		}
+	});
+}
 /********************************* GET DETAIL APPOINTMENT *********************************/
 export function* getAppointmentByIdSaga(action) {
 	try {
@@ -1086,6 +1195,8 @@ export function* getTimeStaffLoginSaga(action) {
 function* updateNextStaff_Saga() {
 	yield takeLatest(constants.UPDATE_NEXT_STAFF, function* (action) {
 		try {
+			let qtyResources = yield select(makeQtyResource());
+			qtyResources = parseInt(qtyResources);
 			const { isReloadCalendar } = action.payload;
 			const requestURL = new URL(`${api_constants.GET_MEMBER}`);
 			const currentDate = yield select(makeCurrentDay());
@@ -1101,16 +1212,14 @@ function* updateNextStaff_Saga() {
 				members.push(lastStaff);
 				const slideIndex = yield select(makeSlideIndex());
 				yield put(actions.membersLoaded(members));
-				yield put(actions.setDisplayedMembers(members.slice(slideIndex * 8, slideIndex * 8 + 8)));
+				yield put(actions.setDisplayedMembers(members.slice(slideIndex * qtyResources, slideIndex * qtyResources + qtyResources)));
 
-				if (!isReloadCalendar) yield put(actions.getBlockTime());
+				if (!isReloadCalendar)
+					yield put(actions.getBlockTime());
 				else yield put(actions.reloadCalendar());
 			}
 		} catch (err) {
-			// yield put(memberLoadingError(err));
 		}
-
-		/* &&&&*76678678678678 */
 	});
 }
 
@@ -1249,13 +1358,204 @@ export function* readNotification(action) {
 	try {
 		const requestURL = new URL(`${api_constants.NOTIFICATION_MASK_READ}/${action.payload}`);;
 		const response = yield api(requestURL.toString(), '', 'PUT', token);
-		if(response.codeNumber == 200){
-			yield put({ type : 'COUNT_NOTIFICATION_UNREAD' });
+		if (response.codeNumber == 200) {
+			yield put({ type: 'COUNT_NOTIFICATION_UNREAD' });
 		}
 	} catch (err) { }
 }
 
+export function* getAppointmentAnyStaff(action) {
+	try {
+		const { date } = action;
+		const requestURL = new URL(`${api_constants.COUNT_APPOINTMENT_ANY_STAFF}/${date}`);
+		const response = yield api(requestURL.toString(), '', 'GET', token);
+		if (response.codeNumber == 200) {
+			yield put({ type: 'SET_APPOINTMENT_ANY_STAFF', payload: response.data });
+			yield put({ type: 'GET_DETAIL_MERCHANT', payload: { isFirstLoad: true } })
+		} else {
+			alert(response.message)
+		}
+	} catch (err) { }
+}
 
+export function* countAppointmentAnyStaff(action) {
+	try {
+		const { date, appointment, fromTime, isDayClick } = action.payload;
+		// const resourceWidth = yield select(makeResourceWidth());
+		// const members = yield select(makeSelectMembers());
+		// const qtyResources = yield select(makeQtyResource());
+		const appointmentAnyStaff = yield select(makeAppointmentAnyStaff());
+		const currentDay = yield select(makeCurrentDay());
+
+		if (
+			moment(currentDay).format('YYYY-MM-DD') == moment(fromTime).format('YYYY-MM-DD') ||
+			isDayClick == true
+		) {
+			const requestURL = new URL(`${api_constants.COUNT_APPOINTMENT_ANY_STAFF}/${date}`);
+			const response = yield api(requestURL.toString(), '', 'GET', token);
+
+			if (response.codeNumber == 200) {
+				const count = response.data;
+				let type = null;
+				if (parseInt(appointmentAnyStaff) < 4) {
+					if (count >= 4) {
+						reloadWeb(date, appointment);
+					}
+				} else if (parseInt(appointmentAnyStaff) >= 4 && parseInt(appointmentAnyStaff) < 8) {
+					if (count >= 8) {
+						reloadWeb(date, appointment);
+					} else if (count < 4) {
+						reloadWeb(date, appointment);
+						// type = 'decrease';
+					}
+				} else if (parseInt(appointmentAnyStaff) >= 8 && parseInt(appointmentAnyStaff) < 12) {
+					if (count >= 12) {
+						reloadWeb(date, appointment);
+					} else if (count < 8) {
+						reloadWeb(date, appointment);
+						// type = 'decrease';
+					}
+				}
+				// if (type) {
+				// 	yield* updateAnyStaff(
+				// 		members,
+				// 		qtyResources,
+				// 		resourceWidth,
+				// 		appointment,
+				// 		type
+				// 	);
+				// }
+
+				yield put({ type: 'SET_APPOINTMENT_ANY_STAFF', payload: response.data });
+				if (isDayClick) {
+					const day = moment(date, ['YYYY-MM-DD']).format('DDMMYYYY');
+					yield put(actions.selectDay(day));
+				}
+
+			} else {
+				alert(response.message)
+			}
+		}
+
+	} catch (err) { }
+}
+
+const reloadWeb = (date, appointment) => {
+	localStorage.setItem('date', JSON.stringify(date));
+	if (appointment) {
+		if (appointment.StaffId == 0) {
+			localStorage.setItem('appointmentExpand', JSON.stringify(appointment));
+		} else {
+			localStorage.setItem('appointmentAssignStaff', JSON.stringify(appointment));
+		}
+	}
+	setTimeout(() => {
+		window.location.reload();
+	}, 1000);
+}
+
+
+function* updateAnyStaff(members, qtyResources, resourceWidth, appointment, type) {
+	let quantity = parseInt(qtyResources) + 1;
+
+	if (type == 'decrease') {
+		quantity = parseInt(qtyResources) + 1;
+	} else {
+		quantity = parseInt(qtyResources) - 1;
+	}
+
+	const displayedMember = members.slice(0 * quantity, 0 * quantity + quantity);
+	yield put(actions.setDisplayedMembers(members.slice(displayedMember)));
+	yield put({ type: 'SET_SLIDE_INDEX', slideIndex: 0 });
+	yield delay(1000);
+
+	if (type == 'decrease') {
+		yield* decreaseResource(resourceWidth, qtyResources);
+	} else {
+		yield* increaseResource(resourceWidth, qtyResources);
+	}
+	yield put(actions.renderAppointment());
+
+	if (appointment && parseInt(appointment.StaffId) === 0) {
+		yield delay(500);
+		localStorage.setItem('appointmentExpand', JSON.stringify(appointment));
+		yield put({ type: 'ANYSTAFF_ASSIGN_TO_STAFF', payload: true });
+	} else if (appointment && parseInt(appointment.StaffId) !== 0) {
+		yield delay(500);
+		localStorage.setItem('appointmentAssignStaff', JSON.stringify(appointment));
+		yield put({ type: 'ANYSTAFF_ASSIGN_TO_STAFF', payload: true });
+	}
+}
+
+function* decreaseResource(resourceWidth, qtyResource) {
+	yield put({ type: 'UPDATE_RESOURCE_WIDTH', payload: resourceWidth - 1 });
+
+	var calendarOptions = $('#full-calendar')
+		.fullCalendar('getView')
+		.options;
+
+	let arrTempResouces = [];
+
+	for (let i = 0; i < parseInt(resourceWidth); i++) {
+		const tempStaff = { id: i };
+		arrTempResouces.push(tempStaff);
+	}
+	calendarOptions.resources = arrTempResouces;
+
+	$('#full-calendar')
+		.fullCalendar('destroy');
+
+	$('#full-calendar')
+		.fullCalendar(calendarOptions);
+
+	yield put({ type: 'UPDATE_QUANTITY_RESOURCE', payload: qtyResource + 1 });
+
+	let tempWidth = 7;
+	let temResourceWidth = resourceWidth - 1;
+	if (temResourceWidth == 9) {
+		tempWidth = 10.1;
+	} else if (temResourceWidth == 10) {
+		tempWidth = 7.4;
+	} else if (temResourceWidth == 11) {
+		tempWidth = 6.05;
+	} else if (temResourceWidth == 12) {
+		tempWidth = 4.025;
+	}
+
+	let width = `calc(((100vw - 5.05rem - ((100vw - 5.05rem) / 10)) / 9)`;
+	if (temResourceWidth !== 8) {
+		width = `calc(((100vw - 5.05rem - ((100vw - 5.05rem) / 10)) / ${tempWidth}) * 2)`;
+	}
+	const ths = document.querySelectorAll(".fc-bg table tbody tr td")
+	ths[1].style.width = width;
+	const tds = document.querySelectorAll(".fc-body .fc-time-grid .fc-content-skeleton table tbody tr td");
+	tds[1].style.width = width;
+}
+
+function* increaseResource(resourceWidth, qtyResource) {
+
+	yield put({ type: 'UPDATE_RESOURCE_WIDTH', payload: resourceWidth + 1 });
+
+	var calendarOptions = $('#full-calendar')
+		.fullCalendar('getView')
+		.options;
+
+	let arrTempResouces = [];
+
+	for (let i = 0; i < parseInt(qtyResource); i++) {
+		const tempStaff = { id: i };
+		arrTempResouces.push(tempStaff);
+	}
+	calendarOptions.resources = arrTempResouces;
+
+	$('#full-calendar')
+		.fullCalendar('destroy');
+
+	$('#full-calendar')
+		.fullCalendar(calendarOptions);
+
+	yield put({ type: 'UPDATE_QUANTITY_RESOURCE', payload: qtyResource - 1 });
+}
 
 /* **************************** Subroutines ******************************** */
 
@@ -1412,5 +1712,7 @@ export default function* root() {
 		takeLatest("COUNT_NOTIFICATION_UNREAD", countNotificationUnread),
 		takeLatest("GET_NOTIFICATION", getNotification),
 		takeLatest("READ_NOTIFICATION", readNotification),
+		takeLatest("COUNT_APPOINTMENT_ANY_STAFF", countAppointmentAnyStaff),
+		takeLatest("GET_APPOINTMENT_ANY_STAFF", getAppointmentAnyStaff),
 	]);
 }

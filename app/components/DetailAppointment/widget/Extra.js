@@ -21,18 +21,19 @@ export default class Extra extends Component {
 
     getStyleExtra(appointment, extra, index) {
         let backgroundColor = '#dddddd';
-        if (appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' && extra.duration > 5) backgroundColor = '#0071c5';
+        if (status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' && extra.duration > 5) backgroundColor = '#0071c5';
         return backgroundColor;
     }
 
     getStyleExtra2(appointment, extra, index) {
         let backgroundColor = '#dddddd';
-        if (appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND') backgroundColor = '#0071c5';
+        if (status !== 'PAID' && status !== 'VOID' && status !== 'REFUND') backgroundColor = '#0071c5';
         return backgroundColor;
     }
 
     render() {
         const { appointment, pricesExtras, extra, index } = this.props;
+        const { status } = this.props;
 
         let price = pricesExtras[index] ? parseFloat(pricesExtras[index].replace(/,/g, '')).toFixed(2) : "0.00";
         price = price.toString().replace(/\d(?=(\d{3})+\.)/g, '$&,');
@@ -43,7 +44,7 @@ export default class Extra extends Component {
                 <td style={{ textAlign: 'center' }}>
                     <ButtonExtra
                         backgroundColor={this.getStyleExtra(appointment, extra, index)}
-                        disabled={appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND' || extra.duration <= 5}
+                        disabled={status === 'PAID' || status === 'VOID' || status === 'REFUND' || extra.duration <= 5}
                         onClick={() => this.props.subtractExtra(extra)}
                     >
                         -5&#39;
@@ -51,23 +52,28 @@ export default class Extra extends Component {
                     {extra.duration}
                     <ButtonExtra
                         backgroundColor={this.getStyleExtra2(appointment, extra, index)}
-                        disabled={appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND'}
+                        disabled={status === 'PAID' || status === 'VOID' || status === 'REFUND'}
                         onClick={() => this.props.addExtra(extra)}
                     >
                         +5&#39;
 					</ButtonExtra>
                 </td>
 
-                <td onClick={appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' ? (
+                <td onClick={status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' ? (
                     () => this.props.openPopupPrice(price, index, 'extra')) : (() => { })} style={{ textAlign: 'center' }}
                 >
                     <Row>
                         <div>
-                            <div style={appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' ? style.priceS : {}}>{price}</div>
+                            <div style={status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' ? style.priceS : {}}>
+                                {price}
+                            </div>
                         </div>
 
-                        {appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' && (
-                            <img src={require('../../../images/edit.png')} style={{ width: 16, height: 16 }} />
+                        {status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' && (
+                            <img
+                                src={require('../../../images/edit.png')}
+                                style={{ width: 16, height: 16 }}
+                            />
                         )}
                     </Row>
                 </td>

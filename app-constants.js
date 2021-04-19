@@ -9,14 +9,18 @@ export const role = getURLParam('role');
 
 export const API_PORT = 8010;
 
-export const DEV_API_BASE_URL = `https://api.harmonypayment.com`;
-export const PROD_API_BASE_URL = `https://api.harmonypayment.com`;
+// export const DEV_API_BASE_URL = `https://api.harmonypayment.com`;
+// export const PROD_API_BASE_URL = `https://api.harmonypayment.com`;
 
 // export const DEV_API_BASE_URL = `https://dev.harmonypayment.com`;
 // export const PROD_API_BASE_URL = `https://dev.harmonypayment.com`;
 
 // export const DEV_API_BASE_URL = `https://staging.harmonypayment.com`;
 // export const PROD_API_BASE_URL = `https://staging.harmonypayment.com`;
+
+
+export const DEV_API_BASE_URL = `https://staging2.harmonypayment.com`;
+export const PROD_API_BASE_URL = `https://staging2.harmonypayment.com`;
 
 export const isDesktopOrLaptop = window.innerWidth > 1000 ? true : false;
 
@@ -53,4 +57,5 @@ export const NOTIFICATION_COUNT_UNREAD = `${API_BASE_URL}/notification/countUnRe
 export const NOTIFICATION_MASK_READ = `${API_BASE_URL}/notification/view`;
 export const NOTIFICATION_GET_BY_PAGE = `${API_BASE_URL}/notification`;
 export const NOTIFICATION_DELETE = `${API_BASE_URL}/notification?ids=`;
+export const COUNT_APPOINTMENT_ANY_STAFF = `${API_BASE_URL}/appointment/countAnyStaffLength?date=`;
 export const VAR_DEFAULT_AVATAR_PATH = `/upload/staff/avatar.svg`;

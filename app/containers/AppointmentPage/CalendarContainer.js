@@ -41,6 +41,7 @@ import {
   countNotificationUnread,
   scrollToAppointment,
   selectDay,
+  countAppointmentAnyStaff,
 } from './actions';
 import {
   makeSelectWaitingAppointments,
@@ -77,7 +78,7 @@ export function mapDispatchToProps(dispatch) {
     updateStaff: (staff)=>dispatch(updateStaff(staff)),
     loadMembers: ()=>dispatch(loadMembers()),
     reloadStaff: ()=>dispatch(reloadStaff()),
-    reloadCalendar: ()=>dispatch(reloadCalendar()),
+    reloadCalendar: (payload)=>dispatch(reloadCalendar(payload)),
     loadAppointmentByMembers :()=>dispatch(loadAppointmentByMembers()),
     updateNextStaff:(data)=>dispatch(updateNextStaff(data)),
     updateConsumer:(data)=>dispatch(updateConsumer(data)),
@@ -95,6 +96,7 @@ export function mapDispatchToProps(dispatch) {
     countNotificationUnread: () => dispatch(countNotificationUnread()),
     scrollToAppointment: (appointmentId) => dispatch(scrollToAppointment(appointmentId)),
     onChangeDay: (day) => dispatch(selectDay(day)),
+    countAppointmentAnyStaff : (payload) =>dispatch(countAppointmentAnyStaff(payload)),
   };
 }
 

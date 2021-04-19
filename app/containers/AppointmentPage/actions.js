@@ -128,6 +128,12 @@ import {
 	READ_NOTIFICATION,
 	UPDATE_BLOCKTIME_FRONTEND,
 	ADD_BLOCK_TEMP_FRONTEND,
+	COUNT_APPOINTMENT_ANY_STAFF,
+	UPDATE_RESOURCE_WIDTH,
+	UPDATE_QUANTITY_RESOURCE,
+	GET_APPOINTMENT_ANY_STAFF,
+	ANYSTAFF_ASSIGN_TO_STAFF,
+	FIRST_LOAD_CALENDAR,
 } from './constants';
 
 /**
@@ -380,7 +386,7 @@ export function appointmentAssigningError(error) {
  * @param  {object} newEndTime The url options
  * @return {object} An action object with a type of MOVE_APPOINTMENT
  */
-export function moveAppointment(appointmentId, newPositionIndex, newTime, newEndTime , appointment) {
+export function moveAppointment(appointmentId, newPositionIndex, newTime, newEndTime, appointment) {
 	return {
 		type: MOVE_APPOINTMENT,
 		appointmentId,
@@ -686,7 +692,7 @@ export const updateAppointmentPaid = (appointment) => ({
 	type: UPDATE_APPOINTMENT_PAID,
 	appointment
 });
-  
+
 export const deleteAppointmentCalendar = (appointment) => ({
 	type: DELETE_APPOINTMENT_CALENDAR,
 	appointment
@@ -969,4 +975,46 @@ export function addBlockTempFrontEnd(payload) {
 		type: ADD_BLOCK_TEMP_FRONTEND,
 		payload,
 	};
+}
+
+export function countAppointmentAnyStaff(payload) {
+	return {
+		type: COUNT_APPOINTMENT_ANY_STAFF,
+		payload
+	}
+}
+
+export function updateResourceWidth(payload) {
+	return {
+		type: UPDATE_RESOURCE_WIDTH,
+		payload
+	}
+}
+
+export function updateQuantityResource(payload){
+	return{
+		type : UPDATE_QUANTITY_RESOURCE,
+		payload
+	}
+}
+
+export function getAppointmentAnyStaff(date){
+	return{
+		type : GET_APPOINTMENT_ANY_STAFF,
+		date
+	}
+}
+
+export function anystaffAssignStaff(payload){
+	return {
+		type : ANYSTAFF_ASSIGN_TO_STAFF,
+		payload
+	}
+}
+
+export function firstReload(payload){
+	return{
+		type : FIRST_LOAD_CALENDAR,
+		payload
+	}
 }

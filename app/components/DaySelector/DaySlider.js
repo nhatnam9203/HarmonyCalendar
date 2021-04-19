@@ -11,7 +11,7 @@ import rightButton from '../../images/rightButton.png'
 const DateSliderWrapper = styled.div`
     display : flex;
     flex-direction : row;
-    flex : 9;
+    flex : 6;
     position: relative;
     height : 4.4rem !important;
     justify-content : center;
@@ -138,12 +138,23 @@ class DaySlider extends React.Component {
       default:
         break;
     }
-    this.props.onChangeDay(day);
     this.props.loadingCalendar(true);
+    this.props.countAppointmentAnyStaff({
+      date: moment(day, ['DDMMYYYY']).format('YYYY-MM-DD'),
+      isDayClick: true,
+      isReloadCalendar: true,
+    });
+    this.props.onChangeDay(day);
   }
 
   onDaySelected(day) {
-    this.props.onChangeDay(moment(new Date(day)).format('DDMMYYYY'));
+    this.props.countAppointmentAnyStaff({
+      date: moment(day).format('YYYY-MM-DD'),
+      isDayClick: true,
+      isReloadCalendar: true,
+    });
+    // this.props.countAppointmentAnyStaff({ date: moment(day).format('YYYY-MM-DD'), isDayClick: true, isReloadCalendar: true })
+    // this.props.onChangeDay(moment(new Date(day)).format('DDMMYYYY'));
   }
 
   renderPopup() {
@@ -182,7 +193,7 @@ class DaySlider extends React.Component {
             <img src={leftButton} />
           </Picker.Button>
           <Picker onClick={() => this.onClickButton()}>
-            {moment(selectedDay).format('MMMM dddd DD, YYYY')}
+            {selectedDay ? moment(selectedDay).format('MMMM dddd DD, YYYY') : ''}
           </Picker>
           <Picker.Button
             onClick={() => this.changeDay('plus')}

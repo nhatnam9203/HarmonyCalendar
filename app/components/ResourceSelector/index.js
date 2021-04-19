@@ -1,263 +1,7 @@
 import React from 'react';
 import moment from 'moment';
-import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import Carousel from 'nuka-carousel';
-import { staffId } from '../../../app-constants';
-import PopupBlockTime from './PopupBlockTime';
-import ButtonSplash from './ButtonSplash';
-import moment_tz from "moment-timezone"
-
-const ResourceSelectorWrapper = styled.div`
-	width: 100%;
-	height: 4.4rem;
-	border-left: 2px solid #3883bb;
-	border-right: 2px solid #3883bb;
-	border-top: 2px solid #3883bb;
-	display: flex;
-	@media (min-width: 1025px) {
-		height: 5rem;
-	}
-	-webkit-user-select: none; 
-	-moz-user-select: none; 
-	-ms-user-select: none;
-	-o-user-select: none;
-	user-select: none;
-`;
-
-const BellButton = styled.div`
-	width: calc(5.05rem - 2px);
-	height: 100%;
-	text-align: center;
-	padding: 0.5rem;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	& > img {
-		width: 30px;
-		height : 30px;
-	}
-	position : relative;
-`;
-
-BellButton.Icon = styled.div`
-	background : red;
-	width : 1.5rem;
-	height : 1.5rem;
-	display: flex;
-	justify-content : center;
-	align-items : center;
-	position : absolute;
-	top : 0.8rem;
-	right : 1.2rem;
-	color : white;
-	font-size : 0.6rem;
-	font-weight : 600;
-	border-radius : 300rem;
-`;
-
-
-const ResourceSliderWrapper = styled.div`
-	width: calc(100% - 5.05rem - (calc((100vw - 5.05rem) / 10)) - (calc((100vw - 5.05rem) / 10)) + 1px);
-	position: relative;
-`;
-
-const ResourceWrapper = styled.div`
-	height: calc(4.4rem - 2px);
-	position: relative;
-	display: flex;
-	@media (min-width: 1025px) {
-		height: calc(5rem - 2px);
-	}
-`;
-
-const Resource = styled.div`
-	cursor: pointer;
-	width: calc(100% / 8);
-	padding: 0.25rem;
-	position: relative;
-	border-right: 1px solid #ddd;
-	text-align: center;
-	background-color: ${(props) => (props.active ? '#1EB5F4' : '#ffffff')};
-`;
-
-const AnyStaff = styled(Resource)`
-	width : calc(100% - 5.05rem - ((calc((100vw - 5.05rem) / 10)) * 9) + 4px);
-	height : 4.2rem;
-	border-left: 1px solid #1173C3;
-	background-color : #F5F5F5;
-	display : flex;
-	justify-content : center;
-	align-items : center;
-	@media (min-width: 1025px) {
-		height: 4.85rem;
-  	}
-`;
-
-AnyStaff.Image = styled.div`
-	border-radius: 4px;
-	width: 100%;
-	font-size: 1rem;
-	line-height: 2.8;
-	margin-top: 0.6rem;
-	height: 100%;
-	cursor: pointer;
-	& > img {
-		width: 33px;
-		height: 29px;
-	}
-	@media (min-width: 1025px) {
-		& > img {
-			width: 37px;
-			height: 33px;
-			margin-top: 0.8rem;
-		}
-	}
-`;
-
-AnyStaff.Title = styled.div`
-	margin-top: -0.2rem !important;
-	width: 100%;
-	opacity: 0.75;
-	text-align: center;
-	padding-bottom: 4px;
-	font-size: 0.85rem;
-	line-height: 1.3;
-	font-weight: 500;
-	@media (min-width: 1025px) {
-		font-size: 0.95rem;
-		margin-top: 0rem !important;
-	}
-`;
-
-Resource.Avatar = styled.div`
-	padding: 2px;
-	cursor: pointer;
-	& img {
-		width: 3.7rem;
-		height: 3.7rem;
-		border-radius: 50%;
-		object-fit: cover;
-	}
-	@media (min-width: 1025px) {
-		& img {
-			width: 4rem;
-			height: 4rem;
-			border-radius: 50%;
-			object-fit: cover;
-		}
-	}
-`;
-
-Resource.OrderNumber = styled.div`
-	position: absolute;
-	top: 2px;
-	right: 2px;
-	background: ${(props) => (props.next ? '#DD4124' : '#1073C2')};
-	width: 20px;
-	height: 20px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	font-weight: 600;
-	border-radius: 50%;
-	color: #ffffff;
-	padding: 2px;
-	font-size: 12px;
-	line-height: 1.3;
-`;
-
-Resource.WorkingTime = styled.div`
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	opacity: 0.75;
-	text-align: center;
-	padding-bottom: 4px;
-	padding-left: 5px;
-	font-size: 7px;
-	line-height: 1.3;
-	font-weight: 500;
-	color: ${(props) => (props.notWork ? '#ffffff' : '')};
-	background: ${(props) => (props.notWork ? 'red' : '#ffffff')};
-`;
-
-Resource.Title = styled.div`
-	position: absolute;
-	bottom: 0px;
-	left: 0;
-	background: rgba(255, 255, 255, 1);
-	border-top: 2px solid white;
-	width: 100%;
-	opacity: 0.75;
-	text-align: center;
-	padding-bottom: 4px;
-	font-size: 0.8rem;
-	line-height: 1.3;
-	font-weight: 400;
-	@media (min-width: 1024px) {
-		font-size: 0.93rem;
-	}
-`;
-
-const WaitingHeader = styled.div`
-	width: calc((100vw - 5.05rem) / 10);
-	text-align: center;
-	display: flex;
-	justify-content: center;
-	font-weight: 500;
-	align-items: center;
-	line-height: 64px;
-	font-size: 16px;
-	color: #333333;
-	background: #f4f4f5;
-	border-left: 1px solid #3883bb;
-	@media (min-width: 1024px) {
-		font-size: 1.3rem;
-	}
-`;
-
-const ButtonArrow = styled.div`
-	& > img {
-		width: 19px;
-		height: 19px;
-		margin-left: ${(props) => (props.isLeft ? '-3px' : '0px')};
-		margin-right: ${(props) => (props.isLeft ? '0px' : '-3px')};
-		transform: ${(props) => (props.isLeft ? 'rotate(180deg)' : 'rotate(0deg)')};
-	}
-`;
-
-
-const WrapButtonToday = styled.div`
-	width: calc(5.05rem - 2px);
-	height: 100%;
-	text-align: center;
-	padding: 0.2rem;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	position : relative;
-`;
-
-const ButtonToday = styled.div`
-	width : 4.4rem;
-	height : 3.2rem;
-	border-radius : 5px;
-	display : flex;
-	flex-direction : row;
-	justify-content : center;
-	align-items : center;
-	background : #136AB7;
-	cursor: pointer;
-`;
-
-ButtonToday.Text = styled.div`
-	font-size : 0.94rem;
-	font-weight : 600;
-	color : white;
-`;
-
+import moment_tz from "moment-timezone";
+import layout from './layout';
 
 function chunk(array, size) {
 	const chunkedArr = [];
@@ -272,13 +16,14 @@ function chunk(array, size) {
 	return chunkedArr;
 }
 
-const qtyStaff = 8;
-
-class ResourceSelector extends React.Component {
+class ResourceSelector extends layout {
 	constructor(props) {
 		super(props);
 		this.refPrevButton = React.createRef();
 		this.refNextButton = React.createRef();
+		this.state = {
+			isLoadingStaff: false
+		}
 	}
 
 	toggleNotification = () => {
@@ -286,12 +31,47 @@ class ResourceSelector extends React.Component {
 		this.props.getNotification({ page: 1 });
 	}
 
+
+
 	async componentWillReceiveProps(nextProps) {
-		const { appointmentScroll, isScrollToAppointment } = nextProps;
+		const { appointmentScroll, isScrollToAppointment, isAssignAnyStaffToStaff } = nextProps;
 		if (isScrollToAppointment === true && isScrollToAppointment !== this.props.isScrollToAppointment) {
 			await this.findSlideScroll(appointmentScroll);
 			await this.verticalScrollToAppointment(appointmentScroll);
 			this.resetScrollAppointment();
+		}
+
+		if (nextProps.isFirstReloadCalendar == false && this.props.isFirstReloadCalendar !== nextProps.isFirstReloadCalendar) {
+			const { resources, qtyResources } = this.props;
+			const slide = chunk(resources, parseInt(qtyResources));
+			if (slide.length > 1 && slide[slide.length - 1].length < qtyResources) {
+					await this.setState({ isLoadingStaff: true });
+					this.refNextButton.current.click();
+					setTimeout(() => {
+						this.refPrevButton.current.click();
+					}, 700);
+
+					setTimeout(() => {
+						this.setState({ isLoadingStaff: false });
+					}, 1500);
+			}
+		}
+
+		if (isAssignAnyStaffToStaff == true && isAssignAnyStaffToStaff !== this.props.isAssignAnyStaffToStaff) {
+
+			let appAssignStaff = JSON.parse(localStorage.getItem('appointmentAssignStaff'));
+			let appointmentExpand = JSON.parse(localStorage.getItem('appointmentExpand'));
+			if (appAssignStaff || appointmentExpand) {
+				let appointmentId = appAssignStaff ? appAssignStaff.AppointmentId : appointmentExpand.AppointmentId;
+				await this.afterSlide(0);
+				await this.findSlideScroll(appointmentId);
+				await this.verticalScrollToAppointment(appointmentId);
+				setTimeout(() => {
+					this.props.anystaffAssignStaff(false);
+					localStorage.removeItem('appointmentAssignStaff');
+					localStorage.removeItem('appointmentExpand');
+				}, 500);
+			}
 		}
 	}
 
@@ -303,13 +83,15 @@ class ResourceSelector extends React.Component {
 	findSlideScroll = (appointmentId) => {
 		const { allAppointment, resources, slideIndex } = this.props;
 		let app = allAppointment.find(app => app.id === appointmentId);
-		const { memberId } = app;
-		let indexStaff = resources.findIndex(s => parseInt(s.id) === parseInt(memberId));
-		let slideIndexAppointment = parseInt((indexStaff + 1) / qtyStaff);
-		let slideNeedToScroll = slideIndexAppointment - slideIndex;
-		this.scrollToAppointment(slideNeedToScroll);
-	}
 
+		if (app) {
+			const { memberId } = app;
+			let indexStaff = resources.findIndex(s => parseInt(s.id) === parseInt(memberId));
+			let slideIndexAppointment = parseInt((indexStaff + 1) / this.props.qtyResources);
+			let slideNeedToScroll = slideIndexAppointment - slideIndex;
+			this.scrollToAppointment(slideNeedToScroll);
+		}
+	}
 	verticalScrollToAppointment(appointmentId) {
 		var els = document.getElementsByClassName("apppointment-calendar");
 		Array.prototype.forEach.call(els, function (el) {
@@ -332,12 +114,19 @@ class ResourceSelector extends React.Component {
 			}
 		}
 	}
-
 	componentWillMount() {
-		this.props.getDetailMerchant({ isFirstLoad: true });
-		this.props.countNotificationUnread();
+		const { currentDay } = this.props;
+		const dateCalendar = JSON.parse(localStorage.getItem('date'));
+		if (dateCalendar) {
+			this.props.getAppointmentAnyStaff(dateCalendar);
+			setTimeout(() => {
+				localStorage.removeItem('date');
+			}, 500);
+		} else {
+			this.props.getAppointmentAnyStaff(moment(currentDay, ['DDMMYYYY']).format('YYYY-MM-DD'));
+		}
+		// this.props.getDetailMerchant({ isFirstLoad: true });
 	}
-
 
 	onPrevClick(event, previousSlide) {
 		previousSlide(event);
@@ -347,9 +136,12 @@ class ResourceSelector extends React.Component {
 		nextSlide(event);
 	}
 
+
 	afterSlide(index) {
 		const { resources } = this.props;
-		this.props.setDisplayedMembers(resources.slice(index * 8, index * 8 + 8));
+		const { qtyResources } = this.props;
+		const quantity = parseInt(qtyResources);
+		this.props.setDisplayedMembers(resources.slice(index * quantity, index * quantity + quantity));
 		this.props.renderAppointment();
 		this.props.setSlideIndex(index);
 	}
@@ -357,7 +149,8 @@ class ResourceSelector extends React.Component {
 	onTodayClick() {
 		const { timezone } = this.props.merchantInfo;
 		let timeNow = timezone ? moment_tz.tz(timezone.substring(12)).format('DDMMYYYY') : moment().format('DDMMYYYY');
-		this.props.onChangeToday(timeNow);
+		this.props.countAppointmentAnyStaff({ date: moment(timeNow, ['DDMMYYYY']).format('YYYY-MM-DD'), isDayClick: true, isReloadCalendar: true });
+		// this.props.onChangeToday(timeNow);
 	}
 
 	openPincode(staff) {
@@ -372,9 +165,11 @@ class ResourceSelector extends React.Component {
 
 	getActiveArrow() {
 		const { slideIndex, resources } = this.props;
+
+		const { qtyResources } = this.props;
 		let isActiveLeft = false,
 			isActiveRight = false;
-		const totalSlide = (resources.length - 1) / 8;
+		const totalSlide = (resources.length - 1) / (qtyResources);
 
 		if (totalSlide <= 1) {
 			isActiveLeft = false;
@@ -406,155 +201,6 @@ class ResourceSelector extends React.Component {
 		};
 	}
 
-	renderResource(resource, index) {
-		if (parseInt(resource.id) !== 0)
-			return (
-				<Resource
-					onClick={() => this.openPincode(resource)}
-					active={parseInt(resource.id) === parseInt(staffId) ? true : false}
-					key={index}
-				>
-					<Resource.Avatar>
-						<img src={resource.imageUrl} alt={resource.orderNumber} />
-					</Resource.Avatar>
-
-					<Resource.OrderNumber next={resource.isNextAvailableStaff === 1 ? true : false}>
-						{resource.orderNumber}
-					</Resource.OrderNumber>
-					<Resource.Title>{resource.title}</Resource.Title>
-				</Resource>
-			);
-	}
-
-	renderResources(resources, index) {
-		return (
-			<ResourceWrapper key={index}>
-				{resources.map((resource, indexS) => this.renderResource(resource, indexS))}
-			</ResourceWrapper>
-		);
-	}
-
-	renderLoadingResources(index) {
-		return (
-			<ResourceWrapper key={index}>
-				<Resource>{/* <LoadingIndicator /> */}</Resource>
-			</ResourceWrapper>
-		);
-	}
-
-	renderCarouselSlide() {
-		const { loading, resources } = this.props;
-		if (loading) {
-			return [1].map((index) => this.renderLoadingResources(index));
-		}
-		if (resources) {
-			return chunk(resources, 8).map((resource, index) => this.renderResources(resource, index));
-		}
-		return null;
-	}
-
-	render() {
-		const {
-			checkPinCode,
-			popupPincode,
-			togglePopupPincode,
-			disableCalendar,
-			PinStaff,
-			calendarMembers,
-			SubmitEditBlockTime,
-			deleteBlockTime,
-			currentDay,
-			editBlockTime,
-			resources,
-			notificationUnreadQuantity
-		} = this.props;
-
-		const isActiveLett = this.getActiveArrow().isActiveLeft;
-		const isActiveRight = this.getActiveArrow().isActiveRight;
-
-		return (
-			<React.Fragment>
-				<ResourceSelectorWrapper>
-					<WrapButtonToday>
-						<ButtonToday onClick={() => this.onTodayClick()}>
-							<ButtonToday.Text>Today</ButtonToday.Text>
-						</ButtonToday>
-					</WrapButtonToday>
-
-
-					<AnyStaff>
-						<AnyStaff.Image>
-							<img src={require('../../images/anystaff.png')} />
-							<AnyStaff.Title>Any staff</AnyStaff.Title>
-						</AnyStaff.Image>
-					</AnyStaff>
-
-					<ResourceSliderWrapper>
-						{resources.length > 0 && (
-							<Carousel
-								dragging={true}
-								renderBottomCenterControls={() => ''}
-								renderCenterLeftControls={({ previousSlide }) => {
-									if (!isActiveLett) {
-										return (
-											<ButtonArrow isLeft>
-												<img src={require('../../images/arrow-right-grey.png')} />
-											</ButtonArrow>
-										);
-									} else
-										return (
-											<ButtonSplash
-												refButton={this.refPrevButton}
-												isLeft
-												onClick={(ev) => this.onPrevClick(ev, previousSlide)}
-											/>
-										);
-								}}
-								renderCenterRightControls={({ nextSlide }) => {
-									if (!isActiveRight) {
-										return (
-											<ButtonArrow>
-												<img src={require('../../images/arrow-right-grey.png')} />
-											</ButtonArrow>
-										);
-									} else return <ButtonSplash
-										refButton={this.refNextButton}
-										onClick={(ev) => this.onNextClick(ev, nextSlide)}
-									/>;
-								}}
-								afterSlide={(slideIndex) => this.afterSlide(slideIndex)}
-							>
-								{this.renderCarouselSlide()}
-							</Carousel>
-						)}
-					</ResourceSliderWrapper>
-					<WaitingHeader>Waiting</WaitingHeader>
-				</ResourceSelectorWrapper>
-
-				<PopupBlockTime
-					checkPinCode={checkPinCode}
-					popupPincode={popupPincode}
-					togglePopupPincode={togglePopupPincode}
-					disableCalendar={disableCalendar}
-					staff={PinStaff}
-					calendarMembers={calendarMembers}
-					SubmitEditBlockTime={SubmitEditBlockTime}
-					deleteBlockTime={deleteBlockTime}
-					currentDay={currentDay}
-					editBlockTime={editBlockTime}
-				/>
-			</React.Fragment>
-		);
-	}
 }
-
-ResourceSelector.propTypes = {
-	resources: PropTypes.any,
-	calendarMembers: PropTypes.any,
-	onChangeToday: PropTypes.func,
-	loadMembers: PropTypes.func,
-	setDisplayedMembers: PropTypes.func,
-	loading: PropTypes.bool
-};
 
 export default ResourceSelector;
