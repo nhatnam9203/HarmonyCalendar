@@ -39,7 +39,6 @@ import {
 	addBlockAnyStaff,
 	new_total_duration,
 	checkMerchantWorking,
-	postMesageAssignAppointment,
 	adapterServicesMoved,
 	blockTempFrontEnd,
 } from './utilSaga';
@@ -504,10 +503,8 @@ export function* assignAppointment(action) {
 
 			if (response.codeStatus !== 1) return yield* checkResponse(response);
 			if (response.codeStatus === 1) {
-				postMesageAssignAppointment(appointment.id, appointment, memberId)
 			}
 		} else {
-			postMesageAssignAppointment(appointment.id, appointment, memberId)
 		}
 	} catch (err) {
 		// yield put(appointmentAssigningError(err));

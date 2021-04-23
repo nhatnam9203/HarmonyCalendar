@@ -648,19 +648,6 @@ export function checkMerchantWorking(merchantInfo, fromTime) {
 	return true;
 }
 
-export function postMesageAssignAppointment(idAppointment, app , memberId) {
-	const { options, extras, products } = app;
-	if (options.length + extras.length + products.length === 0) {
-		const data = JSON.stringify({
-			appointmentId: idAppointment ? idAppointment : 'web',
-			appointment: app,
-			staffId : memberId,
-			action: 'checkout'
-		});
-		window.postMessage(data);
-	}
-}
-
 export function adapterServicesMoved(services = [], staffId) {
 	let arrTemp = [];
 	for (let i = 0; i < services.length; i++) {
