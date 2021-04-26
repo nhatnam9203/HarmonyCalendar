@@ -6,7 +6,7 @@ import { MAIN_CALENDAR_OPTIONS } from './constants';
 import { merchantId, deviceId, GET_APPOINTMENT_ID, token } from '../../../app-constants';
 import { store } from 'app';
 import { addEventsToCalendar } from './constants';
-import { PROD_API_BASE_URL } from '../../../app-constants';
+import { PROD_API_BASE_URL , SIGNALR } from '../../../app-constants';
 import { returnAppointment } from './util';
 import { appointmentAdapter } from '../../containers/AppointmentPage/utilSaga';
 import axios from 'axios';
@@ -186,7 +186,7 @@ class Calendar extends React.Component {
 	}
 
 	runSignalR_Appointment() {
-		const url = `${PROD_API_BASE_URL}/notification/?merchantId=${merchantId}&Title=Merchant&kind=calendar&deviceId=${deviceId}`;
+		const url = `${SIGNALR}/notification/?merchantId=${merchantId}&Title=Merchant&kind=calendar&deviceId=${deviceId}`;
 		let connection = new signalR.HubConnectionBuilder().withUrl(url).withAutomaticReconnect().build();
 		connection.serverTimeoutInMilliseconds = 6000000;
 
