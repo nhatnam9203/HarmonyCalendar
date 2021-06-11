@@ -1,8 +1,6 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { formatUsPhone, checkStringNumber2 } from '../../utils/helper';
-import Layout from './layout'
-
+import Layout from './layout';
 
 const initialState = {
 	isOpenSearchingPopup: true,
@@ -41,6 +39,18 @@ class AddAppointment extends Layout {
 		this.setState({ isPopupCustomer: false });
 	}
 
+	onClickNumber = (number) => {
+		if (number === ".") return;
+		let { phoneNumber } = this.state;
+		if (number === "x") {
+			phoneNumber = phoneNumber.substring(0, phoneNumber.length - 1);
+		} else {
+			if (phoneNumber.toString().length < 10) {
+				phoneNumber += number;
+			}
+		}
+		this.setState({ phoneNumber })
+	}
 
 	async componentWillReceiveProps(nextProps) {
 		if (nextProps.StateAddCustomerSuccess === true) {
@@ -68,7 +78,7 @@ class AddAppointment extends Layout {
 		}
 	}
 
-	closeAllModal() {
+	closeAllModal = () => {
 		this.setState({
 			isOpenSearchingPopup: true,
 			isOpenAddingPopup: false,
@@ -85,9 +95,8 @@ class AddAppointment extends Layout {
 		this.closePopupCustomer();
 	}
 
-	async handleSubmitVerifyPhone() {
-		const { phoneNumber } = this.state;
-		// const { time, staffID, dataAnyStaff } = this.props.TimeAndStaffID;
+	handleSubmitVerifyPhone = async () => {
+		let phoneNumber = this.refPopupPhone.current.refPhone.current.value;
 		const phone = checkStringNumber2(phoneNumber.toString()); // lấy ra số phone , ex : 123-456-7890
 		await this.setState({ phoneNumber: phone });
 		if (phone.trim() !== "") {
@@ -127,10 +136,12 @@ class AddAppointment extends Layout {
 			}
 	};
 
-	async handleChange(e) {
-		const val = e.target.value;
-		if (e.target.validity.valid) this.setState({ phoneNumber: e.target.value.replace(/^0+/, '') });
-		else if (val === '' || val === '-') this.setState({ phoneNumber: val });
+	handleChangeNumber = async (e) => {
+		this.setState({ phoneNumber: e.target.value });
+	}
+
+	onChangePhoneCheck = (value) => {
+		this.setState({ phoneCheck: value });
 	}
 
 	handleChangeNote(e) {

@@ -68,7 +68,6 @@ const CalendarPopup = styled.div`
     z-index: 1;
     background: #fff;
     color: #000;
-    height: 18rem;
     line-height: 1;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;

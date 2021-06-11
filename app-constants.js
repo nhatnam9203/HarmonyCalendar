@@ -11,7 +11,7 @@ export const API_PORT = 8010;
 
 // export const DEV_API_BASE_URL = `https://api.harmonypayment.com`;
 // export const PROD_API_BASE_URL = `https://api.harmonypayment.com`;
-// export const SIGNALR = `https://api.harmonypayment.com`;
+// export const SIGNALR = `https://signalr.harmonypayment.com`;
 
 // export const DEV_API_BASE_URL = `https://dev.harmonypayment.com`;
 // export const PROD_API_BASE_URL = `https://dev.harmonypayment.com`;
@@ -24,6 +24,10 @@ export const SIGNALR = `https://signalr-stage.harmonypayment.com`;
 // export const DEV_API_BASE_URL = `https://staging2.harmonypayment.com`;
 // export const PROD_API_BASE_URL = `https://staging2.harmonypayment.com`;
 // export const SIGNALR = `https://signalr-stage.harmonypayment.com`;
+
+// export const DEV_API_BASE_URL = ` https://api2.harmonypayment.com`;
+// export const PROD_API_BASE_URL = ` https://api2.harmonypayment.com`;
+// export const SIGNALR = `https://signalr.harmonypayment.com`;
 
 export const isDesktopOrLaptop = window.innerWidth > 1000 ? true : false;
 

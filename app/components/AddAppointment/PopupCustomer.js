@@ -243,20 +243,22 @@ const convertStatus = {
 
 class PopupCustomer extends React.Component {
 	renderProducts(products) {
-		return products.map((pro) => (
-			<Row key={'product' + pro.productId}>
-				<Row.ServiceName>{pro.productName}</Row.ServiceName>
-				<Row.StartTime />
-				<Row.Staff />
-				<Row.Duration>{`${pro.quantity} items`}</Row.Duration>
-				<Row.Price>{`$ ${pro.price}`}</Row.Price>
-			</Row>
-		));
+		return products.map((pro) => {
+			return (
+				<Row key={'product' + pro.bookingProductId + Math.random()}>
+					<Row.ServiceName>{pro.productName}</Row.ServiceName>
+					<Row.StartTime />
+					<Row.Staff />
+					<Row.Duration>{`${pro.quantity} items`}</Row.Duration>
+					<Row.Price>{`$ ${pro.price}`}</Row.Price>
+				</Row>
+			)
+		})
 	}
 
 	renderExtras(extrasServices) {
 		return extrasServices.map((ex) => (
-			<Row key={'extra' + ex.bookingExtraId}>
+			<Row key={'extra' + ex.bookingExtraId + Math.random()}>
 				<Row.ExtraName>
 					<ImgExtra src={require('../../images/iconExtra.png')} />
 					{ex.extraName}
@@ -274,7 +276,7 @@ class PopupCustomer extends React.Component {
 			const extrasServices = extras.filter((ex) => ex.bookingServiceId === sv.bookingServiceId);
 			return (
 				<React.Fragment>
-					<Row key={'service' + sv.serviceId}>
+					<Row key={'service' + sv.bookingServiceId + Math.random()}>
 						<Row.ServiceName>{sv.serviceName}</Row.ServiceName>
 						<Row.StartTime>{moment(sv.fromTime).format('hh:mm A')}</Row.StartTime>
 						<Row.Staff>{sv.staff.displayName}</Row.Staff>
@@ -355,15 +357,15 @@ class PopupCustomer extends React.Component {
 								{isSendLink ? (
 									<ImageSendLink src={require('../../images/check-box@3x.png')} />
 								) : (
-									<ImageSendLink src={require('../../images/check-box-empty@3x.png')} />
-								)}
+										<ImageSendLink src={require('../../images/check-box-empty@3x.png')} />
+									)}
 								<TextSendLink>Send application download link</TextSendLink>
 							</Row>
 						)}
 
 						<LineBottom />
 						<Bottom>
-							<ButtonNext onClick={()=>onSubmit(true)}>Next</ButtonNext>
+							<ButtonNext onClick={() => onSubmit(true)}>Next</ButtonNext>
 						</Bottom>
 					</Body>
 				</Container>

@@ -309,6 +309,13 @@ export function* reRenderAppointment() {
 		if (appointmentScroll && appointmentScroll !== '') {
 			yield put({ type: 'START_SCROLL_TO_APPOINTMENT', isScrollToAppointment: true });
 		}
+
+		const scrollNow = JSON.parse(localStorage.getItem('scrollNow'));
+		if (scrollNow) {
+			scrollToNow();
+			yield delay(500);
+			localStorage.removeItem('scrollNow')
+		}
 	} catch (err) {
 		yield put(actions.appointmentByMemberLoadingError(err));
 	}
@@ -1113,7 +1120,7 @@ export function* getBlockTimeSaga() {
 					yield* increaseResource(9, 7);
 				}
 				else if (count >= 12) {
-					yield* increaseResource(10, 4);
+					yield* increaseResource(10, 6);
 				}
 			}
 			yield put(actions.getBlockTime_Success(response.data));
@@ -1369,6 +1376,9 @@ export function* getAppointmentAnyStaff(action) {
 		if (response.codeNumber == 200) {
 			yield put({ type: 'SET_APPOINTMENT_ANY_STAFF', payload: response.data });
 			yield put({ type: 'GET_DETAIL_MERCHANT', payload: { isFirstLoad: true } })
+			if (parseInt(response.data) >= 4) {
+				localStorage.setItem('scrollNow', true);
+			}
 		} else {
 			alert(response.message)
 		}
@@ -1411,6 +1421,15 @@ export function* countAppointmentAnyStaff(action) {
 					} else if (count < 8) {
 						reloadWeb(date, appointment);
 						// type = 'decrease';
+					}
+				} else if (parseInt(appointmentAnyStaff) === 12) {
+					if (count < 12) {
+						reloadWeb(date, appointment);
+					}
+				}
+				else if (parseInt(appointmentAnyStaff) === 8) {
+					if (count < 8) {
+						reloadWeb(date, appointment);
 					}
 				}
 				// if (type) {

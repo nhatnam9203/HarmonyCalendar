@@ -44,7 +44,8 @@ class ResourceSelector extends layout {
 		if (nextProps.isFirstReloadCalendar == false && this.props.isFirstReloadCalendar !== nextProps.isFirstReloadCalendar) {
 			const { resources, qtyResources } = this.props;
 			const slide = chunk(resources, parseInt(qtyResources));
-			if (slide.length > 1 && slide[slide.length - 1].length < qtyResources) {
+
+			if (slide.length > 1 && slide[slide.length - 1].length <= qtyResources && slide[slide.length - 1].length > 1) {
 					await this.setState({ isLoadingStaff: true });
 					this.refNextButton.current.click();
 					setTimeout(() => {
@@ -150,6 +151,7 @@ class ResourceSelector extends layout {
 		const { timezone } = this.props.merchantInfo;
 		let timeNow = timezone ? moment_tz.tz(timezone.substring(12)).format('DDMMYYYY') : moment().format('DDMMYYYY');
 		this.props.countAppointmentAnyStaff({ date: moment(timeNow, ['DDMMYYYY']).format('YYYY-MM-DD'), isDayClick: true, isReloadCalendar: true });
+		localStorage.setItem('scrollNow', true);
 		// this.props.onChangeToday(timeNow);
 	}
 

@@ -4,6 +4,7 @@ import Popup from 'reactjs-popup';
 import { formatUsPhone } from '../../utils/helper';
 import NumberFormat from 'react-number-format';
 import PopupCustomer from './PopupCustomer';
+import PopupPhone from "./PopupPhone";
 
 const AppPopup = styled(Popup)`
   border-radius: 1.5rem;
@@ -57,11 +58,6 @@ AppPopupWrapper.Footer = styled.div`
 		width: 5rem;
 		height: 3rem;
 	}
-`;
-
-const SearchingPopup = styled(AppPopup)`
-  width: 30rem !important;
-  
 `;
 
 const SearchingWrapper = styled(AppPopupWrapper)`
@@ -122,40 +118,6 @@ const Label = styled.div`
 	font-size : 1rem;
 `;
 
-const FooterChekPhone = styled.div`
-	width: 100%;
-	padding: 1rem;
-	text-align: center;
-`;
-
-const FormCheckPhone = styled.div`
-	display: flex;
-	flex-direction: row;
-	width: 100%;
-	height: 2.5rem;
-	margin-bottom: 1rem;
-	& > input {
-		flex: 1;
-		text-align: left;
-		background: #ffffff;
-		border: 1px solid #dddddd;
-		border-radius: 4px;
-		padding-left: 1.3rem;
-		-moz-appearance: none;
-		-webkit-appearance: none;
-	}
-	& > select {
-		width: 4rem;
-		background: #ffffff;
-		border: 1px solid #dddddd;
-		border-radius: 4px;
-		margin-right: 0.5rem;
-		padding-left: 1.2rem;
-		-moz-appearance: none;
-		-webkit-appearance: none;
-	}
-`;
-
 const Row = styled.div`
 	display : flex;
 	flex-direction : row;
@@ -203,6 +165,10 @@ const Button = styled.button`
 	cursor: pointer;
 	text-align: center;
 	padding: 0rem 3rem;
+    &:active{
+		background : white;
+		color : #1B68AC;
+	}
 `;
 
 const NoteWrapper = styled.div`
@@ -264,6 +230,11 @@ const BtnClose = styled.div`
 
 class AddAppointment extends React.Component {
 
+    constructor(props){
+        super(props);
+        this.refPopupPhone = React.createRef();
+    }
+
     renderNote = (note, index) => (
         <NoteInformation key={index}>
             <div>{note}</div>
@@ -283,58 +254,6 @@ class AddAppointment extends React.Component {
         );
     }
 
-    renderPopupSearch() {
-        const {
-            isOpenSearchingPopup,
-            error_phone,
-        } = this.state;
-
-        return (
-            <SearchingPopup open={isOpenSearchingPopup} closeOnDocumentClick={false} lockScroll={true}>
-                <SearchingWrapper>
-                    <BtnClose onClick={() => this.closeAllModal()}>
-                        <img src={require("../../images/close_white.png")} />
-                    </BtnClose>
-                    <SearchingWrapper.Header backgroundColor="#1366AE">Add Appointment</SearchingWrapper.Header>
-                    <SearchingWrapper.Body>Enter Phone Number</SearchingWrapper.Body>
-
-                    <FooterChekPhone>
-                        <FormCheckPhone>
-                            <select
-                                value={this.state.phoneCheck}
-                                onChange={(e) => this.setState({ phoneCheck: e.target.value })}
-                                className=""
-                                name=""
-                                id=""
-                            >
-                                <option value="1">+1</option>
-                                <option value="84">+84</option>
-                                <option />
-                            </select>
-                            <NumberFormat
-                                format="###-###-####"
-                                mask="_"
-                                value={this.state.phoneNumber}
-                                onChange={(e) => this.handleChange(e)}
-                                placeholder="Enter Phone Number"
-                                type="tel"
-                            />
-                        </FormCheckPhone>
-                        <Button
-                            onClick={() => this.handleSubmitVerifyPhone()}
-                            id="submit-create-appointment"
-                            primary
-                            style={{ fontWeight: '600' }}
-                        >
-                            Next
-                        </Button>
-                        {error_phone && <p style={{ color: 'red' }}>{error_phone}</p>}
-                    </FooterChekPhone>
-                </SearchingWrapper>
-            </SearchingPopup>
-        )
-    }
-
     checkConditionSendLink() {
         const { InfoAfterCheckPhone } = this.props;
         if (InfoAfterCheckPhone && InfoAfterCheckPhone.userId === 0) return true
@@ -345,7 +264,6 @@ class AddAppointment extends React.Component {
     renderPopupAddCustomer() {
         const {
             isOpenAddingPopup,
-            success_addApointment,
             isSendLink
         } = this.state;
 
@@ -507,7 +425,6 @@ class AddAppointment extends React.Component {
 
         return (
             <div>
-                {this.renderPopupSearch()}
                 {this.renderPopupAddCustomer()}
                 <PopupCustomer
                     close={() => this.closeAllModal()}
@@ -517,6 +434,17 @@ class AddAppointment extends React.Component {
                     isSendLink={this.state.isSendLink}
                     condition={condition}
                     onSubmit={this.handleSubmitAppointment}
+                />
+                <PopupPhone
+                    ref={this.refPopupPhone}
+                    closeAllModal={this.closeAllModal}
+                    phoneCheck={this.state.phoneCheck}
+                    onChangePhoneCheck={this.onChangePhoneCheck}
+                    handleChangeNumber={this.handleChangeNumber}
+                    handleSubmitVerifyPhone={this.handleSubmitVerifyPhone}
+                    isOpenSearchingPopup={this.state.isOpenSearchingPopup}
+                    phoneNumber={this.state.phoneNumber}
+                    onClickNumber={this.onClickNumber}
                 />
             </div>
         );
