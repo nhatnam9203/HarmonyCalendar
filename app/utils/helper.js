@@ -72,7 +72,7 @@ export function formatPhone(phone) {
 	return phoneFotmat;
 }
 
-export function formatPhoneCalendar(phone){
+export function formatPhoneCalendar(phone) {
 	let phoneFotmat = '';
 	if (phone) {
 		if (phone.charAt(0) === '1') {
@@ -119,12 +119,13 @@ export const PromiseAction = async (action, data) => {
 	});
 };
 
-export function scrollToNow(){
+export function scrollToNow() {
 	setTimeout(() => {
 		const x = document.getElementsByClassName('fc-now-indicator fc-now-indicator-arrow');
 		for (let i = 0; i < x.length; i++) {
 			x[i].scrollIntoView();
 		}
+
 	}, 600);
 }
 
@@ -133,12 +134,29 @@ export function convertMinsToHrsMins(mins) {
 	let m = mins % 60;
 	// h = h < 10 ? '0' + h : h;
 	// m = m < 10 ? '0' + m : m;
-	if (h !== 0){
-		if(m !==0){
+	if (h !== 0) {
+		if (m !== 0) {
 			return `${h} hour ${m} min`;
-		}else{
+		} else {
 			return `${h} hour`;
 		}
 	}
 	return `${m} min`;
-  }
+}
+
+
+export const getWindowSize = () => {
+
+	let size = "medium"
+	const width = window.screen.width;
+
+	if (parseInt(width) > 1200) {
+		size = "superLarge";
+	} else
+		if (parseInt(width) < 1024) {
+			size = "medium";
+		} else if (parseInt(width) >= 1024) {
+			size = "large";
+		}
+	return size;
+}

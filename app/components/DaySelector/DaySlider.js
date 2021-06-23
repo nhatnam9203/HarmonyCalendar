@@ -60,8 +60,8 @@ Picker.Button = styled.div`
   `;
 
 const CalendarPopup = styled.div`
-    top: -1rem;
-    left: calc(100%/2 - 9rem);
+    top: -6.3rem;
+    left: calc(100%/2 - 11.5rem);
     position: absolute;
     transform: translate3d(0.5rem, calc(-18rem + 0.5rem), 0px);
     will-change: transform;
@@ -77,8 +77,9 @@ const CalendarPopup = styled.div`
 CalendarPopup.Heading = styled.div`
     background: #1366AE;
     color: #ffffff;
-    height: 3rem;
-    font-size: 1.5rem;
+    height: 3.5rem;
+    font-size: 1.7rem;
+    padding-top: 3px;
     line-height: 2; 
     padding-left : 1rem;
   `;
@@ -89,14 +90,14 @@ CalendarPopup.Body = styled.div``;
 const BtnClose = styled.div`
 	position: absolute;
 	right: 0.5rem;
-	top: 0.3rem;
+	top: 0.7rem;
 	line-height: 1;
 	font-size: 2rem;
 	color: #ffffff;
 	cursor: pointer;
 	& > img{
-		width : 27px;
-		height : 27px;
+		width : 35px;
+		height : 35px;
 	}
 `;
 

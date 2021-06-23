@@ -60,9 +60,8 @@ const Button = styled.div`
 	border-bottom-right-radius: ${(props) => (props.borderBottomRight ? '8px' : 0)};
 	border-right: ${(props) => (props.borderRight ? '2px solid #dddddd' : 0)};
 	zIndex: 1111;
-	& > span {
+	& > div {
 		font-weight: 500;
-		font-family : 'Arial'
 	},
 `;
 
@@ -97,12 +96,6 @@ export default class PopupTimePicker extends Component {
 		});
 	}
 
-	availableTime(){
-		const { services, indexFromTime } = this.props;
-		const activeService = {...services[indexFromTime]};
-		console.log({activeService})
-	}
-
 	componentWillReceiveProps(nextProps) {
 		const { fromTimeService } = nextProps;
 		this.setState({
@@ -116,17 +109,11 @@ export default class PopupTimePicker extends Component {
 	}
 
 	handleChange = (name, value) => {
-		const { optionGroups } = this.state;
 		this.setState(({ valueGroups }) => ({
 			valueGroups: {
 				...valueGroups,
 				[name]: value
 			},
-			// optionGroups: {
-			// 	hour: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'],
-			// 	minutes: ['00', '05', '10'],
-			// 	localization: ['AM', 'PM']
-			// }
 		}));
 	};
 
@@ -159,10 +146,10 @@ export default class PopupTimePicker extends Component {
 					</Body>
 					<Footer>
 						<Button borderRight onClick={() => this.cancel()}>
-							<span>Cancel</span>
+							<div>Cancel</div>
 						</Button>
 						<Button borderBottomRight onClick={() => this.done()}>
-							<span>Done</span>
+							<div>Done</div>
 						</Button>
 					</Footer>
 				</Container>

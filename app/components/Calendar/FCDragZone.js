@@ -10,6 +10,18 @@ import call from '../../images/call.png';
 import ButtonSplash from './ButtonSplash';
 import { store } from 'app';
 import { disableCalendar, getApppointmentById } from '../../containers/AppointmentPage/actions';
+import { isEmpty } from "lodash";
+
+import { getWindowSize } from "../../utils/helper";
+
+let COUNT_EVENTS_IN_SLIDE = 8;
+let size = getWindowSize();
+if (size === "large") {
+	COUNT_EVENTS_IN_SLIDE = 12;
+} else
+	if (size === "superLarge") {
+		COUNT_EVENTS_IN_SLIDE = 8;
+	}
 
 const DragZoneWrapper = styled.div`
 	height: calc(100vh - 8.8rem);
@@ -17,11 +29,15 @@ const DragZoneWrapper = styled.div`
 	@media (min-width: 1025px) {
 		height: calc(100vh - 10rem);
 	}
+	overflow : hidden;
 	-webkit-user-select: none; 
 	-moz-user-select: none; 
 	-ms-user-select: none;
 	-o-user-select: none;
 	user-select: none;
+	display : flex;
+	flex-direction: column;
+	justify-content: space-between;
 `;
 
 const EventWrapper = styled.div`
@@ -29,12 +45,12 @@ const EventWrapper = styled.div`
 	width: calc((100vw - 5.05rem) / 10);
 	border: 0.5px solid #ffffff;
 	color: #333333;
-	height: calc((100vh - 8.8rem - 55px)/4);
-	@media (min-width: 1025px) {
-		height: calc((100vh - 10rem - 60px)/4);
-	}
 	overflow: hidden;
 	position: relative;
+	height :${(props) => props.height};
+	@media (min-width: 1025px) {
+		height : ${(props) => props.heightMedia};
+	}
 `;
 
 const WaitingEvent = styled.div`
@@ -43,6 +59,10 @@ const WaitingEvent = styled.div`
   -ms-user-select: none;
   -o-user-select: none;
   user-select: none;
+  height: calc(100vh - 8.8rem - 6rem);
+  @media (min-width: 1025px) {
+	height: calc(100vh - 10rem - 6rem);
+}
 `;
 
 const BtnClose = styled.div`
@@ -53,32 +73,31 @@ const BtnClose = styled.div`
 	font-size: 2rem;
 	color: #ffffff;
 	cursor: pointer;
-	& > img {
-		width: 18px;
-		height: 18px;
+	& > img{
+		width : 15px;
+		height : 15px;
 	}
 `;
 
 const PrevButton = styled.div`
 	color: #3883bb;
 	font-size: 2rem;
-	line-height: 2rem;
+	height: 3rem;
 	cursor: pointer;
 	text-align: center;
 	width: 100%;
-	& > img {
-		width: 19px;
-		height: 19px;
-		transform: rotate(180deg);
-	}
+	& > img{
+		width: 26px;
+		height: 26px;
+		transform: rotate(180deg)
+  }
 `;
 
 const NextButton = styled(PrevButton)`
-  position : absolute;
-  bottom : 0;
+
   & > img{
-    width: 19px;
-    height: 19px;
+    width: 26px;
+    height: 26px;
     transform: rotate(360deg)
   }
 `;
@@ -117,8 +136,9 @@ class FCDragZone extends React.PureComponent {
 		super(props);
 		this.state = {
 			slideIndex: 0,
-			slidesToShow: 4,
-			event: ''
+			slidesToShow: COUNT_EVENTS_IN_SLIDE,
+			event: '',
+			eventHeightContainer: 0,
 		};
 	}
 
@@ -133,11 +153,26 @@ class FCDragZone extends React.PureComponent {
 	}
 
 	componentDidMount() {
+		const eventHeightContainer = document.getElementById("waiting-events").clientHeight;
+		console.log({ eventHeightContainer })
+		this.setState({ eventHeightContainer })
 		window.addEventListener('resize', () => this.updateDimensions());
 	}
 
 	componentWillUnmount() {
 		// window.removeEventListener('resize', () => this.updateDimensions());
+	}
+
+	componentDidUpdate() {
+		const { events } = this.props;
+		const { slideIndex, slidesToShow } = this.state;
+		const displayedEvents = events.slice(
+			slideIndex * slidesToShow,
+			slideIndex * slidesToShow + slidesToShow
+		);
+		if (displayedEvents.length === 0 && slideIndex > 0) {
+			this.prevSlide();
+		}
 	}
 
 	prevSlide() {
@@ -175,7 +210,7 @@ class FCDragZone extends React.PureComponent {
 			isActiveRight = false;
 		let { slideIndex } = this.state;
 		const { events } = this.props;
-		const totalSlide = events.length / 4;
+		const totalSlide = events.length / COUNT_EVENTS_IN_SLIDE;
 
 		if (totalSlide <= 1) {
 			isActiveLeft = false;
@@ -207,7 +242,7 @@ class FCDragZone extends React.PureComponent {
 
 	render() {
 		const { events, StatusDeleteWaiting, deleteWaitingAppointment, deleteEventWaitingList } = this.props;
-		const { slideIndex, slidesToShow } = this.state;
+		const { slideIndex, slidesToShow, eventHeightContainer } = this.state;
 		const displayedEvents = events
 			.sort(function (a, b) {
 				var c = new Date(a.id);
@@ -218,6 +253,9 @@ class FCDragZone extends React.PureComponent {
 
 		const isActiveLeft = this.getActiveArrow().isActiveLeft;
 		const isActiveRight = this.getActiveArrow().isActiveRight;
+
+		const eventHeight = `calc((100vh - 8.8rem - 6rem)/${slidesToShow})`
+		const eventHeightMedia = `calc((100vh - 10rem - 6rem)/${slidesToShow})`
 
 		return (
 			<React.Fragment>
@@ -237,6 +275,8 @@ class FCDragZone extends React.PureComponent {
 								key={event.id}
 								onClick={() => this.selectAppointment(event)}
 								data-event-information={JSON.stringify(event)}
+								height={eventHeight}
+								heightMedia={eventHeightMedia}
 							>
 								<BtnClose>
 									<img
@@ -248,9 +288,14 @@ class FCDragZone extends React.PureComponent {
 									/>
 								</BtnClose>
 
-								<div className="app-event__full-name waiting-event">{event.firstName}</div>
-								<div className="app-event__phone-number4">
-								{` ${formatPhone(event.phoneNumber).toString().replace("(+84)","").replace("+84-","").replace("+1-","").replace("(+1)","")}`}
+								<div
+									style={{ color: '#585858' }}
+									className="app-event__full-name waiting-event"
+								>
+									{event.firstName}
+								</div>
+								{/* <div className="app-event__phone-number4">
+									{` ${formatPhone(event.phoneNumber).toString().replace("(+84)", "").replace("+84-", "").replace("+1-", "").replace("(+1)", "")}`}
 								</div>
 								{event.options.map((option, index) => (
 									<div className="app-event__option option_waiting" key={index}>
@@ -264,7 +309,7 @@ class FCDragZone extends React.PureComponent {
 									>
 										- {option.categoryName}
 									</div>
-								))}
+								))} */}
 							</EventWrapper>
 						))}
 					</WaitingEvent>

@@ -504,6 +504,7 @@ export function* assignAppointment(action) {
 		};
 
 		if (navigator.onLine) {
+			localStorage.setItem("isDragFromWaiting",JSON.stringify(true));
 			const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);
 			const url = `${requestURL.toString()}/${appointment.id}`;
 			const response = yield api(url, data, 'PUT', token);

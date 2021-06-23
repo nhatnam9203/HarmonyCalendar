@@ -6,7 +6,7 @@ import { MAIN_CALENDAR_OPTIONS } from './constants';
 import { merchantId, deviceId, GET_APPOINTMENT_ID, token } from '../../../app-constants';
 import { store } from 'app';
 import { addEventsToCalendar } from './constants';
-import { PROD_API_BASE_URL , SIGNALR } from '../../../app-constants';
+import { PROD_API_BASE_URL, SIGNALR } from '../../../app-constants';
 import { returnAppointment } from './util';
 import { appointmentAdapter } from '../../containers/AppointmentPage/utilSaga';
 import axios from 'axios';
@@ -46,6 +46,7 @@ const MainCalendar = styled.div`
 const RightSideBar = styled.div`
 	width: calc((100vw - 5.05rem) / 10);
 	position: relative;
+	overflow : hidden;
 	-webkit-user-select: none; 
 	-moz-user-select: none; 
 	-ms-user-select: none;
@@ -69,6 +70,7 @@ class Calendar extends React.Component {
 
 	componentWillMount() {
 		this.props.loadWaitingAppointments();
+		localStorage.removeItem("isDragFromWaiting");
 	}
 
 	receiveMessage = async (message) => {
@@ -90,6 +92,7 @@ class Calendar extends React.Component {
 				localStorage.removeItem('staffList');
 				localStorage.removeItem('AppointmentCalendar');
 				localStorage.removeItem('AppointmentWaiting');
+				localStorage.removeItem("isDragFromWaiting");
 				setTimeout(() => {
 					window.location.reload();
 				}, 300);
@@ -102,13 +105,13 @@ class Calendar extends React.Component {
 				}
 			}
 
-			if(action === 'appointmentNotification'){
+			if (action === 'appointmentNotification') {
 				this.props.onChangeDay(moment(data.data.appointmentDate).format('DDMMYYYY'));
 				this.props.scrollToAppointment(data.data.appointmentId);
 				let app = {
 					...data.data,
-					id : data.data.appointmentId,
-					end : data.data.createdDate,
+					id: data.data.appointmentId,
+					end: data.data.createdDate,
 				}
 				this.props.getApppointmentById({ appointment: app });
 			}
@@ -126,7 +129,16 @@ class Calendar extends React.Component {
 
 		if (res.status === 200) {
 			if (res.data.codeNumber === 200) {
+
 				let appointment = appointmentAdapter(res.data.data);
+
+				let flag = this.conditionPopupDetail(appointment.options);
+				const isDragFromWaiting = JSON.parse(localStorage.getItem("isDragFromWaiting"));
+				if (flag && isDragFromWaiting) {
+					this.props.getApppointmentById({ appointment, event: null });
+					localStorage.removeItem("isDragFromWaiting");
+				}
+
 				let newEndTime =
 					appointment.start === appointment.end
 						? `${moment(app.start).add('minutes', 15).format('YYYY-MM-DD')}T${moment(app.start)
@@ -142,6 +154,17 @@ class Calendar extends React.Component {
 		return 0;
 	};
 
+	conditionPopupDetail(services) {
+		let flag = false;
+		for (let i = 0; i < services.length; i++) {
+			if (services[i].isWarning) {
+				flag = true;
+				break;
+			}
+		}
+		return flag;
+	}
+
 	componentDidMount() {
 		window.addEventListener('message', this.receiveMessage);
 		this.runSignalR();
@@ -154,7 +177,6 @@ class Calendar extends React.Component {
 	addAppointmentFromSignalr(appointment_R) {
 		if (appointment_R.status === 'ASSIGNED' || appointment_R.status === 'CHECKED_IN') {
 			const displayMember = store.getState().getIn(['appointment', 'appointments', 'calendar']);
-
 			const member = displayMember.find((mem) =>
 				mem.appointments.find((app) => parseInt(app.id) === parseInt(appointment_R.id))
 			);
@@ -168,7 +190,7 @@ class Calendar extends React.Component {
 	}
 
 	async pushNotification(isNotification, appointment) {
-		if(appointment.Status !== 'waiting'){
+		if (appointment.Status !== 'waiting') {
 			const data = await JSON.stringify({
 				action: 'push_notification',
 				isNotification,
@@ -178,7 +200,7 @@ class Calendar extends React.Component {
 		}
 	}
 
-	updateNotification(){
+	updateNotification() {
 		const data = JSON.stringify({
 			action: 'update_notification',
 		});

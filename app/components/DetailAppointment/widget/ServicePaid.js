@@ -2,10 +2,14 @@ import React, { Component } from 'react'
 
 import styled from 'styled-components';
 import PopupStaff from './PopupStaff';
+import { api } from "../../../utils/helper";
+import * as api_constants from '../../../../app-constants';
+import { token } from '../../../../app-constants';
+
 const ImgButton = styled.img`
-	width : 12px;
-	height : 6px; 
-	margin-left : 8px; 
+    width : 12px;
+    height : 6px; 
+    margin-left : 8px; 
 `;
 
 const Row = styled.div`
@@ -35,6 +39,32 @@ const ServiceName = styled.div`
 `;
 
 export default class ServicePaid extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            isLoading: false,
+            staffOfService: [],
+        }
+    }
+
+    getStaffAvailable = async () => {
+        this.setState({ isLoading: true });
+        const { service: { serviceId, fromTime } } = this.props;
+        const date = moment(fromTime).format('YYYY-MM-DD');
+
+        const requestURL = new URL(`${api_constants.GET_STAFF_OF_SERVICE}/${serviceId}?date=${date}`);
+        const response = await api(requestURL.toString(), "", 'GET', token);
+        this.setState({
+            isLoading: false,
+            staffOfService: Array.isArray(response.data) ? response.data.map((s) => ({
+                ...s,
+                title: s.displayName,
+                id: s.staffId
+            })) : []
+        });
+    }
+
     render() {
         const {
             service,
@@ -50,15 +80,18 @@ export default class ServicePaid extends Component {
             openPopupTip,
             price
         } = this.props;
+        const { isWarning } = service;
+        const { staffOfService, isLoading } = this.state;
         return (
             <tr>
                 <td style={{ borderRight: 1 }}>
                     <ServiceName>{service.serviceName}</ServiceName>
                 </td>
-                <td style={{ position: 'relative' }}
+                <td style={{ position: 'relative' , background : isWarning ? '#FCD2D5' : 'transparent' }}
                     onClick={() => {
                         if (appointment.status === 'PAID' && isEditPaidAppointment) {
                             togglePopupStaff('', index)
+                            this.getStaffAvailable();
                         }
                     }}
                 >
@@ -70,6 +103,8 @@ export default class ServicePaid extends Component {
                         }
                         {isPopupStaff && index === indexPopupStaff && (
                             <PopupStaff
+                                staffOfService={staffOfService}
+                                isLoading={isLoading}
                                 togglePopupStaff={(staff) => {
                                     togglePopupStaff(staff, index);
                                 }}

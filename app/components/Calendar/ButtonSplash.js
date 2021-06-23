@@ -2,18 +2,18 @@ import React, { Component } from 'react';
 import styled from "styled-components";
 
 const Button = styled.div`
+    color: #3883bb;
+    font-size: 2rem;
+    height: 3rem;
+    cursor: pointer;
     text-align: center;
-    position: ${(props) => props.isTop ? "relative" : "absolute"};
-    bottom: 0px;
     width: 100%;
-	& > img {
-	width: 19px;
-	height: 19px;
+  & > img {
+	width: 26px;
+	height: 26px;
 	opacity:  ${(props) => props.isSplash ? 1 : 0.5};
-	margin-bottom: ${(props) => props.isTop ? "0px" : "8px"};
-	margin-top: ${(props) => props.isTop ? "8px" : "0px"};
 	transform : ${(props) => props.isTop ? "rotate(180deg)" : "rotate(0deg)"};
-	}
+  }
 `;
 
 export default class ButtonSplash extends Component {

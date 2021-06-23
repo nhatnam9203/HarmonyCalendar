@@ -69,7 +69,7 @@ const ResourceWrapper = styled.div`
 
 const Resource = styled.div`
 	cursor: pointer;
-	width : ${(props) => (props.width ? props.width : 'calc(100%/8)')};
+	/* width : ${(props) => (props.width ? props.width : 'calc(100%/8)')}; */
 	padding: 0.25rem;
 	position: relative;
 	border-right: 1px solid #ddd;
@@ -281,9 +281,8 @@ class layout extends React.Component {
 		if (parseInt(resource.id) !== 0 && !isLoadingStaff && !isFirstReloadCalendar)
 			return (
 				<Resource
-					id="resourceTest"
 					onClick={() => this.openPincode(resource)}
-					width={`calc(100% / ${qtyResources.toString()})`}
+					style={{ width : `calc(100% / ${qtyResources.toString()})` }}
 					active={parseInt(resource.id) === parseInt(staffId) ? true : false}
 					key={index}
 				>

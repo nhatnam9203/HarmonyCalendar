@@ -15,7 +15,7 @@ export const API_PORT = 8010;
 
 // export const DEV_API_BASE_URL = `https://dev.harmonypayment.com`;
 // export const PROD_API_BASE_URL = `https://dev.harmonypayment.com`;
-// export const SIGNALR = `https://dev.harmonypayment.com`;
+// export const SIGNALR = `https://dev-signalr.harmonypayment.com`;
 
 export const DEV_API_BASE_URL = `https://staging.harmonypayment.com`;
 export const PROD_API_BASE_URL = `https://staging.harmonypayment.com`;
@@ -65,4 +65,5 @@ export const NOTIFICATION_MASK_READ = `${API_BASE_URL}/notification/view`;
 export const NOTIFICATION_GET_BY_PAGE = `${API_BASE_URL}/notification`;
 export const NOTIFICATION_DELETE = `${API_BASE_URL}/notification?ids=`;
 export const COUNT_APPOINTMENT_ANY_STAFF = `${API_BASE_URL}/appointment/countAnyStaffLength?date=`;
+export const GET_STAFF_OF_SERVICE = `${API_BASE_URL}/staff/byService`; //{serviceId}?date=2021-06-10
 export const VAR_DEFAULT_AVATAR_PATH = `/upload/staff/avatar.svg`;

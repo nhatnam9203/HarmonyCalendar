@@ -15,7 +15,6 @@ const Row = styled.div`
 `;
 
 export default class Service extends Component {
-
     render() {
         const {
             appointment,
@@ -35,6 +34,8 @@ export default class Service extends Component {
             addService,
             openPopupPrice,
             openPopupTip,
+            getStaffOfService,
+            staffOfService,
         } = this.props;
 
         const staff = staffList.find((s) => parseInt(s.id) === parseInt(service.staffId));
@@ -68,6 +69,8 @@ export default class Service extends Component {
                             appointment={appointment}
                             price={price}
                             openPopupPrice={openPopupPrice}
+                            getStaffOfService={getStaffOfService}
+                            staffOfService={staffOfService}
                         />
                     </tr>
                     {
@@ -108,6 +111,8 @@ export default class Service extends Component {
                             closePopupStaff={closePopupStaff}
                             openPopupTip={openPopupTip}
                             price={price}
+                            getStaffOfService={getStaffOfService}
+                            staffOfService={staffOfService}
                         />
                         {
                             extras.map((extra, i) => {

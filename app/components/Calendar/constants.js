@@ -867,69 +867,18 @@ export const deleteEventFromCalendar = (eventId) => {
 };
 
 export const updateEventToCalendar = (fcEvent) => {
-	let eventColor;
 	let startEditable = true;
 	let resourceEditable = true;
-	let eventClass = '';
-	const { status } = fcEvent;
-	if (status === 'ASSIGNED') {
-		eventColor = '#ffe559';
-		eventClass = 'event-assigned';
-	}
-	if (status === 'CONFIRMED') {
-		eventColor = '#baedf7';
-		eventClass = 'event-confirmed';
-	}
-	if (status === 'CHECKED_IN') {
-		eventColor = '#28AAE9';
-		eventClass = 'event-checkin';
-	}
-	if (status === 'PAID') {
-		eventColor = '#50CF25';
-		eventClass = 'event-paid';
-		startEditable = false;
-		resourceEditable = false;
-	}
-	if (status === 'BLOCK') {
-		eventColor = '#DDDDDD';
-		eventClass = 'event-block';
-	}
-	if (status === 'BLOCK_TEMP') {
-		eventColor = '#DDDDDD';
-		eventClass = 'event-block-temp';
-	}
-	if (status === 'BLOCK_TEMP_ASSIGNED') {
-		eventColor = '#ffe559';
-		eventClass = 'event-block-temp-assigned';
-	}
-	if (status === 'BLOCK_TEMP_CONFIMED') {
-		eventColor = '#baedf7';
-		eventClass = 'event-block-temp-confirmed';
-	}
-	if (status === 'BLOCK_TEMP_CHECKED_IN') {
-		eventColor = '#28AAE9';
-		eventClass = 'event-block-temp-check-in';
-	}
-	if (status === 'BLOCK_TEMP_PAID') {
-		eventColor = '#38ff05';
-		eventClass = 'event-block-temp-paid';
-	}
-	if (status === 'BLOCK_TEMP_REFUND') {
-		eventColor = '#FB5B54';
-		eventClass = 'event-block-temp';
-	}
-	if (!status) {
-		eventColor = 'red';
-		eventClass = 'event-checkin';
-	}
-	const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
 
+	const { status, start, end, isWarning } = fcEvent;
+	const { eventColor, eventClass } = getEventStyle(status,isWarning);
+	const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
 	const resourceId = displayedMembers.findIndex((mem) => mem.id === fcEvent.memberId);
 
 	const data = {
 		resourceId: fcEvent.memberId === 0 && fcEvent.status !== 'WAITING' ? 0 : resourceId + 1,
-		start: fcEvent.start,
-		end: fcEvent.end,
+		start,
+		end,
 		data: fcEvent,
 		color: eventColor,
 		className: eventClass,
@@ -937,66 +886,130 @@ export const updateEventToCalendar = (fcEvent) => {
 		resourceEditable
 	};
 
-	//viet them ham update cho event o cot any staff tai day
-
 	$('#full-calendar').fullCalendar('addEventSource', [data]);
 };
 
 function getAtrributeByStatus(appointment) {
+	const { status , isWarning } = appointment;
+	const { eventColor, eventClass } = getEventStyle(status,isWarning);
+	return {
+		eventColor,
+		eventClass
+	};
+}
+
+function getEventStyle(status, isWarning) {
+
 	let eventColor = '#00b4f7';
 	let eventClass = 'event-paid';
-	if (appointment.status === 'ASSIGNED') {
+
+	if (status === 'ASSIGNED') {
 		eventColor = '#ffe559';
 		eventClass = 'event-assigned';
+		if (isWarning) {
+			eventClass = 'event-assigned-warning';
+		} else {
+			eventClass = 'event-assigned';
+		}
 	}
-	if (appointment.status === 'CONFIRMED') {
+
+	if (status === 'CONFIRMED') {
 		eventColor = '#baedf7';
-		eventClass = 'event-confirmed';
+		if (isWarning) {
+			eventClass = 'event-confirmed-warning';
+		} else {
+			eventClass = 'event-confirmed';
+		}
 	}
-	if (appointment.status === 'CHECKED_IN') {
+
+	if (status === 'CHECKED_IN') {
 		eventColor = '#28AAE9';
 		eventClass = 'event-checkin';
+		if (isWarning) {
+			eventClass = 'event-checkin-warning';
+		} else {
+			eventClass = 'event-checkin';
+		}
 	}
-	if (appointment.status === 'PAID') {
+
+	if (status === 'PAID') {
 		eventColor = '#50CF25';
-		eventClass = 'event-paid';
+		if (isWarning) {
+			eventClass = 'event-paid-warning';
+		} else {
+			eventClass = 'event-paid';
+		}
 	}
-	if (appointment.status === 'BLOCK') {
+
+	if (status === 'BLOCK_TEMP_ASSIGNED') {
+		eventColor = '#ffe559';
+		if (isWarning) {
+			eventClass = 'event-block-temp-assigned-warning';
+		} else {
+			eventClass = 'event-block-temp-assigned';
+		}
+	}
+
+	if (status === 'BLOCK_TEMP_CONFIRMED') {
+		eventColor = '#baedf7';
+		if (isWarning) {
+			eventClass = 'event-block-temp-confirmed-warning';
+		} else {
+			eventClass = 'event-block-temp-confirmed';
+		}
+	}
+
+	if (status === 'BLOCK_TEMP_CHECKED_IN') {
+		eventColor = '#28AAE9';
+		if (isWarning) {
+			eventClass = 'event-block-temp-check-in-warning';
+		} else {
+			eventClass = 'event-block-temp-check-in';
+		}
+	}
+
+	if (status === 'BLOCK_TEMP_PAID') {
+		eventColor = '#38ff05';
+		if (isWarning) {
+			eventClass = 'event-block-temp-paid-warning';
+		} else {
+			eventClass = 'event-block-temp-paid';
+		}
+	}
+
+	if (status === 'BLOCK_TEMP_REFUND') {
+		eventColor = '#FB5B54';
+		if (isWarning) {
+			eventClass = 'event-block-temp-warning';
+		} else {
+			eventClass = 'event-block-temp';
+		}
+	}
+
+	if (status === 'VOID' || status === "REFUND") {
+		eventColor = '#FD594F';
+		if (isWarning) {
+			eventClass = 'event-void-warning';
+		} else {
+			eventClass = 'event-void';
+		}
+	}
+
+	if (status === 'BLOCK') {
 		eventColor = '#b5b5b5';
 		eventClass = 'event-block';
 	}
-	if (appointment.status === 'BLOCK_TEMP') {
+
+	if (status === 'BLOCK_TEMP') {
 		eventColor = '#b5b5b5';
 		eventClass = 'event-block-temp';
 	}
-	if (appointment.status === 'BLOCK_TEMP_ASSIGNED') {
-		eventColor = '#ffe559';
-		eventClass = 'event-block-temp-assigned';
-	}
-	if (appointment.status === 'BLOCK_TEMP_CONFIRMED') {
-		eventColor = '#baedf7';
-		eventClass = 'event-block-temp-confirmed';
-	}
-	if (appointment.status === 'BLOCK_TEMP_CHECKED_IN') {
-		eventColor = '#28AAE9';
-		eventClass = 'event-block-temp-check-in';
-	}
-	if (appointment.status === 'BLOCK_TEMP_PAID') {
-		eventColor = '#38ff05';
-		eventClass = 'event-block-temp-paid';
-	}
-	if (appointment.status === 'BLOCK_TEMP_REFUND') {
-		eventColor = '#FB5B54';
-		eventClass = 'event-block-temp';
-	}
-	if (appointment.status === 'VOID' || appointment.status === 'REFUND') {
-		eventColor = '#FD594F';
-		eventClass = 'event-void';
-	}
-	if (!appointment.status) {
+	
+	if (!status) {
 		eventColor = 'red';
 		eventClass = 'event-paid';
 	}
+
 	return {
 		eventColor,
 		eventClass

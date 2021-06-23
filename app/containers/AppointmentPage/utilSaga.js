@@ -150,7 +150,7 @@ const splitNotes = (note) => {
 	}
 }
 
-export function blockTemp(memberId, start, end, note, appointmentId, status, blockId, isVip) {
+export function blockTemp(memberId, start, end, note, appointmentId, status, blockId, isVip , isWarning) {
 	let tempNote = splitNotes(note);
 	return {
 		status,
@@ -170,7 +170,8 @@ export function blockTemp(memberId, start, end, note, appointmentId, status, blo
 		blockName: tempNote.blockName ? tempNote.blockName : "",
 		blockPhone: tempNote.blockPhone ? tempNote.blockPhone.toString().replace("+84", "").replace("+1", "") : "",
 		blockService: tempNote.blockService ? tempNote.blockService : "",
-		isBlock: true
+		isBlock: true,
+		isWarning,
 	};
 }
 
@@ -201,6 +202,7 @@ export function addBlockCalendar(appointmentsMembers, displayedMembers, currentD
 		const blockTimeMember = memFind.blockTime.filter(
 			(b) => moment(b.workingDate).format('YYYY-MM-DD') === apiDateQuery
 		);
+	
 		for (let i = 0; i < blockTimeMember.length; i++) {
 			const memberId = mem.memberId;
 			const start = `${moment(currentDate).format('YYYY-MM-DD')}T${moment(blockTimeMember[i].blockTimeStart, [
@@ -212,19 +214,20 @@ export function addBlockCalendar(appointmentsMembers, displayedMembers, currentD
 			const note = blockTimeMember[i].note;
 			const appointmentId = blockTimeMember[i].appointmentId;
 			const blockTimeId = blockTimeMember[i].blockTimeId;
+			const isWarning = blockTimeMember[i].isWarning;
 			const app = appointments.find(obj => obj.id === appointmentId);
 			const isVip = app ? app.isVip : 0
 
 			if (checkStatusAppointment(appointmentId, appointments) === 'PAID') {
-				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_PAID', blockTimeId, isVip));
+				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_PAID', blockTimeId, isVip, isWarning));
 			} else if (checkStatusAppointment(appointmentId, appointments) === 'REFUND') {
-				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_REFUND', blockTimeId, isVip));
+				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_REFUND', blockTimeId, isVip, isWarning));
 			} else if (checkStatusAppointment(appointmentId, appointments) === 'ASSIGNED') {
-				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_ASSIGNED', blockTimeId, isVip));
+				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_ASSIGNED', blockTimeId, isVip, isWarning));
 			} else if (checkStatusAppointment(appointmentId, appointments) === 'CONFIRMED') {
-				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CONFIRMED', blockTimeId, isVip));
+				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CONFIRMED', blockTimeId, isVip, isWarning));
 			} else if (checkStatusAppointment(appointmentId, appointments) === 'CHECKED_IN') {
-				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CHECKED_IN', blockTimeId, isVip));
+				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CHECKED_IN', blockTimeId, isVip, isWarning));
 			}
 			else {
 				mem.appointments.push(blockTemp(memberId, start, end, [], appointmentId, 'BLOCK_TEMP', blockTimeId));
@@ -659,7 +662,7 @@ export function adapterServicesMoved(services = [], staffId) {
 }
 
 export const blockTempFrontEnd = (appointment, newEndTime) => {
-	const { memberId, start, firstName , phoneNumber, createdDate, options, products, extras } = appointment;
+	const { memberId, start, firstName, phoneNumber, createdDate, options, products, extras } = appointment;
 	return {
 		appointmentId: appointment.id,
 		blockTimeEnd: moment(newEndTime).format('hh:mm A'),

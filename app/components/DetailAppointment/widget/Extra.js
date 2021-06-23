@@ -2,19 +2,19 @@ import React, { Component } from 'react'
 import styled from 'styled-components';
 
 const ButtonExtra = styled.button`
-	color: #ffffff;
-	padding: 5px 15px;
-	margin: 0 10px;
-	width: 47px;
-	border-radius: 3px;
-	cursor: ${(props) => (props.active ? 'pointer' : 'initial')};
+    color: #ffffff;
+    padding: 5px 15px;
+    margin: 0 10px;
+    width: 47px;
+    border-radius: 3px;
+    cursor: ${(props) => (props.active ? 'pointer' : 'initial')};
     background: ${(props) => props.backgroundColor};
 `;
 
 const Row = styled.div`
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
 `;
 
 export default class Extra extends Component {
@@ -48,7 +48,7 @@ export default class Extra extends Component {
                         onClick={() => this.props.subtractExtra(extra)}
                     >
                         -5&#39;
-					</ButtonExtra>
+                    </ButtonExtra>
                     {extra.duration}
                     <ButtonExtra
                         backgroundColor={this.getStyleExtra2(appointment, extra, index)}
@@ -56,7 +56,7 @@ export default class Extra extends Component {
                         onClick={() => this.props.addExtra(extra)}
                     >
                         +5&#39;
-					</ButtonExtra>
+                    </ButtonExtra>
                 </td>
 
                 <td onClick={status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' ? (

@@ -6,7 +6,6 @@ import number_delete from "../../images/number_delete.png";
 import number_delete_white from "../../images/number_delete_white.png";
 import down_arrow from "../../images/down-arrow.png";
 import OutsideClickHandler from 'react-outside-click-handler';
-import { findLastIndexChangeTime } from '../../containers/AppointmentPage/utilSaga';
 
 const AppPopup = styled(Popup)`
   border-radius: 1.5rem;
@@ -159,10 +158,6 @@ const Button = styled.button`
 	cursor: pointer;
 	text-align: center;
 	padding: 0rem 3rem;
-	&:active{
-		background : white;
-		color : #1B68AC;
-	}
 `;
 
 
@@ -191,24 +186,20 @@ const ButtonNumber = styled.div`
 	display: flex;
 	justify-content: center;
 	align-items : center;
-	background : white;
 	border : 1px solid #dddddd;
 	font-size : 1.5rem;
-	color : #404040;
 	font-weight : 600;
 	border-radius : 3px;
 	width : 7.2rem;
 	height : 3.7rem;
 	margin-bottom : 9px;
+	touch-action: manipulation;
+	background: ${(props) => (props.isActive ? '#1366AE' : 'white')};
+	color: ${(props) => (props.isActive ? '#ffffff' : '#404040')};
 	& > img{
 		width : 40px;
 		height : 40px;
 		object-fit: contain;
-	}
-
-	&:active{
-		background : #1B68AC;
-		color : white;
 	}
 `;
 
@@ -278,14 +269,8 @@ class AddAppointment extends React.Component {
 		this.refPhone = React.createRef();
 		this.state = {
 			isPopupPhone: false,
-			isEnterDelete: true
+			isEnterDelete: false,
 		}
-	}
-
-	componentDidMount() {
-		document.getElementById('btn-delete-number').addEventListener('pointerdown', () => { this.setState({ isEnterDelete: false }) }, false);
-		document.getElementById('btn-delete-number').addEventListener('pointerup', () => { this.setState({ isEnterDelete: true }) }, false);
-		document.getElementById('btn-delete-number').addEventListener('pointerleave', () => { this.setState({ isEnterDelete: true }) }, false);
 	}
 
 	togglePopupPhone = () => {
@@ -308,6 +293,8 @@ class AddAppointment extends React.Component {
 			phoneNumber,
 			onClickNumber,
 		} = this.props;
+
+		const { isEnterDelete } = this.state;
 
 		return (
 			<SearchingPopup
@@ -353,26 +340,22 @@ class AddAppointment extends React.Component {
 						<WrapButtonNumber>
 							{
 								numbers.map((number, index) => (
-									<ButtonNumber onClick={() => onClickNumber(number)} key={"number" + index}>
-										{number}
-									</ButtonNumber>
+									<NumPad
+										key={"number" + index}
+										text={number}
+										onClickNumber={onClickNumber}
+									/>
 								))
 							}
 							<ButtonNumber
-								id="btn-delete-number"
-								onMouseDown={() => {
-									console.log('on mouse down')
-									this.setState({ isEnterDelete: false });
-								}}
-								onMouseEnter={() => {
-									console.log('on mouse enter');
-								}}
-								onMouseUp={() => {
-									console.log('on mouse up');
-									this.setState({ isEnterDelete: true });
-								}}
-								onClick={() => onClickNumber("x")}>
-								<img src={this.state.isEnterDelete ? number_delete : number_delete_white} />
+								onTouchStart={() => this.setState({ isEnterDelete: true })}
+								onTouchEnd={() => this.setState({ isEnterDelete: false })}
+								onMouseDown={() => this.setState({ isEnterDelete: true })}
+								onMouseUp={() => this.setState({ isEnterDelete: false })}
+								isActive={isEnterDelete}
+								onClick={() => onClickNumber("x")}
+							>
+								<img src={ isEnterDelete ? number_delete_white : number_delete} />
 							</ButtonNumber>
 						</WrapButtonNumber>
 
@@ -392,6 +375,34 @@ class AddAppointment extends React.Component {
 		);
 	}
 }
+
+class NumPad extends React.Component {
+
+	constructor(props) {
+		super(props);
+		this.state = {
+			isEnter: false
+		}
+	}
+
+	render() {
+		const { text } = this.props;
+		return (
+			<ButtonNumber
+				onTouchStart={() => this.setState({ isEnter: true })}
+				onTouchEnd={() => this.setState({ isEnter: false })}
+				onMouseDown={() => this.setState({ isEnter: true })}
+				onMouseUp={() => this.setState({ isEnter: false })}
+				id="btn-delete-number"
+				onClick={() => this.props.onClickNumber(text)}
+				isActive={this.state.isEnter}
+			>
+				{text}
+			</ButtonNumber>
+		)
+	}
+}
+
 
 const PhoneHeader = ({ phone, toggle, isPopupPhone, onChangePhoneCheck }) => {
 	return (

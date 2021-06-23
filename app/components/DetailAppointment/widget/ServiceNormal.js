@@ -5,30 +5,33 @@ import PopupStaff from './PopupStaff';
 import moment from 'moment';
 import edit from '../../../images/edit.png';
 import topArrow from '../../../images/top_arrow@3x.png';
+import { api } from "../../../utils/helper";
+import * as api_constants from '../../../../app-constants';
+import { token } from '../../../../app-constants';
 
 const ButtonService = styled.button`
-	background: ${(props) => props.backgroundColor};
-	color: #ffffff;
-	padding: 5px 15px;
-	margin: 0 10px;
-	width: 47px;
-	border-radius: 3px;
-	cursor: ${(props) => (props.active ? 'pointer' : 'initial')};
+    background: ${(props) => props.backgroundColor};
+    color: #ffffff;
+    padding: 5px 15px;
+    margin: 0 10px;
+    width: 47px;
+    border-radius: 3px;
+    cursor: ${(props) => (props.active ? 'pointer' : 'initial')};
 `;
 
 const ImgButton = styled.img`
-	width : 12px;
-	height : 6px; 
-	margin-left : 8px; 
+    width : 12px;
+    height : 6px; 
+    margin-left : 8px; 
 `;
 
 const ButtonTime = styled.div`
-	background-color: #eeeeee;
-	border-radius: 5px;
-	padding: 10px;
-	text-align: center;
-	width: 120px;
-	position: relative;
+    background-color: #eeeeee;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+    width: 120px;
+    position: relative;
 `;
 
 const IconEdit = styled.img`
@@ -66,7 +69,62 @@ const ContainerButton = styled.div`
     display: flex;
 `;
 
+const StaffName = styled.p`
+    margin-left: 8px;
+    width: 50px;
+    font-size: 15px;
+`;
+
+const RenderStaff = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    background-color: ${(props) => (props.isActive ? '#FDD2D4' : '#EEEEEE')};
+    border: ${(props) => (props.isActive ? '1px solid red' : '')};
+    border-radius: 5px;
+    max-width: 120px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    height: 40px;
+    padding-right: 10px;
+`;
+
+const ServiceColumn = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 10rem;
+`;
+
 export default class ServiceNormal extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            isLoading: false,
+            staffOfService: [],
+        }
+    }
+
+    getStaffAvailable = async () => {
+        this.setState({ isLoading: true });
+        const { service: { serviceId, fromTime } } = this.props;
+        const date = moment(fromTime).format('YYYY-MM-DD');
+
+        const requestURL = new URL(`${api_constants.GET_STAFF_OF_SERVICE}/${serviceId}?date=${date}`);
+        const response = await api(requestURL.toString(), "", 'GET', token);
+        this.setState({
+            isLoading: false,
+            staffOfService: Array.isArray(response.data) ? response.data.map((s) => ({
+                ...s,
+                title: s.displayName,
+                id: s.staffId
+            })) : []
+        });
+    }
+
     render() {
         const {
             service,
@@ -84,17 +142,21 @@ export default class ServiceNormal extends Component {
             appointment,
             duration,
             openPopupPrice,
-            price
+            price,
         } = this.props;
         const { status } = appointment;
+        const { isWarning } = service;
+
+        const { staffOfService, isLoading } = this.state;
+
         return (
             <React.Fragment>
                 <td>
-                    <div style={style.serviceColumn}>
+                    <ServiceColumn>
                         <ServiceName>
                             {service.serviceName}
                         </ServiceName>
-                    </div>
+                    </ServiceColumn>
                 </td>
 
                 <td>
@@ -105,21 +167,32 @@ export default class ServiceNormal extends Component {
                 </td>
 
                 <td style={{ borderRight: 0 }}>
-                    <div onClick={() => togglePopupStaff('', index)} style={style.staffService}>
-                        <p style={style.staffNameColumn}>{title}</p>
+                    <RenderStaff
+                        isActive={isWarning ? true : false}
+                        onClick={() => {
+                            togglePopupStaff('', index);
+                            this.getStaffAvailable();
+                        }}
+                    >
+                        <StaffName>{title}</StaffName>
                         <ImgButton src={topArrow} />
-                        {isPopupStaff && index === indexPopupStaff &&
+                        {
+                            isPopupStaff && index === indexPopupStaff &&
                             (
                                 <PopupStaff
+                                    staffOfService={staffOfService}
+                                    isLoading={isLoading}
                                     togglePopupStaff={(staff) => {
                                         this.props.togglePopupStaff(staff, index)
                                     }}
                                     staffList={staffList.filter((s) => s.id !== 0)}
                                     closePopupStaff={() => closePopupStaff()}
                                 />
-                            )}
-                    </div>
+                            )
+                        }
+                    </RenderStaff>
                 </td>
+
                 <td style={{ textAlign: 'center' }}>
                     <ContainerButton>
                         <ButtonService
@@ -128,7 +201,7 @@ export default class ServiceNormal extends Component {
                             onClick={() => subtractService(index)}
                         >
                             -5&#39;
-						</ButtonService>
+                        </ButtonService>
                         {duration}
                         <ButtonService
                             backgroundColor={(status !== 'PAID' && status !== 'VOID' && status !== 'REFUND') ? '#0071c5' : '#dddddd'}
@@ -136,7 +209,7 @@ export default class ServiceNormal extends Component {
                             onClick={() => addService(index)}
                         >
                             +5&#39;
-						</ButtonService>
+                        </ButtonService>
                     </ContainerButton>
                 </td>
 
@@ -151,38 +224,3 @@ export default class ServiceNormal extends Component {
         )
     }
 }
-
-
-const style = {
-    price: {
-        fontWeight: '700',
-        color: '#1366AF',
-        width: 60,
-        textAlign: 'center'
-    },
-    staffService: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        position: 'relative',
-        backgroundColor: '#EEEEEE',
-        borderRadius: 5,
-        maxWidth: 120,
-        whiteSpace: 'nowrap',
-        textOverflow: 'ellipsis',
-        height: 40,
-        paddingRight: 10
-    },
-    serviceColumn: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        width: '10rem',
-    },
-    staffNameColumn: {
-        marginLeft: 8,
-        width: 50,
-        fontSize: 15,
-    },
-};

@@ -120,9 +120,13 @@ const GlobalStyle = createGlobalStyle`
     color : white !important;
   }
 
-  .event-block-temp-paid{
+  .event-block-temp-paid ,.event-block-temp-paid-warning{
     color : #ffffff !important;
     overflow : hidden;
+    background-color : #56CD36 !important;
+    opacity : 1 !important;
+    ${'' /* margin-right : 40%; */}
+    ${'' /* margin-right : 80px; */}
   }
 
   .event-anystaff{
@@ -364,6 +368,46 @@ const GlobalStyle = createGlobalStyle`
 }
 
 
+.event-assigned-warning, 
+.event-confirmed-warning,
+.event-block-temp-assigned-warning,
+.event-block-temp-confirmed-warning,
+.event-assigned-warning:hover, 
+.event-confirmed-warning:hover,
+.event-block-temp-assigned-warning:hover,
+.event-block-temp-confirmed-warning:hover
+{
+  font-weight : 500;
+  color : #585858;
+  letter-spacing : 0.6;
+  border : 2px solid red !important;
+  overflow: hidden !important;
+}
+
+.event-checkin-warning, 
+.event-paid-warning,
+.event-block-temp-check-in-warning,
+.event-block-temp-paid-warning,
+.evemt-block-temp,
+.event-void,
+.event-void-warning,
+.event-block-temp-warning,
+.event-checkin-warning:hover, 
+.event-paid-warning:hover,
+.event-block-temp-check-in-warning:hover, 
+.event-block-temp-paid-warning:hover,
+.evemt-block-temp:hover,
+.event-void:hover,
+.event-void-warning:hover,
+.event-block-temp-warning:hover
+{
+  font-weight : 500;
+  color : white;
+  letter-spacing : 0.6;
+  border : 3px solid red !important;
+  overflow: hidden !important;
+}
+
 
 .timePicker{
   border : 10px !important;
@@ -421,6 +465,26 @@ const GlobalStyle = createGlobalStyle`
     padding-left: 1.2rem;
     -moz-appearance: none;
     -webkit-appearance: none;
+}
+
+
+.DayPicker-Day{
+  font-size : 1.3rem !important ;
+  width : 41px;
+  height : 45px;
+}
+
+.DayPicker-Weekday{
+  font-size : 1.25rem !important ;
+}
+
+.DayPicker-Caption{
+  font-size : 1.3rem !important ;
+}
+
+.DayPicker-NavButton{
+  width : 1.6rem !important;
+  height : 1.6rem !important;
 }
 
 .rc-time-picker-panel-select ul li{

@@ -13,10 +13,12 @@ import {
 	PopupTip, Header, PopupCancel, BottomButton
 } from './widget';
 import ReactLoading from 'react-loading';
+import LoadingDetail from "./widget/LoadingDetail";
 import closeBlack from '../../images/close_black.png';
 import closeWhite from '../../images/close_white.png'
 import iconCalendarGrey from '../../images/iconCalendarGrey.png';
 import topArrow from '../../images/top_arrow@3x.png';
+import alertIcon from "../../images/alert.png";
 
 const AppPopup = styled(Popup)`
 	border-radius: 1.5rem;
@@ -84,8 +86,8 @@ const BtnClose = styled.div`
 
 const BtnCloseSelectDay = styled(BtnClose)`
 	& > img{
-		width : 27px;
-		height : 27px;
+		width : 32px;
+		height : 32px;
 	}
 `;
 
@@ -108,6 +110,7 @@ AppPopupWrapper.Footer = styled.div`
 
 const AppointmentPopup = styled(AppPopup)`
 	width: 50rem !important;
+	position: relative;
 	`;
 
 const AppointmentWrapper = styled(AppPopupWrapper)`
@@ -292,8 +295,8 @@ const CalendarPopup = styled.div`
 CalendarPopup.Heading = styled.div`
 	background: #0071c5;
 	color: #ffffff;
-	height: 3rem;
-	font-size: 1.2rem;
+	height: 3.4rem;
+	font-size: 1.5rem;
 	line-height: 2;
 	text-align: center;
 	padding-top: 0.3rem;
@@ -450,6 +453,26 @@ const ContainerAddMore = styled.div`
 	}
 `;
 
+const WrapAlert = styled.div`
+	display: flex;
+	align-items: center;
+	color : red;
+	&>img{
+		width : 28px;
+		height : 28px;
+		object-fit: contain;
+		margin-right : 10px;
+	}
+`;
+
+const RowAlert = styled.div`
+	position: relative;
+	display: flex ;
+	align-items: center;
+	justify-content: space-between ;
+	margin-bottom : 2px;
+`;
+
 class Appointment extends React.Component {
 	renderNote = (note, index) => {
 		return (
@@ -555,6 +578,17 @@ class Appointment extends React.Component {
 				</div>
 			);
 		}
+		return <div />
+	}
+
+	renderWrongAlert() {
+		if (this.conditionRenderAlertService())
+			return (
+				<WrapAlert>
+					<img src={alertIcon} />
+					<div>Therre are services cannot be performed</div>
+				</WrapAlert>
+			);
 	}
 
 	renderTileColumn() {
@@ -601,7 +635,7 @@ class Appointment extends React.Component {
 	renderServices() {
 		const { services } = this.state;
 		const { prices, isPopupStaff, indexPopupStaff, extras } = this.state;
-		const { appointment, staffList } = this.props;
+		const { appointment, staffList , getStaffOfService , staffOfService } = this.props;
 		if (services.length > 0) {
 			return (
 				<table>
@@ -632,6 +666,8 @@ class Appointment extends React.Component {
 								subtractExtra={(extra) => this.subtractExtra(extra)}
 								addExtra={(extra) => this.addExtra(extra)}
 								openPopupPriceExtra={(price, index, key) => this.openPopupPrice(price, index, key)}
+								getStaffOfService={getStaffOfService}
+								staffOfService={staffOfService}
 							/>
 						))}
 					</tbody>
@@ -801,8 +837,10 @@ class Appointment extends React.Component {
 		return (
 			<AppointmentWrapper.Body scroll={isPopupTimePicker ? false : true}>
 				{this.renderCustomerName()}
-
-				{this.renderSelectDay()}
+				<RowAlert>
+					{this.renderSelectDay()}
+					{this.renderWrongAlert()}
+				</RowAlert>
 				{this.renderServices()}
 				{this.renderProducts()}
 				{this.renderAddMore()}
@@ -836,6 +874,7 @@ class Appointment extends React.Component {
 				appointment.status === 'WAITING'
 				? true
 				: false;
+		const isDisabled = this.conditionRenderAlertService();
 		return (
 			<React.Fragment>
 				<AppointmentPopup
@@ -870,9 +909,12 @@ class Appointment extends React.Component {
 							updateStaffAppointmentPaid={() => this.updateStaffAppointmentPaid()}
 							toggleEditPaidAppointment={() => this.toggleEditPaidAppointment()}
 							changeAppointmentTime={() => this.ChangeAppointmentTime()}
+							isDisabled={isDisabled}
 						/>
 
 					</AppointmentWrapper>
+					{/* <LoadingDetail /> */}
+
 				</AppointmentPopup>
 
 				<PopupCancel

@@ -4,12 +4,12 @@ import edit from '../../../images/edit.png';
 import iconExtra from '../../../images/iconExtra.png';
 
 const ButtonExtra = styled.button`
-	color: #ffffff;
-	padding: 5px 15px;
-	margin: 0 10px;
-	width: 47px;
-	border-radius: 3px;
-	cursor: ${(props) => (props.active ? 'pointer' : 'initial')};
+    color: #ffffff;
+    padding: 5px 15px;
+    margin: 0 10px;
+    width: 47px;
+    border-radius: 3px;
+    cursor: ${(props) => (props.active ? 'pointer' : 'initial')};
     background: ${(props) => props.backgroundColor};
 `;
 
@@ -87,7 +87,7 @@ export default class Service extends Component {
                             onClick={() => this.props.subtractExtra(extra)}
                         >
                             -5&#39;
-					    </ButtonExtra>
+                        </ButtonExtra>
                         {extra.duration}
                         <ButtonExtra
                             backgroundColor={this.getStyleExtra2(appointment, extra, index)}
@@ -95,7 +95,7 @@ export default class Service extends Component {
                             onClick={() => this.props.addExtra(extra)}
                         >
                             +5&#39;
-					    </ButtonExtra>
+                        </ButtonExtra>
                     </ContainerButton>
                 </td>
 

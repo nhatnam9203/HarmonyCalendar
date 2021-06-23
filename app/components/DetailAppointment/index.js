@@ -1,11 +1,13 @@
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import moment_tz from "moment-timezone";
 import { isEqual } from 'lodash'
-import { convertAppointment, initialState , statusConvertData } from './widget/utilDetail';
+import { convertAppointment, initialState, statusConvertData } from './widget/utilDetail';
 import Layout from './layout'
 import { addLastStaff } from "../../containers/AppointmentPage/utilSaga"
 import { checkStringNumber2, PromiseAction } from "../../utils/helper"
 import { staffId } from '../../../app-constants';
+import { store } from 'app';
 import $ from 'jquery';
 
 class Appointment extends Layout {
@@ -36,6 +38,18 @@ class Appointment extends Layout {
 		});
 	}
 
+	conditionRenderAlertService() {
+		let flag = false;
+		const { services } = this.state;
+		for (let i = 0; i < services.length; i++) {
+			if (services[i].isWarning) {
+				flag = true;
+				break;
+			}
+		}
+		return flag;
+	}
+
 	addProduct(index) {
 		this.setState((state) => {
 			const { products } = state;
@@ -49,6 +63,7 @@ class Appointment extends Layout {
 	onChangeFromTime(fromTime) {
 		this.setState({ fromTime: fromTime });
 	}
+
 	onChangeToTime(toTime) {
 		this.setState({ toTime });
 	}
@@ -370,6 +385,7 @@ class Appointment extends Layout {
 	}
 
 	toggleEditPaidAppointment() {
+		console.log('toggle edit paid')
 		const { isEditPaidAppointment } = this.state;
 		this.setState({
 			isEditPaidAppointment: !isEditPaidAppointment
@@ -400,7 +416,30 @@ class Appointment extends Layout {
 		this.closeModal();
 	}
 
-	checkOut = async (idAppointment) => {
+	conditionCheckOut = () => {
+		const { appointment: { end } } = this.props;
+		const merchantInfo = store.getState().getIn(['appointment', 'merchantInfo']);
+		const { timezone } = merchantInfo;
+		let now = timezone ? moment_tz.tz(timezone.substring(12)) : moment();
+
+		if (moment(now).format("YYYY-MM-DD") === moment(end).format("YYYY-MM-DD")) {
+			return true;
+		}
+		return false;
+	}
+
+	checkOut = (idAppointment) => {
+		let flag = this.conditionCheckOut();
+		if (!flag) {
+			if (window.confirm("This Appointment is NOT for today. Would you like to proceed?")) {
+				this.proceedCheckOut(idAppointment);
+			}
+		} else {
+			this.proceedCheckOut(idAppointment);
+		}
+	};
+
+	proceedCheckOut = async (idAppointment) => {
 		const { appointment } = this.props;
 
 		const app = await convertAppointment(appointment);
@@ -408,21 +447,20 @@ class Appointment extends Layout {
 		const data = await JSON.stringify({
 			appointmentId: idAppointment ? idAppointment : 'web',
 			appointment: app,
-			staffId : appointment.memberId,
+			staffId: appointment.memberId,
 			action: 'checkout'
 		});
 
 		window.postMessage(data);
-	};
-
+	}
 
 	addMore = () => {
 		const { appointment } = this.props;
 		const data = JSON.stringify({
 			appointmentId: appointment.id,
-			staffId : appointment.memberId,
-			status : statusConvertData[appointment.status],
-			action : (parseInt(appointment.memberId) === 0) ? 'addMoreAnyStaff' : 'addMore'
+			staffId: appointment.memberId,
+			status: statusConvertData[appointment.status],
+			action: (parseInt(appointment.memberId) === 0) ? 'addMoreAnyStaff' : 'addMore'
 		});
 
 		window.postMessage(data);
@@ -539,9 +577,10 @@ class Appointment extends Layout {
 	};
 
 	togglePopupStaff = (staff, index) => {
-		if (staff.id) {
+		if (typeof staff === "object") {
 			let { services } = this.state;
 			services[index].staffId = staff.id;
+			services[index].isWarning = false;
 			this.setState({ services });
 		}
 		const { isPopupStaff } = this.state;
