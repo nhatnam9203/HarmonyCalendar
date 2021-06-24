@@ -19,6 +19,8 @@ import {
 	editBlockTime,
 } from '../../containers/AppointmentPage/actions';
 import vip from '../../images/vip.png';
+import { blockTemp, checkStatusAppointment } from "../../containers/AppointmentPage/utilSaga";
+
 
 const resouceDesktop = [
 	{ id: 0 },
@@ -829,39 +831,22 @@ export const addEventsToCalendar = async (currentDate, appointmentsMembers) => {
 
 	const allAppointments = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
 
-	const app_in_anystaff = allAppointments
-		? allAppointments.filter((app) => app.memberId === 0 && app.status !== 'WAITING')
+	let blockTimes = store.getState().getIn(['appointment', 'members', 'blockTime']);
+	blockTimes = blockTimes.filter(b => parseInt(b.staffId) === 0);
+	blockTimes = blockTimes.map(block => {
+		const temptApp = mapBlockTemp(block, currentDate, allAppointments);
+		return temptApp;
+	});
+
+	const blockGreyAnyStaff = allAppointments
+		? allAppointments.filter((app) => app.memberId === 0 && app.status !== 'WAITING' && app.status === "BLOCK")
 		: [];
 
-	app_in_anystaff.forEach((appointment) => {
-		events.push({
-			resourceId: 0,
-			start: appointment.start,
-			end: appointment.end,
-			data: appointment,
-			color: getAtrributeByStatus(appointment).eventColor,
-			rendering: appointment.status === 'BLOCK' || appointment.status === 'BLOCK_TEMP' ? 'background' : '',
-			className: getAtrributeByStatus(appointment).eventClass,
-			startEditable: !(
-				appointment.status === 'PAID' ||
-				appointment.status === 'VOID' ||
-				appointment.status === 'REFUND' ||
-				appointment.status === 'BLOCK_TEMP_PAID' ||
-				appointment.status === 'BLOCK_TEMP_REFUND'
-			),
-			resourceEditable: !(
-				appointment.status === 'PAID' ||
-				appointment.status === 'VOID' ||
-				appointment.status === 'REFUND' ||
-				appointment.status === 'BLOCK_TEMP_PAID' ||
-				appointment.status === 'BLOCK_TEMP_REFUND'
-			)
-		});
-	});
-	// viet ham render appointment cho cot any staff tai day
+	mapAppointmentAnyStaff(blockGreyAnyStaff, events);
+	mapAppointmentAnyStaff(blockTimes, events);
+
 	$('#full-calendar').fullCalendar('renderEvents', events);
 };
-
 export const deleteEventFromCalendar = (eventId) => {
 	$('#full-calendar').fullCalendar('removeEvents', [eventId]);
 };
@@ -871,7 +856,7 @@ export const updateEventToCalendar = (fcEvent) => {
 	let resourceEditable = true;
 
 	const { status, start, end, isWarning } = fcEvent;
-	const { eventColor, eventClass } = getEventStyle(status,isWarning);
+	const { eventColor, eventClass } = getEventStyle(status, isWarning);
 	const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
 	const resourceId = displayedMembers.findIndex((mem) => mem.id === fcEvent.memberId);
 
@@ -890,8 +875,8 @@ export const updateEventToCalendar = (fcEvent) => {
 };
 
 function getAtrributeByStatus(appointment) {
-	const { status , isWarning } = appointment;
-	const { eventColor, eventClass } = getEventStyle(status,isWarning);
+	const { status, isWarning } = appointment;
+	const { eventColor, eventClass } = getEventStyle(status, isWarning);
 	return {
 		eventColor,
 		eventClass
@@ -1004,7 +989,7 @@ function getEventStyle(status, isWarning) {
 		eventColor = '#b5b5b5';
 		eventClass = 'event-block-temp';
 	}
-	
+
 	if (!status) {
 		eventColor = 'red';
 		eventClass = 'event-paid';
@@ -1014,4 +999,67 @@ function getEventStyle(status, isWarning) {
 		eventColor,
 		eventClass
 	};
+}
+
+export const mapBlockTemp = (blockTime, currentDate, appointments) => {
+	let temptData;
+	const memberId = blockTime.staffId;
+	const start = `${moment(currentDate).format('YYYY-MM-DD')}T${moment(blockTime.blockTimeStart, [
+		'h:mm A'
+	]).format('HH:mm:ss')}`;
+	const end = `${moment(currentDate).format('YYYY-MM-DD')}T${moment(blockTime.blockTimeEnd, [
+		'h:mm A'
+	]).format('HH:mm:ss')}`;
+
+	const note = blockTime.note;
+	const appointmentId = blockTime.appointmentId;
+	const blockTimeId = blockTime.blockTimeId;
+	const isWarning = blockTime.isWarning;
+	const app = appointments.find(obj => obj.id === appointmentId);
+	const isVip = app ? app.isVip : 0
+
+	if (checkStatusAppointment(appointmentId, appointments) === 'PAID') {
+		temptData = blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_PAID', blockTimeId, isVip, isWarning);
+	} else if (checkStatusAppointment(appointmentId, appointments) === 'REFUND') {
+		temptData = blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_REFUND', blockTimeId, isVip, isWarning);
+	} else if (checkStatusAppointment(appointmentId, appointments) === 'ASSIGNED') {
+		temptData = blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_ASSIGNED', blockTimeId, isVip, isWarning);
+	} else if (checkStatusAppointment(appointmentId, appointments) === 'CONFIRMED') {
+		temptData = blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CONFIRMED', blockTimeId, isVip, isWarning);
+	} else if (checkStatusAppointment(appointmentId, appointments) === 'CHECKED_IN') {
+		temptData = blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CHECKED_IN', blockTimeId, isVip, isWarning);
+	}
+	else {
+		temptData = blockTemp(memberId, start, end, [], appointmentId, 'BLOCK_TEMP', blockTimeId);
+	}
+
+	return temptData;
+}
+
+const mapAppointmentAnyStaff = (appointments, events) => {
+	appointments.forEach((appointment) => {
+		events.push({
+			resourceId: 0,
+			start: appointment.start,
+			end: appointment.end,
+			data: appointment,
+			color: getAtrributeByStatus(appointment).eventColor,
+			rendering: appointment.status === 'BLOCK' || appointment.status === 'BLOCK_TEMP' ? 'background' : '',
+			className: getAtrributeByStatus(appointment).eventClass,
+			startEditable: !(
+				appointment.status === 'PAID' ||
+				appointment.status === 'VOID' ||
+				appointment.status === 'REFUND' ||
+				appointment.status === 'BLOCK_TEMP_PAID' ||
+				appointment.status === 'BLOCK_TEMP_REFUND'
+			),
+			resourceEditable: !(
+				appointment.status === 'PAID' ||
+				appointment.status === 'VOID' ||
+				appointment.status === 'REFUND' ||
+				appointment.status === 'BLOCK_TEMP_PAID' ||
+				appointment.status === 'BLOCK_TEMP_REFUND'
+			)
+		});
+	});
 }

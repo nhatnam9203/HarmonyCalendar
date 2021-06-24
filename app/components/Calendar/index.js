@@ -35,6 +35,7 @@ const CalendarWrapper = styled.div`
 
 const MainCalendar = styled.div`
 	flex: 1 0;
+	overflow: hidden;
 	border-right: 1px solid #3883bb;
 	-webkit-user-select: none; 
 	-moz-user-select: none; 
@@ -258,7 +259,7 @@ class Calendar extends React.Component {
 									fromTime: appointment.FromTime,
 									isReloadCalendar: true
 								});
-								return;
+								// return;
 							} else {
 								this.props.countAppointmentAnyStaff({
 									date,

@@ -175,7 +175,7 @@ export function blockTemp(memberId, start, end, note, appointmentId, status, blo
 	};
 }
 
-function checkStatusAppointment(appointmentId, appointments) {
+export function checkStatusAppointment(appointmentId, appointments) {
 	let find = false;
 	appointments.forEach(appointment => {
 		if (appointment.id === appointmentId) {

@@ -380,7 +380,7 @@ const GlobalStyle = createGlobalStyle`
   font-weight : 500;
   color : #585858;
   letter-spacing : 0.6;
-  border : 2px solid red !important;
+  border : 1.5px solid red !important;
   overflow: hidden !important;
 }
 
@@ -404,7 +404,7 @@ const GlobalStyle = createGlobalStyle`
   font-weight : 500;
   color : white;
   letter-spacing : 0.6;
-  border : 3px solid red !important;
+  border : 1.5px solid red !important;
   overflow: hidden !important;
 }
 

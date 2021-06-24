@@ -154,7 +154,6 @@ class FCDragZone extends React.PureComponent {
 
 	componentDidMount() {
 		const eventHeightContainer = document.getElementById("waiting-events").clientHeight;
-		console.log({ eventHeightContainer })
 		this.setState({ eventHeightContainer })
 		window.addEventListener('resize', () => this.updateDimensions());
 	}

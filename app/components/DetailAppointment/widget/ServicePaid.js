@@ -7,9 +7,9 @@ import * as api_constants from '../../../../app-constants';
 import { token } from '../../../../app-constants';
 
 const ImgButton = styled.img`
-    width : 12px;
-    height : 6px; 
-    margin-left : 8px; 
+	width : 12px;
+	height : 6px; 
+	margin-left : 8px; 
 `;
 
 const Row = styled.div`
@@ -80,14 +80,17 @@ export default class ServicePaid extends Component {
             openPopupTip,
             price
         } = this.props;
+        const { status, memberId } = appointment;
         const { isWarning } = service;
+        const isActive = isWarning && status !== "WAITING" && parseInt(memberId) !== 0;
+
         const { staffOfService, isLoading } = this.state;
         return (
             <tr>
                 <td style={{ borderRight: 1 }}>
                     <ServiceName>{service.serviceName}</ServiceName>
                 </td>
-                <td style={{ position: 'relative' , background : isWarning ? '#FCD2D5' : 'transparent' }}
+                <td style={{ position: 'relative' , background : isActive ? '#FCD2D5' : 'transparent' }}
                     onClick={() => {
                         if (appointment.status === 'PAID' && isEditPaidAppointment) {
                             togglePopupStaff('', index)

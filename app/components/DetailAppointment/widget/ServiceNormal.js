@@ -10,28 +10,28 @@ import * as api_constants from '../../../../app-constants';
 import { token } from '../../../../app-constants';
 
 const ButtonService = styled.button`
-    background: ${(props) => props.backgroundColor};
-    color: #ffffff;
-    padding: 5px 15px;
-    margin: 0 10px;
-    width: 47px;
-    border-radius: 3px;
-    cursor: ${(props) => (props.active ? 'pointer' : 'initial')};
+	background: ${(props) => props.backgroundColor};
+	color: #ffffff;
+	padding: 5px 15px;
+	margin: 0 10px;
+	width: 47px;
+	border-radius: 3px;
+	cursor: ${(props) => (props.active ? 'pointer' : 'initial')};
 `;
 
 const ImgButton = styled.img`
-    width : 12px;
-    height : 6px; 
-    margin-left : 8px; 
+	width : 12px;
+	height : 6px; 
+	margin-left : 8px; 
 `;
 
 const ButtonTime = styled.div`
-    background-color: #eeeeee;
-    border-radius: 5px;
-    padding: 10px;
-    text-align: center;
-    width: 120px;
-    position: relative;
+	background-color: #eeeeee;
+	border-radius: 5px;
+	padding: 10px;
+	text-align: center;
+	width: 120px;
+	position: relative;
 `;
 
 const IconEdit = styled.img`
@@ -144,8 +144,9 @@ export default class ServiceNormal extends Component {
             openPopupPrice,
             price,
         } = this.props;
-        const { status } = appointment;
+        const { status, memberId } = appointment;
         const { isWarning } = service;
+        const isActive = isWarning && status !== "WAITING" && parseInt(memberId) !== 0;
 
         const { staffOfService, isLoading } = this.state;
 
@@ -168,7 +169,7 @@ export default class ServiceNormal extends Component {
 
                 <td style={{ borderRight: 0 }}>
                     <RenderStaff
-                        isActive={isWarning ? true : false}
+                        isActive={isActive}
                         onClick={() => {
                             togglePopupStaff('', index);
                             this.getStaffAvailable();
@@ -201,7 +202,7 @@ export default class ServiceNormal extends Component {
                             onClick={() => subtractService(index)}
                         >
                             -5&#39;
-                        </ButtonService>
+						</ButtonService>
                         {duration}
                         <ButtonService
                             backgroundColor={(status !== 'PAID' && status !== 'VOID' && status !== 'REFUND') ? '#0071c5' : '#dddddd'}
@@ -209,7 +210,7 @@ export default class ServiceNormal extends Component {
                             onClick={() => addService(index)}
                         >
                             +5&#39;
-                        </ButtonService>
+						</ButtonService>
                     </ContainerButton>
                 </td>
 

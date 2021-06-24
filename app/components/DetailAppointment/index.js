@@ -40,6 +40,10 @@ class Appointment extends Layout {
 
 	conditionRenderAlertService() {
 		let flag = false;
+		const { appointment : { memberId , status } } = this.props;
+		if(parseInt(memberId) === 0 && status !== "WAITING"){
+			return false;
+		}
 		const { services } = this.state;
 		for (let i = 0; i < services.length; i++) {
 			if (services[i].isWarning) {
