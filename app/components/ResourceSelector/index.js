@@ -42,20 +42,20 @@ class ResourceSelector extends layout {
 		}
 
 		if (nextProps.isFirstReloadCalendar == false && this.props.isFirstReloadCalendar !== nextProps.isFirstReloadCalendar) {
-			// const { resources, qtyResources } = this.props;
-			// const slide = chunk(resources, parseInt(qtyResources));
+			const { resources, qtyResources } = this.props;
+			const slide = chunk(resources, parseInt(qtyResources));
 
-			// if (slide.length > 1 && slide[slide.length - 1].length <= qtyResources && slide[slide.length - 1].length > 1) {
-			// 		await this.setState({ isLoadingStaff: true });
-			// 		this.refNextButton.current.click();
-			// 		setTimeout(() => {
-			// 			this.refPrevButton.current.click();
-			// 		}, 700);
+			if (slide.length > 1 && slide[slide.length - 1].length <= qtyResources && slide[slide.length - 1].length > 1) {
+					await this.setState({ isLoadingStaff: true });
+					this.refNextButton.current.click();
+					setTimeout(() => {
+						this.refPrevButton.current.click();
+					}, 700);
 
-			// 		setTimeout(() => {
-			// 			this.setState({ isLoadingStaff: false });
-			// 		}, 1500);
-			// }
+					setTimeout(() => {
+						this.setState({ isLoadingStaff: false });
+					}, 1500);
+			}
 		}
 
 		if (isAssignAnyStaffToStaff == true && isAssignAnyStaffToStaff !== this.props.isAssignAnyStaffToStaff) {
@@ -139,11 +139,14 @@ class ResourceSelector extends layout {
 
 
 	afterSlide(index) {
+		const {isLoadingStaff} = this.state;
 		const { resources } = this.props;
 		const { qtyResources } = this.props;
 		const quantity = parseInt(qtyResources);
 		this.props.setDisplayedMembers(resources.slice(index * quantity, index * quantity + quantity));
-		this.props.renderAppointment();
+		if(!isLoadingStaff){
+			this.props.renderAppointment();
+		}
 		this.props.setSlideIndex(index);
 	}
 

@@ -4,7 +4,6 @@ import Carousel from 'nuka-carousel';
 import { staffId } from '../../../app-constants';
 import PopupBlockTime from './PopupBlockTime';
 import ButtonSplash from './ButtonSplash';
-import ReactLoading from 'react-loading';
 
 const ResourceSelectorWrapper = styled.div`
 	width: 100%;
@@ -251,6 +250,7 @@ ButtonToday.Text = styled.div`
 `;
 
 const ButtonArrow = styled.div`
+	opacity: ${(props) => props.opacity};
 	& > img {
 		width: 19px;
 		height: 19px;
@@ -275,14 +275,14 @@ function chunk(array, size) {
 
 class layout extends React.Component {
 	renderResource(resource, index) {
-		const { qtyResources , isFirstReloadCalendar } = this.props;
+		const { qtyResources, isFirstReloadCalendar } = this.props;
 		const { isLoadingStaff } = this.state;
 
 		if (parseInt(resource.id) !== 0 && !isLoadingStaff && !isFirstReloadCalendar)
 			return (
 				<Resource
 					onClick={() => this.openPincode(resource)}
-					style={{ width : `calc(100% / ${qtyResources.toString()})` }}
+					style={{ width: `calc(100% / ${qtyResources.toString()})` }}
 					active={parseInt(resource.id) === parseInt(staffId) ? true : false}
 					key={index}
 				>
@@ -299,11 +299,11 @@ class layout extends React.Component {
 	}
 
 	renderResources(resources, index) {
-			return (
-				<ResourceWrapper key={index}>
-					{resources.map((resource, indexS) => this.renderResource(resource, indexS))}
-				</ResourceWrapper>
-			);
+		return (
+			<ResourceWrapper key={index}>
+				{resources.map((resource, indexS) => this.renderResource(resource, indexS))}
+			</ResourceWrapper>
+		);
 	}
 
 	renderLoadingResources(index) {
@@ -347,6 +347,7 @@ class layout extends React.Component {
 		const isActiveRight = this.getActiveArrow().isActiveRight;
 
 		const { resourceWidth, qtyResources } = this.props;
+		const { isLoadingStaff } = this.state;
 
 		const flexAnyStaff = resourceWidth % 8 + 0.95;
 
@@ -376,7 +377,7 @@ class layout extends React.Component {
 								renderCenterLeftControls={({ previousSlide }) => {
 									if (!isActiveLett) {
 										return (
-											<ButtonArrow isLeft>
+											<ButtonArrow opacity={isLoadingStaff ? 0 : 1} isLeft>
 												<img src={require('../../images/arrow-right-grey.png')} />
 											</ButtonArrow>
 										);
@@ -386,13 +387,14 @@ class layout extends React.Component {
 												refButton={this.refPrevButton}
 												isLeft
 												onClick={(ev) => this.onPrevClick(ev, previousSlide)}
+												isLoadingStaff={isLoadingStaff}
 											/>
 										);
 								}}
 								renderCenterRightControls={({ nextSlide }) => {
 									if (!isActiveRight) {
 										return (
-											<ButtonArrow>
+											<ButtonArrow opacity={isLoadingStaff ? 0 : 1}>
 												<img src={require('../../images/arrow-right-grey.png')} />
 											</ButtonArrow>
 										);
@@ -401,6 +403,7 @@ class layout extends React.Component {
 											<ButtonSplash
 												refButton={this.refNextButton}
 												onClick={(ev) => this.onNextClick(ev, nextSlide)}
+												isLoadingStaff={isLoadingStaff}
 											/>
 										);
 								}}

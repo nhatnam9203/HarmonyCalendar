@@ -86,6 +86,7 @@ class Calendar extends React.Component {
 					const displayMember = store.getState().getIn(['appointment', 'appointments', 'calendar']);
 					const selectDay = store.getState().getIn(['appointment', 'currentDay']);
 					addEventsToCalendar(selectDay, displayMember);
+					this.props.renderAppointment();
 				}
 			}
 

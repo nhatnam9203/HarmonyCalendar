@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import styled from "styled-components"
 
 const Button = styled.div`
+	opacity: ${(props) => props.opacity};
 	& > img {
 	width: 19px;
 	height: 19px;
@@ -28,10 +29,16 @@ export default class ButtonSplash extends Component {
 	}
 
 	render() {
-		const { onClick, isLeft, refButton } = this.props;
+		const { onClick, isLeft, refButton, isLoadingStaff } = this.props;
 		const { isSplash } = this.state;
 		return (
-			<Button ref={refButton} isLeft={isLeft} isSplash={isSplash} onClick={onClick}>
+			<Button
+				opacity={isLoadingStaff ? 0 : 1}
+				ref={refButton}
+				isLeft={isLeft}
+				isSplash={isSplash}
+				onClick={onClick}
+			>
 				<img src={require('../../images/arrow-right.png')} />
 			</Button>
 		);

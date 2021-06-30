@@ -13,13 +13,13 @@ export const API_PORT = 8010;
 // export const PROD_API_BASE_URL = `https://api.harmonypayment.com`;
 // export const SIGNALR = `https://signalr.harmonypayment.com`;
 
-// export const DEV_API_BASE_URL = `https://dev.harmonypayment.com`;
-// export const PROD_API_BASE_URL = `https://dev.harmonypayment.com`;
-// export const SIGNALR = `https://dev-signalr.harmonypayment.com`;
+export const DEV_API_BASE_URL = `https://dev.harmonypayment.com`;
+export const PROD_API_BASE_URL = `https://dev.harmonypayment.com`;
+export const SIGNALR = `https://dev-signalr.harmonypayment.com`;
 
-export const DEV_API_BASE_URL = `https://staging.harmonypayment.com`;
-export const PROD_API_BASE_URL = `https://staging.harmonypayment.com`;
-export const SIGNALR = `https://signalr-stage.harmonypayment.com`;
+// export const DEV_API_BASE_URL = `https://staging.harmonypayment.com`;
+// export const PROD_API_BASE_URL = `https://staging.harmonypayment.com`;
+// export const SIGNALR = `https://signalr-stage.harmonypayment.com`;
 
 // export const DEV_API_BASE_URL = `https://staging2.harmonypayment.com`;
 // export const PROD_API_BASE_URL = `https://staging2.harmonypayment.com`;

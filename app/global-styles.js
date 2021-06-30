@@ -300,6 +300,7 @@ const GlobalStyle = createGlobalStyle`
 .app-event__blockName{
   font-size : 1.1rem;
   padding : 10px;
+  padding-left: 5px !important;
   font-weight : 900;
 }
 
