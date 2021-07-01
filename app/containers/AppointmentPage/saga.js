@@ -979,6 +979,9 @@ export function* getDetailMerchantSaga(action) {
 				const dateCalendar = JSON.parse(localStorage.getItem('date'));
 				if (dateCalendar) {
 					day = moment(dateCalendar, ['YYYY-MM-DD']).format('DDMMYYYY');
+					setTimeout(() => {
+						localStorage.removeItem('date');
+					}, 500);
 				}
 
 				yield put(actions.selectDay(day));

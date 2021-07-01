@@ -1014,7 +1014,7 @@ export const mapBlockTemp = (blockTime, currentDate, appointments) => {
 	const note = blockTime.note;
 	const appointmentId = blockTime.appointmentId;
 	const blockTimeId = blockTime.blockTimeId;
-	const isWarning = blockTime.isWarning;
+	const isWarning = (blockTime.isWarning && parseInt(memberId === 0)) ? blockTime.isWarning : false;
 	const app = appointments.find(obj => obj.id === appointmentId);
 	const isVip = app ? app.isVip : 0
 

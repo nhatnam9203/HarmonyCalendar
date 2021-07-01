@@ -120,9 +120,6 @@ class ResourceSelector extends layout {
 		const dateCalendar = JSON.parse(localStorage.getItem('date'));
 		if (dateCalendar) {
 			this.props.getAppointmentAnyStaff(dateCalendar);
-			setTimeout(() => {
-				localStorage.removeItem('date');
-			}, 500);
 		} else {
 			this.props.getAppointmentAnyStaff(moment(currentDay, ['DDMMYYYY']).format('YYYY-MM-DD'));
 		}
