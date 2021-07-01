@@ -114,15 +114,23 @@ export default class ServiceNormal extends Component {
         const date = moment(fromTime).format('YYYY-MM-DD');
 
         const requestURL = new URL(`${api_constants.GET_STAFF_OF_SERVICE}/${serviceId}?date=${date}`);
-        const response = await api(requestURL.toString(), "", 'GET', token);
-        this.setState({
-            isLoading: false,
-            staffOfService: Array.isArray(response.data) ? response.data.map((s) => ({
-                ...s,
-                title: s.displayName,
-                id: s.staffId
-            })) : []
-        });
+        try {
+            const response = await api(requestURL.toString(), "", 'GET', token);
+            if (parseInt(response.codeNumber) === 200) {
+                this.setState({
+                    isLoading: false,
+                    staffOfService: Array.isArray(response.data) ? response.data.map((s) => ({
+                        ...s,
+                        title: s.displayName,
+                        id: s.staffId
+                    })) : []
+                });
+            } else {
+                alert(response.message)
+            }
+        } catch (err) {
+            alert(err)
+        }
     }
 
     render() {

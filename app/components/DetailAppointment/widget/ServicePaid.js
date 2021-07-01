@@ -54,15 +54,23 @@ export default class ServicePaid extends Component {
         const date = moment(fromTime).format('YYYY-MM-DD');
 
         const requestURL = new URL(`${api_constants.GET_STAFF_OF_SERVICE}/${serviceId}?date=${date}`);
-        const response = await api(requestURL.toString(), "", 'GET', token);
-        this.setState({
-            isLoading: false,
-            staffOfService: Array.isArray(response.data) ? response.data.map((s) => ({
-                ...s,
-                title: s.displayName,
-                id: s.staffId
-            })) : []
-        });
+        try {
+            const response = await api(requestURL.toString(), "", 'GET', token);
+            if (parseInt(response.codeNumber) === 200) {
+                this.setState({
+                    isLoading: false,
+                    staffOfService: Array.isArray(response.data) ? response.data.map((s) => ({
+                        ...s,
+                        title: s.displayName,
+                        id: s.staffId
+                    })) : []
+                });
+            } else {
+                alert(response.message)
+            }
+        } catch (err) {
+            alert(err)
+        }
     }
 
     render() {
@@ -90,7 +98,7 @@ export default class ServicePaid extends Component {
                 <td style={{ borderRight: 1 }}>
                     <ServiceName>{service.serviceName}</ServiceName>
                 </td>
-                <td style={{ position: 'relative' , background : isActive ? '#FCD2D5' : 'transparent' }}
+                <td style={{ position: 'relative', background: isActive ? '#FCD2D5' : 'transparent' }}
                     onClick={() => {
                         if (appointment.status === 'PAID' && isEditPaidAppointment) {
                             togglePopupStaff('', index)
