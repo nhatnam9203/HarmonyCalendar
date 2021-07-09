@@ -586,7 +586,7 @@ class Appointment extends React.Component {
 			return (
 				<WrapAlert>
 					<img src={alertIcon} />
-					<div>Therre are services cannot be performed</div>
+					<div>There are services cannot be performed</div>
 				</WrapAlert>
 			);
 	}
