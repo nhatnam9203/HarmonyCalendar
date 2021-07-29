@@ -138,6 +138,22 @@ export default class Header extends Component {
 						Waiting Appointment
                     </HeaderAppointment>
                 );
+            case 'no show':
+                return (
+                    <HeaderAppointment color={'#585858'} backgroundColor={'#f1f1f1'}>
+                        <div
+                            style={{
+                                position: 'absolute',
+                                left: 15,
+                                fontSize: 18,
+                                marginTop: 4
+                            }}
+                        >
+                            {appointment.code}
+                        </div>
+                            Appointment
+                    </HeaderAppointment>
+                );
 
             default:
                 return (

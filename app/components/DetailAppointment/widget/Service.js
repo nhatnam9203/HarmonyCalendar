@@ -7,6 +7,7 @@ import ExtraItemPaid from './ExtraItemPaid';
 import ServiceNormal from './ServiceNormal';
 import ServicePaid from './ServicePaid';
 import { isEmpty } from 'lodash';
+import { appointmentMoved } from '../../../containers/AppointmentPage/actions';
 
 const Row = styled.div`
     display: flex;
@@ -48,7 +49,7 @@ export default class Service extends Component {
             staff.title : '';
         const fromTime = service.fromTime && service.fromTime !== '0001-01-01T00:00:00' ? service.fromTime : appointment.start;
 
-        if (appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND') {
+        if (appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' && appointment.status !== "no show") {
             return (
                 <React.Fragment key={index}>
                     <tr>

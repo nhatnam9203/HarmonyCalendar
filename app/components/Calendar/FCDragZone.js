@@ -14,13 +14,13 @@ import { isEmpty } from "lodash";
 
 import { getWindowSize } from "../../utils/helper";
 
-let COUNT_EVENTS_IN_SLIDE = 8;
+let COUNT_EVENTS_IN_SLIDE = 4;
 let size = getWindowSize();
 if (size === "large") {
-	COUNT_EVENTS_IN_SLIDE = 12;
+	COUNT_EVENTS_IN_SLIDE = 6;
 } else
 	if (size === "superLarge") {
-		COUNT_EVENTS_IN_SLIDE = 8;
+		COUNT_EVENTS_IN_SLIDE = 4;
 	}
 
 const DragZoneWrapper = styled.div`
@@ -293,22 +293,22 @@ class FCDragZone extends React.PureComponent {
 								>
 									{event.firstName}
 								</div>
-								{/* <div className="app-event__phone-number4">
+								<div className="app-event__phone-number4">
 									{` ${formatPhone(event.phoneNumber).toString().replace("(+84)", "").replace("+84-", "").replace("+1-", "").replace("(+1)", "")}`}
 								</div>
-								{event.options.map((option, index) => (
+								{event.options.map((option, index) => index === 0 && (
 									<div className="app-event__option option_waiting" key={index}>
 										- {option.serviceName}
 									</div>
 								))}
-								{event.categories && event.categories.map((option) => (
+								{event.categories && event.categories.map((option) => index === 0 && (
 									<div
 										className="app-event__option option_waiting option_categories"
 										key={option.bookingCategoryId}
 									>
 										- {option.categoryName}
 									</div>
-								))} */}
+								))}
 							</EventWrapper>
 						))}
 					</WaitingEvent>

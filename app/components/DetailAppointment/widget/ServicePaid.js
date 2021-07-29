@@ -98,6 +98,7 @@ export default class ServicePaid extends Component {
                 <td style={{ borderRight: 1 }}>
                     <ServiceName>{service.serviceName}</ServiceName>
                 </td>
+
                 <td style={{ position: 'relative', background: isActive ? '#FCD2D5' : 'transparent' }}
                     onClick={() => {
                         if (appointment.status === 'PAID' && isEditPaidAppointment) {
@@ -125,6 +126,7 @@ export default class ServicePaid extends Component {
                         )}
                     </Row>
                 </td>
+                
                 <td style={{ textAlign: 'center' }}
                     onClick={() => {
                         if (isEditPaidAppointment) {

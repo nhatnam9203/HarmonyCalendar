@@ -4,12 +4,12 @@ import edit from '../../../images/edit.png';
 import iconExtra from '../../../images/iconExtra.png';
 
 const ButtonExtra = styled.button`
-    color: #ffffff;
-    padding: 5px 15px;
-    margin: 0 10px;
-    width: 47px;
-    border-radius: 3px;
-    cursor: ${(props) => (props.active ? 'pointer' : 'initial')};
+	color: #ffffff;
+	padding: 5px 15px;
+	margin: 0 10px;
+	width: 47px;
+	border-radius: 3px;
+	cursor: ${(props) => (props.active ? 'pointer' : 'initial')};
     background: ${(props) => props.backgroundColor};
 `;
 
@@ -56,13 +56,13 @@ export default class Service extends Component {
 
     getStyleExtra(appointment, extra, index) {
         let backgroundColor = '#dddddd';
-        if (status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' && extra.duration > 5) backgroundColor = '#0071c5';
+        if (status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' && status !== "no show" && extra.duration > 5) backgroundColor = '#0071c5';
         return backgroundColor;
     }
 
     getStyleExtra2(appointment, extra, index) {
         let backgroundColor = '#dddddd';
-        if (status !== 'PAID' && status !== 'VOID' && status !== 'REFUND') backgroundColor = '#0071c5';
+        if (status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' && status !== "no show") backgroundColor = '#0071c5';
         return backgroundColor;
     }
 
@@ -83,19 +83,19 @@ export default class Service extends Component {
                     <ContainerButton>
                         <ButtonExtra
                             backgroundColor={this.getStyleExtra(appointment, extra, index)}
-                            disabled={status === 'PAID' || status === 'VOID' || status === 'REFUND' || extra.duration <= 5}
+                            disabled={status === 'PAID' || status === 'VOID' || status === 'REFUND' || status === "no show" || extra.duration <= 5}
                             onClick={() => this.props.subtractExtra(extra)}
                         >
                             -5&#39;
-                        </ButtonExtra>
+					    </ButtonExtra>
                         {extra.duration}
                         <ButtonExtra
                             backgroundColor={this.getStyleExtra2(appointment, extra, index)}
-                            disabled={status === 'PAID' || status === 'VOID' || status === 'REFUND'}
+                            disabled={status === 'PAID' || status === 'VOID' || status === 'REFUND' || status === "no show"}
                             onClick={() => this.props.addExtra(extra)}
                         >
                             +5&#39;
-                        </ButtonExtra>
+					    </ButtonExtra>
                     </ContainerButton>
                 </td>
 

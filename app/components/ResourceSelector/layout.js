@@ -108,6 +108,7 @@ const WaitingHeader = styled.div`
 	color: #333333;
 	background: #f4f4f5;
 	border-left: 1px solid #3883bb;
+	touch-action: manipulation;
 	@media (min-width: 1024px) {
 		font-size: 1.3rem;
 	}

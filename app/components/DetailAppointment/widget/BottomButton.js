@@ -95,7 +95,7 @@ export default class BottomButton extends Component {
                         );
                     }
                 } else return null;
-            } else if (appointment.status !== 'WAITING' && appointment.status !== 'CANCEL' && appointment.status !== 'PAID' && appointment.status !== 'REFUND' && appointment.status !== 'VOID') {
+            } else if (appointment.status !== 'WAITING' && appointment.status !== 'CANCEL' && appointment.status !== 'PAID' && appointment.status !== 'REFUND' && appointment.status !== 'VOID' && appointment.status !== "no show") {
                 return (
                     <ButtonChange primary={!isDisabled} onClick={() => !isDisabled && this.props.changeAppointmentTime()}>
                         <strong>Change</strong>
@@ -112,6 +112,7 @@ export default class BottomButton extends Component {
                 {appointment.status !== 'VOID' &&
                     appointment.status !== 'REFUND' &&
                     appointment.status !== 'PAID' &&
+                    appointment.status !== 'no show' &&
                     appointment.status !== 'CANCEL' && (
                         <div>
                             <Button

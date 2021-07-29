@@ -212,7 +212,19 @@ const GlobalStyle = createGlobalStyle`
   }
 
   .option_waiting{
-    // width : calc((100vw - 5.05rem) / 10);
+    margin-left: 5px !important;
+    margin-right : 10px !important;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    @supports (-webkit-line-clamp: 2) {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: initial;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
   }
 
 
@@ -331,7 +343,7 @@ const GlobalStyle = createGlobalStyle`
 .fc-event {
   border: 1px solid ;
 }
-.event-assigned, .event-confirmed,.event-block-temp-assigned,.event-block-temp-confirmed{
+.event-assigned, .event-confirmed,.event-block-temp-assigned,.event-block-temp-confirmed , .event-no-show{
   font-weight : 500;
   color : #585858;
   letter-spacing : 0.6;
@@ -359,7 +371,18 @@ const GlobalStyle = createGlobalStyle`
 }
 
 
-.event-checkin,.event-confirmed,.event-paid,.event-anystaff,.event-void,.event-assigned,.event-block-temp-assigned,.event-block-temp-confirmed,.event-block-temp-check-in,.event-block-temp{
+
+.event-checkin,
+.event-confirmed,
+.event-paid,
+.event-anystaff,
+.event-void,
+.event-assigned,
+.event-block-temp-assigned,
+.event-block-temp-confirmed,
+.event-block-temp-check-in,
+.event-no-show,
+.event-block-temp{
   border : 1px solid #ffffff !important;
   overflow: hidden !important;
 }
@@ -371,8 +394,10 @@ const GlobalStyle = createGlobalStyle`
 
 .event-assigned-warning, 
 .event-confirmed-warning,
+.event-no-show-warning,
 .event-block-temp-assigned-warning,
 .event-block-temp-confirmed-warning,
+.event-no-show-warning:hover,
 .event-assigned-warning:hover, 
 .event-confirmed-warning:hover,
 .event-block-temp-assigned-warning:hover,
@@ -428,7 +453,14 @@ const GlobalStyle = createGlobalStyle`
   padding-left : 10px !important;
 }
 
-.event-assigned:hover ,.event-confirmed:hover,.event-anystaff:hover , .event-confirmed-anystaff:hover , .event-assigned-anystaff:hover , .event-block-temp-assigned:hover , .event-block-temp-confirmed:hover{
+.event-assigned:hover ,
+.event-confirmed:hover,
+.event-anystaff:hover ,
+.event-confirmed-anystaff:hover ,
+.event-assigned-anystaff:hover ,
+.event-block-temp-assigned:hover ,
+.event-no-show:hover ,
+.event-block-temp-confirmed:hover{
   font-weight : 500;
   color : #333;
 }

@@ -19,6 +19,7 @@ import closeWhite from '../../images/close_white.png'
 import iconCalendarGrey from '../../images/iconCalendarGrey.png';
 import topArrow from '../../images/top_arrow@3x.png';
 import alertIcon from "../../images/alert.png";
+import { appointmentMoved } from '../../containers/AppointmentPage/actions';
 
 const AppPopup = styled(Popup)`
 	border-radius: 1.5rem;
@@ -594,7 +595,7 @@ class Appointment extends React.Component {
 	renderTileColumn() {
 		const { appointment } = this.props;
 		const { status } = appointment;
-		if (status === 'PAID' || status === 'VOID' || status === 'REFUND') {
+		if (status === 'PAID' || status === 'VOID' || status === 'REFUND' || status === "no show") {
 			return (
 				<tr>
 					<th width="25%" style={{ borderRight: 0 }}>
@@ -602,7 +603,7 @@ class Appointment extends React.Component {
 						Services
 					</th>
 					<th width="25%">Staff</th>
-					{(status === 'PAID' || status === 'VOID' || status === 'REFUND') &&
+					{(status === 'PAID' || status === 'VOID' || status === 'REFUND' || status === "no show") &&
 						(
 							<th width="25%" style={{ textAlign: 'center' }}>
 								Tip ($)
@@ -821,7 +822,7 @@ class Appointment extends React.Component {
 	renderAddMore() {
 		const { appointment } = this.props;
 		const { status } = appointment;
-		if (status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' && status !== 'CANCEL') {
+		if (status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' && status !== 'CANCEL' && status !== 'no show') {
 			return (
 				<ContainerAddMore onClick={this.addMore}>
 					<img src={require('../../images/addIcon.png')} />
@@ -871,7 +872,8 @@ class Appointment extends React.Component {
 			appointment.status === 'ASSIGNED' ||
 				appointment.status === 'CONFIRMED' ||
 				appointment.status === 'ASSIGNED' ||
-				appointment.status === 'WAITING'
+				appointment.status === 'WAITING' || 
+				appointment.status === "no show"
 				? true
 				: false;
 		const isDisabled = this.conditionRenderAlertService();

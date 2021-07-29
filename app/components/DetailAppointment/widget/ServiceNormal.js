@@ -205,16 +205,16 @@ export default class ServiceNormal extends Component {
                 <td style={{ textAlign: 'center' }}>
                     <ContainerButton>
                         <ButtonService
-                            backgroundColor={(status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' && service.duration > 5) ? '#0071c5' : '#dddddd'}
-                            disabled={status === 'PAID' || status === 'VOID' || status === 'REFUND' || service.duration <= 5}
+                            backgroundColor={(status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' && appointment.status !== "no show" && service.duration > 5) ? '#0071c5' : '#dddddd'}
+                            disabled={status === 'PAID' || status === 'VOID' || status === 'REFUND' || status === "no show" || service.duration <= 5}
                             onClick={() => subtractService(index)}
                         >
                             -5&#39;
 						</ButtonService>
                         {duration}
                         <ButtonService
-                            backgroundColor={(status !== 'PAID' && status !== 'VOID' && status !== 'REFUND') ? '#0071c5' : '#dddddd'}
-                            disabled={status === 'PAID' || status === 'VOID' || status === 'REFUND'}
+                            backgroundColor={(status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' && status !== "no show") ? '#0071c5' : '#dddddd'}
+                            disabled={status === 'PAID' || status === 'VOID' || status === 'REFUND' || status === "no show"}
                             onClick={() => addService(index)}
                         >
                             +5&#39;

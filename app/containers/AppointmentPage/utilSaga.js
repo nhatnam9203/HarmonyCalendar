@@ -20,7 +20,7 @@ export const statusConvertKey = {
 	cancel: 'CANCEL',
 	pending: 'PENDING',
 	void: 'VOID',
-	refund: 'REFUND'
+	refund: 'REFUND',
 };
 
 export const appointmentAdapter = (appointment) => {
@@ -36,7 +36,7 @@ export const appointmentAdapter = (appointment) => {
 		extras: appointment.extras,
 		categories: appointment.categories,
 		customerNote: appointment.customerNote ? appointment.customerNote : '',
-		status: statusConvertKey[appointment.status],
+		status: statusConvertKey[appointment.status] ? statusConvertKey[appointment.status] : 'no show',
 		memberId: appointment.staffId,
 		start: appointment.fromTime,
 		end:
@@ -150,7 +150,7 @@ const splitNotes = (note) => {
 	}
 }
 
-export function blockTemp(memberId, start, end, note, appointmentId, status, blockId, isVip , isWarning) {
+export function blockTemp(memberId, start, end, note, appointmentId, status, blockId, isVip, isWarning) {
 	let tempNote = splitNotes(note);
 	return {
 		status,
@@ -189,6 +189,8 @@ export function checkStatusAppointment(appointmentId, appointments) {
 				find = 'CONFIRMED'
 			if (appointment.status === 'CHECKED_IN')
 				find = 'CHECKED_IN'
+			if (appointment.status === 'no show')
+				find = 'no show'
 		}
 	})
 	return find
@@ -202,7 +204,7 @@ export function addBlockCalendar(appointmentsMembers, displayedMembers, currentD
 		const blockTimeMember = memFind.blockTime.filter(
 			(b) => moment(b.workingDate).format('YYYY-MM-DD') === apiDateQuery
 		);
-	
+
 		for (let i = 0; i < blockTimeMember.length; i++) {
 			const memberId = mem.memberId;
 			const start = `${moment(currentDate).format('YYYY-MM-DD')}T${moment(blockTimeMember[i].blockTimeStart, [
@@ -228,6 +230,9 @@ export function addBlockCalendar(appointmentsMembers, displayedMembers, currentD
 				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CONFIRMED', blockTimeId, isVip, isWarning));
 			} else if (checkStatusAppointment(appointmentId, appointments) === 'CHECKED_IN') {
 				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CHECKED_IN', blockTimeId, isVip, isWarning));
+			}
+			else if (checkStatusAppointment(appointmentId, appointments) === 'no show') {
+				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'no show', blockTimeId, isVip, isWarning));
 			}
 			else {
 				mem.appointments.push(blockTemp(memberId, start, end, [], appointmentId, 'BLOCK_TEMP', blockTimeId));

@@ -2,32 +2,32 @@ import React, { Component } from 'react'
 import styled from 'styled-components';
 
 const ButtonExtra = styled.button`
-    color: #ffffff;
-    padding: 5px 15px;
-    margin: 0 10px;
-    width: 47px;
-    border-radius: 3px;
-    cursor: ${(props) => (props.active ? 'pointer' : 'initial')};
+	color: #ffffff;
+	padding: 5px 15px;
+	margin: 0 10px;
+	width: 47px;
+	border-radius: 3px;
+	cursor: ${(props) => (props.active ? 'pointer' : 'initial')};
     background: ${(props) => props.backgroundColor};
 `;
 
 const Row = styled.div`
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
 `;
 
 export default class Extra extends Component {
 
     getStyleExtra(appointment, extra, index) {
         let backgroundColor = '#dddddd';
-        if (status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' && extra.duration > 5) backgroundColor = '#0071c5';
+        if (status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' && status !== "no show" && extra.duration > 5) backgroundColor = '#0071c5';
         return backgroundColor;
     }
 
     getStyleExtra2(appointment, extra, index) {
         let backgroundColor = '#dddddd';
-        if (status !== 'PAID' && status !== 'VOID' && status !== 'REFUND') backgroundColor = '#0071c5';
+        if (status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' && status !== "no show") backgroundColor = '#0071c5';
         return backgroundColor;
     }
 
@@ -44,32 +44,32 @@ export default class Extra extends Component {
                 <td style={{ textAlign: 'center' }}>
                     <ButtonExtra
                         backgroundColor={this.getStyleExtra(appointment, extra, index)}
-                        disabled={status === 'PAID' || status === 'VOID' || status === 'REFUND' || extra.duration <= 5}
+                        disabled={status === 'PAID' || status === 'VOID' || status === 'REFUND' || status ==="no show" || extra.duration <= 5}
                         onClick={() => this.props.subtractExtra(extra)}
                     >
                         -5&#39;
-                    </ButtonExtra>
+					</ButtonExtra>
                     {extra.duration}
                     <ButtonExtra
                         backgroundColor={this.getStyleExtra2(appointment, extra, index)}
-                        disabled={status === 'PAID' || status === 'VOID' || status === 'REFUND'}
+                        disabled={status === 'PAID' || status === 'VOID' || status === 'REFUND' || status === "no show"}
                         onClick={() => this.props.addExtra(extra)}
                     >
                         +5&#39;
-                    </ButtonExtra>
+					</ButtonExtra>
                 </td>
 
-                <td onClick={status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' ? (
+                <td onClick={status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' && status !== "no show" ? (
                     () => this.props.openPopupPrice(price, index, 'extra')) : (() => { })} style={{ textAlign: 'center' }}
                 >
                     <Row>
                         <div>
-                            <div style={status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' ? style.priceS : {}}>
+                            <div style={status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' && status !== "no show" ? style.priceS : {}}>
                                 {price}
                             </div>
                         </div>
 
-                        {status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' && (
+                        {status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' && status !== "no show" && (
                             <img
                                 src={require('../../../images/edit.png')}
                                 style={{ width: 16, height: 16 }}

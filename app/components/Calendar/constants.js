@@ -728,7 +728,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 		},
 		/* eslint no-param-reassign: "error" */
 		eventRender: (event, element) => {
-			if (!event.data.status.toString().includes('BLOCK')) {
+			if (!event.data.status.toString().includes('BLOCK') && event.data.status.toString() !== "no show") {
 				let options = event.data.options.filter(obj => obj.staffId === event.data.memberId);
 				let _extrasRender = extrasRender(options, event.data.extras);
 				let dataEvent = {
@@ -750,7 +750,11 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 				}
 			}
 
-			if (event.data.status === 'BLOCK_TEMP_PAID' || event.data.status === 'BLOCK_TEMP_REFUND') {
+			if (
+				event.data.status === 'BLOCK_TEMP_PAID'
+				|| event.data.status === 'BLOCK_TEMP_REFUND'
+				|| event.data.status === 'no show'
+			) {
 				const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
 				const allAppointments = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
 				if (event.data.memberId) {
@@ -815,14 +819,16 @@ export const addEventsToCalendar = async (currentDate, appointmentsMembers) => {
 						appointment.status === 'VOID' ||
 						appointment.status === 'REFUND' ||
 						appointment.status === 'BLOCK_TEMP_PAID' ||
-						appointment.status === 'BLOCK_TEMP_REFUND'
+						appointment.status === 'BLOCK_TEMP_REFUND' ||
+						appointment.status === 'no show'
 					),
 					resourceEditable: !(
 						appointment.status === 'PAID' ||
 						appointment.status === 'VOID' ||
 						appointment.status === 'REFUND' ||
 						appointment.status === 'BLOCK_TEMP_PAID' ||
-						appointment.status === 'BLOCK_TEMP_REFUND'
+						appointment.status === 'BLOCK_TEMP_REFUND' ||
+						appointment.status === 'no show'
 					)
 				});
 			});
@@ -887,6 +893,16 @@ function getEventStyle(status, isWarning) {
 
 	let eventColor = '#00b4f7';
 	let eventClass = 'event-paid';
+
+	if (status === 'no show') {
+		eventColor = '#f1f1f1';
+		eventClass = 'event-no-show';
+		if (isWarning) {
+			eventClass = 'event-no-show-warning';
+		} else {
+			eventClass = 'event-no-show';
+		}
+	}
 
 	if (status === 'ASSIGNED') {
 		eventColor = '#ffe559';
