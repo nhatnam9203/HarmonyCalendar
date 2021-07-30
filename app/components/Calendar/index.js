@@ -202,10 +202,9 @@ class Calendar extends React.Component {
 		}
 	}
 
-	updateNotification(data) {
+	updateNotification() {
 		const message = JSON.stringify({
 			action: 'update_notification',
-			data,
 		});
 		window.postMessage(message);
 	}
@@ -216,7 +215,6 @@ class Calendar extends React.Component {
 		connection.serverTimeoutInMilliseconds = 6000000;
 
 		connection.on('ListWaNotification', async (data) => {
-			this.updateNotification(data);
 			let app = JSON.parse(data);
 			if (app.data) {
 				let type = app.data.Type;
@@ -247,6 +245,7 @@ class Calendar extends React.Component {
 						break;
 
 					case 'appointment_update':
+						this.updateNotification();
 						let app_update = app.data.appointment;
 
 						const { isLoadingPopup } = this.props;
@@ -329,6 +328,7 @@ class Calendar extends React.Component {
 						break;
 
 					case 'change_item':
+						this.updateNotification();
 						setTimeout(() => {
 							this.props.loadWaitingAppointments();
 							this.props.reloadCalendar();

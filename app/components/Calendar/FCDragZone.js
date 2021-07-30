@@ -296,24 +296,38 @@ class FCDragZone extends React.PureComponent {
 								<div className="app-event__phone-number4">
 									{` ${formatPhone(event.phoneNumber).toString().replace("(+84)", "").replace("+84-", "").replace("+1-", "").replace("(+1)", "")}`}
 								</div>
-								{event.options.map((option, index) => inddex === 0 && (
-									<div
-										className={"app-event__option " + slidesToShow === 5 ? "option_waiting" : "option_waiting2"}
-										key={index}
-										style={{ fontStyle: 'italic' }}
-									>
-										- {option.serviceName}
-									</div>
-								))}
-								{event.categories && event.categories.map((option, index) => index === 0 && (
-									<div
-										className={"app-event__option option_categories " + slidesToShow === 5 ? "option_waiting" : "option_waiting2"}
-										key={option.bookingCategoryId}
-										style={{ fontStyle: 'italic' }}
-									>
-										- {option.categoryName}
-									</div>
-								))}
+								{
+									event.options.map((option, index) => {
+										if (index && index === 0) {
+											return (
+												<div
+													className={"app-event__option " + slidesToShow === 5 ? "option_waiting" : "option_waiting2"}
+													key={index}
+													style={{ fontStyle: 'italic' }}
+												>
+													- {option.serviceName}
+												</div>
+											)
+										}
+										return null;
+									})
+								}
+								{
+									event.categories && event.categories.map((option, index) => {
+										if (index === 0) {
+											return (
+												<div
+													className={"app-event__option option_categories " + slidesToShow === 5 ? "option_waiting" : "option_waiting2"}
+													key={option.bookingCategoryId}
+													style={{ fontStyle: 'italic' }}
+												>
+													- {option.categoryName}
+												</div>
+											)
+										}
+										return null;
+									})
+								}
 							</EventWrapper>
 						))}
 					</WaitingEvent>
