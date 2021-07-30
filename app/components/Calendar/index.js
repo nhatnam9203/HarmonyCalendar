@@ -202,11 +202,12 @@ class Calendar extends React.Component {
 		}
 	}
 
-	updateNotification() {
-		const data = JSON.stringify({
+	updateNotification(data) {
+		const message = JSON.stringify({
 			action: 'update_notification',
+			data,
 		});
-		window.postMessage(data);
+		window.postMessage(message);
 	}
 
 	runSignalR_Appointment() {
@@ -215,7 +216,7 @@ class Calendar extends React.Component {
 		connection.serverTimeoutInMilliseconds = 6000000;
 
 		connection.on('ListWaNotification', async (data) => {
-			this.updateNotification();
+			this.updateNotification(data);
 			let app = JSON.parse(data);
 			if (app.data) {
 				let type = app.data.Type;

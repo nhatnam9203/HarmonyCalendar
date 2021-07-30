@@ -451,6 +451,10 @@ export function dataChangeTimeAppointment(
 		}
 	}
 
+	if(appointment.status === "CONFIRMED"){
+		status = "confirm";
+	}
+
 	return {
 		staffId: selectedStaff.id,
 		fromTime: start_time,

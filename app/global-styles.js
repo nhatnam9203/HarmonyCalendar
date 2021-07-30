@@ -227,6 +227,22 @@ const GlobalStyle = createGlobalStyle`
     }
   }
 
+  .option_waiting2{
+    margin-left: 5px !important;
+    margin-right : 10px !important;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    @supports (-webkit-line-clamp: 2) {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: initial;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+    }
+  }
+
 
   .app-event__full-name2 {
     position : absolute;

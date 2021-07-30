@@ -357,7 +357,7 @@ class Appointment extends Layout {
 		if (appointment.status === 'ASSIGNED') {
 			this.updateChangeAppointment('unconfirm');
 		} else if (appointment.status === 'CONFIRMED') {
-			this.updateChangeAppointment('unconfirm');
+			this.updateChangeAppointment('confirm');
 		} else if (appointment.status === 'CHECKED_IN') {
 			this.updateChangeAppointment('checkin');
 		} else {
@@ -385,11 +385,11 @@ class Appointment extends Layout {
 			dayPicker: this.state.dayChange,
 			selectedStaff: selectedStaff
 		}
+
 		this.props.changeAppointmentTime(payload)
 	}
 
 	toggleEditPaidAppointment() {
-		console.log('toggle edit paid')
 		const { isEditPaidAppointment } = this.state;
 		this.setState({
 			isEditPaidAppointment: !isEditPaidAppointment

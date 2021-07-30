@@ -1044,6 +1044,8 @@ export const mapBlockTemp = (blockTime, currentDate, appointments) => {
 		temptData = blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CONFIRMED', blockTimeId, isVip, isWarning);
 	} else if (checkStatusAppointment(appointmentId, appointments) === 'CHECKED_IN') {
 		temptData = blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CHECKED_IN', blockTimeId, isVip, isWarning);
+	} else if (checkStatusAppointment(appointmentId, appointments) === 'no show') {
+		mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'no show', blockTimeId, isVip, isWarning));
 	}
 	else {
 		temptData = blockTemp(memberId, start, end, [], appointmentId, 'BLOCK_TEMP', blockTimeId);
