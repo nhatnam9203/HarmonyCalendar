@@ -19,6 +19,7 @@ import {
 	editBlockTime,
 } from '../../containers/AppointmentPage/actions';
 import vip from '../../images/vip.png';
+import heart from "../../images/heart.png";
 import { blockTemp, checkStatusAppointment } from "../../containers/AppointmentPage/utilSaga";
 
 
@@ -741,6 +742,16 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 						.find('div.app-event')
 						.prepend("<div class='app-event__full-name2'><img src='" + vip + "' width='18' height='18'></div>");
 				}
+				if (event.data.isFavorite && event.data.isVip === 1) {
+					element
+						.find('div.app-event')
+						.prepend("<div class='app-event__heart'><img src='" + heart + "' width='18' height='18'></div>");
+				} else if (event.data.isFavorite && event.data.isVip === 0) {
+					element
+					.find('div.app-event')
+					.prepend("<div class='app-event__full-name2'><img src='" + heart + "' width='18' height='18'></div>");
+				}
+
 			} else {
 				element[0].innerHTML = EVENT_RENDER_TEMPLATE_BLOCK(event.data);
 				if (event.data.isVip === 1) {
@@ -748,6 +759,16 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 						.find('div.app-event')
 						.prepend("<div class='app-event__vipBlock'><img src='" + vip + "' width='18' height='18'></div>");
 				}
+				if (event.data.isFavorite && event.data.isVip === 1) {
+					element
+						.find('div.app-event')
+						.prepend("<div class='app-event__heart'><img src='" + heart + "' width='18' height='18'></div>");
+				} else if (event.data.isFavorite && event.data.isVip === 0) {
+					element
+					.find('div.app-event')
+					.prepend("<div class='app-event__vipBlock'><img src='" + heart + "' width='18' height='18'></div>");
+				}
+
 			}
 
 			if (
@@ -1032,20 +1053,21 @@ export const mapBlockTemp = (blockTime, currentDate, appointments) => {
 	const blockTimeId = blockTime.blockTimeId;
 	const isWarning = (blockTime.isWarning && parseInt(memberId === 0)) ? blockTime.isWarning : false;
 	const app = appointments.find(obj => obj.id === appointmentId);
-	const isVip = app ? app.isVip : 0
+	const isVip = app ? app.isVip : 0;
+	const isFavorite = blockTime.isFavorite;
 
 	if (checkStatusAppointment(appointmentId, appointments) === 'PAID') {
-		temptData = blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_PAID', blockTimeId, isVip, isWarning);
+		temptData = blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_PAID', blockTimeId, isVip, isWarning, isFavorite);
 	} else if (checkStatusAppointment(appointmentId, appointments) === 'REFUND') {
-		temptData = blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_REFUND', blockTimeId, isVip, isWarning);
+		temptData = blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_REFUND', blockTimeId, isVip, isWarning, isFavorite);
 	} else if (checkStatusAppointment(appointmentId, appointments) === 'ASSIGNED') {
-		temptData = blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_ASSIGNED', blockTimeId, isVip, isWarning);
+		temptData = blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_ASSIGNED', blockTimeId, isVip, isWarning, isFavorite);
 	} else if (checkStatusAppointment(appointmentId, appointments) === 'CONFIRMED') {
-		temptData = blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CONFIRMED', blockTimeId, isVip, isWarning);
+		temptData = blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CONFIRMED', blockTimeId, isVip, isWarning, isFavorite);
 	} else if (checkStatusAppointment(appointmentId, appointments) === 'CHECKED_IN') {
-		temptData = blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CHECKED_IN', blockTimeId, isVip, isWarning);
+		temptData = blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CHECKED_IN', blockTimeId, isVip, isWarning, isFavorite);
 	} else if (checkStatusAppointment(appointmentId, appointments) === 'no show') {
-		mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'no show', blockTimeId, isVip, isWarning));
+		temptData = blockTemp(memberId, start, end, note, appointmentId, 'no show', blockTimeId, isVip, isWarning, isFavorite);
 	}
 	else {
 		temptData = blockTemp(memberId, start, end, [], appointmentId, 'BLOCK_TEMP', blockTimeId);
@@ -1069,14 +1091,16 @@ const mapAppointmentAnyStaff = (appointments, events) => {
 				appointment.status === 'VOID' ||
 				appointment.status === 'REFUND' ||
 				appointment.status === 'BLOCK_TEMP_PAID' ||
-				appointment.status === 'BLOCK_TEMP_REFUND'
+				appointment.status === 'BLOCK_TEMP_REFUND' ||
+				appointment.status === 'no show'
 			),
 			resourceEditable: !(
 				appointment.status === 'PAID' ||
 				appointment.status === 'VOID' ||
 				appointment.status === 'REFUND' ||
 				appointment.status === 'BLOCK_TEMP_PAID' ||
-				appointment.status === 'BLOCK_TEMP_REFUND'
+				appointment.status === 'BLOCK_TEMP_REFUND' ||
+				appointment.status === 'no show'
 			)
 		});
 	});

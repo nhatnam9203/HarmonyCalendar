@@ -298,7 +298,7 @@ class FCDragZone extends React.PureComponent {
 								</div>
 								{
 									event.options.map((option, index) => {
-										if (index && index === 0) {
+										if (typeof index === "number" && index === 0) {
 											return (
 												<div
 													className={"app-event__option " + slidesToShow === 5 ? "option_waiting" : "option_waiting2"}
@@ -314,7 +314,7 @@ class FCDragZone extends React.PureComponent {
 								}
 								{
 									event.categories && event.categories.map((option, index) => {
-										if (index === 0) {
+										if (typeof index === "number" && index === 0) {
 											return (
 												<div
 													className={"app-event__option option_categories " + slidesToShow === 5 ? "option_waiting" : "option_waiting2"}

@@ -150,7 +150,7 @@ const splitNotes = (note) => {
 	}
 }
 
-export function blockTemp(memberId, start, end, note, appointmentId, status, blockId, isVip, isWarning) {
+export function blockTemp(memberId, start, end, note, appointmentId, status, blockId, isVip, isWarning, isFavorite) {
 	let tempNote = splitNotes(note);
 	return {
 		status,
@@ -172,6 +172,7 @@ export function blockTemp(memberId, start, end, note, appointmentId, status, blo
 		blockService: tempNote.blockService ? tempNote.blockService : "",
 		isBlock: true,
 		isWarning,
+		isFavorite
 	};
 }
 
@@ -218,21 +219,23 @@ export function addBlockCalendar(appointmentsMembers, displayedMembers, currentD
 			const blockTimeId = blockTimeMember[i].blockTimeId;
 			const isWarning = blockTimeMember[i].isWarning;
 			const app = appointments.find(obj => obj.id === appointmentId);
-			const isVip = app ? app.isVip : 0
+			const isVip = app ? app.isVip : 0;
+
+			const isFavorite = blockTimeMember[i].isFavorite;
 
 			if (checkStatusAppointment(appointmentId, appointments) === 'PAID') {
-				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_PAID', blockTimeId, isVip, isWarning));
+				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_PAID', blockTimeId, isVip, isWarning, isFavorite));
 			} else if (checkStatusAppointment(appointmentId, appointments) === 'REFUND') {
-				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_REFUND', blockTimeId, isVip, isWarning));
+				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_REFUND', blockTimeId, isVip, isWarning, isFavorite));
 			} else if (checkStatusAppointment(appointmentId, appointments) === 'ASSIGNED') {
-				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_ASSIGNED', blockTimeId, isVip, isWarning));
+				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_ASSIGNED', blockTimeId, isVip, isWarning, isFavorite));
 			} else if (checkStatusAppointment(appointmentId, appointments) === 'CONFIRMED') {
-				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CONFIRMED', blockTimeId, isVip, isWarning));
+				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CONFIRMED', blockTimeId, isVip, isWarning, isFavorite));
 			} else if (checkStatusAppointment(appointmentId, appointments) === 'CHECKED_IN') {
-				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CHECKED_IN', blockTimeId, isVip, isWarning));
+				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CHECKED_IN', blockTimeId, isVip, isWarning, isFavorite));
 			}
 			else if (checkStatusAppointment(appointmentId, appointments) === 'no show') {
-				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'no show', blockTimeId, isVip, isWarning));
+				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'no show', blockTimeId, isVip, isWarning, isFavorite));
 			}
 			else {
 				mem.appointments.push(blockTemp(memberId, start, end, [], appointmentId, 'BLOCK_TEMP', blockTimeId));
@@ -449,10 +452,6 @@ export function dataChangeTimeAppointment(
 		} else {
 			status = statusConvertData[appointment.status];
 		}
-	}
-
-	if(appointment.status === "CONFIRMED"){
-		status = "confirm";
 	}
 
 	return {

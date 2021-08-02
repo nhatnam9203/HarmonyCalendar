@@ -255,6 +255,12 @@ const GlobalStyle = createGlobalStyle`
     right: 5px;
     top : 5px;
   }
+  .app-event__heart{
+    position : absolute;
+    right: 25px;
+    top : 5px;
+  }
+
 
   .app-event__full-name3 {
     position : absolute;
