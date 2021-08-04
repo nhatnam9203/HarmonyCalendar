@@ -582,6 +582,7 @@ export function addLastStaff(members) {
 }
 
 export function addBlockAnyStaff(merchantInfo, currentDayName, currentDate, appointments) {
+	console.log({ appointments })
 	const businessHour = Object.entries(merchantInfo.businessHour).find((b) => b[0] === currentDayName);
 	if (merchantInfo) {
 		const blockStart = block(

@@ -150,6 +150,7 @@ export function* reloadCalendarSaga() {
 
 		// addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery, appointments);
 		yield put(actions.loadedAllAppointments(appointments));
+		console.log({ appointments })
 		yield put(actions.appointmentByMembersLoaded(appointmentsMembers));
 		yield put(actions.getBlockTime());
 		if (navigator.onLine) {
@@ -300,6 +301,7 @@ export function* reRenderAppointment() {
 
 		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery, appointments);
 		yield put(actions.appointmentByMembersLoaded(appointmentsMembers));
+
 		addEventsToCalendar(currentDate, appointmentsMembers);
 
 		if (isFirstLoadCalendar) {
