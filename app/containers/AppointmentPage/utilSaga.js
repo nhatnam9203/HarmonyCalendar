@@ -617,11 +617,13 @@ export function adapterServicesMoved(services = [], staffId) {
 export const blockTempFrontEnd = (appointment, newEndTime, currentDate) => {
 	const currentDayName = moment(currentDate).format('dddd');
 
-	const { memberId, start, firstName, phoneNumber, createdDate, options, products, extras } = appointment;
+	const { memberId, start, firstName, phoneNumber, createdDate, options } = appointment;
 
 	const blockTimeStart = `${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(start).format('HH:mm:ss')}`;
 
 	const blockTimeEnd = `${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(newEndTime).format('HH:mm:ss')}`;
+	let services = `${firstName}<br>${phoneNumber}<br>${tempServices(options)}`;
+	services = services.replace(/,/g, '');
 
 	return {
 		appointmentId: appointment.id,
@@ -634,15 +636,16 @@ export const blockTempFrontEnd = (appointment, newEndTime, currentDate) => {
 		isDisabled: 0,
 		isPaid: false,
 		merchantId: "",
-		note: `${firstName}<br>${phoneNumber}<br>${tempServices(options)}${tempProducts(products)}${tempExtras(extras)}`,
+		note: services,
 		staffId: memberId,
 		workingDate: `${moment(start).format('YYYY-MM-DD')}T00:00:00`,
 		isFavorite: false,
-		isVip: false,
+		isVip: (appointment.isVip === 1 || appointment.isVip) ? true : false,
 		isWarning: false,
 		status: 'checkin'
 	}
 }
+
 
 const tempServices = (services) => {
 	return services.map(sv => "- " + sv.serviceName + "<br>");

@@ -279,16 +279,10 @@ class Calendar extends React.Component {
 								this.props.deselectAppointment();
 								this.props.disable_Calendar(false);
 
-								const displayMember = store
-									.getState()
-									.getIn(['appointment', 'appointments', 'calendar']);
-								const selectDay = store.getState().getIn(['appointment', 'currentDay']);
-
 								switch (appointment_R.status) {
 									case 'WAITING':
 										this.props.addAppointmentWaiting(appointment_R);
-										this.props.deleteAppointmentCalendar(appointment_R);
-										addEventsToCalendar(selectDay, displayMember);
+		
 										break;
 
 									case 'CANCEL':
@@ -303,17 +297,7 @@ class Calendar extends React.Component {
 										break;
 
 									default:
-										const blockTimes = store
-											.getState()
-											.getIn(['appointment', 'members', 'blockTime']);
-
-											const pos = blockTimes.findIndex((app) => app.appointmentId === appointment_R.id);
-											if (pos === -1) {
-											this.addAppointmentFromSignalr(appointment_R);
-										} else {
-											// this.props.updateAppointmentPaid(appointment_R);
-											// this.props.renderAppointment();
-										}
+	
 										this.props.removeAppointmentWaiting(appointment_R);
 
 										break;

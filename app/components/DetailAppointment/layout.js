@@ -13,11 +13,13 @@ import {
 	PopupTip, Header, PopupCancel, BottomButton
 } from './widget';
 import ReactLoading from 'react-loading';
+import LoadingDetail from "./widget/LoadingDetail";
 import closeBlack from '../../images/close_black.png';
 import closeWhite from '../../images/close_white.png'
 import iconCalendarGrey from '../../images/iconCalendarGrey.png';
 import topArrow from '../../images/top_arrow@3x.png';
 import alertIcon from "../../images/alert.png";
+import { appointmentMoved } from '../../containers/AppointmentPage/actions';
 
 const AppPopup = styled(Popup)`
 	border-radius: 1.5rem;
@@ -687,7 +689,7 @@ class Appointment extends React.Component {
 						<tr>
 							<th
 								style={{
-									width: status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' ? '63%' : '50%'
+									width: status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' && status !== 'no show' ? '63%' : '50%'
 								}}
 							>
 								Selected Products
@@ -695,7 +697,7 @@ class Appointment extends React.Component {
 							<th
 								style={{
 									width:
-										status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' ? '20%' : '25%',
+										status !== 'PAID' && status !== 'VOID' && status !== 'REFUND' && status !== 'no show' ? '20%' : '25%',
 									textAlign: 'center'
 								}}
 							>
