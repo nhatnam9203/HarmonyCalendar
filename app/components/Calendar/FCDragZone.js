@@ -33,6 +33,7 @@ const DragZoneWrapper = styled.div`
 	-ms-user-select: none;
 	-o-user-select: none;
 	user-select: none;
+	touch-action: manipulation;
 	display : flex;
 	flex-direction: column;
 	justify-content: space-between;
@@ -57,6 +58,7 @@ const WaitingEvent = styled.div`
   -ms-user-select: none;
   -o-user-select: none;
   user-select: none;
+  touch-action: manipulation;
   height: calc(100vh - 8.8rem - 6rem);
   @media (min-width: 1025px) {
 	height: calc(100vh - 10rem - 6rem);

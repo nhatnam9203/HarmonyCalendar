@@ -18,6 +18,7 @@ const DaySelectorWrapper = styled.div`
   -ms-user-select: none;
   -o-user-select: none;
   user-select: none;
+  touch-action: manipulation;
   @media (min-width: 1025px) {
       height : 5rem;
 	  }

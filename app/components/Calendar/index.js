@@ -35,7 +35,7 @@ const CalendarWrapper = styled.div`
 
 const MainCalendar = styled.div`
 	flex: 1 0;
-	overflow: hidden;
+	/* overflow: hidden; */
 	border-right: 1px solid #3883bb;
 	-webkit-user-select: none; 
 	-moz-user-select: none; 
@@ -215,7 +215,6 @@ class Calendar extends React.Component {
 		connection.serverTimeoutInMilliseconds = 6000000;
 
 		connection.on('ListWaNotification', async (data) => {
-			console.log({ data });
 			let app = JSON.parse(data);
 			if (app.data) {
 				let type = app.data.Type;

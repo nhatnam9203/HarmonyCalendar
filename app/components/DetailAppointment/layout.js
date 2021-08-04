@@ -13,13 +13,11 @@ import {
 	PopupTip, Header, PopupCancel, BottomButton
 } from './widget';
 import ReactLoading from 'react-loading';
-import LoadingDetail from "./widget/LoadingDetail";
 import closeBlack from '../../images/close_black.png';
 import closeWhite from '../../images/close_white.png'
 import iconCalendarGrey from '../../images/iconCalendarGrey.png';
 import topArrow from '../../images/top_arrow@3x.png';
 import alertIcon from "../../images/alert.png";
-import { appointmentMoved } from '../../containers/AppointmentPage/actions';
 
 const AppPopup = styled(Popup)`
 	border-radius: 1.5rem;
