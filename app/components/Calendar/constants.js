@@ -705,6 +705,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 
 						/* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
 						$('#full-calendar').fullCalendar('removeEvents', event._id);
+						store.dispatch(loadingCalendar(true));
 						store.dispatch(
 							editBlockTime({
 								start: event.data.start,

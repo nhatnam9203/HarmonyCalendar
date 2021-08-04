@@ -108,14 +108,16 @@ class Calendar extends React.Component {
 			}
 
 			if (action === 'appointmentNotification') {
-				this.props.onChangeDay(moment(data.data.appointmentDate).format('DDMMYYYY'));
-				this.props.scrollToAppointment(data.data.appointmentId);
-				let app = {
-					...data.data,
-					id: data.data.appointmentId,
-					end: data.data.createdDate,
+				if(data.data.appointmentId !== 0){
+					this.props.onChangeDay(moment(data.data.appointmentDate).format('DDMMYYYY'));
+					this.props.scrollToAppointment(data.data.appointmentId);
+					let app = {
+						...data.data,
+						id: data.data.appointmentId,
+						end: data.data.createdDate,
+					}
+					this.props.getApppointmentById({ appointment: app });
 				}
-				this.props.getApppointmentById({ appointment: app });
 			}
 		}
 	};
