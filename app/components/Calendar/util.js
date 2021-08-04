@@ -1,8 +1,7 @@
 
-import { statusConvertKey } from '../../containers/AppointmentPage/utilSaga';
+import { statusConvertKey, block } from '../../containers/AppointmentPage/utilSaga';
 import moment from 'moment'
 import moment_tz from 'moment-timezone'
-import { formatPhoneCalendar } from '../../utils/helper';
 import { store } from 'app';
 
 const notesAdapter = (notes) => {
@@ -126,31 +125,7 @@ export function checkAnyStaffFuture() {
     return false;
 }
 
-const OPTION_RENDER_TEMPLATE = (option) => `<div class="app-event__option">- ${option.serviceName}</div>`;
-const PRODUCT_RENDER_TEMPLATE = (product) => `<div class="app-event__option">- ${product.productName}</div>`;
-const EXTRAS_RENDER_TEMPLATE = (extra) => `<div class="app-event__option">- ${extra.extraName}</div>`;
-
 const BLOCK_RENDER_SERVICE = (obj) => `<div class="app-event__option">${obj}</div>`;
-
-
-export const EVENT_RENDER_TEMPLATE = (event) => `
-  <div class="app-event222 apppointment-calendar">
-    <div class="app-event__full-name">${event.userFullName}</div>
-    <div class="app-event__phone-number">
-    ${formatPhoneCalendar(event.phoneNumber)}</div>
-    <div class="app-event__option-container">
-        ${event.options.filter(obj => obj.staffId === event.memberId).map((option) => OPTION_RENDER_TEMPLATE(option)).join('')}
-    </div>
-    <div class="app-event__option-container">
-        ${event.products.map((product) => PRODUCT_RENDER_TEMPLATE(product)).join('')}
-    </div>
-    <div class="app-event__option-container">
-        ${event.extrasRender.map((extra) => EXTRAS_RENDER_TEMPLATE(extra)).join('')}
-    </div>
-    <div class="app-event__id-number">${event.code}</div>
-    <div class="app-event__appointmentId">${event.id}</div>
-  </div>
-`;
 
 export const EVENT_RENDER_TEMPLATE_BLOCK = (event) => `
   <div class="app-event apppointment-calendar">
@@ -175,4 +150,33 @@ export const extrasRender = (services = [], extras = []) => {
         }
     }
     return arrTemp;
+}
+
+export function BlockAnyStaff(merchantInfo, currentDayName, currentDate) {
+	const businessHour = Object.entries(merchantInfo.businessHour).find((b) => b[0] === currentDayName);
+	if (merchantInfo) {
+		const blockStart = block(
+			0,
+			`${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(businessHour[1].timeEnd, [
+				'h:mm A'
+			]).format('HH:mm:ss')}`,
+			`${moment(currentDate).day(currentDayName).endOf('days').format('YYYY-MM-DD')}T${moment()
+				.endOf('days')
+				.subtract(1, 'seconds')
+				.format('HH:mm:ss')}`
+		);
+		const blockEnd = block(
+			0,
+			`${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment()
+				.startOf('days')
+				.format('HH:mm:ss')}`,
+			`${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(businessHour[1].timeStart, [
+				'h:mm A'
+			]).format('HH:mm:ss')}`
+		);
+		return {
+			blockStart,
+			blockEnd
+		}
+	}
 }

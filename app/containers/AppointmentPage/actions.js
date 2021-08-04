@@ -134,6 +134,7 @@ import {
 	GET_APPOINTMENT_ANY_STAFF,
 	ANYSTAFF_ASSIGN_TO_STAFF,
 	FIRST_LOAD_CALENDAR,
+	GET_STAFF_OF_SERVICE,
 } from './constants';
 
 /**
@@ -434,18 +435,6 @@ export function putBackAppointment(appointment) {
 }
 
 /**
- * Dispatched when put back appointment to waiting list by the request saga
- * @param  {object} appointment
- * @return {object} An action object with a type of PUT_BACK_APPOINTMENT_SUCCESS passing the members
- */
-export function appointmentPutBack(appointment) {
-	return {
-		type: PUT_BACK_APPOINTMENT_SUCCESS,
-		appointment
-	};
-}
-
-/**
  * Dispatched when putting back appointment to waiting fails
  * @param  {object} error The error
  * @return {object} An action object with a type of PUT_BACK_APPOINTMENT_ERROR passing the error
@@ -504,18 +493,6 @@ export function updateStatusAppointment(appointmentId, bookingServices) {
 		type: UPDATE_STATUS_APPOINTMENT,
 		appointmentId,
 		bookingServices
-	};
-}
-
-/**
- * Dispatched when update status of appointment to waiting list by the request saga
- * @param  {number} appointmentId
- * @return {object} An action object with a type of UPDATE_STATUS_APPOINTMENT_SUCCESS passing the members
- */
-export function appointmentUpdatedStatus(appointment) {
-	return {
-		type: UPDATE_STATUS_APPOINTMENT_SUCCESS,
-		appointment
 	};
 }
 
@@ -647,10 +624,6 @@ export const changeAppointmentTime = (appointment) => ({
 	appointment
 });
 
-export const changeAppointmentTime_Success = (appointment) => ({
-	type: CHANGE_APPOINTMENT_TIME_SUCCESS,
-	appointment
-});
 export const changeAppointmentTime_Error = (appointment) => ({
 	type: CHANGE_APPOINTMENT_TIME_ERROR,
 	appointment
@@ -671,11 +644,6 @@ export const updateAppointmentOfflineError = (data) => ({
 
 export const addAppointmentWaiting = (data) => ({
 	type: ADD_APPOINTMENT_TO_WAITING,
-	data
-});
-
-export const addAppointmentReloadCalendar = (data) => ({
-	type: ADD_APPOINTMENT_RELOAD_CALENDAR,
 	data
 });
 

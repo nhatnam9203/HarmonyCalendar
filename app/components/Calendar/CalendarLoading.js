@@ -15,6 +15,7 @@ const LoadingCalendar = styled.div`
     font-size: 24px;
     justify-content : center;
     align-items: center;
+    overflow: hidden;
     /* padding-left : 45%; */
 `
 

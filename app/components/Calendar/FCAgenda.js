@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import moment from 'moment';
 import $ from 'jquery';
 import moment_tz from 'moment-timezone'
@@ -7,18 +6,20 @@ import moment_tz from 'moment-timezone'
 class FCAgenda extends React.Component {
 
   componentDidMount() {
-    const { options, merchantInfo } = this.props;
+    const { options } = this.props;
     $('#full-calendar').fullCalendar(options());
-    // $('.fc-now-indicator-arrow').html(moment().format('hh:mm'));
   }
 
   componentWillReceiveProps(nextProps) {
     const { disableCalendar, merchantInfo } = nextProps;
+
     if (this.props.merchantInfo !== merchantInfo) {
       const { timezone } = merchantInfo;
+
       let tz = timezone ? timezone.toString().substring(12) : null;
       let calendarOptions = $('#full-calendar').fullCalendar('getView').options;
       calendarOptions.now = tz ? moment_tz.tz(tz) : moment().local();
+
       $('#full-calendar').fullCalendar('destroy');
       $('#full-calendar').fullCalendar(calendarOptions);
       $('#full-calendar').fullCalendar('render');
@@ -34,9 +35,5 @@ class FCAgenda extends React.Component {
     return <div id="full-calendar" />;
   }
 }
-
-FCAgenda.propTypes = {
-  // options: PropTypes.object,
-};
 
 export default FCAgenda;

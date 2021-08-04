@@ -126,7 +126,7 @@ export function scrollToNow() {
 			x[i].scrollIntoView();
 		}
 
-	}, 600);
+	}, 50);
 }
 
 export function convertMinsToHrsMins(mins) {

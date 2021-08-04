@@ -22,6 +22,7 @@ import {
   makeQtyResource,
   makeAssignAnyStaffToStaff,
   makeFirstReload,
+  makeBlockTime
 } from './selectors';
 
 import {
@@ -47,6 +48,7 @@ import {
   countAppointmentAnyStaff,
   getAppointmentAnyStaff,
   anystaffAssignStaff,
+  loadingCalendar
 } from './actions';
 
 export function mapDispatchToProps(dispatch) {
@@ -73,6 +75,7 @@ export function mapDispatchToProps(dispatch) {
     countAppointmentAnyStaff : (payload) =>dispatch(countAppointmentAnyStaff(payload)),
     getAppointmentAnyStaff : (payload) =>dispatch(getAppointmentAnyStaff(payload)),
     anystaffAssignStaff : (payload) =>dispatch(anystaffAssignStaff(payload)),
+    loadingCalendar : (payload) =>dispatch(loadingCalendar(payload)),
   };
 }
 
@@ -94,6 +97,7 @@ const mapStateToProps = createStructuredSelector({
   qtyResources : makeQtyResource(),
   isAssignAnyStaffToStaff : makeAssignAnyStaffToStaff(),
   isFirstReloadCalendar : makeFirstReload(),
+  blockTimes: makeBlockTime(),
 });
 
 const withConnect = connect(

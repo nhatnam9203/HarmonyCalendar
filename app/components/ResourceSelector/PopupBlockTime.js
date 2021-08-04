@@ -194,6 +194,7 @@ class PopupBlockTime extends Component {
 			app.status === 'BLOCK_TEMP_PAID' ||
 			app.status === 'BLOCK_TEMP_REFUND' ||
 			app.status === 'BLOCK_TEMP_ASSIGNED' ||
+			app.status === 'BLOCK_TEMP_CONFIRMED' ||
 			app.status === 'BLOCK_TEMP_CHECKED_IN' ||
 			app.status === 'BLOCK_TEMP_PAID').length;
 
@@ -358,6 +359,7 @@ class PopupBlockTime extends Component {
 		return (
 			<StaffBody>
 				<StaffBody.Title>Add Blocked Time</StaffBody.Title>
+
 				<Row>
 					<div style={styles.titleBody}>Time</div>
 					<div onClick={() => this.setState({ isPopupSelectTime: true, isStart: true })}>
@@ -367,7 +369,9 @@ class PopupBlockTime extends Component {
 							<img style={{ width: 11, height: 11, marginLeft: 5 }} src={require("../../images/down-arrow.png")} />
 						</div>
 					</div>
+
 					<p style={{ marginLeft: 8, marginTop: 7, fontWeight: '500', fontSize: 16 }}> - </p>
+
 					<div onClick={() => this.setState({ isPopupSelectTime: true, isEnd: true })}>
 						<div style={styles.select}>
 							{end}
@@ -375,6 +379,7 @@ class PopupBlockTime extends Component {
 						</div>
 					</div>
 				</Row>
+
 				<Row>
 					<div style={styles.titleBody}>Reason</div>
 					<div>
@@ -385,6 +390,7 @@ class PopupBlockTime extends Component {
 						/>
 					</div>
 				</Row>
+
 				{!blockTimeEdit && (
 					<div style={styles.bottom}>
 						<div onClick={() => this.submitEditBlock()} style={styles.btnSubmit}>Submit</div>
@@ -433,7 +439,7 @@ class PopupBlockTime extends Component {
 
 	render() {
 		const { popupPincode, staff } = this.props;
-		const { isPopupSelectTime, isAddBlock , isPopupDelete } = this.state;
+		const { isPopupSelectTime , isPopupDelete } = this.state;
 
 		if (popupPincode === false) return '';
 		return (

@@ -144,6 +144,9 @@ const makeAssignAnyStaffToStaff = () =>
 const makeFirstReload = () =>
 	createSelector(currentAppointment, (appointmentState) => appointmentState.get('isFirstLoadCalendar'));
 
+const makeBlockTime = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.getIn(['members', 'blockTime']));
+
 export {
 	currentAppointment,
 	makeCurrentDay,
@@ -189,4 +192,5 @@ export {
 	makeResourceWidth,
 	makeAssignAnyStaffToStaff,
 	makeFirstReload,
+	makeBlockTime
 };

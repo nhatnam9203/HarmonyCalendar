@@ -6,11 +6,9 @@ import 'jquery-ui';
 import moment from 'moment';
 import ConfirmDeleteWaiting from './ConfirmDeleteWaiting';
 import { formatPhone } from '../../utils/helper';
-import call from '../../images/call.png';
 import ButtonSplash from './ButtonSplash';
 import { store } from 'app';
-import { disableCalendar, getApppointmentById } from '../../containers/AppointmentPage/actions';
-import { isEmpty } from "lodash";
+import { disableCalendar, getApppointmentById, loadingCalendar } from '../../containers/AppointmentPage/actions';
 
 import { getWindowSize } from "../../utils/helper";
 
@@ -73,6 +71,7 @@ const BtnClose = styled.div`
 	font-size: 2rem;
 	color: #ffffff;
 	cursor: pointer;
+	z-index: 9;
 	& > img{
 		width : 15px;
 		height : 15px;
@@ -200,6 +199,7 @@ class FCDragZone extends React.PureComponent {
 	}
 
 	selectAppointment(appointment) {
+		store.dispatch(loadingCalendar(true));
 		store.dispatch(getApppointmentById({ appointment, event: null }));
 		store.dispatch(disableCalendar(true));
 	}

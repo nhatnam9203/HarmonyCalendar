@@ -1,5 +1,14 @@
 import moment from 'moment';
 
+export const statusConvertBlock = {
+	ASSIGNED: 'BLOCK_TEMP_ASSIGNED',
+	CONFIRMED: 'BLOCK_TEMP_CONFIRMED',
+	CHECKED_IN: 'BLOCK_TEMP_CHECKED_IN',
+	PAID: 'BLOCK_TEMP_PAID',
+	VOID: 'BLOCK_TEMP_REFUND',
+	REFUND: 'BLOCK_TEMP_REFUND',
+};
+
 export const statusConvertData = {
 	ASSIGNED: 'unconfirm',
 	CONFIRMED: 'confirm',
@@ -167,7 +176,7 @@ export function blockTemp(memberId, start, end, note, appointmentId, status, blo
 		extras: [],
 		notes: [],
 		blockId,
-		blockName: tempNote.blockName ? tempNote.blockName : "",
+		blockName: status === "BLOCK_TEMP" ? "" : tempNote.blockName ? tempNote.blockName : "",
 		blockPhone: tempNote.blockPhone ? tempNote.blockPhone.toString().replace("+84", "").replace("+1", "") : "",
 		blockService: tempNote.blockService ? tempNote.blockService : "",
 		isBlock: true,
@@ -176,72 +185,8 @@ export function blockTemp(memberId, start, end, note, appointmentId, status, blo
 	};
 }
 
-export function checkStatusAppointment(appointmentId, appointments) {
-	let find = false;
-	appointments.forEach(appointment => {
-		if (appointment.id === appointmentId) {
-			if (appointment.status === 'PAID')
-				find = 'PAID';
-			if (appointment.status === 'REFUND' || appointment.status === 'VOID')
-				find = 'REFUND'
-			if (appointment.status === 'ASSIGNED')
-				find = 'ASSIGNED'
-			if (appointment.status === 'CONFIRMED')
-				find = 'CONFIRMED'
-			if (appointment.status === 'CHECKED_IN')
-				find = 'CHECKED_IN'
-			if (appointment.status === 'no show')
-				find = 'no show'
-		}
-	})
-	return find
-}
-
-export function addBlockCalendar(appointmentsMembers, displayedMembers, currentDate, apiDateQuery, appointments) {
+export function addBlockCalendar(appointmentsMembers, displayedMembers, currentDate) {
 	const currentDayName = moment(currentDate).format('dddd');
-	/* ADD BLOCK TEMP ( YELLOW BLOCK ) */
-	appointmentsMembers.forEach((mem) => {
-		const memFind = displayedMembers.find((member) => member.id === mem.memberId);
-		const blockTimeMember = memFind.blockTime.filter(
-			(b) => moment(b.workingDate).format('YYYY-MM-DD') === apiDateQuery
-		);
-
-		for (let i = 0; i < blockTimeMember.length; i++) {
-			const memberId = mem.memberId;
-			const start = `${moment(currentDate).format('YYYY-MM-DD')}T${moment(blockTimeMember[i].blockTimeStart, [
-				'h:mm A'
-			]).format('HH:mm:ss')}`;
-			const end = `${moment(currentDate).format('YYYY-MM-DD')}T${moment(blockTimeMember[i].blockTimeEnd, [
-				'h:mm A'
-			]).format('HH:mm:ss')}`;
-			const note = blockTimeMember[i].note;
-			const appointmentId = blockTimeMember[i].appointmentId;
-			const blockTimeId = blockTimeMember[i].blockTimeId;
-			const isWarning = blockTimeMember[i].isWarning;
-			const app = appointments.find(obj => obj.id === appointmentId);
-			const isVip = app ? app.isVip : 0;
-
-			const isFavorite = blockTimeMember[i].isFavorite;
-
-			if (checkStatusAppointment(appointmentId, appointments) === 'PAID') {
-				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_PAID', blockTimeId, isVip, isWarning, isFavorite));
-			} else if (checkStatusAppointment(appointmentId, appointments) === 'REFUND') {
-				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_REFUND', blockTimeId, isVip, isWarning, isFavorite));
-			} else if (checkStatusAppointment(appointmentId, appointments) === 'ASSIGNED') {
-				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_ASSIGNED', blockTimeId, isVip, isWarning, isFavorite));
-			} else if (checkStatusAppointment(appointmentId, appointments) === 'CONFIRMED') {
-				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CONFIRMED', blockTimeId, isVip, isWarning, isFavorite));
-			} else if (checkStatusAppointment(appointmentId, appointments) === 'CHECKED_IN') {
-				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CHECKED_IN', blockTimeId, isVip, isWarning, isFavorite));
-			}
-			else if (checkStatusAppointment(appointmentId, appointments) === 'no show') {
-				mem.appointments.push(blockTemp(memberId, start, end, note, appointmentId, 'no show', blockTimeId, isVip, isWarning, isFavorite));
-			}
-			else {
-				mem.appointments.push(blockTemp(memberId, start, end, [], appointmentId, 'BLOCK_TEMP', blockTimeId));
-			}
-		}
-	});
 
 	/* ADD BLOCK ( GREY BLOCK ) */
 	appointmentsMembers.forEach((mem) => {
@@ -582,7 +527,6 @@ export function addLastStaff(members) {
 }
 
 export function addBlockAnyStaff(merchantInfo, currentDayName, currentDate, appointments) {
-	console.log({ appointments })
 	const businessHour = Object.entries(merchantInfo.businessHour).find((b) => b[0] === currentDayName);
 	if (merchantInfo) {
 		const blockStart = block(
@@ -670,13 +614,20 @@ export function adapterServicesMoved(services = [], staffId) {
 	return arrTemp;
 }
 
-export const blockTempFrontEnd = (appointment, newEndTime) => {
+export const blockTempFrontEnd = (appointment, newEndTime, currentDate) => {
+	const currentDayName = moment(currentDate).format('dddd');
+
 	const { memberId, start, firstName, phoneNumber, createdDate, options, products, extras } = appointment;
+
+	const blockTimeStart = `${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(start).format('HH:mm:ss')}`;
+
+	const blockTimeEnd = `${moment(currentDate).day(currentDayName).format('YYYY-MM-DD')}T${moment(newEndTime).format('HH:mm:ss')}`;
+
 	return {
 		appointmentId: appointment.id,
-		blockTimeEnd: moment(newEndTime).format('hh:mm A'),
+		blockTimeEnd,
 		blockTimeId: "",
-		blockTimeStart: moment(start).format('hh:mm A'),
+		blockTimeStart,
 		bookingServiceId: "",
 		createdDate,
 		editable: false,
@@ -685,7 +636,11 @@ export const blockTempFrontEnd = (appointment, newEndTime) => {
 		merchantId: "",
 		note: `${firstName}<br>${phoneNumber}<br>${tempServices(options)}${tempProducts(products)}${tempExtras(extras)}`,
 		staffId: memberId,
-		workingDate: `${moment(start).format('YYYY-MM-DD')}T00:00:00`
+		workingDate: `${moment(start).format('YYYY-MM-DD')}T00:00:00`,
+		isFavorite: false,
+		isVip: false,
+		isWarning: false,
+		status: 'checkin'
 	}
 }
 
@@ -699,4 +654,37 @@ const tempExtras = (extras) => {
 
 const tempProducts = (products) => {
 	return products.map(p => "- " + p.productName + "<br>");
+}
+
+
+export const convertStatus = (statusVarieable) => {
+	let status = 'BLOCK_TEMP';
+	switch (statusVarieable) {
+		case 'paid':
+			status = 'BLOCK_TEMP_PAID';
+			break;
+		case 'refund':
+			status = 'BLOCK_TEMP_REFUND';
+			break;
+		case 'void':
+			status = 'BLOCK_TEMP_REFUND';
+			break;
+		case 'unconfirm':
+			status = 'BLOCK_TEMP_ASSIGNED';
+			break;
+		case 'confirm':
+			status = 'BLOCK_TEMP_CONFIRMED';
+			break;
+		case 'checkin':
+			status = 'BLOCK_TEMP_CHECKED_IN';
+			break;
+		case 'no show':
+			status = 'no show';
+			break;
+
+		default:
+			break;
+	}
+
+	return status;
 }

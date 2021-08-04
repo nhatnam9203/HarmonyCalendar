@@ -82,8 +82,8 @@ class ResourceSelector extends layout {
 	}
 
 	findSlideScroll = (appointmentId) => {
-		const { allAppointment, resources, slideIndex } = this.props;
-		let app = allAppointment.find(app => app.id === appointmentId);
+		const { resources, slideIndex , blockTimes} = this.props;
+		let app = blockTimes.find(app => app.appointmentId === appointmentId);
 
 		if (app) {
 			const { memberId } = app;
@@ -150,9 +150,13 @@ class ResourceSelector extends layout {
 	onTodayClick() {
 		const { timezone } = this.props.merchantInfo;
 		let timeNow = timezone ? moment_tz.tz(timezone.substring(12)).format('DDMMYYYY') : moment().format('DDMMYYYY');
-		this.props.countAppointmentAnyStaff({ date: moment(timeNow, ['DDMMYYYY']).format('YYYY-MM-DD'), isDayClick: true, isReloadCalendar: true });
+		this.props.loadingCalendar(true);
+		this.props.countAppointmentAnyStaff({ 
+			date: moment(timeNow, ['DDMMYYYY']).format('YYYY-MM-DD'), 
+			isDayClick: true, 
+			isReloadCalendar: true 
+		});
 		localStorage.setItem('scrollNow', true);
-		// this.props.onChangeToday(timeNow);
 	}
 
 	openPincode(staff) {

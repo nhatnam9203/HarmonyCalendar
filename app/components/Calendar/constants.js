@@ -4,11 +4,11 @@ import moment_tz from 'moment-timezone';
 import { store } from 'app';
 import {
 	checkDragWaitingInThePast,
-	EVENT_RENDER_TEMPLATE,
 	EVENT_RENDER_TEMPLATE_BLOCK,
 	checkAnyStaffFuture,
-	extrasRender,
+	BlockAnyStaff
 } from './util';
+
 import {
 	assignAppointment,
 	moveAppointment,
@@ -17,10 +17,11 @@ import {
 	TimeAndStaffID,
 	getApppointmentById,
 	editBlockTime,
+	loadingCalendar
 } from '../../containers/AppointmentPage/actions';
 import vip from '../../images/vip.png';
 import heart from "../../images/heart.png";
-import { blockTemp, checkStatusAppointment } from "../../containers/AppointmentPage/utilSaga";
+import { blockTemp, convertStatus } from "../../containers/AppointmentPage/utilSaga";
 
 
 const resouceDesktop = [
@@ -65,7 +66,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 
 			/* book any staff */
 			if (parseInt(resource.id) === 0) {
-				const allAppointment = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
+				const blockTimes = store.getState().getIn(['appointment', 'members', 'blockTime']);
 				let allMember = store.getState().getIn(['appointment', 'members', 'all']);
 				let count = 0;
 				let countAppAnyStaff = 0;
@@ -73,7 +74,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 				let displayAllMember = allMember.map((mem) => {
 					return {
 						member: mem,
-						appointments: allAppointment.filter((app) => app.memberId === mem.id)
+						appointments: blockTimes.filter((app) => app.staffId === mem.id)
 					};
 				});
 
@@ -108,12 +109,9 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 								el.appointments.forEach((app) => {
 									if (
 										// check appointment available ở các cột staff
-										moment(start).isBefore(moment(app.end)) &&
-										moment(start).isSameOrAfter(moment(app.start)) &&
-										(app.status === 'CHECKED_IN' ||
-											app.status === 'CONFIRMED' ||
-											app.status === 'BLOCK_TEMP')
-										// (app.memberId !== 0)
+										moment(start).isBefore(moment(app.blockTimeEnd)) &&
+										moment(start).isSameOrAfter(moment(app.blockTimeStart)) &&
+										(app.status === 'checkin' || app.status === 'confirm' || app.status === null)
 									) {
 										if (_j === 0) {
 											count = count + 1;
@@ -123,9 +121,9 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 
 									if (
 										// check appointment available ở cột any staff
-										moment(start).isBefore(moment(app.end)) &&
-										moment(start).isSameOrAfter(moment(app.start)) &&
-										app.memberId === 0
+										moment(start).isBefore(moment(app.blockTimeEnd)) &&
+										moment(start).isSameOrAfter(moment(app.blockTimeStart)) &&
+										app.staffId === 0
 									) {
 										countAppAnyStaff = countAppAnyStaff + 1;
 									}
@@ -275,11 +273,16 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 		},
 
 		eventClick: (event) => {
-			const allAppointment = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
-			const appointment = allAppointment.find((app) => parseInt(app.id) === parseInt(event.data.id));
-			if (!appointment) return;
-			store.dispatch(getApppointmentById({ appointment, event }));
-			store.dispatch(disableCalendar(true));
+			if (navigator.onLine) {
+				const blockTimes = store.getState().getIn(['appointment', 'members', 'blockTime']);
+				const appointment = blockTimes.find((app) => parseInt(app.appointmentId) === parseInt(event.data.id));
+				if (!appointment) return;
+				store.dispatch(loadingCalendar(true));
+				store.dispatch(getApppointmentById({ appointment, event }));
+				store.dispatch(disableCalendar(true));
+			} else {
+				alert('Please check your internet !!!');
+			}
 		},
 
 		drop(date_time, jsEvent, ui, idResource) {
@@ -289,8 +292,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 			let check = true;
 			let check_workingStaff = '';
 			let check_staff_drop = false;
-			let time_working_start = '';
-			let time_working_end = '';
+
 			let totalDuration = 0;
 			let check_workingTime = false;
 
@@ -309,11 +311,14 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 			member_clone.forEach((element) => {
 				delete element.memberId;
 			});
+
 			const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
+
 			let all_appointments = [];
 			member_clone.forEach((apps) => {
 				all_appointments = [...all_appointments, ...apps.appointments];
 			});
+
 			const resourceId = parseInt(idResource) - 1;
 			const pos = displayedMembers.findIndex((mem) => parseInt(mem.resourceId) === parseInt(resourceId));
 
@@ -330,8 +335,6 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 					(b) => b[0] === currentDayName
 				);
 				check_workingStaff = checkWorkingTime[1].isCheck;
-				time_working_start = checkWorkingTime[1].timeStart;
-				time_working_end = checkWorkingTime[1].timeEnd;
 			}
 
 			if (!displayedMembers[parseInt(resourceId)]) {
@@ -541,10 +544,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 				}
 			}
 
-			let all_appointments = []; // tất cả appointment trên calendar
-			member_clone.forEach((apps) => {
-				all_appointments = [...all_appointments, ...apps.appointments];
-			});
+			let all_appointments = store.getState().getIn(['appointment', 'members', 'blockTime']);
 
 			if (!staffAvailable) {
 				check = false;
@@ -554,12 +554,12 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 					// check khi thả appointment overlap
 					if (parseInt(app.memberId) === parseInt(staffAvailable.id)) {
 						if (
-							moment(start_time).isBetween(app.start, app.end) ||
-							moment(end_time).isBetween(app.start, app.end) ||
-							moment(app.start).isBetween(start_time, end_time) ||
-							moment(app.end).isBetween(start_time, end_time)
+							moment(start_time).isBetween(app.blockTimeStart, app.blockTimeEnd) ||
+							moment(end_time).isBetween(app.blockTimeStart, app.blockTimeEnd) ||
+							moment(app.blockTimeStart).isBetween(start_time, end_time) ||
+							moment(app.blockTimeEnd).isBetween(start_time, end_time)
 						) {
-							if (parseInt(app.id) !== parseInt(event.data.id)) {
+							if (parseInt(app.appointmentId) !== parseInt(event.data.id)) {
 								if (app.status === 'BLOCK_TEMP') {
 									if (app.appointmentId !== event.data.id) {
 										// alert('The Staff is not available on your time selected.')
@@ -572,13 +572,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 									check = false;
 								}
 							} else {
-								// if (app.status === 'BLOCK_TEMP') {
-								// 	if (window.confirm('Accept appointment outside working hours?')) {
-								// 		check = true;
-								// 	} else {
-								// 		check = 1;
-								// 	}
-								// }
+
 							}
 						}
 					}
@@ -697,9 +691,6 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 			// }
 		},
 		eventDragStop: (event, jsEvent) => {
-			// if (event.data.status.toString().includes('BLOCK')) {
-			// 	return;
-			// }
 			if (parseInt(event.resourceId) !== 0) {
 				const trashEl = $('#drag-zone');
 
@@ -729,47 +720,23 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 		},
 		/* eslint no-param-reassign: "error" */
 		eventRender: (event, element) => {
-			if (!event.data.status.toString().includes('BLOCK') && event.data.status.toString() !== "no show") {
-				let options = event.data.options.filter(obj => obj.staffId === event.data.memberId);
-				let _extrasRender = extrasRender(options, event.data.extras);
-				let dataEvent = {
-					...event.data,
-					extrasRender: _extrasRender
-				}
-				element[0].innerHTML = EVENT_RENDER_TEMPLATE(dataEvent);
-				if (event.data.isVip === 1) {
-					element
-						.find('div.app-event')
-						.prepend("<div class='app-event__full-name2'><img src='" + vip + "' width='18' height='18'></div>");
-				}
-				if (event.data.isFavorite && event.data.isVip === 1) {
+			element[0].innerHTML = EVENT_RENDER_TEMPLATE_BLOCK(event.data);
+			if (event.data.isVip) {
+				element
+					.find('div.app-event')
+					.prepend("<div class='app-event__vipBlock'><img src='" + vip + "' width='18' height='18'></div>");
+
+				if (event.data.isFavorite && event.data.isVip) {
 					element
 						.find('div.app-event')
 						.prepend("<div class='app-event__heart'><img src='" + heart + "' width='18' height='18'></div>");
-				} else if (event.data.isFavorite && event.data.isVip === 0) {
-					element
-					.find('div.app-event')
-					.prepend("<div class='app-event__full-name2'><img src='" + heart + "' width='18' height='18'></div>");
 				}
-
-			} else {
-				element[0].innerHTML = EVENT_RENDER_TEMPLATE_BLOCK(event.data);
-				if (event.data.isVip === 1) {
+			} else
+				if (event.data.isFavorite) {
 					element
 						.find('div.app-event')
-						.prepend("<div class='app-event__vipBlock'><img src='" + vip + "' width='18' height='18'></div>");
+						.prepend("<div class='app-event__vipBlock'><img src='" + heart + "' width='18' height='18'></div>");
 				}
-				if (event.data.isFavorite && event.data.isVip === 1) {
-					element
-						.find('div.app-event')
-						.prepend("<div class='app-event__heart'><img src='" + heart + "' width='18' height='18'></div>");
-				} else if (event.data.isFavorite && event.data.isVip === 0) {
-					element
-					.find('div.app-event')
-					.prepend("<div class='app-event__vipBlock'><img src='" + heart + "' width='18' height='18'></div>");
-				}
-
-			}
 
 			if (
 				event.data.status === 'BLOCK_TEMP_PAID'
@@ -777,7 +744,7 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 				|| event.data.status === 'no show'
 			) {
 				const displayedMembers = store.getState().getIn(['appointment', 'members', 'displayed']);
-				const allAppointments = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
+				const blockTimes = store.getState().getIn(['appointment', 'members', 'blockTime']);
 				if (event.data.memberId) {
 					const member = displayedMembers.find((mem) => parseInt(mem.id) === parseInt(event.data.memberId));
 					if (member) {
@@ -787,11 +754,11 @@ export const MAIN_CALENDAR_OPTIONS = (timezone_merchant) => {
 							const { appointmentId } = block;
 							if (parseInt(event.data.id) !== parseInt(appointmentId)) {
 								const { start, end } = event.data;
-								const app = allAppointments.find((obj) => parseInt(obj.id) === parseInt(appointmentId));
+								const app = blockTimes.find(obj => parseInt(obj.appointmentId) === parseInt(appointmentId))
 								if (app)
 									if (
-										(moment(start).isAfter(app.start) && moment(start).isBefore(app.end)) ||
-										(moment(end).isAfter(app.start) && moment(end).isBefore(app.end))
+										(moment(start).isAfter(app.blockTimeStart) && moment(start).isBefore(app.blockTimeEnd)) ||
+										(moment(end).isAfter(app.blockTimeStart) && moment(end).isBefore(app.blockTimeEnd))
 									) {
 										count += 1;
 									}
@@ -856,24 +823,34 @@ export const addEventsToCalendar = async (currentDate, appointmentsMembers) => {
 		}
 	});
 
-	const allAppointments = store.getState().getIn(['appointment', 'appointments', 'allAppointment']);
-
 	let blockTimes = store.getState().getIn(['appointment', 'members', 'blockTime']);
 	blockTimes = blockTimes.filter(b => parseInt(b.staffId) === 0);
-	blockTimes = blockTimes.map(block => {
-		const temptApp = mapBlockTemp(block, currentDate, allAppointments);
-		return temptApp;
-	});
+	blockTimes = blockTimes.map(block => blockTemp(
+		block.staffId,
+		block.blockTimeStart,
+		block.blockTimeEnd,
+		block.note,
+		block.appointmentId,
+		convertStatus(block.status),
+		block.blockTimeId,
+		block.isVip,
+		block.isWarning,
+		block.isFavorite,
+	));
 
-	const blockGreyAnyStaff = allAppointments
-		? allAppointments.filter((app) => app.memberId === 0 && app.status !== 'WAITING' && app.status === "BLOCK")
-		: [];
+	const merchantInfo = store.getState().getIn(['appointment', 'merchantInfo'])
+	const currentDayName = moment(currentDate).format('dddd');
+
+	const { blockStart, blockEnd } = BlockAnyStaff(merchantInfo, currentDayName, currentDate);
+
+	const blockGreyAnyStaff = [blockStart, blockEnd];
 
 	mapAppointmentAnyStaff(blockGreyAnyStaff, events);
 	mapAppointmentAnyStaff(blockTimes, events);
 
 	$('#full-calendar').fullCalendar('renderEvents', events);
 };
+
 export const deleteEventFromCalendar = (eventId) => {
 	$('#full-calendar').fullCalendar('removeEvents', [eventId]);
 };
@@ -1036,44 +1013,6 @@ function getEventStyle(status, isWarning) {
 		eventColor,
 		eventClass
 	};
-}
-
-export const mapBlockTemp = (blockTime, currentDate, appointments) => {
-	let temptData;
-	const memberId = blockTime.staffId;
-	const start = `${moment(currentDate).format('YYYY-MM-DD')}T${moment(blockTime.blockTimeStart, [
-		'h:mm A'
-	]).format('HH:mm:ss')}`;
-	const end = `${moment(currentDate).format('YYYY-MM-DD')}T${moment(blockTime.blockTimeEnd, [
-		'h:mm A'
-	]).format('HH:mm:ss')}`;
-
-	const note = blockTime.note;
-	const appointmentId = blockTime.appointmentId;
-	const blockTimeId = blockTime.blockTimeId;
-	const isWarning = (blockTime.isWarning && parseInt(memberId === 0)) ? blockTime.isWarning : false;
-	const app = appointments.find(obj => obj.id === appointmentId);
-	const isVip = app ? app.isVip : 0;
-	const isFavorite = blockTime.isFavorite;
-
-	if (checkStatusAppointment(appointmentId, appointments) === 'PAID') {
-		temptData = blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_PAID', blockTimeId, isVip, isWarning, isFavorite);
-	} else if (checkStatusAppointment(appointmentId, appointments) === 'REFUND') {
-		temptData = blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_REFUND', blockTimeId, isVip, isWarning, isFavorite);
-	} else if (checkStatusAppointment(appointmentId, appointments) === 'ASSIGNED') {
-		temptData = blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_ASSIGNED', blockTimeId, isVip, isWarning, isFavorite);
-	} else if (checkStatusAppointment(appointmentId, appointments) === 'CONFIRMED') {
-		temptData = blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CONFIRMED', blockTimeId, isVip, isWarning, isFavorite);
-	} else if (checkStatusAppointment(appointmentId, appointments) === 'CHECKED_IN') {
-		temptData = blockTemp(memberId, start, end, note, appointmentId, 'BLOCK_TEMP_CHECKED_IN', blockTimeId, isVip, isWarning, isFavorite);
-	} else if (checkStatusAppointment(appointmentId, appointments) === 'no show') {
-		temptData = blockTemp(memberId, start, end, note, appointmentId, 'no show', blockTimeId, isVip, isWarning, isFavorite);
-	}
-	else {
-		temptData = blockTemp(memberId, start, end, [], appointmentId, 'BLOCK_TEMP', blockTimeId);
-	}
-
-	return temptData;
 }
 
 const mapAppointmentAnyStaff = (appointments, events) => {

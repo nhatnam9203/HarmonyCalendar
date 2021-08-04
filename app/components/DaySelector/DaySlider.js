@@ -1,6 +1,5 @@
 import React from 'react';
 import moment from 'moment';
-import moment_tz from 'moment'
 import styled from 'styled-components';
 import DayPicker from 'react-day-picker';
 import 'react-day-picker/lib/style.css';
@@ -148,11 +147,13 @@ class DaySlider extends React.Component {
   }
 
   onDaySelected(day) {
+    this.props.loadingCalendar(true);
     this.props.countAppointmentAnyStaff({
       date: moment(day).format('YYYY-MM-DD'),
       isDayClick: true,
       isReloadCalendar: true,
     });
+    this.onOutsideClickPopup();
     // this.props.countAppointmentAnyStaff({ date: moment(day).format('YYYY-MM-DD'), isDayClick: true, isReloadCalendar: true })
     // this.props.onChangeDay(moment(new Date(day)).format('DDMMYYYY'));
   }

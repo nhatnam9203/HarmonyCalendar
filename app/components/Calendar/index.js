@@ -6,7 +6,7 @@ import { MAIN_CALENDAR_OPTIONS } from './constants';
 import { merchantId, deviceId, GET_APPOINTMENT_ID, token } from '../../../app-constants';
 import { store } from 'app';
 import { addEventsToCalendar } from './constants';
-import { PROD_API_BASE_URL, SIGNALR } from '../../../app-constants';
+import { SIGNALR } from '../../../app-constants';
 import { returnAppointment } from './util';
 import { appointmentAdapter } from '../../containers/AppointmentPage/utilSaga';
 import axios from 'axios';
@@ -215,6 +215,7 @@ class Calendar extends React.Component {
 		connection.serverTimeoutInMilliseconds = 6000000;
 
 		connection.on('ListWaNotification', async (data) => {
+			console.log({ data });
 			let app = JSON.parse(data);
 			if (app.data) {
 				let type = app.data.Type;
@@ -238,7 +239,7 @@ class Calendar extends React.Component {
 							if (appointment_R.status === 'WAITING') {
 								this.props.loadWaitingAppointments();
 							} else {
-								this.props.reloadCalendar();
+								this.props.getBlockTime();
 							}
 							// this.addAppointmentFromSignalr(appointment_R);
 						}
@@ -296,21 +297,21 @@ class Calendar extends React.Component {
 										if (app) {
 											this.props.loadWaitingAppointments();
 										} else {
-											this.props.reloadCalendar();
+											// this.props.getBlockTime();
 										}
 										break;
 
 									default:
-										const allAppointment = store
+										const blockTimes = store
 											.getState()
-											.getIn(['appointment', 'appointments', 'allAppointment']);
+											.getIn(['appointment', 'members', 'blockTime']);
 
-										const pos = allAppointment.findIndex((app) => app.id === appointment_R.id);
-										if (pos === -1) {
+											const pos = blockTimes.findIndex((app) => app.appointmentId === appointment_R.id);
+											if (pos === -1) {
 											this.addAppointmentFromSignalr(appointment_R);
 										} else {
-											this.props.updateAppointmentPaid(appointment_R);
-											this.props.renderAppointment();
+											// this.props.updateAppointmentPaid(appointment_R);
+											// this.props.renderAppointment();
 										}
 										this.props.removeAppointmentWaiting(appointment_R);
 
@@ -323,7 +324,7 @@ class Calendar extends React.Component {
 						break;
 					case 'appointment_checkout':
 						setTimeout(() => {
-							this.props.reloadCalendar();
+							this.props.getBlockTime();
 						}, 1000);
 						break;
 
@@ -331,7 +332,7 @@ class Calendar extends React.Component {
 						this.updateNotification();
 						setTimeout(() => {
 							this.props.loadWaitingAppointments();
-							this.props.reloadCalendar();
+							this.props.getBlockTime();
 						}, 500);
 						break;
 
@@ -348,15 +349,12 @@ class Calendar extends React.Component {
 			if (app.type) {
 				let type = app.type;
 				if (type === 'staff_update') {
-					// console.log('staff update');
 					this.props.deselectAppointment();
 					this.props.disable_Calendar(false);
-					// this.props.getDetailMerchant();
 					this.props.updateNextStaff({});
 				}
 
 				if (type === 'update_blocktime') {
-					// console.log('update blocktime');
 					this.props.deselectAppointment();
 					this.props.disable_Calendar(false);
 					this.props.updateNextStaff({ isReloadCalendar: false });
@@ -364,7 +362,6 @@ class Calendar extends React.Component {
 			}
 		});
 		connection.start().catch((error) => {
-			// console.log({ error });
 		});
 		connection.onclose(function () { });
 	}
@@ -373,18 +370,14 @@ class Calendar extends React.Component {
 		const {
 			waitingAppointments,
 			waitingIndex,
-			openAddingAppointment,
-			calendarMembers,
 			disableCalendar,
 			isLoadWaiting,
 			isLoadCalendar,
-			disable_Calendar,
 			deleteEventWaitingList,
 			StatusDeleteWaiting,
 			deleteWaitingAppointment,
-			updateAppointmentPaid,
 			merchantInfo,
-			today
+			
 		} = this.props;
 		return (
 			<CalendarWrapper>
@@ -392,7 +385,6 @@ class Calendar extends React.Component {
 					{isLoadCalendar === true && <CalendarLoading />}
 					<FCAgenda
 						disableCalendar={disableCalendar}
-						updateAppointmentPaid={updateAppointmentPaid}
 						options={MAIN_CALENDAR_OPTIONS}
 						merchantInfo={merchantInfo}
 					/>
