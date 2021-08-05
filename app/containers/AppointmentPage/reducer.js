@@ -69,6 +69,7 @@ import {
 	UPDATE_QUANTITY_RESOURCE,
 	ANYSTAFF_ASSIGN_TO_STAFF,
 	FIRST_LOAD_CALENDAR,
+	SET_ALL_BLOCK
 } from './constants';
 
 import { unionBy } from 'lodash';
@@ -141,6 +142,12 @@ export const initialState = fromJS({
 function appointmentReducer(state = initialState, action) {
 	let startOfWeek;
 	switch (action.type) {
+
+		case SET_ALL_BLOCK:
+			return state.updateIn(['members', 'allBlock'], arr => {
+				return [...action.payload];
+			});
+
 		case SELECT_DAY:
 			return state.set('currentDay', moment(action.day, 'DDMMYYYY'));
 		case SET_TODAY:

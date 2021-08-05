@@ -135,6 +135,7 @@ import {
 	ANYSTAFF_ASSIGN_TO_STAFF,
 	FIRST_LOAD_CALENDAR,
 	GET_STAFF_OF_SERVICE,
+	SET_ALL_BLOCK
 } from './constants';
 
 /**
@@ -983,6 +984,14 @@ export function anystaffAssignStaff(payload){
 export function firstReload(payload){
 	return{
 		type : FIRST_LOAD_CALENDAR,
+		payload
+	}
+}
+
+
+export function setAllBlock(payload){
+	return{
+		type : SET_ALL_BLOCK,
 		payload
 	}
 }

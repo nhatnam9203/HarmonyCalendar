@@ -155,7 +155,7 @@ const initialState = {
 	isEnd: false,
 	start: '02:00 PM',
 	end: '02:00 PM',
-	blockStaffId : '',
+	blockStaffId: '',
 	isPopupSelectTime: false,
 	blockTimeEdit: null,
 	isPopupDelete: false,
@@ -203,10 +203,10 @@ class PopupBlockTime extends Component {
 
 
 	editBlockTime() {
-		const { blockTimeEdit, start, end, note , blockStaffId} = this.state;
+		const { blockTimeEdit, start, end, note, blockStaffId } = this.state;
 		if (blockTimeEdit) {
 			const noteSubmit = note.replace(/(\r\n|\n|\r)/gm, '<br>');
-			const data = { start, end, note: noteSubmit, id: blockTimeEdit.blockTimeId , staffId : blockStaffId};
+			const data = { start, end, note: noteSubmit, id: blockTimeEdit.blockTimeId, staffId: blockStaffId };
 			this.props.editBlockTime(data);
 			this.closeModal();
 		}
@@ -224,7 +224,7 @@ class PopupBlockTime extends Component {
 				note: blockTime.note.replace(/<br>/gm, '\n'),
 				start: blockTime.blockTimeStart,
 				end: blockTime.blockTimeEnd,
-				blockStaffId : blockTime.staffId
+				blockStaffId: blockTime.staffId
 			});
 		}
 	}
@@ -312,7 +312,7 @@ class PopupBlockTime extends Component {
 						<div style={styles.blockHeader}>
 							<div style={styles.workingDate}>{moment(obj.workingDate).format('MM/DD/YYYY')}</div>
 							<div style={styles.timeBlock}>
-								{obj.blockTimeStart} - {obj.blockTimeEnd}
+								{moment(obj.blockTimeStart).format('hh:mm A')} - {moment(obj.blockTimeEnd).format('hh:mm A')}
 							</div>
 						</div>
 
@@ -439,7 +439,7 @@ class PopupBlockTime extends Component {
 
 	render() {
 		const { popupPincode, staff } = this.props;
-		const { isPopupSelectTime , isPopupDelete } = this.state;
+		const { isPopupSelectTime, isPopupDelete } = this.state;
 
 		if (popupPincode === false) return '';
 		return (

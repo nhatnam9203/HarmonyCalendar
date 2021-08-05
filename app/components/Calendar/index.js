@@ -108,7 +108,7 @@ class Calendar extends React.Component {
 			}
 
 			if (action === 'appointmentNotification') {
-				if(data.data.appointmentId !== 0){
+				if (data.data.appointmentId !== 0) {
 					this.props.onChangeDay(moment(data.data.appointmentDate).format('DDMMYYYY'));
 					this.props.scrollToAppointment(data.data.appointmentId);
 					let app = {
@@ -282,7 +282,7 @@ class Calendar extends React.Component {
 								switch (appointment_R.status) {
 									case 'WAITING':
 										this.props.addAppointmentWaiting(appointment_R);
-		
+
 										break;
 
 									case 'CANCEL':
@@ -296,8 +296,15 @@ class Calendar extends React.Component {
 										}
 										break;
 
+									case 'VOID':
+										this.props.getBlockTime()
+										break;
+									case 'REFUND':
+										this.props.getBlockTime()
+										break;
+
 									default:
-	
+
 										this.props.removeAppointmentWaiting(appointment_R);
 
 										break;
@@ -362,7 +369,7 @@ class Calendar extends React.Component {
 			StatusDeleteWaiting,
 			deleteWaitingAppointment,
 			merchantInfo,
-			
+
 		} = this.props;
 		return (
 			<CalendarWrapper>
