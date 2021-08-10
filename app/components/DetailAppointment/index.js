@@ -385,7 +385,6 @@ class Appointment extends Layout {
 			dayPicker: this.state.dayChange,
 			selectedStaff: selectedStaff
 		}
-
 		this.props.changeAppointmentTime(payload)
 	}
 

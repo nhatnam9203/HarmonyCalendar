@@ -39,7 +39,8 @@ import {
 	checkMerchantWorking,
 	blockTempFrontEnd,
 	blockTemp,
-	convertStatus
+	convertStatus,
+	reduceServices
 } from './utilSaga';
 
 
@@ -267,6 +268,8 @@ export function* assignAppointment(action) {
 		yield put(actions.addBlockTempFrontEnd(tempBlock));
 		yield put(actions.renderAppointment());
 
+		const services = reduceServices(options , start , extras );
+
 		let data = {
 			staffId: memberId,
 			fromTime: start,
@@ -275,10 +278,11 @@ export function* assignAppointment(action) {
 					? moment(start).add(duration_total, 'minutes').format().substr(0, 19)
 					: moment(start).add(15, 'minutes').format().substr(0, 19),
 			status: statusConvertData[status],
-			services: options,
+			services,
 			products,
 			extras,
-			giftCards
+			giftCards,
+			isWaiting: true
 		};
 
 		const requestURL = new URL(api_constants.PUT_STATUS_APPOINTMENT_API);

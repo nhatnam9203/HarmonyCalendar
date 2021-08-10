@@ -399,6 +399,10 @@ export function dataChangeTimeAppointment(
 		}
 	}
 
+	if(appointment.status === "CONFIRMED"){
+		status = 'confirm'
+	}
+
 	return {
 		staffId: selectedStaff.id,
 		fromTime: start_time,
@@ -690,4 +694,22 @@ export const convertStatus = (statusVarieable) => {
 	}
 
 	return status;
+}
+
+export const reduceServices = (services, start, extras) => {
+	for (let i = 0; i < services.length; i++) {
+		if (i === 0) {
+			services[i].fromTime = start;
+		} else if (i > 0) {
+			let tempService = services[i - 1];
+			services[i].fromTime = moment(tempService.fromTime).add('minutes', tempService.duration)
+			const ex = extras.find(ex => ex.bookingServiceId === tempService.bookingServiceId);
+			if (ex) {
+				const duration = tempService.duration + ex.duration;
+				services[i].fromTime = moment(tempService.fromTime).add('minutes', duration);
+			}
+			services[i].fromTime = `${moment(services[i].fromTime).format("YYYY-MM-DD")}T${moment(services[i].fromTime).format("HH:mm")}:00`;
+		}
+	}
+	return services;
 }

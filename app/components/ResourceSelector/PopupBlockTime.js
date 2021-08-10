@@ -194,13 +194,12 @@ class PopupBlockTime extends Component {
 			app.status === 'BLOCK_TEMP_PAID' ||
 			app.status === 'BLOCK_TEMP_REFUND' ||
 			app.status === 'BLOCK_TEMP_ASSIGNED' ||
-			app.status === 'BLOCK_TEMP_CONFIRMED' ||
 			app.status === 'BLOCK_TEMP_CHECKED_IN' ||
+			app.status === 'BLOCK_TEMP_CONFIRMED' ||
 			app.status === 'BLOCK_TEMP_PAID').length;
 
 		return count ? count.toString() : 0;
 	}
-
 
 	editBlockTime() {
 		const { blockTimeEdit, start, end, note, blockStaffId } = this.state;
@@ -222,8 +221,8 @@ class PopupBlockTime extends Component {
 				isAddBlock: true,
 				blockTimeEdit: blockTime,
 				note: blockTime.note.replace(/<br>/gm, '\n'),
-				start: blockTime.blockTimeStart,
-				end: blockTime.blockTimeEnd,
+				start: moment(blockTime.blockTimeStart).format("hh:mm A"),
+				end: moment(blockTime.blockTimeEnd).format("hh:mm A"),
 				blockStaffId: blockTime.staffId
 			});
 		}
@@ -371,7 +370,7 @@ class PopupBlockTime extends Component {
 					</div>
 
 					<p style={{ marginLeft: 8, marginTop: 7, fontWeight: '500', fontSize: 16 }}> - </p>
-
+					
 					<div onClick={() => this.setState({ isPopupSelectTime: true, isEnd: true })}>
 						<div style={styles.select}>
 							{end}
@@ -396,6 +395,7 @@ class PopupBlockTime extends Component {
 						<div onClick={() => this.submitEditBlock()} style={styles.btnSubmit}>Submit</div>
 					</div>
 				)}
+
 				{blockTimeEdit && (
 					<div onClick={() => this.submitEditBlock()} style={styles.bottom}>
 						<div style={styles.btnSubmit}>Save</div>
@@ -439,7 +439,9 @@ class PopupBlockTime extends Component {
 
 	render() {
 		const { popupPincode, staff } = this.props;
-		const { isPopupSelectTime, isPopupDelete } = this.state;
+		const { isPopupSelectTime, isAddBlock, isPopupDelete } = this.state;
+
+		console.log('render popup block time')
 
 		if (popupPincode === false) return '';
 		return (

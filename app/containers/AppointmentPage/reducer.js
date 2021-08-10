@@ -539,7 +539,6 @@ function appointmentReducer(state = initialState, action) {
 						//update
 						arr[pos] = action.appointment.appointment;
 					}
-					saveAppointmentOffLine(action.appointment.appointment);
 					localStorage.setItem('AppointmentCalendar', JSON.stringify(arr));
 					return [...arr];
 				});
