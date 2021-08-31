@@ -45,17 +45,17 @@ class ResourceSelector extends layout {
 			const { resources, qtyResources } = this.props;
 			const slide = chunk(resources, parseInt(qtyResources));
 
-			if (slide.length > 1 && slide[slide.length - 1].length <= qtyResources && slide[slide.length - 1].length > 1) {
-					await this.setState({ isLoadingStaff: true });
-					this.refNextButton.current.click();
-					setTimeout(() => {
-						this.refPrevButton.current.click();
-					}, 700);
+			// if (slide.length > 1 && slide[slide.length - 1].length <= qtyResources && slide[slide.length - 1].length > 1) {
+			// 		await this.setState({ isLoadingStaff: true });
+			// 		this.refNextButton.current.click();
+			// 		setTimeout(() => {
+			// 			this.refPrevButton.current.click();
+			// 		}, 700);
 
-					setTimeout(() => {
-						this.setState({ isLoadingStaff: false });
-					}, 1500);
-			}
+			// 		setTimeout(() => {
+			// 			this.setState({ isLoadingStaff: false });
+			// 		}, 1500);
+			// }
 		}
 
 		if (isAssignAnyStaffToStaff == true && isAssignAnyStaffToStaff !== this.props.isAssignAnyStaffToStaff) {
