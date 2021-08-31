@@ -147,6 +147,9 @@ const makeFirstReload = () =>
 const makeBlockTime = () =>
 	createSelector(currentAppointment, (appointmentState) => appointmentState.getIn(['members', 'blockTime']));
 
+const makeVisibleCarousel = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.get('isVisibleCarousel'));
+
 export {
 	currentAppointment,
 	makeCurrentDay,
@@ -192,5 +195,6 @@ export {
 	makeResourceWidth,
 	makeAssignAnyStaffToStaff,
 	makeFirstReload,
-	makeBlockTime
+	makeBlockTime,
+	makeVisibleCarousel
 };

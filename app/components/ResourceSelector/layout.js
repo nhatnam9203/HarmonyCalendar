@@ -5,6 +5,8 @@ import { staffId } from '../../../app-constants';
 import PopupBlockTime from './PopupBlockTime';
 import ButtonSplash from './ButtonSplash';
 
+const columnWidth = `((100vw - 5.05rem - 2px) / 10)`;
+
 const ResourceSelectorWrapper = styled.div`
 	width: 100%;
 	height: 4.4rem;
@@ -22,40 +24,8 @@ const ResourceSelectorWrapper = styled.div`
 	user-select: none;
 `;
 
-const BellButton = styled.div`
-	width: calc(5.05rem - 2px);
-	height: 100%;
-	text-align: center;
-	padding: 0.5rem;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	& > img {
-		width: 30px;
-		height: 30px;
-	}
-	position: relative;
-`;
-
-BellButton.Icon = styled.div`
-	background: red;
-	width: 1.5rem;
-	height: 1.5rem;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	position: absolute;
-	top: 0.8rem;
-	right: 1.2rem;
-	color: white;
-	font-size: 0.6rem;
-	font-weight: 600;
-	border-radius: 300rem;
-`;
-
 const ResourceWrapper = styled.div`
 	height: calc(4.4rem - 2px);
-	/* width : ${(props) => (props.width ? props.width : 'calc(100vw - 4rem - (100vw/7) * 2)')}; */
 	position: relative;
 	display: flex;
 	margin : 0px !important;
@@ -68,36 +38,21 @@ const ResourceWrapper = styled.div`
 
 const Resource = styled.div`
 	cursor: pointer;
-	/* width : ${(props) => (props.width ? props.width : 'calc(100%/8)')}; */
 	padding: 0.25rem;
 	position: relative;
 	border-right: 1px solid #ddd;
 	text-align: center;
-	/* width: ${(props) => (props.width ? props.width : 'calc(100% / 5)')}; */
 	background-color: ${(props) => (props.active ? '#1EB5F4' : '#ffffff')};
 `;
 
-const AnyStaff = styled(Resource)`
-	flex : ${(props) => (props.flex ? props.flex : '0.95')};
-	height : 4.2rem;
-	border-left: 1px solid #1173C3;
-	background-color : #F5F5F5;
-	display : flex;
-	justify-content : center;
-	align-items : center;
-	@media (min-width: 1025px) {
-		height: 4.9rem;
-  	}
-`;
-
-const ResourceSliderWrapper = styled.div`
-	flex: ${(props) => (props.flex ? props.flex : '8')};
+const StaffList = styled.div`
+	flex: 1;
 	position: relative;
 	background-color: white;
 `;
 
 const WaitingHeader = styled.div`
-	width: calc((100vw - 5.05rem) / 10 + 1px);
+	width : ${props => props.width ? props.width : `calc(${columnWidth} + 1.5px)`};
 	text-align: center;
 	display: flex;
 	justify-content: center;
@@ -112,6 +67,20 @@ const WaitingHeader = styled.div`
 	@media (min-width: 1024px) {
 		font-size: 1.3rem;
 	}
+`;
+
+const AnyStaff = styled(Resource)`
+	/* flex : ${(props) => (props.flex ? props.flex : '0.95')}; */
+	width : ${props => props.width ? props.width : `calc(${columnWidth} + 1.5px)`};
+	height : 4.2rem;
+	border-left: 1px solid #1173C3;
+	background-color : #F5F5F5;
+	display : flex;
+	justify-content : center;
+	align-items : center;
+	@media (min-width: 1025px) {
+		height: 4.9rem;
+  	}
 `;
 
 AnyStaff.Image = styled.div`
@@ -341,7 +310,8 @@ class layout extends React.Component {
 			deleteBlockTime,
 			currentDay,
 			editBlockTime,
-			resources
+			resources,
+			isCarousel,
 		} = this.props;
 
 		const isActiveLett = this.getActiveArrow().isActiveLeft;
@@ -350,7 +320,10 @@ class layout extends React.Component {
 		const { resourceWidth, qtyResources } = this.props;
 		const { isLoadingStaff } = this.state;
 
-		const flexAnyStaff = resourceWidth % 8 + 0.95;
+		const tempNumber = parseInt(resourceWidth - 7);
+		const tempNumberCarousel = 2 + tempNumber - 1;
+
+		const tempWidth = `(${columnWidth} * ${tempNumberCarousel})`;
 
 		return (
 			<React.Fragment>
@@ -361,18 +334,20 @@ class layout extends React.Component {
 						</ButtonToday>
 					</WrapButtonToday>
 
-					<AnyStaff id="headerAnyStaff" flex={flexAnyStaff}>
+					<AnyStaff
+						width={`calc(${columnWidth} * ${tempNumber} + 3px)`}
+						id="headerAnyStaff"
+					>
 						<AnyStaff.Image>
 							<img src={require('../../images/anystaff.png')} />
 							<AnyStaff.Title>Any staff</AnyStaff.Title>
 						</AnyStaff.Image>
 					</AnyStaff>
 
-					<ResourceSliderWrapper flex={qtyResources}>
-						{resources.length > 0 && (
+					<StaffList>
+						{resources.length > 0 && isCarousel && (
 							<Carousel
-								width={`calc(((100vw - 5.05rem - 2px - ((100vw - 5.05rem) / 10))/${(resourceWidth +
-									1).toString()}) * 8`}
+								width={`calc(100vw - 5.05rem - 3px - ${tempWidth})`}
 								dragging={true}
 								renderBottomCenterControls={() => ''}
 								renderCenterLeftControls={({ previousSlide }) => {
@@ -413,8 +388,12 @@ class layout extends React.Component {
 								{this.renderCarouselSlide()}
 							</Carousel>
 						)}
-					</ResourceSliderWrapper>
-					<WaitingHeader>Waiting</WaitingHeader>
+					</StaffList>
+					<WaitingHeader
+						width={resourceWidth > 9 ? `calc(${columnWidth} + 0.7px)` : `calc(${columnWidth} + 2px)`}
+					>
+						Waiting
+					</WaitingHeader>
 				</ResourceSelectorWrapper>
 
 				<PopupBlockTime

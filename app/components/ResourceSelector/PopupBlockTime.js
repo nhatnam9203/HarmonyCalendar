@@ -441,8 +441,6 @@ class PopupBlockTime extends Component {
 		const { popupPincode, staff } = this.props;
 		const { isPopupSelectTime, isAddBlock, isPopupDelete } = this.state;
 
-		console.log('render popup block time')
-
 		if (popupPincode === false) return '';
 		return (
 			<React.Fragment>

@@ -126,10 +126,10 @@ export default class ServiceNormal extends Component {
                     })) : []
                 });
             } else {
-                alert(response.message)
+                // alert(response.message)
             }
         } catch (err) {
-            alert(err)
+            // alert(err)
         }
     }
 

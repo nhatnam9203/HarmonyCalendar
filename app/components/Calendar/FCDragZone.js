@@ -305,7 +305,7 @@ class FCDragZone extends React.PureComponent {
 												<div
 													className={"app-event__option " + slidesToShow === 5 ? "option_waiting" : "option_waiting2"}
 													key={index}
-													style={{ fontStyle: 'italic' }}
+													style={{ fontStyle: 'italic', fontSize: 14 }}
 												>
 													- {option.serviceName}
 												</div>
@@ -321,7 +321,7 @@ class FCDragZone extends React.PureComponent {
 												<div
 													className={"app-event__option option_categories " + slidesToShow === 5 ? "option_waiting" : "option_waiting2"}
 													key={option.bookingCategoryId}
-													style={{ fontStyle: 'italic' }}
+													style={{ fontStyle: 'italic', fontSize: 14 }}
 												>
 													- {option.categoryName}
 												</div>

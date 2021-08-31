@@ -22,7 +22,8 @@ import {
   makeQtyResource,
   makeAssignAnyStaffToStaff,
   makeFirstReload,
-  makeBlockTime
+  makeBlockTime,
+  makeVisibleCarousel,
 } from './selectors';
 
 import {
@@ -98,6 +99,7 @@ const mapStateToProps = createStructuredSelector({
   isAssignAnyStaffToStaff : makeAssignAnyStaffToStaff(),
   isFirstReloadCalendar : makeFirstReload(),
   blockTimes: makeBlockTime(),
+  isCarousel : makeVisibleCarousel(),
 });
 
 const withConnect = connect(

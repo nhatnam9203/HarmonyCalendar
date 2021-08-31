@@ -45,7 +45,7 @@ const MainCalendar = styled.div`
 `;
 
 const RightSideBar = styled.div`
-	width: calc((100vw - 5.05rem) / 10);
+	width: calc((100vw - 5.05rem - 2px) / 10 );
 	position: relative;
 	overflow : hidden;
 	-webkit-user-select: none; 
@@ -152,7 +152,7 @@ class Calendar extends React.Component {
 				appointment.end = newEndTime;
 				return appointment;
 			} else {
-				alert(res.data.message);
+				// alert(res.data.message);
 			}
 		}
 		return 0;

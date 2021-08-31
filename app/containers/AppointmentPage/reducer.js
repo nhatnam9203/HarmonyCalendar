@@ -136,6 +136,7 @@ export const initialState = fromJS({
 	qtyResource: 8,
 	isAssignAnyStaffToStaff: false,
 	isFirstLoadCalendar: true,
+	isVisibleCarousel: false,
 });
 
 
@@ -179,6 +180,9 @@ function appointmentReducer(state = initialState, action) {
 
 		case UPDATE_RESOURCE_WIDTH:
 			return state.set('resourceWidth', action.payload);
+
+		case "SET_VISIBLE_CAROUSEL":
+			return state.set('isVisibleCarousel', action.payload);
 
 		case SET_APPOINTMENT_ANY_STAFF:
 			return state.set('appointmentAnyStaff', action.payload);

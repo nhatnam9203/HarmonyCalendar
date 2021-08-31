@@ -175,24 +175,12 @@ export function* reRenderAppointment() {
 	}
 }
 
+const columnWidth = `calc((100vw - 5.05rem - 2px) / 10)`;
 
 function* reRenderAnyStaffColumn(resourceWidth) {
-	let tempWidth = 7;
-	let temResourceWidth = resourceWidth;
-	if (temResourceWidth == 9) {
-		tempWidth = 10.1;
-	} else if (temResourceWidth == 10) {
-		tempWidth = 7.4;
-	} else if (temResourceWidth == 11) {
-		tempWidth = 6.05;
-	} else if (temResourceWidth == 12) {
-		tempWidth = 4.025;
-	}
 
-	let width = `calc(((100vw - 5.05rem - ((100vw - 5.05rem) / 10)) / 9)`;
-	if (temResourceWidth !== 8) {
-		width = `calc(((100vw - 5.05rem - ((100vw - 5.05rem) / 10)) / ${tempWidth}) * 2)`;
-	}
+	let tempNumber = parseInt(resourceWidth) - 7;
+	let width = `calc(${columnWidth} * ${tempNumber} - 1px)`;
 
 	const ths = document.querySelectorAll(".fc-bg table tbody tr td");
 	ths[1].style.width = width;
@@ -860,6 +848,7 @@ export function* getBlockTimeSaga() {
 				if (count < 4) {
 					yield put({ type: 'UPDATE_RESOURCE_WIDTH', payload: 8 });
 					yield put({ type: 'UPDATE_QUANTITY_RESOURCE', payload: 8 });
+					yield put({ type: 'SET_VISIBLE_CAROUSEL', payload : true });
 				} else if (count >= 4 && count < 8) {
 					yield* increaseResource(8, 8);
 				}
@@ -1235,6 +1224,8 @@ function* increaseResource(resourceWidth, qtyResource) {
 		.fullCalendar(calendarOptions);
 
 	yield put({ type: 'UPDATE_QUANTITY_RESOURCE', payload: qtyResource - 1 });
+	yield put({ type: 'SET_VISIBLE_CAROUSEL', payload : true });
+
 }
 
 /* **************************** Subroutines ******************************** */
