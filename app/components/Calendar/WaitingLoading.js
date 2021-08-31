@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import styled from 'styled-components';
-import ReactLoading from "react-loading";
 
 const Loading = styled.div`
     position: absolute;
@@ -27,12 +26,7 @@ export default class WaitingLoading extends Component {
   render() {
     return (
       <Loading>
-        <ReactLoading
-          type={'spin'}
-          color={'#136AB7'}
-          height={50}
-          width={50}
-        />
+        <img style={{ width: 80, height: 80 }} src={require('../../images/loading.gif')} alt="" />
       </Loading>
     )
   }
