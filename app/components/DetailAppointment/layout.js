@@ -632,11 +632,38 @@ class Appointment extends React.Component {
 		}
 	}
 
+	/********************************* RENDER CATEGORIES *********************************/
+	renderCategories() {
+		const { appointment: { categories } } = this.props;
+		if (categories && Array.isArray(categories) && categories.length > 0)
+			return (
+				<table>
+					<thead>
+						<tr>
+							<th width="100%">
+								{' '}
+						Categories
+					</th>
+						</tr>
+					</thead>
+					<tbody>
+						{
+							categories.map((ct, key) => (
+								<tr key={key}>
+									<td>{ct.categoryName}</td>
+								</tr>
+							))
+						}
+					</tbody>
+				</table>
+			);
+	}
+
 	/********************************* RENDER SERVICES *********************************/
 	renderServices() {
 		const { services } = this.state;
 		const { prices, isPopupStaff, indexPopupStaff, extras } = this.state;
-		const { appointment, staffList , getStaffOfService , staffOfService } = this.props;
+		const { appointment, staffList, getStaffOfService, staffOfService } = this.props;
 		if (services.length > 0) {
 			return (
 				<table>
@@ -842,6 +869,7 @@ class Appointment extends React.Component {
 					{this.renderSelectDay()}
 					{this.renderWrongAlert()}
 				</RowAlert>
+				{this.renderCategories()}
 				{this.renderServices()}
 				{this.renderProducts()}
 				{this.renderAddMore()}
@@ -872,7 +900,7 @@ class Appointment extends React.Component {
 			appointment.status === 'ASSIGNED' ||
 				appointment.status === 'CONFIRMED' ||
 				appointment.status === 'ASSIGNED' ||
-				appointment.status === 'WAITING' || 
+				appointment.status === 'WAITING' ||
 				appointment.status === "no show"
 				? true
 				: false;
