@@ -26,7 +26,7 @@ export default class WaitingLoading extends Component {
   render() {
     return (
       <Loading>
-        <img style={{ width: 80, height: 80 }} src={require('../../images/loading.gif')} alt="" />
+        <img style={{ width: 50, height: 50 }} src={require('../../images/loading.gif')} alt="" />
       </Loading>
     )
   }
