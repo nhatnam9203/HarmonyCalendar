@@ -19,7 +19,6 @@ import closeWhite from '../../images/close_white.png'
 import iconCalendarGrey from '../../images/iconCalendarGrey.png';
 import topArrow from '../../images/top_arrow@3x.png';
 import alertIcon from "../../images/alert.png";
-import { appointmentMoved } from '../../containers/AppointmentPage/actions';
 
 const AppPopup = styled(Popup)`
 	border-radius: 1.5rem;
@@ -182,8 +181,6 @@ const NoteWrapper = styled.div`
 	border: 1px solid #dddddd;
 	background: #eeeeee;
 	padding: 0.5rem;
-	min-height: 10rem;
-	max-height : 14.5rem;
 `;
 
 const TextNoteAppointment = styled.div`
@@ -430,7 +427,7 @@ const IconCalendar = styled.img`
 `;
 
 const ContainerNotes = styled.div`
-	min-height : 3.5rem;
+	min-height : 1rem;
 	max-height : 7.5rem;
 	width: 100%;
 	overflow-y : scroll;

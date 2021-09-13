@@ -1,19 +1,19 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import styled from 'styled-components';
 
 const WrapperFooterPaid = styled.div`
-    padding: 10px;
-    display: flex;
+	padding: 10px;
+	display: flex;
     flex-direction: row;
-    color : #585858;
+    color: #585858;
 `;
 WrapperFooterPaid.Item = styled.div`
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 50%;
-    margin-left: 10px;
-    color: #0b0b0b;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	width: 50%;
+	margin-left: 10px;
+	color: #0b0b0b;
 `;
 
 WrapperFooterPaid.ItemLeft = styled(WrapperFooterPaid.Item)`
@@ -37,81 +37,94 @@ const FooterTotal = styled(WrapperFooterPaid)`
 `;
 
 export default class FooterAppointment extends Component {
+	render() {
+		const { appointment } = this.props;
 
-    render() {
-        const { appointment } = this.props;
+		let subTotal = appointment.subTotal
+			? parseFloat(appointment.subTotal.toString().replace(/,/g, ''))
+					.toFixed(2)
+					.replace(/\d(?=(\d{3})+\.)/g, '$&,')
+			: '0.00';
 
-        let subTotal = appointment.subTotal ? parseFloat(appointment.subTotal.toString().replace(/,/g, '')).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') : "0.00";
-        
-        let total = appointment.total ? parseFloat(appointment.total.toString().replace(/,/g, '')).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') : "0.00";
+		let total = appointment.total
+			? parseFloat(appointment.total.toString().replace(/,/g, '')).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
+			: '0.00';
 
-        let tipAmount = appointment.tipAmount ? parseFloat(appointment.tipAmount.toString().replace(/,/g, '')).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') : "0.00";
+		let tipAmount = appointment.tipAmount
+			? parseFloat(appointment.tipAmount.toString().replace(/,/g, ''))
+					.toFixed(2)
+					.replace(/\d(?=(\d{3})+\.)/g, '$&,')
+			: '0.00';
 
-        let tipPercent = appointment.tipPercent ? parseFloat(appointment.tipPercent.toString().replace(/,/g, '')).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') : "0.00";
+		let tipPercent = appointment.tipPercent
+			? parseFloat(appointment.tipPercent.toString().replace(/,/g, ''))
+					.toFixed(2)
+					.replace(/\d(?=(\d{3})+\.)/g, '$&,')
+			: '0.00';
 
-        if (appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND') {
-            return (
-                <React.Fragment>
-                    <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
-                            <WrapperFooterPaid>
-                                <WrapperFooterPaid.ItemLeft>
-                                    <div>Subtotal : </div>
-                                    <div>$ {appointment.subTotal}</div>
-                                </WrapperFooterPaid.ItemLeft>
-                                <WrapperFooterPaid.Item>
-                                    <div>Discount : </div>
-                                    <div>$ {appointment.discount}</div>
-                                </WrapperFooterPaid.Item>
-                            </WrapperFooterPaid>
-                        </div>
+		if (appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND') {
+			return (
+				<React.Fragment>
+					<div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+						<div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+							<WrapperFooterPaid>
+								<WrapperFooterPaid.ItemLeft>
+									<div>Subtotal : </div>
+									<div>$ {appointment.subTotal}</div>
+								</WrapperFooterPaid.ItemLeft>
+								<WrapperFooterPaid.Item>
+									<div>Discount : </div>
+									<div>$ {appointment.discount}</div>
+								</WrapperFooterPaid.Item>
+							</WrapperFooterPaid>
+						</div>
 
-                        <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
-                            <WrapperFooterPaid>
-                                <WrapperFooterPaid.ItemLeft>
-                                    <div>Tip : </div>
-                                    <div>$ {tipAmount}</div>
-                                </WrapperFooterPaid.ItemLeft>
-                                <WrapperFooterPaid.Item>
-                                    <div>Gift card : </div>
-                                    <div>$ {appointment.giftCard}</div>
-                                </WrapperFooterPaid.Item>
-                            </WrapperFooterPaid>
-                        </div>
+						<div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+							<WrapperFooterPaid>
+								<WrapperFooterPaid.ItemLeft>
+									<div>Tip : </div>
+									<div>$ {tipAmount}</div>
+								</WrapperFooterPaid.ItemLeft>
+								<WrapperFooterPaid.Item>
+									<div>Gift card : </div>
+									<div>$ {appointment.giftCard}</div>
+								</WrapperFooterPaid.Item>
+							</WrapperFooterPaid>
+						</div>
 
-                        <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
-                            <WrapperFooterPaid>
-                                <WrapperFooterPaid.ItemLeft>
-                                    <div>Tax : </div>
-                                    <div style={{ paddingRight: 10 }}>$ {appointment.tax}</div>
-                                </WrapperFooterPaid.ItemLeft>
-                            </WrapperFooterPaid>
-                        </div>
+						<div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+							<WrapperFooterPaid>
+								<WrapperFooterPaid.ItemLeft>
+									<div>Tax : </div>
+									<div style={{ paddingRight: 10 }}>$ {appointment.tax}</div>
+								</WrapperFooterPaid.ItemLeft>
+							</WrapperFooterPaid>
+						</div>
 
-                        <FooterTotal>
-                            <div>Total</div>
-                            <div>$ {total}</div>
-                        </FooterTotal>
-                    </div>
-                </React.Fragment>
-            );
-        } else {
-            return (
-                <React.Fragment>
-                    <div>
-                        <span style={{ color : '#585858' }}>Arriving : </span>
-                        <strong style={{ color : '#585858' }}>{moment(appointment.start).fromNow()}</strong>
-                    </div>
-                    <div>
-                        <span style={{ color : '#585858' }}>Tip : </span>
-                        <strong style={{ color : '#585858' }}>$ {tipAmount}</strong>
-                    </div>
-                    <div>
-                        <span style={{ color : '#585858' }}>Total : </span>
-                        <strong style={{ color : '#585858' }}>$ {subTotal}</strong>
-                    </div>
-                </React.Fragment>
-            );
-        }
-    }
+						<FooterTotal>
+							<div>Total</div>
+							<div>$ {total}</div>
+						</FooterTotal>
+					</div>
+				</React.Fragment>
+			);
+		} else {
+			return (
+				<React.Fragment>
+					<div>
+						<span style={{ color: '#585858' }}>Code : </span>
+						<strong style={{ color: '#585858' }}>{appointment.code}</strong>
+					</div>
+					<div>
+						<span style={{ color: '#585858' }}>Tip : </span>
+						<strong style={{ color: '#585858' }}>$ {tipAmount}</strong>
+					</div>
+					<div>
+						<span style={{ color: '#585858' }}>Total : </span>
+						<strong style={{ color: '#585858' }}>$ {subTotal}</strong>
+					</div>
+				</React.Fragment>
+			);
+		}
+	}
 }

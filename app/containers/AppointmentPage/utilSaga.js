@@ -141,13 +141,19 @@ export function block(memberId, start, end) {
 
 const notesServices = (notes = []) => {
 	let noteServices = [];
+	
 	for (let i = 0; i < notes.length; i++) {
-		if (notes[i].includes("- ")) {
-			noteServices.push(notes[i])
+		if (i > 1) {
+			if (notes[i].includes("- ")) {
+				noteServices.push(notes[i])
+			} else if(notes[i].toString().trim() !== "") {
+				noteServices.push(`- ${notes[i]}`)
+			}
 		}
 	}
 	return noteServices;
 }
+
 
 const splitNotes = (note) => {
 	let tempNote = note.toString().replace("</br>", "<br>");

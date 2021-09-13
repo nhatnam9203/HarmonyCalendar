@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import styled from 'styled-components'
+import styled from 'styled-components';
+import moment from "moment";
 
 const HeaderAppointment = styled.div`
 	height: 3rem;
@@ -32,7 +33,7 @@ export default class Header extends Component {
                                 marginTop: 4
                             }}
                         >
-                            {appointment.code}
+                            {moment(appointment.start).fromNow()}
                         </div>
 						Unconfirmed Appointment
                     </HeaderAppointment>
@@ -48,7 +49,7 @@ export default class Header extends Component {
                                 marginTop: 4
                             }}
                         >
-                            {appointment.code}
+                             {moment(appointment.start).fromNow()}
                         </div>
 						Confirmed Appointment
                     </HeaderAppointment>
@@ -65,7 +66,7 @@ export default class Header extends Component {
                                 marginTop: 4
                             }}
                         >
-                            {appointment.code}
+                             {moment(appointment.start).fromNow()}
                         </div>
 						Check-In Appointment
                     </HeaderAppointment>
@@ -82,7 +83,7 @@ export default class Header extends Component {
                                 marginTop: 4
                             }}
                         >
-                            {appointment.code}
+                             {moment(appointment.start).fromNow()}
                         </div>
 						Paid Appointment
                     </HeaderAppointment>
@@ -99,7 +100,7 @@ export default class Header extends Component {
                                 marginTop: 4
                             }}
                         >
-                            {appointment.code}
+                             {moment(appointment.start).fromNow()}
                         </div>
 						Void Appointment
                     </HeaderAppointment>
@@ -116,7 +117,7 @@ export default class Header extends Component {
                                 marginTop: 4
                             }}
                         >
-                            {appointment.code}
+                             {moment(appointment.start).fromNow()}
                         </div>
 						Refund Appointment
                     </HeaderAppointment>
@@ -133,7 +134,7 @@ export default class Header extends Component {
                                 marginTop: 4
                             }}
                         >
-                            {appointment.code}
+                             {moment(appointment.start).fromNow()}
                         </div>
 						Waiting Appointment
                     </HeaderAppointment>
@@ -149,7 +150,7 @@ export default class Header extends Component {
                                 marginTop: 4
                             }}
                         >
-                            {appointment.code}
+                             {moment(appointment.start).fromNow()}
                         </div>
                             Appointment
                     </HeaderAppointment>
@@ -166,7 +167,7 @@ export default class Header extends Component {
                                 marginTop: 4
                             }}
                         >
-                            {appointment.code}
+                             {moment(appointment.start).fromNow()}
                         </div>
 						Appointment Canceled
                     </HeaderAppointment>
