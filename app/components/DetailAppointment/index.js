@@ -457,6 +457,19 @@ class Appointment extends Layout {
 		window.postMessage(data);
 	}
 
+	print = async() =>{
+		const { appointment } = this.props;
+
+		const app = await convertAppointment(appointment);
+
+		const data = await JSON.stringify({
+			appointment: app,
+			action: 'printFromCalendar'
+		});
+
+		window.postMessage(data);
+	}
+
 	addMore = () => {
 		const { appointment } = this.props;
 		const data = JSON.stringify({

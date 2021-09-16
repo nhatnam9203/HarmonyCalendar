@@ -19,6 +19,7 @@ import closeWhite from '../../images/close_white.png'
 import iconCalendarGrey from '../../images/iconCalendarGrey.png';
 import topArrow from '../../images/top_arrow@3x.png';
 import alertIcon from "../../images/alert.png";
+import printer from "../../images/printer.png"
 
 const AppPopup = styled(Popup)`
 	border-radius: 1.5rem;
@@ -124,7 +125,6 @@ AppointmentWrapper.Body = styled(AppPopupWrapper.Body)`
 const UserInformation = styled.div`
 	display: flex;
 	flex-direction: row;
-	align-items: center;
 	justify-content: space-between;
 	margin-bottom: 0.5rem;
 	padding-bottom: 0.8rem;
@@ -162,16 +162,18 @@ const UserInformation = styled.div`
 			}
 		}
 		& > div:nth-child(3) {
-			font-weight: 500;
-			font-size: 1rem;
-			color: #404040;
-			margin-left: 1rem;
-			display: flex;
-			flex-direction: row;
+			& > div{
+				font-weight: 500;
+				font-size: 1rem;
+				color: #404040;
+				margin-left: 1rem;
+				display: flex;
+				flex-direction: row;
 			& > div:nth-child(2) {
 				margin-left: 1rem;
 				color: #585858;
 				width: 25rem;
+			}	
 			}
 		}
 	}
@@ -303,7 +305,7 @@ CalendarPopup.Heading = styled.div`
 
 const LogoVip = styled.div`
 	border-radius: 100px;
-	padding: 6.7px 22px;
+	padding: 4px 22px;
 	background-color: #22da27;
 	align-items: center !important;
 	justify-content: center !important;
@@ -469,6 +471,25 @@ const RowAlert = styled.div`
 	align-items: center;
 	justify-content: space-between ;
 	margin-bottom : 2px;
+`;
+
+const ButtonPrint = styled.div`
+	display : flex;
+	align-items : center;
+	justify-content: center;
+	width: 100px;
+	height: 35px;
+	background-color: #F1F1F1;
+	border-radius : 5px;
+	margin-top: 5px;
+	& > img{
+		width: 18px; 
+		height: 18px; 
+		margin-right : 10px;
+	}
+	& > span{
+		font-size : 1rem;
+	}
 `;
 
 class Appointment extends React.Component {
@@ -767,6 +788,10 @@ class Appointment extends React.Component {
 								<span>VIP</span>
 							</LogoVip2>
 						)}
+						<ButtonPrint onClick={this.print} style={{ marginLeft : 15 }}>
+							<img src={printer} style={{}} />
+							<span style={{}}>print</span>
+						</ButtonPrint>
 					</CompanionWrapper.ColumnName>
 				</CompanionWrapperName>
 
@@ -832,12 +857,20 @@ class Appointment extends React.Component {
 							<div>{customerNote}</div>
 						</div>
 					</div>
-					{isVip === 1 && (
-						<LogoVip>
-							<img src={require('../../images/vip.png')} />
-							<span>VIP</span>
-						</LogoVip>
-					)}
+
+					<div>
+						{isVip === 1 && (
+							<LogoVip>
+								<img src={require('../../images/vip.png')} />
+								<span>VIP</span>
+							</LogoVip>
+						)}
+						<ButtonPrint onClick={this.print}>
+							<img src={printer} style={{}} />
+							<span style={{}}>print</span>
+						</ButtonPrint>
+					</div>
+
 				</UserInformation>
 			);
 		}
