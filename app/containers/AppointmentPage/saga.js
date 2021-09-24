@@ -849,7 +849,6 @@ export function* getBlockTimeSaga() {
 					yield put({ type: 'UPDATE_RESOURCE_WIDTH', payload: 8 });
 					yield put({ type: 'UPDATE_QUANTITY_RESOURCE', payload: 8 });
 					yield put({ type: 'SET_VISIBLE_CAROUSEL', payload: true });
-					yield* updateWorkingTimeToday();
 				} else if (count >= 4 && count < 8) {
 					yield* increaseResource(8, 8);
 				}
@@ -1217,32 +1216,7 @@ const reloadWeb = (date, appointment) => {
 	}, 1000);
 }
 
-function* updateWorkingTimeToday() {
-	const merchantInfo = yield select(makeMerchantInfo());
-	const currentDay = yield select(makeCurrentDay());
-	const dayName = moment(currentDay).format("dddd");
-	const businessHour = merchantInfo.businessHour[dayName];
-	var calendarOptions = $('#full-calendar')
-		.fullCalendar('getView')
-		.options;
-	if (businessHour && businessHour.timeStart && businessHour.timeEnd) {
-		calendarOptions.minTime = `${moment(businessHour.timeStart, ["hh:mm A"]).subtract(1, "hours").format("HH:mm")}:00`;
-		calendarOptions.maxTime = `${moment(businessHour.timeEnd, ["hh:mm A"]).add(1, "hours").format("HH:mm")}:00`;
-	}
-	$('#full-calendar')
-		.fullCalendar('destroy');
-
-	$('#full-calendar')
-		.fullCalendar(calendarOptions);
-}
-
 function* increaseResource(resourceWidth, qtyResource) {
-
-	const merchantInfo = yield select(makeMerchantInfo());
-	const currentDay = yield select(makeCurrentDay());
-	const dayName = moment(currentDay).format("dddd");
-	const businessHour = merchantInfo.businessHour[dayName]; 
-
 
 	yield put({ type: 'UPDATE_RESOURCE_WIDTH', payload: resourceWidth + 1 });
 
@@ -1257,10 +1231,6 @@ function* increaseResource(resourceWidth, qtyResource) {
 		arrTempResouces.push(tempStaff);
 	}
 	calendarOptions.resources = arrTempResouces;
-	if (businessHour && businessHour.timeStart && businessHour.timeEnd) {
-		calendarOptions.minTime = `${moment(businessHour.timeStart, ["hh:mm A"]).subtract(1, "hours").format("HH:mm")}:00`;
-		calendarOptions.maxTime = `${moment(businessHour.timeEnd, ["hh:mm A"]).add(1, "hours").format("HH:mm")}:00`;
-	}
 
 	$('#full-calendar')
 		.fullCalendar('destroy');
