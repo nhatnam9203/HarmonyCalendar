@@ -256,7 +256,7 @@ export function* assignAppointment(action) {
 		yield put(actions.addBlockTempFrontEnd(tempBlock));
 		yield put(actions.renderAppointment());
 
-		const services = reduceServices(options , start , extras );
+		const services = reduceServices(options, start, extras);
 
 		let data = {
 			staffId: memberId,
@@ -848,7 +848,7 @@ export function* getBlockTimeSaga() {
 				if (count < 4) {
 					yield put({ type: 'UPDATE_RESOURCE_WIDTH', payload: 8 });
 					yield put({ type: 'UPDATE_QUANTITY_RESOURCE', payload: 8 });
-					yield put({ type: 'SET_VISIBLE_CAROUSEL', payload : true });
+					yield put({ type: 'SET_VISIBLE_CAROUSEL', payload: true });
 				} else if (count >= 4 && count < 8) {
 					yield* increaseResource(8, 8);
 				}
@@ -1149,27 +1149,42 @@ export function* countAppointmentAnyStaff(action) {
 				if (parseInt(appointmentAnyStaff) < 4) {
 					if (count >= 4) {
 						reloadWeb(date, appointment);
+						return;
 					}
 				} else if (parseInt(appointmentAnyStaff) >= 4 && parseInt(appointmentAnyStaff) < 8) {
 					if (count >= 8) {
 						reloadWeb(date, appointment);
+						return;
 					} else if (count < 4) {
 						reloadWeb(date, appointment);
+						return;
+					} else if (isDayClick) {
+						yield put(actions.firstReload(true));
 					}
 				} else if (parseInt(appointmentAnyStaff) >= 8 && parseInt(appointmentAnyStaff) < 12) {
 					if (count >= 12) {
 						reloadWeb(date, appointment);
+						return;
 					} else if (count < 8) {
 						reloadWeb(date, appointment);
+						return;
+					} else if (isDayClick) {
+						yield put(actions.firstReload(true));
 					}
 				} else if (parseInt(appointmentAnyStaff) === 12) {
 					if (count < 12) {
 						reloadWeb(date, appointment);
+						return;
+					} else if (isDayClick) {
+						yield put(actions.firstReload(true));
 					}
 				}
 				else if (parseInt(appointmentAnyStaff) === 8) {
 					if (count < 8) {
 						reloadWeb(date, appointment);
+						return;
+					} else if (isDayClick) {
+						yield put(actions.firstReload(true));
 					}
 				}
 
@@ -1224,7 +1239,7 @@ function* increaseResource(resourceWidth, qtyResource) {
 		.fullCalendar(calendarOptions);
 
 	yield put({ type: 'UPDATE_QUANTITY_RESOURCE', payload: qtyResource - 1 });
-	yield put({ type: 'SET_VISIBLE_CAROUSEL', payload : true });
+	yield put({ type: 'SET_VISIBLE_CAROUSEL', payload: true });
 
 }
 

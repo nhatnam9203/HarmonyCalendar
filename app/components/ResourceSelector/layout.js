@@ -335,7 +335,7 @@ class layout extends React.Component {
 					</WrapButtonToday>
 
 					<AnyStaff
-						width={`calc(${columnWidth} * ${tempNumber} + 3px)`}
+						width={`calc(${columnWidth} * ${tempNumber} + 1.72px)`}
 						id="headerAnyStaff"
 					>
 						<AnyStaff.Image>

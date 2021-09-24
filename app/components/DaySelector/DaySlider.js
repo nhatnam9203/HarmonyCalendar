@@ -143,7 +143,7 @@ class DaySlider extends React.Component {
       isDayClick: true,
       isReloadCalendar: true,
     });
-    this.props.onChangeDay(day);
+    // this.props.onChangeDay(day);
   }
 
   onDaySelected(day) {
