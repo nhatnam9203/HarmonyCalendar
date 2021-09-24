@@ -849,6 +849,7 @@ export function* getBlockTimeSaga() {
 					yield put({ type: 'UPDATE_RESOURCE_WIDTH', payload: 8 });
 					yield put({ type: 'UPDATE_QUANTITY_RESOURCE', payload: 8 });
 					yield put({ type: 'SET_VISIBLE_CAROUSEL', payload: true });
+					yield* updateWorkingTimeToday();
 				} else if (count >= 4 && count < 8) {
 					yield* increaseResource(8, 8);
 				}
