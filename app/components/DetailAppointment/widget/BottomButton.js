@@ -23,7 +23,7 @@ const Button = styled.button`
     height: 100%;
     cursor: pointer;
     text-align: center;
-    padding: 0 2rem;
+    padding: 0px;
     width: 9rem;
     height: 2.92rem;
 `;

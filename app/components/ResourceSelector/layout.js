@@ -71,7 +71,7 @@ const WaitingHeader = styled.div`
 
 const AnyStaff = styled(Resource)`
 	/* flex : ${(props) => (props.flex ? props.flex : '0.95')}; */
-	width : ${props => props.width ? props.width : `calc(${columnWidth} + 1.5px)`};
+	width : ${props => props.width ? props.width : `calc(${columnWidth} + 1.1px)`};
 	height : 4.2rem;
 	border-left: 1px solid #1173C3;
 	background-color : #F5F5F5;
