@@ -788,10 +788,10 @@ class Appointment extends React.Component {
 								<span>VIP</span>
 							</LogoVip2>
 						)}
-						<ButtonPrint onClick={this.print} style={{ marginLeft : 15 }}>
+						{/* <ButtonPrint onClick={this.print} style={{ marginLeft : 15 }}>
 							<img src={printer} style={{}} />
 							<span style={{}}>print</span>
-						</ButtonPrint>
+						</ButtonPrint> */}
 					</CompanionWrapper.ColumnName>
 				</CompanionWrapperName>
 
@@ -865,10 +865,10 @@ class Appointment extends React.Component {
 								<span>VIP</span>
 							</LogoVip>
 						)}
-						<ButtonPrint onClick={this.print}>
+						{/* <ButtonPrint onClick={this.print}>
 							<img src={printer} style={{}} />
 							<span style={{}}>print</span>
-						</ButtonPrint>
+						</ButtonPrint> */}
 					</div>
 
 				</UserInformation>
