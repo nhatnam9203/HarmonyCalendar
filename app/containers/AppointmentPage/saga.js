@@ -832,6 +832,18 @@ export function* deleteBlockTime_Saga(action) {
 	} catch (error) { }
 }
 
+function updateWorkingTimeToday() {
+	let calendarOptions = $('#full-calendar')
+		.fullCalendar('getView')
+		.options;
+
+	$('#full-calendar')
+		.fullCalendar('destroy');
+
+	$('#full-calendar')
+		.fullCalendar(calendarOptions);
+}
+
 /********************************* GET BLOCK TIME LIST IN CALENDAR *********************************/
 export function* getBlockTimeSaga() {
 	try {
@@ -846,6 +858,7 @@ export function* getBlockTimeSaga() {
 		if (response.codeStatus === 1) {
 			if (isFirstLoadCalendar) {
 				if (count < 4) {
+					updateWorkingTimeToday();
 					yield put({ type: 'UPDATE_RESOURCE_WIDTH', payload: 8 });
 					yield put({ type: 'UPDATE_QUANTITY_RESOURCE', payload: 8 });
 					yield put({ type: 'SET_VISIBLE_CAROUSEL', payload: true });

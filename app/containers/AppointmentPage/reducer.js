@@ -153,7 +153,7 @@ function updateWorkingTimeToday(merchantInfo, dayName) {
 				calendarOptions.maxTime = `${moment(businessHour.timeEnd, ["hh:mm A"]).add(1, "hours").format("HH:mm")}:00`;
 			}
 
-			if ((businessHour.timeStart === "00:00 AM") || (businessHour.timeStart === "00:30 AM") || (businessHour.timeStart === "10:00 AM")) {
+			if ((businessHour.timeStart === "00:00 AM") || (businessHour.timeStart === "00:30 AM") || (businessHour.timeStart === "01:00 AM")) {
 
 			} else {
 				calendarOptions.minTime = `${moment(businessHour.timeStart, ["hh:mm A"]).subtract(1, "hours").format("HH:mm")}:00`;

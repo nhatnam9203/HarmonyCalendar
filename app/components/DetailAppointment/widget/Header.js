@@ -36,6 +36,17 @@ export default class Header extends Component {
                             {moment(appointment.start).fromNow()}
                         </div>
 						Unconfirmed Appointment
+                        {appointment.isVip === 1 && (
+                            <img
+                                style={{
+                                    position: 'absolute',
+                                    right: 60,
+                                    fontSize: 18,
+                                    width: 31,
+                                    height: 31
+                                }}
+                                src={require('../../../images/star_grey.png')} />
+                        )}
                     </HeaderAppointment>
                 );
             case 'CONFIRMED':
@@ -49,9 +60,20 @@ export default class Header extends Component {
                                 marginTop: 4
                             }}
                         >
-                             {moment(appointment.start).fromNow()}
+                            {moment(appointment.start).fromNow()}
                         </div>
 						Confirmed Appointment
+                        {appointment.isVip === 1 && (
+                            <img
+                                style={{
+                                    position: 'absolute',
+                                    right: 60,
+                                    fontSize: 18,
+                                    width: 31,
+                                    height: 31
+                                }}
+                                src={require('../../../images/star_grey.png')} />
+                        )}
                     </HeaderAppointment>
                 );
 
@@ -66,9 +88,20 @@ export default class Header extends Component {
                                 marginTop: 4
                             }}
                         >
-                             {moment(appointment.start).fromNow()}
+                            {moment(appointment.start).fromNow()}
                         </div>
 						Check-In Appointment
+                        {appointment.isVip === 1 && (
+                            <img
+                                style={{
+                                    position: 'absolute',
+                                    right: 60,
+                                    fontSize: 18,
+                                    width: 31,
+                                    height: 31
+                                }}
+                                src={require('../../../images/vip.png')} />
+                        )}
                     </HeaderAppointment>
                 );
 
@@ -83,9 +116,20 @@ export default class Header extends Component {
                                 marginTop: 4
                             }}
                         >
-                             {moment(appointment.start).fromNow()}
+                            {moment(appointment.start).fromNow()}
                         </div>
 						Paid Appointment
+                        {appointment.isVip === 1 && (
+                            <img
+                                style={{
+                                    position: 'absolute',
+                                    right: 60,
+                                    fontSize: 18,
+                                    width: 31,
+                                    height: 31
+                                }}
+                                src={require('../../../images/vip.png')} />
+                        )}
                     </HeaderAppointment>
                 );
 
@@ -100,9 +144,20 @@ export default class Header extends Component {
                                 marginTop: 4
                             }}
                         >
-                             {moment(appointment.start).fromNow()}
+                            {moment(appointment.start).fromNow()}
                         </div>
 						Void Appointment
+                        {appointment.isVip === 1 && (
+                            <img
+                                style={{
+                                    position: 'absolute',
+                                    right: 60,
+                                    fontSize: 18,
+                                    width: 31,
+                                    height: 31
+                                }}
+                                src={require('../../../images/vip.png')} />
+                        )}
                     </HeaderAppointment>
                 );
 
@@ -117,9 +172,20 @@ export default class Header extends Component {
                                 marginTop: 4
                             }}
                         >
-                             {moment(appointment.start).fromNow()}
+                            {moment(appointment.start).fromNow()}
                         </div>
 						Refund Appointment
+                        {appointment.isVip === 1 && (
+                            <img
+                                style={{
+                                    position: 'absolute',
+                                    right: 60,
+                                    fontSize: 18,
+                                    width: 31,
+                                    height: 31
+                                }}
+                                src={require('../../../images/vip.png')} />
+                        )}
                     </HeaderAppointment>
                 );
 
@@ -134,9 +200,20 @@ export default class Header extends Component {
                                 marginTop: 4
                             }}
                         >
-                             {moment(appointment.start).fromNow()}
+                            {moment(appointment.start).fromNow()}
                         </div>
 						Waiting Appointment
+                        {appointment.isVip === 1 && (
+                            <img
+                                style={{
+                                    position: 'absolute',
+                                    right: 60,
+                                    fontSize: 18,
+                                    width: 31,
+                                    height: 31
+                                }}
+                                src={require('../../../images/star_grey.png')} />
+                        )}
                     </HeaderAppointment>
                 );
             case 'no show':
@@ -150,9 +227,20 @@ export default class Header extends Component {
                                 marginTop: 4
                             }}
                         >
-                             {moment(appointment.start).fromNow()}
+                            {moment(appointment.start).fromNow()}
                         </div>
                             Appointment
+                        {appointment.isVip === 1 && (
+                            <img
+                                style={{
+                                    position: 'absolute',
+                                    right: 60,
+                                    fontSize: 18,
+                                    width: 31,
+                                    height: 31
+                                }}
+                                src={require('../../../images/star_grey.png')} />
+                        )}
                     </HeaderAppointment>
                 );
 
@@ -167,7 +255,7 @@ export default class Header extends Component {
                                 marginTop: 4
                             }}
                         >
-                             {moment(appointment.start).fromNow()}
+                            {moment(appointment.start).fromNow()}
                         </div>
 						Appointment Canceled
                     </HeaderAppointment>

@@ -479,7 +479,8 @@ const ButtonPrint = styled.div`
 	justify-content: center;
 	width: 100px;
 	height: 35px;
-	background-color: #F1F1F1;
+	background-color: #1B68AC;
+	color : white;
 	border-radius : 5px;
 	margin-top: 5px;
 	& > img{
@@ -502,7 +503,7 @@ class Appointment extends React.Component {
 				<div style={{ width: 130 }}>
 					<div>{note.staffName}</div>
 				</div>
-				<div>
+				<div style={{ maxWidth : "19rem", wordBreak : "break-all" }}>
 					<div>{note.note}</div>
 				</div>
 			</NoteInformation>
@@ -780,18 +781,12 @@ class Appointment extends React.Component {
 						<span style={{ marginLeft: 35 }}>{`${appointment.firstName} ${appointment.lastName}`}</span>
 					</CompanionWrapper.ColumnName>
 
-					<CompanionWrapper.ColumnName>
+					<CompanionWrapper.ColumnName style={{ justifyContent: 'space-between' }}>
 						<span style={{ marginLeft: 20 }}>{formatPhone(appointment.phoneNumber)}</span>
-						{isVip === 1 && (
-							<LogoVip2 style={{ marginLeft: 15 }}>
-								<img src={require('../../images/vip.png')} />
-								<span>VIP</span>
-							</LogoVip2>
-						)}
-						{/* <ButtonPrint onClick={this.print} style={{ marginLeft : 15 }}>
+						<ButtonPrint onClick={this.print} style={{ marginLeft : 15 }}>
 							<img src={printer} style={{}} />
 							<span style={{}}>print</span>
-						</ButtonPrint> */}
+						</ButtonPrint>
 					</CompanionWrapper.ColumnName>
 				</CompanionWrapperName>
 
@@ -859,16 +854,16 @@ class Appointment extends React.Component {
 					</div>
 
 					<div>
-						{isVip === 1 && (
+						{/* {isVip === 1 && (
 							<LogoVip>
 								<img src={require('../../images/vip.png')} />
 								<span>VIP</span>
 							</LogoVip>
-						)}
-						{/* <ButtonPrint onClick={this.print}>
+						)} */}
+						<ButtonPrint onClick={this.print}>
 							<img src={printer} style={{}} />
 							<span style={{}}>print</span>
-						</ButtonPrint> */}
+						</ButtonPrint>
 					</div>
 
 				</UserInformation>
