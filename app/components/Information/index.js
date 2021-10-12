@@ -87,6 +87,15 @@ const CloseButton = styled.img`
     cursor: pointer;
 `;
 
+
+const ItemAppointment = ({ title = '', icon }) => (
+    <Item>
+        <img src={icon} alt="" />
+        <div>{title}</div>
+        <div>Appointment</div>
+    </Item>
+)
+
 export default class Information extends React.Component {
 
     render() {
@@ -106,7 +115,7 @@ export default class Information extends React.Component {
                     </Header>
                     <Content>
                         <Row>
-                            <ItemAppointment title="Unconfirn" icon={iconUnconfirm} />
+                            <ItemAppointment title="Unconfirm" icon={iconUnconfirm} />
                             <ItemAppointment title="Confirmed" icon={iconConfirm} />
                             <ItemAppointment title="Check-In" icon={iconCheckin} />
                             <ItemAppointment title="Paid" icon={iconPaid} />
@@ -140,12 +149,3 @@ export default class Information extends React.Component {
         )
     }
 }
-
-
-const ItemAppointment = ({ title = '', icon }) => (
-    <Item>
-        <img src={icon} alt="" />
-        <div>{title}</div>
-        <div>Appointment</div>
-    </Item>
-)

@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { createStructuredSelector } from 'reselect';
 
-import Information from '../../components/Information/index';
+import Information from 'components/Information';
 
 import {
     makePopupInformation,
