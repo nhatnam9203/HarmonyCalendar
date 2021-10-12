@@ -150,6 +150,9 @@ const makeBlockTime = () =>
 const makeVisibleCarousel = () =>
 	createSelector(currentAppointment, (appointmentState) => appointmentState.get('isVisibleCarousel'));
 
+const makePopupInformation = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.get('isPopupInformation'));
+
 export {
 	currentAppointment,
 	makeCurrentDay,
@@ -196,5 +199,6 @@ export {
 	makeAssignAnyStaffToStaff,
 	makeFirstReload,
 	makeBlockTime,
-	makeVisibleCarousel
+	makeVisibleCarousel,
+	makePopupInformation
 };

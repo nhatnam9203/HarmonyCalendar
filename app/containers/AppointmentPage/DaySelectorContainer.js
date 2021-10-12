@@ -13,6 +13,7 @@ import {
 	disableCalendar,
 	toggleSearchBox,
 	countAppointmentAnyStaff,
+	toggleInformation
 } from './actions';
 import { makeCurrentDay, makeCurrentWeekDays, makeMerchantInfo } from './selectors';
 
@@ -26,6 +27,8 @@ export function mapDispatchToProps(dispatch) {
 		disable_Calendar: (status) => dispatch(disableCalendar(status)),
 		toggleSearchBox: (isPopupSearchBox) => dispatch(toggleSearchBox(isPopupSearchBox)),
 		countAppointmentAnyStaff : (payload) =>dispatch(countAppointmentAnyStaff(payload)),
+		toggleInformation : (payload) =>dispatch(toggleInformation(payload)),
+
 	};
 }
 

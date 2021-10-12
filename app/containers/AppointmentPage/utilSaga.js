@@ -68,6 +68,7 @@ export const appointmentAdapter = (appointment) => {
 		customerId: appointment.customerId,
 		giftCard: appointment.giftCard,
 		giftCards: appointment.giftCards ? appointment.giftCards : [],
+		checkoutId : appointment.checkoutId ? appointment.checkoutId : null,
 		notes: appointment.notes
 			? appointment.notes.sort(function (a, b) {
 				var c = a.appointmentNoteId;

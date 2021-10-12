@@ -110,7 +110,9 @@ export function api(path, params, method, token) {
 			if (resp.status === 200) return resp.json();
 		})
 		.then((json) => json)
-		.catch((error) => error);
+		.catch((error) => {
+			console.log({ error })
+		});
 }
 
 export const PromiseAction = async (action, data) => {

@@ -135,7 +135,8 @@ import {
 	ANYSTAFF_ASSIGN_TO_STAFF,
 	FIRST_LOAD_CALENDAR,
 	GET_STAFF_OF_SERVICE,
-	SET_ALL_BLOCK
+	SET_ALL_BLOCK,
+	TOGGLE_INFORMATION
 } from './constants';
 
 /**
@@ -995,3 +996,11 @@ export function setAllBlock(payload){
 		payload
 	}
 }
+
+export function toggleInformation(payload){
+	return{
+		type : TOGGLE_INFORMATION,
+		payload
+	}
+}
+

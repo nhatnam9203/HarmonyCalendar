@@ -5,6 +5,7 @@ import moment from 'moment';
 import SearchButton from './SearchButton';
 import ButtonCheckIn from './ButtonCheckIn';
 import DaySlider from './DaySlider';
+import InformationButton from "./InformationButton";
 
 const DaySelectorWrapper = styled.div`
   width: 100%;
@@ -39,9 +40,10 @@ class DaySelector extends React.Component {
     }
   }
 
-  openPopupAddAppointment = () =>{
+  openPopupAddAppointment = () => {
     this.props.openAddingAppointment({});
-    this.props.disable_Calendar(true);  }
+    this.props.disable_Calendar(true);
+  }
 
   render() {
     const {
@@ -53,15 +55,17 @@ class DaySelector extends React.Component {
       loadingCalendar,
       merchantInfo,
       toggleSearchBox,
-      countAppointmentAnyStaff
+      countAppointmentAnyStaff,
+      toggleInformation
     } = this.props;
     return (
       <DaySelectorWrapper>
         <SearchButton
           selectedDay={currentDay}
           onChangeDay={onChangeDayOnCalendar}
-          onPress={()=>toggleSearchBox(true)}
+          onPress={() => toggleSearchBox(true)}
         />
+        <InformationButton onPress={() => toggleInformation(true)} />
         <DaySlider
           days={weekDays.valueSeq().toArray()}
           selectedDay={currentDay}
@@ -70,8 +74,8 @@ class DaySelector extends React.Component {
           loadingCalendar={loadingCalendar}
           merchantInfo={merchantInfo}
           countAppointmentAnyStaff={countAppointmentAnyStaff}
-        /> 
-        <ButtonCheckIn onPress={()=>this.openPopupAddAppointment()} />
+        />
+        <ButtonCheckIn onPress={() => this.openPopupAddAppointment()} />
       </DaySelectorWrapper>
     );
   }

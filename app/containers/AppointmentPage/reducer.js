@@ -69,7 +69,8 @@ import {
 	UPDATE_QUANTITY_RESOURCE,
 	ANYSTAFF_ASSIGN_TO_STAFF,
 	FIRST_LOAD_CALENDAR,
-	SET_ALL_BLOCK
+	SET_ALL_BLOCK,
+	TOGGLE_INFORMATION
 } from './constants';
 
 import { unionBy } from 'lodash';
@@ -137,6 +138,8 @@ export const initialState = fromJS({
 	isAssignAnyStaffToStaff: false,
 	isFirstLoadCalendar: true,
 	isVisibleCarousel: false,
+	isPopupInformation: false,
+
 });
 
 function updateWorkingTimeToday(merchantInfo, dayName) {
@@ -203,6 +206,10 @@ function appointmentReducer(state = initialState, action) {
 					startOfWeek.clone().add(6, 'd')
 				])
 			);
+
+
+		case TOGGLE_INFORMATION:
+			return state.set('isPopupInformation', action.payload);
 
 		case FIRST_LOAD_CALENDAR:
 			return state.set('isFirstLoadCalendar', action.payload);
