@@ -359,14 +359,14 @@ class AddAppointment extends React.Component {
                             )}
                         </Form>
 
-                        <Form className="left" onSubmit={(e) => e.preventDefault()}>
+                        {/* <Form className="left" onSubmit={(e) => e.preventDefault()}>
                             <Label>Referred by</Label>
                             <input
                                 value={this.state.referedBy || ''}
                                 onChange={(e) => this.handleChangeReferedBy(e)}
                                 placeholder="Referred by"
                             />
-                        </Form>
+                        </Form> */}
 
                         {!createdDate && <NoteWrapper>
                             <Label>Note:</Label>
@@ -433,7 +433,7 @@ class AddAppointment extends React.Component {
                     toggleSendLink={() => this.toggleSendLink()}
                     isSendLink={this.state.isSendLink}
                     condition={condition}
-                    onSubmit={this.handleSubmitAppointment}
+                    onSubmit={this.addAppointmentExistCustomer}
                 />
                 <PopupPhone
                     ref={this.refPopupPhone}

@@ -72,9 +72,9 @@ export default class BottomButton extends Component {
                         return (
                             <WrapButton>
                                 <Button
-                                    primary={!isDisabled}
+                                    primary={true}
                                     style={{ fontWeight: '700' }}
-                                    onClick={() => !isDisabled && this.props.updateStaffAppointmentPaid()}
+                                    onClick={() =>  this.props.updateStaffAppointmentPaid()}
 
                                 >
                                     Submit

@@ -37,13 +37,27 @@ const FooterTotal = styled(WrapperFooterPaid)`
 `;
 
 export default class FooterAppointment extends Component {
+
+	goToInvoicePage = async () => {
+		const { appointment } = this.props;
+		if (appointment.status === "PAID") {
+
+			const data = await JSON.stringify({
+				appointment: appointment,
+				action: 'goToInvoice'
+			});
+
+			window.postMessage(data);
+		}
+	}
+
 	render() {
 		const { appointment } = this.props;
 
 		let subTotal = appointment.subTotal
 			? parseFloat(appointment.subTotal.toString().replace(/,/g, ''))
-					.toFixed(2)
-					.replace(/\d(?=(\d{3})+\.)/g, '$&,')
+				.toFixed(2)
+				.replace(/\d(?=(\d{3})+\.)/g, '$&,')
 			: '0.00';
 
 		let total = appointment.total
@@ -52,14 +66,14 @@ export default class FooterAppointment extends Component {
 
 		let tipAmount = appointment.tipAmount
 			? parseFloat(appointment.tipAmount.toString().replace(/,/g, ''))
-					.toFixed(2)
-					.replace(/\d(?=(\d{3})+\.)/g, '$&,')
+				.toFixed(2)
+				.replace(/\d(?=(\d{3})+\.)/g, '$&,')
 			: '0.00';
 
 		let tipPercent = appointment.tipPercent
 			? parseFloat(appointment.tipPercent.toString().replace(/,/g, ''))
-					.toFixed(2)
-					.replace(/\d(?=(\d{3})+\.)/g, '$&,')
+				.toFixed(2)
+				.replace(/\d(?=(\d{3})+\.)/g, '$&,')
 			: '0.00';
 
 		if (appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND') {
@@ -69,25 +83,25 @@ export default class FooterAppointment extends Component {
 						<div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
 							<WrapperFooterPaid>
 								<WrapperFooterPaid.ItemLeft>
+									<div>Invoice : </div>
+									<div onClick={this.goToInvoicePage}>{appointment.code}</div>
+								</WrapperFooterPaid.ItemLeft>
+								<WrapperFooterPaid.Item>
 									<div>Subtotal : </div>
 									<div>$ {appointment.subTotal}</div>
-								</WrapperFooterPaid.ItemLeft>
-								<WrapperFooterPaid.Item>
+								</WrapperFooterPaid.Item>
+							</WrapperFooterPaid>
+						</div>
+
+						<div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+							<WrapperFooterPaid>
+								<WrapperFooterPaid.ItemLeft>
 									<div>Discount : </div>
 									<div>$ {appointment.discount}</div>
-								</WrapperFooterPaid.Item>
-							</WrapperFooterPaid>
-						</div>
-
-						<div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
-							<WrapperFooterPaid>
-								<WrapperFooterPaid.ItemLeft>
-									<div>Tip : </div>
-									<div>$ {tipAmount}</div>
 								</WrapperFooterPaid.ItemLeft>
 								<WrapperFooterPaid.Item>
-									<div>Gift card : </div>
-									<div>$ {appointment.giftCard}</div>
+									<div>Tip : </div>
+									<div>$ {tipAmount}</div>
 								</WrapperFooterPaid.Item>
 							</WrapperFooterPaid>
 						</div>
@@ -95,9 +109,13 @@ export default class FooterAppointment extends Component {
 						<div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
 							<WrapperFooterPaid>
 								<WrapperFooterPaid.ItemLeft>
-									<div>Tax : </div>
-									<div style={{ paddingRight: 10 }}>$ {appointment.tax}</div>
+									<div>Gift card : </div>
+									<div>$ {appointment.giftCard}</div>
 								</WrapperFooterPaid.ItemLeft>
+								<WrapperFooterPaid.Item>
+									<div>Tax : </div>
+									<div>$ {appointment.tax}</div>
+								</WrapperFooterPaid.Item>
 							</WrapperFooterPaid>
 						</div>
 

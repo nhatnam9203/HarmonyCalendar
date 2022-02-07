@@ -90,7 +90,7 @@ export default class ServicePaid extends Component {
         } = this.props;
         const { status, memberId } = appointment;
         const { isWarning } = service;
-        const isActive = isWarning && status !== "WAITING" && parseInt(memberId) !== 0;
+        const isActive = isWarning && status !== "WAITING" && status !== "PAID" && parseInt(memberId) !== 0;
 
         const { staffOfService, isLoading } = this.state;
         return (

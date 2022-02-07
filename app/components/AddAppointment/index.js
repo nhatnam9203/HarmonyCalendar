@@ -98,8 +98,22 @@ class AddAppointment extends Layout {
 	handleSubmitVerifyPhone = async () => {
 		let phoneNumber = this.refPopupPhone.current.refPhone.current.value;
 		const phone = checkStringNumber2(phoneNumber.toString()); // lấy ra số phone , ex : 123-456-7890
-		await this.setState({ phoneNumber: phone });
 		if (phone.trim() !== "") {
+			const kt_phone = phone.toString().replace(/-/g, '');
+			if (parseInt(this.state.phoneCheck) === 84) {
+				if (kt_phone.toString().length < 9) {
+					alert("Phone number must have at least 9 digits");
+					return;
+				}
+			}
+			if (parseInt(this.state.phoneCheck) === 1) {
+				if (kt_phone.toString().length < 10) {
+					alert("Phone number must have at least 10 digits");
+					return;
+				}
+			}
+
+			await this.setState({ phoneNumber: phone });
 			const payload = {
 				phone: `${this.state.phoneCheck}${phone}`,
 			}
@@ -111,6 +125,55 @@ class AddAppointment extends Layout {
 		const { time, staffID, dataAnyStaff } = this.props.TimeAndStaffID;
 		const { first_name, last_name, phoneNumber, phone, notes, email, phoneCheck, refPhoneHeader, referedBy, isSendLink } = this.state;
 		const refFone = phone ? phone : '';
+
+		if (refFone && refFone !== "") {
+			let checkRefPhone = checkStringNumber2(refFone.toString());
+			checkRefPhone = checkRefPhone.toString().replace(/-/g, '');
+			if (parseInt(refPhoneHeader) === 84) {
+				if (checkRefPhone.toString().length < 9) {
+					alert("Referral phone number must have at least 9 digits");
+					return;
+				}
+			}
+			if (parseInt(refPhoneHeader) === 1) {
+				if (checkRefPhone.toString().length < 10) {
+					alert("Referral phone number must have at least 10 digits");
+					return;
+				}
+			}
+		}
+
+
+		const data = {
+			first_name,
+			last_name,
+			phone: `+${phoneCheck}${phoneNumber}`,
+			refPhone: refFone ? refPhoneHeader + checkStringNumber2(refFone.toString()) : "",
+			note: notes.toString(),
+			time,
+			staffID,
+			email,
+			referedBy,
+			isSendLink,
+			dataAnyStaff: dataAnyStaff ? dataAnyStaff : '',
+		}
+		if (isPopupCustomer == true) {
+			this.props.addCustomer(data);
+			this.props.infoCheckPhone('');
+			this.closeAllModal();
+		} else
+			if (first_name.trim() !== '' && last_name.trim() !== '') {
+				this.props.addCustomer(data);
+				this.props.infoCheckPhone('');
+				this.closeAllModal();
+			}
+	};
+
+	addAppointmentExistCustomer = (isPopupCustomer) => {
+		const { time, staffID, dataAnyStaff } = this.props.TimeAndStaffID;
+		const { first_name, last_name, phoneNumber, phone, notes, email, phoneCheck, refPhoneHeader, referedBy, isSendLink } = this.state;
+		const refFone = phone ? phone : '';
+
 		const data = {
 			first_name,
 			last_name,
@@ -137,6 +200,7 @@ class AddAppointment extends Layout {
 	};
 
 	handleChangeNumber = async (e) => {
+		console.log({ value: e.target.value });
 		this.setState({ phoneNumber: e.target.value });
 	}
 

@@ -984,11 +984,7 @@ function getEventStyle(status, isWarning) {
 
 	if (status === 'BLOCK_TEMP_PAID') {
 		eventColor = '#38ff05';
-		if (isWarning) {
-			eventClass = 'event-block-temp-paid-warning';
-		} else {
-			eventClass = 'event-block-temp-paid';
-		}
+		eventClass = 'event-block-temp-paid';
 	}
 
 	if (status === 'BLOCK_TEMP_REFUND') {

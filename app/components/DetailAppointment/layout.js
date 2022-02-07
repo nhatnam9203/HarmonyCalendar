@@ -892,7 +892,7 @@ class Appointment extends React.Component {
 				{this.renderCustomerName()}
 				<RowAlert>
 					{this.renderSelectDay()}
-					{this.renderWrongAlert()}
+					{ appointment.status !== "PAID" && this.renderWrongAlert()}
 				</RowAlert>
 				{this.renderCategories()}
 				{this.renderServices()}
