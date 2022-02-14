@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import moment from 'moment';
 import { convertMinsToHrsMins } from '../../utils/helper';
 
+
 const Item = styled.div`
     border-bottom : 1px solid #dddddd;
     padding-bottom : 0.6rem;
@@ -30,7 +31,6 @@ Item.RowExtra = styled.div`
 const RowInfo = styled.div`
     display: flex;
     flex-direction : row;
-    align-items: flex-end;
     margin-bottom : 0.3rem;
     margin-top : 0.3rem;
     margin-bottom : 0.3rem;
@@ -113,7 +113,8 @@ const RowExtra = styled.div`
     margin-bottom : 0 !important;
 `;
 
-const ItemAppointment = ({ item, selectItem, indexActive }) => {
+const ItemAppointment = ({ item, selectItem, indexActive, jumpToCustomerHistory }) => {
+
     return (
         <Item
             isActive={item.appointmentId === indexActive}
@@ -123,13 +124,13 @@ const ItemAppointment = ({ item, selectItem, indexActive }) => {
                 <Item.Code>
                     #{item.code}
                 </Item.Code>
-                <Item.Status color={statusConvertColor[item.status]}>
-                    {statusConvertKey[item.status]}
+                <Item.Status color={statusConvertColor[item.status] ? statusConvertColor[item.status] : "grey"}>
+                    {statusConvertKey[item.status] ? statusConvertKey[item.status] : "NO SHOW"}
                 </Item.Status>
             </Item.Row>
             <RowInfo>
-                <Item.Name>{`${item.firstName}`}</Item.Name>
-                <Item.PhoneNumber>{`${item.phoneNumber}`}</Item.PhoneNumber>
+                <Item.Name onClick={e => jumpToCustomerHistory(e, item)}>{`${item.firstName}`}</Item.Name>
+                <Item.PhoneNumber onClick={e => jumpToCustomerHistory(e, item)}>{`${item.phoneNumber}`}</Item.PhoneNumber>
             </RowInfo>
             <Item.Date style={{ marginBottom: 18 }}>
                 {moment(item.fromTime).format('MMMM DD dddd, YYYY')}
@@ -174,7 +175,7 @@ const ItemAppointment = ({ item, selectItem, indexActive }) => {
     )
 }
 
-const ItemService = ({ service, extras , item }) => {
+const ItemService = ({ service, extras, item }) => {
     return (
         <ContainerItem>
             <Item.Row key={service.bookingServiceId}>

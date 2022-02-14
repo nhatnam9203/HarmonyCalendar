@@ -840,10 +840,10 @@ class Appointment extends React.Component {
 			return (
 				<UserInformation>
 					<div>
-						<div>
+						<div onClick={()=>this.jumpToCustomerHistory()}>
 							<span>{appointment.firstName.toString().charAt(0)}</span>
 						</div>
-						<div>
+						<div onClick={()=>this.jumpToCustomerHistory()}>
 							<div>{`${appointment.firstName} ${appointment.lastName}`}</div>
 							<div>{formatPhone(appointment.phoneNumber)}</div>
 						</div>

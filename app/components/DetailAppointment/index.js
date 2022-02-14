@@ -40,8 +40,9 @@ class Appointment extends Layout {
 
 	conditionRenderAlertService() {
 		let flag = false;
-		const { appointment : { memberId , status } } = this.props;
-		if(parseInt(memberId) === 0 && status !== "WAITING"){
+		const { appointment: { memberId, status } } = this.props;
+		console.log({ status })
+		if (parseInt(memberId) === 0 && status !== "WAITING") {
 			return false;
 		}
 		const { services } = this.state;
@@ -457,7 +458,7 @@ class Appointment extends Layout {
 		window.postMessage(data);
 	}
 
-	print = async() =>{
+	print = async () => {
 		const { appointment } = this.props;
 
 		const app = await convertAppointment(appointment);
@@ -663,6 +664,19 @@ class Appointment extends Layout {
 		if (e.target.validity.valid) await this.setState({ companionPhone: e.target.value.replace(/^0+/, '') });
 		else if (val === '' || val === '-') await this.setState({ companionPhone: val });
 		await this.searchPhoneCompanion();
+	}
+
+	jumpToCustomerHistory = async() => {
+		const { appointment } = this.props;
+
+		const app = await convertAppointment(appointment);
+
+		const data = await JSON.stringify({
+			appointment: app,
+			action: 'jumpToCustomerHistory'
+		});
+
+		window.postMessage(data);
 	}
 
 	async addNote(e) {

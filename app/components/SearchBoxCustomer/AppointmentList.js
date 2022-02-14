@@ -12,7 +12,7 @@ const Container = styled.div`
 
 export default class AppointmentList extends Component {
     render() {
-        const { appointmentSearchBox , selectItem, indexActive } = this.props;
+        const { appointmentSearchBox, selectItem, indexActive, jumpToCustomerHistory } = this.props;
         return (
             <Container>
                 {
@@ -22,6 +22,7 @@ export default class AppointmentList extends Component {
                             key={item.appointmentId}
                             selectItem={selectItem}
                             indexActive={indexActive}
+                            jumpToCustomerHistory={(e, item) => jumpToCustomerHistory(e, item)}
                         />
                     )}
             </Container>

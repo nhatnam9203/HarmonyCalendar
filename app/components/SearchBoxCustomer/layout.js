@@ -193,6 +193,7 @@ export default class SearchBoxCustomer extends React.Component {
                         appointmentSearchBox={appointmentSearchBox}
                         selectItem={(date, appointment) => this.selectItem(date, appointment)}
                         indexActive={this.state.indexActive}
+                        jumpToCustomerHistory={(e, item) => this.jumpToCustomerHistory(e, item)}
                     />
                 </Container>
             </AppPopup>
