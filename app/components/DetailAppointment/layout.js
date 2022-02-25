@@ -503,7 +503,7 @@ class Appointment extends React.Component {
 				<div style={{ width: 130 }}>
 					<div>{note.staffName}</div>
 				</div>
-				<div style={{ maxWidth : "19rem", wordBreak : "break-all" }}>
+				<div style={{ maxWidth: "19rem", wordBreak: "break-all" }}>
 					<div>{note.note}</div>
 				</div>
 			</NoteInformation>
@@ -661,8 +661,8 @@ class Appointment extends React.Component {
 						<tr>
 							<th width="100%">
 								{' '}
-						Categories
-					</th>
+								Categories
+							</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -776,14 +776,14 @@ class Appointment extends React.Component {
 		return (
 			<React.Fragment>
 				<CompanionWrapperName>
-					<CompanionWrapper.ColumnName>
+					<CompanionWrapper.ColumnName onClick={() => this.jumpToCustomerHistory()}>
 						<span>Main Customer: </span>
 						<span style={{ marginLeft: 35 }}>{`${appointment.firstName} ${appointment.lastName}`}</span>
 					</CompanionWrapper.ColumnName>
 
 					<CompanionWrapper.ColumnName style={{ justifyContent: 'space-between' }}>
 						<span style={{ marginLeft: 20 }}>{formatPhone(appointment.phoneNumber)}</span>
-						<ButtonPrint onClick={this.print} style={{ marginLeft : 15 }}>
+						<ButtonPrint onClick={this.print} style={{ marginLeft: 15 }}>
 							<img src={printer} style={{}} />
 							<span style={{}}>print</span>
 						</ButtonPrint>
@@ -840,10 +840,10 @@ class Appointment extends React.Component {
 			return (
 				<UserInformation>
 					<div>
-						<div onClick={()=>this.jumpToCustomerHistory()}>
+						<div onClick={() => this.jumpToCustomerHistory()}>
 							<span>{appointment.firstName.toString().charAt(0)}</span>
 						</div>
-						<div onClick={()=>this.jumpToCustomerHistory()}>
+						<div onClick={() => this.jumpToCustomerHistory()}>
 							<div>{`${appointment.firstName} ${appointment.lastName}`}</div>
 							<div>{formatPhone(appointment.phoneNumber)}</div>
 						</div>
@@ -892,7 +892,7 @@ class Appointment extends React.Component {
 				{this.renderCustomerName()}
 				<RowAlert>
 					{this.renderSelectDay()}
-					{ appointment.status !== "PAID" && this.renderWrongAlert()}
+					{appointment.status !== "PAID" && this.renderWrongAlert()}
 				</RowAlert>
 				{this.renderCategories()}
 				{this.renderServices()}

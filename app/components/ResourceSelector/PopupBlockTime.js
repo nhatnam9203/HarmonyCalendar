@@ -196,6 +196,7 @@ class PopupBlockTime extends Component {
 			app.status === 'BLOCK_TEMP_ASSIGNED' ||
 			app.status === 'BLOCK_TEMP_CHECKED_IN' ||
 			app.status === 'BLOCK_TEMP_CONFIRMED' ||
+			app.status === 'no show' ||
 			app.status === 'BLOCK_TEMP_PAID').length;
 
 		return count ? count.toString() : 0;

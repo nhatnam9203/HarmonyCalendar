@@ -4,6 +4,7 @@ import Carousel from 'nuka-carousel';
 import { staffId } from '../../../app-constants';
 import PopupBlockTime from './PopupBlockTime';
 import ButtonSplash from './ButtonSplash';
+import AvatarSplash from "./AvatarSplash";
 
 const columnWidth = `((100vw - 5.05rem - 2px) / 10)`;
 
@@ -156,6 +157,13 @@ Resource.OrderNumber = styled.div`
 	line-height: 1.3;
 `;
 
+Resource.AppointmentCount = styled(Resource.OrderNumber)`
+	left : 8px;
+	top : 5px;
+	background : #E5E5E5;
+	color : #404040;
+`;
+
 Resource.WorkingTime = styled.div`
 	position: absolute;
 	bottom: 0;
@@ -244,8 +252,27 @@ function chunk(array, size) {
 }
 
 class layout extends React.Component {
+
+	countAppointment(staff) {
+		const { calendarMembers } = this.props;
+		let count = 0;
+		const memApp = calendarMembers.find((mem) => parseInt(mem.memberId) === parseInt(staff.id));
+		if (!memApp) return 0;
+
+		count = memApp.appointments.filter((app) =>
+			app.status === 'BLOCK_TEMP_PAID' ||
+			app.status === 'BLOCK_TEMP_REFUND' ||
+			app.status === 'BLOCK_TEMP_ASSIGNED' ||
+			app.status === 'BLOCK_TEMP_CHECKED_IN' ||
+			app.status === 'BLOCK_TEMP_CONFIRMED' ||
+			app.status === 'no show' ||
+			app.status === 'BLOCK_TEMP_PAID').length;
+
+		return count ? count.toString() : 0;
+	}
+
 	renderResource(resource, index) {
-		const { qtyResources, isFirstReloadCalendar } = this.props;
+		const { qtyResources, isFirstReloadCalendar, merchantInfo } = this.props;
 		const { isLoadingStaff } = this.state;
 
 		if (parseInt(resource.id) !== 0 && !isLoadingStaff && !isFirstReloadCalendar)
@@ -256,13 +283,34 @@ class layout extends React.Component {
 					active={parseInt(resource.id) === parseInt(staffId) ? true : false}
 					key={index}
 				>
-					<Resource.Avatar>
-						<img src={resource.imageUrl} alt={resource.orderNumber} />
-					</Resource.Avatar>
+					{
+						merchantInfo && merchantInfo.isStaffAppointmentCount ?
+							<>
+								{
+									resource.isNextAvailableStaff === 1 ?
+										<AvatarSplash>
+											<img src={resource.imageUrl} alt={resource.orderNumber} />
+										</AvatarSplash> :
+										<Resource.Avatar>
+											<img src={resource.imageUrl} alt={resource.orderNumber} />
+										</Resource.Avatar>
 
-					<Resource.OrderNumber next={resource.isNextAvailableStaff === 1 ? true : false}>
-						{resource.orderNumber}
-					</Resource.OrderNumber>
+								}
+
+								<Resource.AppointmentCount>
+									{this.countAppointment(resource)}
+								</Resource.AppointmentCount>
+							</> :
+							<>
+								<Resource.Avatar>
+									<img src={resource.imageUrl} alt={resource.orderNumber} />
+								</Resource.Avatar>
+
+								<Resource.OrderNumber next={resource.isNextAvailableStaff === 1 ? true : false}>
+									{resource.orderNumber}
+								</Resource.OrderNumber>
+							</>
+					}
 					<Resource.Title>{resource.title}</Resource.Title>
 				</Resource>
 			);
