@@ -160,8 +160,8 @@ Resource.OrderNumber = styled.div`
 Resource.AppointmentCount = styled(Resource.OrderNumber)`
 	left : 8px;
 	top : 5px;
-	background : #E5E5E5;
-	color : #404040;
+	background : ${(props) => (props.login ? '#76D671' : '#E5E5E5')};
+	color :  ${(props) => (props.login ? 'white' : '#404040')};
 `;
 
 Resource.WorkingTime = styled.div`
@@ -297,7 +297,7 @@ class layout extends React.Component {
 
 								}
 
-								<Resource.AppointmentCount>
+								<Resource.AppointmentCount login={parseInt(resource.orderNumber) !== 0}>
 									{this.countAppointment(resource)}
 								</Resource.AppointmentCount>
 							</> :
