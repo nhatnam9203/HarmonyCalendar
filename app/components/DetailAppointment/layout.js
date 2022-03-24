@@ -761,6 +761,7 @@ class Appointment extends React.Component {
 								appointment={appointment}
 								addProduct={(index) => this.addProduct(index)}
 								subtractProduct={(index) => this.subtractProduct(index)}
+								isEditPaidAppointment={this.state.isEditPaidAppointment}
 							/>
 						))}
 						{appointment.giftCards && appointment.giftCards.map((p, i) => this.renderGiftCard(p, i))}

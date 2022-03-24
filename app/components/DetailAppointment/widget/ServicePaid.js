@@ -86,7 +86,8 @@ export default class ServicePaid extends Component {
             staffList,
             closePopupStaff,
             openPopupTip,
-            price
+            openPopupPrice,
+            price,
         } = this.props;
         const { status, memberId } = appointment;
         const { isWarning } = service;
@@ -126,7 +127,7 @@ export default class ServicePaid extends Component {
                         )}
                     </Row>
                 </td>
-                
+
                 <td style={{ textAlign: 'center' }}
                     onClick={() => {
                         if (isEditPaidAppointment) {
@@ -139,7 +140,15 @@ export default class ServicePaid extends Component {
                         <IconEdit src={require('../../../images/edit.png')} />}
                 </td>
                 <td>
-                    <div style={{ textAlign: 'center' }}>{price}</div>
+                    <div onClick={() => {
+                        if (isEditPaidAppointment) {
+                            openPopupPrice(price, index, 'service')
+                        }
+                    }} style={{ textAlign: 'center' }}>
+                        {price}
+                        {isEditPaidAppointment &&
+                            <IconEdit src={require('../../../images/edit.png')} />}
+                    </div>
                 </td>
             </tr>
         )

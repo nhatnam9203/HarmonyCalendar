@@ -46,7 +46,7 @@ Price.Text = styled.div`
 export default class Product extends Component {
 
 	render() {
-		const { appointment, product, index } = this.props;
+		const { appointment, product, index, isEditPaidAppointment } = this.props;
 		const quantity =
 			product.quantity.toString().length === 1 ? '0' + product.quantity.toString() : product.quantity;
 		let price = product.price ? parseFloat(product.price.replace(/,/g, '')).toFixed(2) : "0.00";
@@ -58,8 +58,8 @@ export default class Product extends Component {
 				<td style={{ display: 'flex', justifyContent: 'center' }}>
 					<WrapButton>
 						<ButtonProduct
-							backgroundColor={(appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' && product.quantity > 1) ? '#0071c5' : '#dddddd'}
-							disabled={appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND' || product.quantity <= 1}
+							backgroundColor={(isEditPaidAppointment && appointment.status !== 'VOID' && appointment.status !== 'REFUND' && appointment.status !== "no show" && product.quantity > 1) ? '#0071c5' : '#dddddd'}
+							disabled={(appointment.status === 'PAID' && !isEditPaidAppointment) || appointment.status === 'VOID' || appointment.status === 'REFUND' || appointment.status === "no show" || product.quantity <= 1}
 							onClick={() => this.props.subtractProduct(index)}
 						>
 							-
@@ -70,8 +70,8 @@ export default class Product extends Component {
 							{quantity}
 						</Quantity>
 						<ButtonProduct
-							backgroundColor={(appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND') ? '#0071c5' : '#dddddd'}
-							disabled={appointment.status === 'PAID' || appointment.status === 'VOID' || appointment.status === 'REFUND'}
+							backgroundColor={(isEditPaidAppointment && appointment.status !== 'VOID' && appointment.status !== 'REFUND' && appointment.status !== "no show") ? '#0071c5' : '#dddddd'}
+							disabled={(appointment.status === 'PAID' && !isEditPaidAppointment) || appointment.status === 'VOID' || appointment.status === 'REFUND' || appointment.status === "no show"}
 							onClick={() => this.props.addProduct(index)}
 						>
 							+
@@ -80,7 +80,7 @@ export default class Product extends Component {
 				</td>
 				<td>
 					<Price>
-						{(appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND') ?
+						{(appointment.status !== 'PAID' && appointment.status !== 'VOID' && appointment.status !== 'REFUND' && appointment.status !== "no show") ?
 							<Price.Text>{price}</Price.Text> :
 							<div>{price}</div>}
 					</Price>

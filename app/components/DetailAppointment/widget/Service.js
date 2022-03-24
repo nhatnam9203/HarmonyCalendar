@@ -83,10 +83,10 @@ export default class Service extends Component {
                                     extraAll={extraAll}
                                     appointment={appointment}
                                     index={i}
-                                    openPopupPrice={this.props.openPopupPrice}
                                     subtractExtra={(ex) => this.props.subtractExtra(ex)}
                                     addExtra={(ex) => this.props.addExtra(ex)}
-                                    openPopupPrice={(price, index, key) => this.props.openPopupPriceExtra(price, index, key)}
+                                    openPopupPrice={() => this.props.openPopupPriceExtra(extra.price, i, "extra")}
+                                    isEditPaidAppointment={isEditPaidAppointment}
                                 />
                             )
                         })
@@ -123,7 +123,6 @@ export default class Service extends Component {
                                         extra={extra}
                                         appointment={appointment}
                                         index={i}
-                                        openPopupPrice={this.props.openPopupPrice}
                                         subtractExtra={(ex) => this.props.subtractExtra(ex)}
                                         addExtra={(ex) => this.props.addExtra(ex)}
                                         openPopupPrice={(price, index, key) => this.props.openPopupPriceExtra(price, index, key)}

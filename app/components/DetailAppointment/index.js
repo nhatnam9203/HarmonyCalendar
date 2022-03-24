@@ -398,8 +398,8 @@ class Appointment extends Layout {
 
 	updateStaffAppointmentPaid() {
 		const { appointment } = this.props;
-		const { services } = this.state;
-		this.props.updateStaffAppointmentPaid({ appointment, services });
+		const { services, products, extras } = this.state;		
+		this.props.updateStaffAppointmentPaid({ appointment, services, products, extras });		
 		this.closePopupTip();
 	}
 

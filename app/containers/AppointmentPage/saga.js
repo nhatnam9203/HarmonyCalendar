@@ -1051,19 +1051,30 @@ function mapServiceEditPaid(service) {
 	return {
 		bookingServiceId: service.bookingServiceId,
 		staffId: service.staffId,
-		tipAmount: parseFloat(service.tipAmount)
+		"tipAmount": service.tipAmount,
+		"price": service.price,
 	};
 }
 
 export function* updateStaffAppointmentPaid(action) {
 	try {
-		let { appointment, services } = action.payload;
+		let { appointment, services = [], products = [], extras = [] } = action.payload;
 		const { id } = appointment;
 		const requestURL = new URL(`${api_constants.UPDATE_STAFF_APPOINTMENT_PAID}/${id}`);
 		services = services.map((obj) => mapServiceEditPaid(obj));
-		const body = { services };
+		extras = extras.map((ex) => ({
+			"bookingExtraId": ex.bookingExtraId,
+			"price": ex.price,
+		}));
+		products = products.map((pro) => ({
+			"bookingProductId": pro.bookingProductId,
+			"quantity": pro.quantity
+		}));
+
+		const body = { services, products, extras };
 		const response = yield api(requestURL.toString(), body, 'PUT', token);
 		if (response.codeStatus === 1) {
+
 		} else {
 			alert(response.message);
 		}
