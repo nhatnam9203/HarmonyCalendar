@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { formatUsPhone, checkStringNumber2 } from '../../utils/helper';
 import Layout from './layout';
+import { validateEmail } from "../../utils/helper";
 
 const initialState = {
 	isOpenSearchingPopup: true,
@@ -125,6 +126,12 @@ class AddAppointment extends Layout {
 		const { time, staffID, dataAnyStaff } = this.props.TimeAndStaffID;
 		const { first_name, last_name, phoneNumber, phone, notes, email, phoneCheck, refPhoneHeader, referedBy, isSendLink } = this.state;
 		const refFone = phone ? phone : '';
+
+		if (email && email !== "" && !validateEmail(email)) {
+			alert("Invalid email");
+			return;
+		}
+
 
 		if (refFone && refFone !== "") {
 			let checkRefPhone = checkStringNumber2(refFone.toString());

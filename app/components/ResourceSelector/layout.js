@@ -284,7 +284,7 @@ class layout extends React.Component {
 					key={index}
 				>
 					{
-						merchantInfo && merchantInfo.isStaffAppointmentCount ?
+						!merchantInfo && merchantInfo.isStaffAppointmentCount ?
 							<>
 								{
 									resource.isNextAvailableStaff === 1 ?
