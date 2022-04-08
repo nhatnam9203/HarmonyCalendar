@@ -114,6 +114,7 @@ export default class Service extends Component {
                             price={price}
                             getStaffOfService={getStaffOfService}
                             staffOfService={staffOfService}
+                            openPopupPrice={openPopupPrice}
                         />
                         {
                             extras.map((extra, i) => {
