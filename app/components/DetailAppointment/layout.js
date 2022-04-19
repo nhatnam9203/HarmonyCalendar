@@ -682,7 +682,8 @@ class Appointment extends React.Component {
 	renderServices() {
 		const { services } = this.state;
 		const { prices, isPopupStaff, indexPopupStaff, extras } = this.state;
-		const { appointment, staffList, getStaffOfService, staffOfService } = this.props;
+
+		const { appointment, staffList, getStaffOfService, staffOfService, invoiceDetail } = this.props;
 		if (services.length > 0) {
 			return (
 				<table>
@@ -715,6 +716,7 @@ class Appointment extends React.Component {
 								openPopupPriceExtra={(price, index, key) => this.openPopupPrice(price, index, key)}
 								getStaffOfService={getStaffOfService}
 								staffOfService={staffOfService}
+								invoiceDetail={invoiceDetail}
 							/>
 						))}
 					</tbody>
@@ -726,7 +728,7 @@ class Appointment extends React.Component {
 	/********************************* RENDER PRODUCTS *********************************/
 	renderProducts() {
 		const { products } = this.state;
-		const { appointment } = this.props;
+		const { appointment, invoiceDetail } = this.props;
 		const { status } = appointment;
 		if (products.length > 0 || (appointment.giftCards && appointment.giftCards.length > 0)) {
 			return (
@@ -762,6 +764,7 @@ class Appointment extends React.Component {
 								addProduct={(index) => this.addProduct(index)}
 								subtractProduct={(index) => this.subtractProduct(index)}
 								isEditPaidAppointment={this.state.isEditPaidAppointment}
+								invoiceDetail={invoiceDetail}
 							/>
 						))}
 						{appointment.giftCards && appointment.giftCards.map((p, i) => this.renderGiftCard(p, i))}
@@ -962,10 +965,11 @@ class Appointment extends React.Component {
 							isEditPaidAppointment={this.state.isEditPaidAppointment}
 							isChange={this.conditionButtonChange()}
 							nextStatus={() => this.nextStatus()}
-							updateStaffAppointmentPaid={() => this.updateStaffAppointmentPaid()}
+							updateStaffAppointmentPaid={(isPostMessage) => this.updateStaffAppointmentPaid(isPostMessage)}
 							toggleEditPaidAppointment={() => this.toggleEditPaidAppointment()}
 							changeAppointmentTime={() => this.ChangeAppointmentTime()}
 							isDisabled={isDisabled}
+							invoiceDetail={this.props.invoiceDetail}
 						/>
 
 					</AppointmentWrapper>

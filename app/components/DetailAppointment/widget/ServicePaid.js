@@ -88,10 +88,22 @@ export default class ServicePaid extends Component {
             openPopupTip,
             openPopupPrice,
             price,
+            invoiceDetail
         } = this.props;
         const { status, memberId } = appointment;
         const { isWarning } = service;
         const isActive = isWarning && status !== "WAITING" && status !== "PAID" && parseInt(memberId) !== 0;
+
+        const checkoutPayments = invoiceDetail && invoiceDetail.checkoutPayments ? invoiceDetail.checkoutPayments : [];
+
+        let isCheckPaymentCreditCard = true;
+
+        for (let i = 0; i < checkoutPayments.length; i++) {
+            if (checkoutPayments[i].paymentMethod !== "credit_card") {
+                isCheckPaymentCreditCard = false
+            }
+        }
+
 
         const { staffOfService, isLoading } = this.state;
         return (
@@ -141,13 +153,15 @@ export default class ServicePaid extends Component {
                 </td>
                 <td>
                     <div onClick={() => {
-                        if (isEditPaidAppointment) {
+                        if (isEditPaidAppointment && !isCheckPaymentCreditCard ) {
                             openPopupPrice(price, index, 'service')
                         }
                     }} style={{ textAlign: 'center' }}>
                         {price}
-                        {isEditPaidAppointment &&
-                            <IconEdit src={require('../../../images/edit.png')} />}
+                        {
+                            isEditPaidAppointment && !isCheckPaymentCreditCard &&
+                            <IconEdit src={require('../../../images/edit.png')} />
+                        }
                     </div>
                 </td>
             </tr>

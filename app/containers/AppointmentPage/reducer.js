@@ -139,7 +139,7 @@ export const initialState = fromJS({
 	isFirstLoadCalendar: true,
 	isVisibleCarousel: false,
 	isPopupInformation: false,
-
+	invoiceDetail: null
 });
 
 function updateWorkingTimeToday(merchantInfo, dayName) {
@@ -179,6 +179,9 @@ function updateWorkingTimeToday(merchantInfo, dayName) {
 function appointmentReducer(state = initialState, action) {
 	let startOfWeek;
 	switch (action.type) {
+
+		case "SET_INVOICE_DETAIL":
+			return state.set("invoiceDetail", action.payload);
 
 		case SET_ALL_BLOCK:
 			return state.updateIn(['members', 'allBlock'], arr => {

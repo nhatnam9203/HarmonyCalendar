@@ -923,6 +923,9 @@ export function* getAppointmentByIdSaga(action) {
 
 		if (response.codeStatus === 1) {
 			let _data = { ...response.data, toTime: end };
+			if (_data && _data.status && _data.status === "paid") {
+				yield put(actions.getInvoiceDetail(_data));
+			}
 			yield put({ type: 'GET_APP_BY_ID_SUCCESS', data: _data });
 			yield put(actions.selectAppointment(appointmentAdapter(_data), event));
 			return;
@@ -937,6 +940,27 @@ export function* getAppointmentByIdSaga(action) {
 		yield put(actions.loadingCalendar(false));
 	}
 }
+
+export function* getInvoiceDetailSaga(action) {
+	try {
+		yield put(actions.setInvoiceDetail(null));
+
+		const appointment = action.payload;
+		const requestURL = new URL(`${api_constants.GET_INVOICE_DETAIL}/${appointment.checkoutId}`);
+		const response = yield api(requestURL.toString(), '', 'GET', token);
+
+		if (response.codeStatus === 1) {
+			yield put(actions.setInvoiceDetail(response.data));
+			return;
+		}
+
+	} catch (err) {
+
+	} finally {
+		// yield put(actions.loadingCalendar(false));
+	}
+}
+
 
 /********************************* GET TIME STAFF LOGIN *********************************/
 export function* getTimeStaffLoginSaga(action) {
@@ -1419,5 +1443,6 @@ export default function* root() {
 		takeLatest("READ_NOTIFICATION", readNotification),
 		takeLatest("COUNT_APPOINTMENT_ANY_STAFF", countAppointmentAnyStaff),
 		takeLatest("GET_APPOINTMENT_ANY_STAFF", getAppointmentAnyStaff),
+		takeLatest("GET_INVOICE_DETAIL", getInvoiceDetailSaga),
 	]);
 }

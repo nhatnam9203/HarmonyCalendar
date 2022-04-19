@@ -34,7 +34,18 @@ const IconEdit = styled.img`
 export default class Service extends Component {
 
     render() {
-        const { extra, openPopupPrice, isEditPaidAppointment } = this.props;
+        const { extra, openPopupPrice, isEditPaidAppointment,  invoiceDetail} = this.props;
+
+        const checkoutPayments = invoiceDetail && invoiceDetail.checkoutPayments ? invoiceDetail.checkoutPayments : [];
+
+        let isCheckPaymentCreditCard = true;
+
+        for (let i = 0; i < checkoutPayments.length; i++) {
+            if (checkoutPayments[i].paymentMethod !== "credit_card") {
+                isCheckPaymentCreditCard = false
+            }
+        }
+        
         return (
             <tr>
                 <td style={{ height: 65 }} colSpan={3}>
@@ -44,13 +55,13 @@ export default class Service extends Component {
                     </div>
                 </td>
                 <td onClick={() => {
-                    if (isEditPaidAppointment) {
+                    if (isEditPaidAppointment && !isCheckPaymentCreditCard) {
                         openPopupPrice();
                     }
                 }}>
                     <WrapPrice>
                         <Price>{extra.price}</Price>
-                        {isEditPaidAppointment && <IconEdit src={edit} />}
+                        {isEditPaidAppointment && !isCheckPaymentCreditCard && <IconEdit src={edit} />}
                     </WrapPrice>
                 </td>
             </tr>

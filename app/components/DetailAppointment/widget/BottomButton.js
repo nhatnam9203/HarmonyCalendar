@@ -44,7 +44,17 @@ const WrapButton = styled.div`
 export default class BottomButton extends Component {
 
     renderNextStatusButton() {
-        const { appointment, isEditPaidAppointment, isChange, isDisabled } = this.props;
+        const { appointment, isEditPaidAppointment, isChange, isDisabled, invoiceDetail } = this.props;
+
+        const checkoutPayments = invoiceDetail && invoiceDetail.checkoutPayments ? invoiceDetail.checkoutPayments : [];
+
+        let isCheckPaymentCreditCard = true;
+
+        for (let i = 0; i < checkoutPayments.length; i++) {
+            if (checkoutPayments[i].paymentMethod !== "credit_card") {
+                isCheckPaymentCreditCard = false
+            }
+        }
 
         if (isChange && appointment.status !== 'PAID') {
             if (appointment.status === 'ASSIGNED')
@@ -74,7 +84,13 @@ export default class BottomButton extends Component {
                                 <Button
                                     primary={true}
                                     style={{ fontWeight: '700' }}
-                                    onClick={() =>  this.props.updateStaffAppointmentPaid()}
+                                    onClick={() => {
+                                        if(!isCheckPaymentCreditCard){
+                                            this.props.updateStaffAppointmentPaid();
+                                        }else{
+                                            this.props.updateStaffAppointmentPaid(true);
+                                        }
+                                    }}
 
                                 >
                                     Submit

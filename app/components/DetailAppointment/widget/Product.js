@@ -46,11 +46,21 @@ Price.Text = styled.div`
 export default class Product extends Component {
 
 	render() {
-		const { appointment, product, index, isEditPaidAppointment } = this.props;
+		const { appointment, product, index, isEditPaidAppointment, invoiceDetail } = this.props;
 		const quantity =
 			product.quantity.toString().length === 1 ? '0' + product.quantity.toString() : product.quantity;
 		let price = product.price ? parseFloat(product.price.replace(/,/g, '')).toFixed(2) : "0.00";
 		price = (parseFloat(price) * product.quantity).toFixed(2).toString().replace(/\d(?=(\d{3})+\.)/g, '$&,');
+
+		const checkoutPayments = invoiceDetail && invoiceDetail.checkoutPayments ? invoiceDetail.checkoutPayments : [];
+
+		let isCheckPaymentCreditCard = true;
+
+		for (let i = 0; i < checkoutPayments.length; i++) {
+			if (checkoutPayments[i].paymentMethod !== "credit_card") {
+				isCheckPaymentCreditCard = false
+			}
+		}
 
 		return (
 			<tr key={index}>
@@ -58,24 +68,26 @@ export default class Product extends Component {
 				<td style={{ display: 'flex', justifyContent: 'center' }}>
 					<WrapButton>
 						<ButtonProduct
-							backgroundColor={(isEditPaidAppointment && appointment.status !== 'VOID' && appointment.status !== 'REFUND' && appointment.status !== "no show" && product.quantity > 1) ? '#0071c5' : '#dddddd'}
-							disabled={(appointment.status === 'PAID' && !isEditPaidAppointment) || appointment.status === 'VOID' || appointment.status === 'REFUND' || appointment.status === "no show" || product.quantity <= 1}
+							backgroundColor={
+								( appointment.status !== 'VOID' && appointment.status !== 'REFUND' && appointment.status !== "no show" && product.quantity > 1) ? 
+								'#0071c5' : '#dddddd'}
+							disabled={(appointment.status === 'PAID' && !isEditPaidAppointment && !isCheckPaymentCreditCard) || appointment.status === 'VOID' || appointment.status === 'REFUND' || appointment.status === "no show" || product.quantity <= 1}
 							onClick={() => this.props.subtractProduct(index)}
 						>
 							-
-					</ButtonProduct>
+						</ButtonProduct>
 						<Quantity
 							size={quantity.toString().length < 4 ? '16px' : quantity.toString().length < 7 ? '11px' : "8px"}
 						>
 							{quantity}
 						</Quantity>
 						<ButtonProduct
-							backgroundColor={(isEditPaidAppointment && appointment.status !== 'VOID' && appointment.status !== 'REFUND' && appointment.status !== "no show") ? '#0071c5' : '#dddddd'}
-							disabled={(appointment.status === 'PAID' && !isEditPaidAppointment) || appointment.status === 'VOID' || appointment.status === 'REFUND' || appointment.status === "no show"}
+							backgroundColor={(appointment.status !== 'VOID' && appointment.status !== 'REFUND' && appointment.status !== "no show") ? '#0071c5' : '#dddddd'}
+							disabled={(appointment.status === 'PAID' && !isEditPaidAppointment && !isCheckPaymentCreditCard) || appointment.status === 'VOID' || appointment.status === 'REFUND' || appointment.status === "no show"}
 							onClick={() => this.props.addProduct(index)}
 						>
 							+
-					</ButtonProduct>
+						</ButtonProduct>
 					</WrapButton>
 				</td>
 				<td>

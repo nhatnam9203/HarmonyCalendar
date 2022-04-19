@@ -6,9 +6,10 @@ import { convertAppointment, initialState, statusConvertData } from './widget/ut
 import Layout from './layout'
 import { addLastStaff } from "../../containers/AppointmentPage/utilSaga"
 import { checkStringNumber2, PromiseAction } from "../../utils/helper"
-import { staffId } from '../../../app-constants';
+import { staffId, GET_INVOICE_DETAIL, token } from '../../../app-constants';
 import { store } from 'app';
 import $ from 'jquery';
+import { api } from '../../utils/helper';
 
 class Appointment extends Layout {
 	constructor(props) {
@@ -41,7 +42,6 @@ class Appointment extends Layout {
 	conditionRenderAlertService() {
 		let flag = false;
 		const { appointment: { memberId, status } } = this.props;
-		console.log({ status })
 		if (parseInt(memberId) === 0 && status !== "WAITING") {
 			return false;
 		}
@@ -326,6 +326,7 @@ class Appointment extends Layout {
 		}
 	}
 
+
 	resetState() {
 		this.setState(initialState);
 	}
@@ -396,11 +397,46 @@ class Appointment extends Layout {
 		})
 	}
 
-	updateStaffAppointmentPaid() {
-		const { appointment } = this.props;
-		const { services, products, extras } = this.state;		
-		this.props.updateStaffAppointmentPaid({ appointment, services, products, extras });		
-		this.closePopupTip();
+	mapServiceEditPaid(service) {
+		return {
+			bookingServiceId: service.bookingServiceId,
+			staffId: service.staffId,
+			"tipAmount": service.tipAmount,
+			"price": service.price,
+		};
+	}
+
+	async updateStaffAppointmentPaid(isPostMessage) {
+		let { appointment } = this.props;
+		let { services, products, extras } = this.state;
+		if (!isPostMessage) {
+			this.props.updateStaffAppointmentPaid({ appointment, services, products, extras });
+			this.closePopupTip();
+		} else {
+			services = services.map((obj) => this.mapServiceEditPaid(obj));
+			extras = extras.map((ex) => ({
+				"bookingExtraId": ex.bookingExtraId,
+				"price": ex.price,
+			}));
+			products = products.map((pro) => ({
+				"bookingProductId": pro.bookingProductId,
+				"quantity": pro.quantity
+			}));
+
+			const body = { services, products, extras };
+
+			await window.postMessage(
+				JSON.stringify({
+					appointment,
+					body,
+				})
+			);
+
+			setTimeout(() => {
+				this.closeModal();
+			}, 500);
+
+		}
 	}
 
 	nextStatus() {
@@ -666,7 +702,7 @@ class Appointment extends Layout {
 		await this.searchPhoneCompanion();
 	}
 
-	jumpToCustomerHistory = async() => {
+	jumpToCustomerHistory = async () => {
 		const { appointment } = this.props;
 
 		const app = await convertAppointment(appointment);
@@ -705,6 +741,7 @@ class Appointment extends Layout {
 			this.props.updateNote({ notes: noteValue, idAppointment: appointment.id });
 		}
 	}
+
 }
 
 Appointment.propTypes = {

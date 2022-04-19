@@ -113,4 +113,5 @@ export const initialState = {
 	valueTip : '',
 	indexFromTime : '',
 	fromTimeService : '',
+	invoiceDetail : null,
 };

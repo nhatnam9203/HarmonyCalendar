@@ -67,3 +67,4 @@ export const NOTIFICATION_DELETE = `${API_BASE_URL}/notification?ids=`;
 export const COUNT_APPOINTMENT_ANY_STAFF = `${API_BASE_URL}/appointment/countAnyStaffLength?date=`;
 export const GET_STAFF_OF_SERVICE = `${API_BASE_URL}/staff/byService`; //{serviceId}?date=2021-06-10
 export const VAR_DEFAULT_AVATAR_PATH = `/upload/staff/avatar.svg`;
+export const GET_INVOICE_DETAIL = `${API_BASE_URL}/checkout`;

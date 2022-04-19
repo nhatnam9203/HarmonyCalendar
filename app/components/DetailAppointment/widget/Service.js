@@ -37,6 +37,7 @@ export default class Service extends Component {
             openPopupTip,
             getStaffOfService,
             staffOfService,
+            invoiceDetail
         } = this.props;
 
         const staff = staffList.find((s) => parseInt(s.id) === parseInt(service.staffId));
@@ -115,6 +116,7 @@ export default class Service extends Component {
                             getStaffOfService={getStaffOfService}
                             staffOfService={staffOfService}
                             openPopupPrice={openPopupPrice}
+                            invoiceDetail={invoiceDetail}
                         />
                         {
                             extras.map((extra, i) => {
@@ -127,6 +129,8 @@ export default class Service extends Component {
                                         subtractExtra={(ex) => this.props.subtractExtra(ex)}
                                         addExtra={(ex) => this.props.addExtra(ex)}
                                         openPopupPrice={(price, index, key) => this.props.openPopupPriceExtra(price, index, key)}
+                                        invoiceDetail={invoiceDetail}
+                                        isEditPaidAppointment={isEditPaidAppointment}
                                     />
                                 )
                             })

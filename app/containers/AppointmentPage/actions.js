@@ -1004,3 +1004,18 @@ export function toggleInformation(payload){
 	}
 }
 
+
+export function getInvoiceDetail(payload){
+	return{
+		type : "GET_INVOICE_DETAIL",
+		payload
+	}
+}
+
+export function setInvoiceDetail(payload){
+	return{
+		type : "SET_INVOICE_DETAIL",
+		payload
+	}
+}
+

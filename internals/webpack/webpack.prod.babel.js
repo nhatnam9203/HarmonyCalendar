@@ -96,7 +96,7 @@ module.exports = require('./webpack.base.babel')({
     // assets manipulations and do leak its manipulations to HtmlWebpackPlugin
     new OfflinePlugin({
       relativePaths: false,
-      publicPath: './calendar_20190316/',
+      publicPath: '/calendar_20190316/',
       appShell: '/',
 
       // No need to cache .htaccess. See http://mxs.is/googmp,

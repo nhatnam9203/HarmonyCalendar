@@ -10,7 +10,8 @@ import {
 	makeSelectMembers,
 	makeSelectAppointmentDetail,
 	makeSelectGroupAppointment,
-	makeLoadingPopup
+	makeLoadingPopup,
+	makeInvoiceDetail,
 } from './selectors';
 import {
 	cancelAppointment,
@@ -52,6 +53,7 @@ const mapStateToProps = createStructuredSelector({
 	staffList: makeSelectMembers(),
 	appointmentDetail: makeSelectAppointmentDetail(),
 	groupAppointment: makeSelectGroupAppointment(),
+	invoiceDetail : makeInvoiceDetail(),
 });
 
 const withConnect = connect(mapStateToProps, mapDispatchToProps);
