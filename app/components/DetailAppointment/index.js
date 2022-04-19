@@ -427,6 +427,7 @@ class Appointment extends Layout {
 
 			await window.postMessage(
 				JSON.stringify({
+					action : "updateAppointmentPaid",
 					appointment,
 					body,
 				})
