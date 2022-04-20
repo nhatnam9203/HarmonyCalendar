@@ -156,6 +156,9 @@ const makePopupInformation = () =>
 const makeInvoiceDetail = () =>
 	createSelector(currentAppointment, (appointmentState) => appointmentState.get('invoiceDetail'));
 
+	const makeLoadingInvoice = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.get('isLoadingInvoice'));
+
 export {
 	currentAppointment,
 	makeCurrentDay,
@@ -205,4 +208,5 @@ export {
 	makeVisibleCarousel,
 	makePopupInformation,
 	makeInvoiceDetail,
+	makeLoadingInvoice
 };

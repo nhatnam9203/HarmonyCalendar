@@ -12,6 +12,7 @@ import {
 	makeSelectGroupAppointment,
 	makeLoadingPopup,
 	makeInvoiceDetail,
+	makeLoadingInvoice,
 } from './selectors';
 import {
 	cancelAppointment,
@@ -39,10 +40,10 @@ export function mapDispatchToProps(dispatch) {
 		disableCalendar: (status) => dispatch(disableCalendar(status)),
 		changeAppointmentTime: (appointment) => dispatch(changeAppointmentTime(appointment)),
 		updateNote: (data) => dispatch(updateNote(data)),
-		updateCompanion : (data)=>dispatch(updateCompanion(data)),
-		loadingPopup : (data)=>dispatch(loadingPopup(data)),
-		searchPhoneCompanion : (data) => dispatch(searchPhoneCompanion(data)),
-		updateStaffAppointmentPaid : (data) => dispatch(updateStaffAppointmentPaid(data))
+		updateCompanion: (data) => dispatch(updateCompanion(data)),
+		loadingPopup: (data) => dispatch(loadingPopup(data)),
+		searchPhoneCompanion: (data) => dispatch(searchPhoneCompanion(data)),
+		updateStaffAppointmentPaid: (data) => dispatch(updateStaffAppointmentPaid(data))
 
 	};
 }
@@ -53,7 +54,8 @@ const mapStateToProps = createStructuredSelector({
 	staffList: makeSelectMembers(),
 	appointmentDetail: makeSelectAppointmentDetail(),
 	groupAppointment: makeSelectGroupAppointment(),
-	invoiceDetail : makeInvoiceDetail(),
+	invoiceDetail: makeInvoiceDetail(),
+	isLoadingInvoice: makeLoadingInvoice(),
 });
 
 const withConnect = connect(mapStateToProps, mapDispatchToProps);

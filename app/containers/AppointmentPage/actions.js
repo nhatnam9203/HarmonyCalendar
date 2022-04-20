@@ -1019,3 +1019,11 @@ export function setInvoiceDetail(payload){
 	}
 }
 
+export function loadingInvoice(payload){
+	return{
+		type : "LOADING_INVOICE",
+		payload
+	}
+}
+
+

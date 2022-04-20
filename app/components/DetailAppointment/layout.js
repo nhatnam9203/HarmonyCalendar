@@ -913,7 +913,7 @@ class Appointment extends React.Component {
 	}
 
 	render() {
-		const { appointment, appointmentDetail } = this.props;
+		const { appointment, appointmentDetail, isLoadingInvoice } = this.props;
 		const {
 			isPoupPrice,
 			isLoadingCompanion,
@@ -943,7 +943,7 @@ class Appointment extends React.Component {
 					onClose={() => this.closeModal()}
 				>
 					<AppointmentWrapper>
-						{isLoadingCompanion && (
+						{(isLoadingCompanion || isLoadingInvoice) && (
 							<LoadingCompanion>
 								<ReactLoading type={'spin'} color={'#1B68AC'} height={50} width={50} />
 							</LoadingCompanion>

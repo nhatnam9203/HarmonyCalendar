@@ -943,6 +943,7 @@ export function* getAppointmentByIdSaga(action) {
 
 export function* getInvoiceDetailSaga(action) {
 	try {
+		yield put(actions.loadingInvoice(true));
 		yield put(actions.setInvoiceDetail(null));
 
 		const appointment = action.payload;
@@ -953,11 +954,12 @@ export function* getInvoiceDetailSaga(action) {
 			yield put(actions.setInvoiceDetail(response.data));
 			return;
 		}
+		yield put(actions.loadingInvoice(false));
 
 	} catch (err) {
 
 	} finally {
-		// yield put(actions.loadingCalendar(false));
+		yield put(actions.loadingInvoice(false));
 	}
 }
 
