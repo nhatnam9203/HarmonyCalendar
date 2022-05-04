@@ -200,7 +200,7 @@ const ImageSendLink = styled.img`
 const BtnClose = styled.div`
 	position: absolute;
 	right: 0.8rem;
-	top: 0.55rem;
+	top: 0.85rem;
 	line-height: 1;
 	font-size: 2rem;
 	color: #ffffff;
@@ -333,7 +333,7 @@ class PopupCustomer extends React.Component {
 						<React.Fragment>
 							<Title>Last appointment</Title>
 							{!lastAppointment && (
-								<TextNoAppointment>This client does not have appointment.</TextNoAppointment>
+								<TextNoAppointment>This client ƒdoes not have appointment.</TextNoAppointment>
 							)}
 							{lastAppointment && (
 								<React.Fragment>

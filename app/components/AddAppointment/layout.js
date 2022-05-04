@@ -216,7 +216,7 @@ const ImageEnter = styled.img`
 const BtnClose = styled.div`
 	position: absolute;
 	right: 0.5rem;
-	top: 0.25rem;
+	top: 0.85rem;
 	line-height: 1;
 	font-size: 2rem;
 	color: #ffffff;
@@ -283,7 +283,7 @@ class AddAppointment extends React.Component {
                 position={'left center'}
             >
                 <AddingWrapper>
-                    <BtnClose style={{ top: 10 }} onClick={() => this.closeAllModal()}>
+                    <BtnClose onClick={() => this.closeAllModal()}>
                         <img src={require("../../images/close_white.png")} />
                     </BtnClose>
 
