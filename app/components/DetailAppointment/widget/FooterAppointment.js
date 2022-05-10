@@ -120,21 +120,6 @@ export default class FooterAppointment extends Component {
 							</WrapperFooterPaid>
 						</div>
 
-						{
-							appointment.depositAmount && appointment.appointmentDepositStatus === "Default" &&
-							<div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
-								<WrapperFooterPaid>
-									<WrapperFooterPaid.ItemLeft>
-										<div>Deposited : </div>
-										<div>$ {appointment.depositAmount}</div>
-									</WrapperFooterPaid.ItemLeft>
-									<WrapperFooterPaid.Item>
-
-									</WrapperFooterPaid.Item>
-								</WrapperFooterPaid>
-							</div>
-						}
-
 						<FooterTotal>
 							<div>Total</div>
 							<div>$ {total}</div>
