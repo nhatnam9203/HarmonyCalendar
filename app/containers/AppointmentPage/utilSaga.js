@@ -68,14 +68,16 @@ export const appointmentAdapter = (appointment) => {
 		customerId: appointment.customerId,
 		giftCard: appointment.giftCard,
 		giftCards: appointment.giftCards ? appointment.giftCards : [],
-		checkoutId : appointment.checkoutId ? appointment.checkoutId : null,
+		checkoutId: appointment.checkoutId ? appointment.checkoutId : null,
 		notes: appointment.notes
 			? appointment.notes.sort(function (a, b) {
 				var c = a.appointmentNoteId;
 				var d = b.appointmentNoteId;
 				return d - c;
 			})
-			: []
+			: [],
+		appointmentDepositStatus: appointment.appointmentDepositStatus ? appointment.appointmentDepositStatus : null,
+		depositAmount : appointment.depositAmount ? appointment.depositAmount : null,
 	};
 };
 
@@ -142,12 +144,12 @@ export function block(memberId, start, end) {
 
 const notesServices = (notes = []) => {
 	let noteServices = [];
-	
+
 	for (let i = 0; i < notes.length; i++) {
 		if (i > 1) {
 			if (notes[i].includes("- ")) {
 				noteServices.push(notes[i])
-			} else if(notes[i].toString().trim() !== "") {
+			} else if (notes[i].toString().trim() !== "") {
 				noteServices.push(`- ${notes[i]}`)
 			}
 		}

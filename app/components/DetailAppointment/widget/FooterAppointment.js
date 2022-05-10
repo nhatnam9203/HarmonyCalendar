@@ -54,6 +54,7 @@ export default class FooterAppointment extends Component {
 	render() {
 		const { appointment } = this.props;
 
+
 		let subTotal = appointment.subTotal
 			? parseFloat(appointment.subTotal.toString().replace(/,/g, ''))
 				.toFixed(2)
@@ -119,6 +120,21 @@ export default class FooterAppointment extends Component {
 							</WrapperFooterPaid>
 						</div>
 
+						{
+							appointment.depositAmount && appointment.appointmentDepositStatus === "Default" &&
+							<div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+								<WrapperFooterPaid>
+									<WrapperFooterPaid.ItemLeft>
+										<div>Deposited : </div>
+										<div>$ {appointment.depositAmount}</div>
+									</WrapperFooterPaid.ItemLeft>
+									<WrapperFooterPaid.Item>
+
+									</WrapperFooterPaid.Item>
+								</WrapperFooterPaid>
+							</div>
+						}
+
 						<FooterTotal>
 							<div>Total</div>
 							<div>$ {total}</div>
@@ -137,6 +153,14 @@ export default class FooterAppointment extends Component {
 						<span style={{ color: '#585858' }}>Tip : </span>
 						<strong style={{ color: '#585858' }}>$ {tipAmount}</strong>
 					</div>
+
+					{
+						appointment.depositAmount && appointment.appointmentDepositStatus === "Default" &&
+						<div>
+							<span style={{ color: 'red', fontWeight: '600' }}>Deposited : </span>
+							<strong style={{ color: 'red', fontWeight: "600" }}>$ {appointment.depositAmount}</strong>
+						</div>
+					}
 					<div>
 						<span style={{ color: '#585858' }}>Total : </span>
 						<strong style={{ color: '#585858' }}>$ {subTotal}</strong>
