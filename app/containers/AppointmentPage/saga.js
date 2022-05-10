@@ -137,18 +137,24 @@ export function* reRenderAppointment() {
 					block.status !== 'cancel' &&
 					block.status !== 'waiting' &&
 					block.status !== undefined
-			).map(block => blockTemp(
-				block.staffId,
-				block.blockTimeStart,
-				block.blockTimeEnd,
-				block.note,
-				block.appointmentId,
-				convertStatus(block.status),
-				block.blockTimeId,
-				block.isVip,
-				block.isWarning,
-				block.isFavorite,
-			))
+			).map(block => {
+				return {
+					...blockTemp(
+						block.staffId,
+						block.blockTimeStart,
+						block.blockTimeEnd,
+						block.note,
+						block.appointmentId,
+						convertStatus(block.status),
+						block.blockTimeId,
+						block.isVip,
+						block.isWarning,
+						block.isFavorite,
+						block.appointmentDepositStatus,
+					),
+					appointmentDepositStatus : block.appointmentDepositStatus
+				}
+			})
 		}));
 
 		addBlockCalendar(appointmentsMembers, displayedMembers, currentDate);

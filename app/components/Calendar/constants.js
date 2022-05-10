@@ -894,15 +894,15 @@ export const updateEventToCalendar = (fcEvent) => {
 };
 
 function getAtrributeByStatus(appointment) {
-	const { status, isWarning } = appointment;
-	const { eventColor, eventClass } = getEventStyle(status, isWarning);
+	const { status, isWarning, appointmentDepositStatus } = appointment;
+	const { eventColor, eventClass } = getEventStyle(status, isWarning, appointmentDepositStatus);
 	return {
 		eventColor,
 		eventClass
 	};
 }
 
-function getEventStyle(status, isWarning) {
+function getEventStyle(status, isWarning, appointmentDepositStatus) {
 
 	let eventColor = '#00b4f7';
 	let eventClass = 'event-paid';
@@ -1018,6 +1018,10 @@ function getEventStyle(status, isWarning) {
 	if (!status) {
 		eventColor = 'red';
 		eventClass = 'event-paid';
+	}
+
+	if(appointmentDepositStatus == "NotPay"){
+		eventClass = `${eventClass} NotPay`;
 	}
 
 	return {

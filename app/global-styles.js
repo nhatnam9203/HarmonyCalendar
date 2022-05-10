@@ -639,6 +639,41 @@ const GlobalStyle = createGlobalStyle`
   margin-right : 40% !important;
 }
 
+<<<<<<< HEAD
+=======
+.DayPicker-Weekday{
+  font-size : 1.25rem !important ;
+}
+
+.DayPicker-Caption{
+  font-size : 1.3rem !important ;
+}
+
+.DayPicker-NavButton{
+  width : 1.6rem !important;
+  height : 1.6rem !important;
+}
+
+.NotPay{
+  border : 1.5px solid red !important;
+}
+
+${'' /* css cột any staff */}
+${'' /* .fc-body .fc-time-grid .fc-content-skeleton table tbody tr td:nth-child(2) .fc-content-col {
+   width: 340px ;
+} */}
+${'' /* .fc-body .fc-time-grid .fc-content-skeleton table tbody tr td:nth-child(2){
+  width: calc(((100vw - 5.05rem - 2px)/8) * 2);
+}
+
+.fc-bg table tbody tr td:nth-child(2){
+  width: calc(((100vw - 5.05rem - 2px)/8) * 2);
+} */}
+
+${'' /* end css cột any staff */}
+
+
+>>>>>>> eee5b04 (appointment not pay)
 ::-webkit-scrollbar { 
     display: none; 
 }
