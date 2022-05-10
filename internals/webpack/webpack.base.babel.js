@@ -19,7 +19,7 @@ module.exports = options => ({
     {
       // Compile into js/build.js
       path: path.resolve(process.cwd(), 'build'),
-      publicPath: '/calendar_20190316/',
+      publicPath: './calendar_20190316/',
     },
     options.output,
   ), // Merge with env dependent settings
