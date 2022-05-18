@@ -216,7 +216,7 @@ const ImageEnter = styled.img`
 const BtnClose = styled.div`
 	position: absolute;
 	right: 0.5rem;
-	top: 0.85rem;
+	top: 0.7rem;
 	line-height: 1;
 	font-size: 2rem;
 	color: #ffffff;

@@ -200,7 +200,7 @@ const ImageSendLink = styled.img`
 const BtnClose = styled.div`
 	position: absolute;
 	right: 0.8rem;
-	top: 0.85rem;
+	top: 0.7rem;
 	line-height: 1;
 	font-size: 2rem;
 	color: #ffffff;
@@ -275,8 +275,8 @@ class PopupCustomer extends React.Component {
 		return services.map((sv) => {
 			const extrasServices = extras.filter((ex) => ex.bookingServiceId === sv.bookingServiceId);
 			return (
-				<React.Fragment>
-					<Row key={'service' + sv.bookingServiceId + Math.random()}>
+				<React.Fragment key={'service' + sv.bookingServiceId + Math.random()}>
+					<Row>
 						<Row.ServiceName>{sv.serviceName}</Row.ServiceName>
 						<Row.StartTime>{moment(sv.fromTime).format('hh:mm A')}</Row.StartTime>
 						<Row.Staff>{sv.staff.displayName}</Row.Staff>
