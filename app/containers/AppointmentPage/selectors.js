@@ -159,6 +159,16 @@ const makeInvoiceDetail = () =>
 	const makeLoadingInvoice = () =>
 	createSelector(currentAppointment, (appointmentState) => appointmentState.get('isLoadingInvoice'));
 
+	const makeIsPopupAppointmentCancel = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.get('isPopupAppointmentCancel'));
+
+const makeAppointmentsCancelled = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.get('appointmentsCancelled'));
+
+const makeIsLoadingAppointmentCanel = () =>
+	createSelector(currentAppointment, (appointmentState) => appointmentState.get('isLoadingAppointmentCanel'));
+
+
 export {
 	currentAppointment,
 	makeCurrentDay,
@@ -208,5 +218,8 @@ export {
 	makeVisibleCarousel,
 	makePopupInformation,
 	makeInvoiceDetail,
-	makeLoadingInvoice
+	makeLoadingInvoice,
+	makeIsPopupAppointmentCancel,
+	makeAppointmentsCancelled,
+	makeIsLoadingAppointmentCanel,
 };

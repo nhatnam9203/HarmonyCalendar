@@ -25,6 +25,20 @@ const DaySelectorWrapper = styled.div`
 	  }
 `;
 
+const Text = styled.div`
+    font-size : 1.3rem;
+    color : #3168B1;
+    font-weight : 600;
+    cursor : pointer;
+    margin-left : 1rem;
+`;
+
+const LeftContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items : center;
+`;
+
 class DaySelector extends React.Component {
   constructor(props) {
     super(props);
@@ -45,6 +59,12 @@ class DaySelector extends React.Component {
     this.props.disable_Calendar(true);
   }
 
+  openPopupAppointmentCancels = () => {
+    this.props.togglePopupAppointmentCancel(true);
+    this.props.loadAppointmentsCancelled();
+  };
+
+
   render() {
     const {
       currentDay,
@@ -60,12 +80,17 @@ class DaySelector extends React.Component {
     } = this.props;
     return (
       <DaySelectorWrapper>
-        <SearchButton
-          selectedDay={currentDay}
-          onChangeDay={onChangeDayOnCalendar}
-          onPress={() => toggleSearchBox(true)}
-        />
-        <InformationButton onPress={() => toggleInformation(true)} />
+        <LeftContainer>
+          <SearchButton
+            selectedDay={currentDay}
+            onChangeDay={onChangeDayOnCalendar}
+            onPress={() => toggleSearchBox(true)}
+          />
+          <InformationButton onPress={() => toggleInformation(true)} />
+          <Text onClick={this.openPopupAppointmentCancels}>
+            Show all
+          </Text>
+        </LeftContainer>
         <DaySlider
           days={weekDays.valueSeq().toArray()}
           selectedDay={currentDay}

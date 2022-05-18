@@ -1026,4 +1026,18 @@ export function loadingInvoice(payload){
 	}
 }
 
+export function togglePopupAppointmentCancel(payload){
+	return{
+		type : "TOGGLE_POPUP_APPOINTMENT_CANCEL",
+		payload
+	}
+};
+
+export function loadAppointmentsCancelled(payload){ 
+	return{
+		type : "LOAD_APPOINTMENTS_CANCELLED",
+		payload
+	}
+};
+
 

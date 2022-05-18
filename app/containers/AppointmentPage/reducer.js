@@ -140,7 +140,10 @@ export const initialState = fromJS({
 	isVisibleCarousel: false,
 	isPopupInformation: false,
 	invoiceDetail: null,
-	isLoadingInvoice : false
+	isLoadingInvoice: false,
+	isPopupAppointmentCancel: false,
+	isLoadingAppointmentCanel: false,
+	appointmentsCancelled: [],
 });
 
 function updateWorkingTimeToday(merchantInfo, dayName) {
@@ -180,6 +183,15 @@ function updateWorkingTimeToday(merchantInfo, dayName) {
 function appointmentReducer(state = initialState, action) {
 	let startOfWeek;
 	switch (action.type) {
+
+		case "SET_LOADING_APPOINTMENT_CANCELLED":
+			return state.set("isLoadingAppointmentCanel", action.payload);
+
+		case "SET_APPOINTMENTS_CANCELLED":
+			return state.set("appointmentsCancelled", action.payload);
+
+		case "TOGGLE_POPUP_APPOINTMENT_CANCEL":
+			return state.set("isPopupAppointmentCancel", action.payload);
 
 		case "LOADING_INVOICE":
 			return state.set("isLoadingInvoice", action.payload);

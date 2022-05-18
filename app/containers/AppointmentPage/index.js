@@ -15,6 +15,7 @@ import AddAppointmentContainer from './AddAppointmentContainer';
 import SearchBoxCustomerContainer from './SearchBoxCustomerContainer';
 import NotificationContainer from './NotificationContainer';
 import InformationContainer from './InformationContainer';
+import AppointmentCancelContainer from './AppointmentCancelContainer';
 import GlobalStyle from '../../global-styles';
 
 import reducer from './reducer';
@@ -41,6 +42,7 @@ export class AppointmentPage extends React.PureComponent {
         <SearchBoxCustomerContainer />
         <NotificationContainer />
         <InformationContainer />
+        <AppointmentCancelContainer />
         <GlobalStyle />
       </AppointmentPageWrapper>
     );

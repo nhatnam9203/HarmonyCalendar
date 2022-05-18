@@ -1126,6 +1126,26 @@ export function* searchCustomerBox(action) {
 	} catch (err) { }
 }
 
+export function* loadAppointmentsCancelled(action) {
+	try {
+		yield put({ type: "SET_LOADING_APPOINTMENT_CANCELLED", payload: true });
+		let currentDay = yield select(makeCurrentDay());
+		currentDay = moment(currentDay).format("YYYY-MM-DD");
+		const requestURL = new URL(`${api_constants.GET_APPOINTMENT_CANCEL}&timeStart=${currentDay}&timeEnd=${currentDay}`);
+		const response = yield api(requestURL.toString(), '', 'GET', token);
+
+		if (response.codeNumber == 200) {
+			const data = response.data ? response.data : [];
+			yield put({ type: "SET_APPOINTMENTS_CANCELLED", payload: data })
+		} else {
+			alert(response.message)
+		}
+		yield put({ type: "SET_LOADING_APPOINTMENT_CANCELLED", payload: false });
+	} catch (err) { 
+		yield put({ type: "SET_LOADING_APPOINTMENT_CANCELLED", payload: false });
+	};
+}
+
 export function* countNotificationUnread(action) {
 	try {
 		const requestURL = new URL(`${api_constants.NOTIFICATION_COUNT_UNREAD}`);
@@ -1452,5 +1472,7 @@ export default function* root() {
 		takeLatest("COUNT_APPOINTMENT_ANY_STAFF", countAppointmentAnyStaff),
 		takeLatest("GET_APPOINTMENT_ANY_STAFF", getAppointmentAnyStaff),
 		takeLatest("GET_INVOICE_DETAIL", getInvoiceDetailSaga),
+		takeLatest("LOAD_APPOINTMENTS_CANCELLED", loadAppointmentsCancelled),
+
 	]);
 }
