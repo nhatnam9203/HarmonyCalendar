@@ -159,8 +159,8 @@ export default class index extends React.Component {
     submitRevert = () => {
         const { appointmentSelected, isLoading } = this.state;
         try {
-            this.setState({ isLoading: true });
-            if (appointmentSelected.length > 0 && !isLoading) {
+            if (appointmentSelected.length > 0) {
+                this.setState({ isLoading: true });
                 const promises = appointmentSelected.map(async appointment => {
                     return this.callApiUpdateStatus(appointment);
                 });
