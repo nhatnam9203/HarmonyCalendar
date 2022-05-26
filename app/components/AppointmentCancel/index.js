@@ -53,7 +53,7 @@ const Bottom = styled.div`
 `;
 
 const ContainerBody = styled.div`
-    min-height : 30rem;
+    min-height : 25rem;
     overflow-y: scroll;
 `;
 
