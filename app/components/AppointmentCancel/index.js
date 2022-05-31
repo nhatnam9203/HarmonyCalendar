@@ -166,6 +166,8 @@ export default class index extends React.Component {
                 });
                 Promise.all(promises).then(data => {
                     if (data.length >= appointmentSelected.length) {
+                        this.props.loadWaitingAppointments();
+                        this.props.loadAppointmentByMembers();
                         this.setState({ isLoading: false });
                         this.close();
                     }

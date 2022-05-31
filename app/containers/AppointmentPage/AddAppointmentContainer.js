@@ -15,8 +15,10 @@ import {
   checkPhoneNumberCustomerError, addCustomerSuccess,
   TimeAndStaffID,
   disableCalendar,
-  infoCheckPhone
+  infoCheckPhone,
 } from './actions';
+
+
 
 export function mapDispatchToProps(dispatch) {
   return {
@@ -27,8 +29,8 @@ export function mapDispatchToProps(dispatch) {
     addCustomer: (customer) => dispatch(addCustomer(customer)),
     addCustomerSuccess: (status) => dispatch(addCustomerSuccess(status)),
     closeTimeAndStaffID: (data) => dispatch(TimeAndStaffID(data)),
-    disableCalendar:(status)=>dispatch(disableCalendar(status)),
-     infoCheckPhone:(data)=>dispatch( infoCheckPhone(data)),
+    disableCalendar: (status) => dispatch(disableCalendar(status)),
+    infoCheckPhone: (data) => dispatch(infoCheckPhone(data)),
   };
 }
 
@@ -38,7 +40,7 @@ const mapStateToProps = createStructuredSelector({
   checkPhoneError: makeCheckPhoneError(),
   StateAddCustomerSuccess: makeAddCustomerSuccess(),
   TimeAndStaffID: makeTimeStaffID(),
-  InfoAfterCheckPhone : makeInfoCheckPhone(),
+  InfoAfterCheckPhone: makeInfoCheckPhone(),
 });
 
 const withConnect = connect(

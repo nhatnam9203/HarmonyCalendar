@@ -129,9 +129,10 @@ const ItemAppointment = ({ item, selectItem, indexActive, appointmentSelected = 
     return (
         <WrapItem isLast={isLast}>
             <img
-                style={{ width: 23, height: 23, marginTop: "1.8rem", marginLeft: "1.5rem" }}
+                style={{ width: 23, height: 23, marginTop: "1.8rem", marginLeft: "1.5rem", cursor: "pointer" }}
                 src={require(isSelected ? '../../images/check-box-empty@3x.png' : '../../images/check-box@3x.png')}
                 alt=""
+                onClick={() => selectItem(item.fromTime, item)}
             />
             <Item
                 isActive={item.appointmentId === indexActive}
