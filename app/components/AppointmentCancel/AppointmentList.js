@@ -7,7 +7,6 @@ const Container = styled.div`
     flex-direction : column;
     flex : 1;
     height : 30rem;
-    overflow-y : scroll;
 `;
 
 export default class AppointmentList extends Component {

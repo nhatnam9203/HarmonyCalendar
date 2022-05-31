@@ -21,6 +21,7 @@ const Item = styled.div`
     background : ${(props) => props.isActive ? '#e3fbff' : 'transparent'};
     padding-top : 1rem;
     width : 95%;
+    min-height: 200px;
 `;
 
 Item.Row = styled.div`

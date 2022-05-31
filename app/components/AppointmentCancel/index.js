@@ -128,7 +128,7 @@ export default class index extends React.Component {
         if (appointmentsCancelled && appointmentsCancelled.length && appointmentsCancelled.length > 0) {
             return (
                 <AppointmentList
-                    appointmentSearchBox={appointmentsCancelled.filter(obj=>obj.previousStatus)}
+                    appointmentSearchBox={appointmentsCancelled.filter(obj => obj.previousStatus)}
                     appointmentSelected={appointmentSelected}
                     selectItem={(date, appointment) => this.selectItem(date, appointment)}
                     indexActive={0}
@@ -143,7 +143,7 @@ export default class index extends React.Component {
         );
     }
 
-    callApiUpdateStatus = async(appointment) => {
+    callApiUpdateStatus = async (appointment) => {
         const { appointmentId, previousStatus } = appointment;
         const requestUrl = `${PUT_UPDATE_STATUS_APPOINTMENT}/${appointmentId}`;
         const res = await axios.put(requestUrl, { status: previousStatus }, {
@@ -166,10 +166,12 @@ export default class index extends React.Component {
                 });
                 Promise.all(promises).then(data => {
                     if (data.length >= appointmentSelected.length) {
-                        this.props.loadWaitingAppointments();
                         this.props.loadAppointmentByMembers();
-                        this.setState({ isLoading: false });
-                        this.close();
+                        this.props.loadWaitingAppointments();
+                        setTimeout(() => {
+                            this.setState({ isLoading: false });
+                            this.close();
+                        }, 500);
                     }
                 })
             }

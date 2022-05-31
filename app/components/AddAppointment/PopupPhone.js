@@ -164,7 +164,7 @@ const Button = styled.button`
 const BtnClose = styled.div`
 	position: absolute;
 	right: 0.5rem;
-	top: 0.35rem;
+	top: 0.55rem;
 	line-height: 1;
 	font-size: 2rem;
 	color: #ffffff;
