@@ -12,14 +12,14 @@ import {
 import {
     togglePopupAppointmentCancel,
     loadWaitingAppointments,
-    loadAppointmentByMembers,
+    getBlockTime,
 } from './actions';
 
 export function mapDispatchToProps(dispatch) {
   return {
     togglePopupAppointmentCancel : (status) => dispatch(togglePopupAppointmentCancel(status)),
     loadWaitingAppointments: () => dispatch(loadWaitingAppointments()),
-    loadAppointmentByMembers: () => dispatch(loadAppointmentByMembers()),
+    getBlockTime: () => dispatch(getBlockTime()),
   };
 }
 
