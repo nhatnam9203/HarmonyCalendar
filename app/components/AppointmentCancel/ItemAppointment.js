@@ -10,6 +10,7 @@ const WrapItem = styled.div`
     display : flex;
     flex-direction : row;
     justify-content : space-between;
+    min-height : 200px;
 `;
 
 
@@ -21,7 +22,6 @@ const Item = styled.div`
     background : ${(props) => props.isActive ? '#e3fbff' : 'transparent'};
     padding-top : 1rem;
     width : 95%;
-    min-height: 200px;
 `;
 
 Item.Row = styled.div`

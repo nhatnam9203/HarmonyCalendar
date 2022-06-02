@@ -3,10 +3,8 @@ import styled from 'styled-components';
 import ItemAppointment from './ItemAppointment';
 
 const Container = styled.div`
-    display : flex;
-    flex-direction : column;
-    flex : 1;
-    height : 30rem;
+    overfow-y: scroll;
+    height: 30rem;
 `;
 
 export default class AppointmentList extends Component {
@@ -16,7 +14,7 @@ export default class AppointmentList extends Component {
         return (
             <Container>
                 {
-                    appointmentSearchBox.map((item, index) =>
+                    appointmentSearchBox.slice(0,4).map((item, index) =>
                         <ItemAppointment
                             item={item}
                             key={item.appointmentId}
