@@ -14,7 +14,7 @@ export default class AppointmentList extends Component {
         return (
             <Container>
                 {
-                    appointmentSearchBox.slice(0,4).map((item, index) =>
+                    appointmentSearchBox.map((item, index) =>
                         <ItemAppointment
                             item={item}
                             key={item.appointmentId}
