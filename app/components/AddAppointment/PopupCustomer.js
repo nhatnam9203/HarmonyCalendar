@@ -200,7 +200,7 @@ const ImageSendLink = styled.img`
 const BtnClose = styled.div`
 	position: absolute;
 	right: 0.8rem;
-	top: 0.8rem;
+	top: 0.5rem;
 	line-height: 1;
 	font-size: 2rem;
 	color: #ffffff;

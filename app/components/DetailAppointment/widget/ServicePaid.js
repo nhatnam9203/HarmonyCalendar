@@ -96,6 +96,9 @@ export default class ServicePaid extends Component {
 
         const checkoutPayments = invoiceDetail && invoiceDetail.checkoutPayments ? invoiceDetail.checkoutPayments : [];
 
+        console.log({ checkoutPayments })
+
+
         let isCheckPaymentCreditCard = true;
 
         for (let i = 0; i < checkoutPayments.length; i++) {

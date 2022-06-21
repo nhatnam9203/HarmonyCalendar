@@ -54,13 +54,15 @@ export default class Product extends Component {
 
 		const checkoutPayments = invoiceDetail && invoiceDetail.checkoutPayments ? invoiceDetail.checkoutPayments : [];
 
-		let isCheckPaymentCreditCard = true;
+		let isEditPaymentCreditCard = true;
 
 		for (let i = 0; i < checkoutPayments.length; i++) {
-			if (checkoutPayments[i].paymentMethod !== "credit_card") {
-				isCheckPaymentCreditCard = false
+			if (checkoutPayments[i].paymentMethod === "credit_card") {
+				isEditPaymentCreditCard = false
 			}
-		}
+		};
+
+		const isEditAppointmentCredit = (appointment.status === "PAID" && isEditPaymentCreditCard) ? true : false;
 
 		return (
 			<tr key={index}>
@@ -69,9 +71,19 @@ export default class Product extends Component {
 					<WrapButton>
 						<ButtonProduct
 							backgroundColor={
-								( appointment.status !== 'VOID' && appointment.status !== 'REFUND' && appointment.status !== "no show" && product.quantity > 1) ? 
-								'#0071c5' : '#dddddd'}
-							disabled={(appointment.status === 'PAID' && !isEditPaidAppointment && !isCheckPaymentCreditCard) || appointment.status === 'VOID' || appointment.status === 'REFUND' || appointment.status === "no show" || product.quantity <= 1}
+								(
+									appointment.status !== 'VOID' &&
+									appointment.status !== 'REFUND' &&
+									appointment.status !== "no show" &&
+									product.quantity > 1 &&
+									isEditAppointmentCredit
+								) ? '#0071c5' : '#dddddd'
+							}
+							disabled={
+								(appointment.status === 'PAID' && !isEditPaidAppointment && !isEditAppointmentCredit) ||
+								appointment.status === 'VOID' || appointment.status === 'REFUND' ||
+								appointment.status === "no show" || product.quantity <= 1
+							}
 							onClick={() => this.props.subtractProduct(index)}
 						>
 							-
@@ -82,8 +94,18 @@ export default class Product extends Component {
 							{quantity}
 						</Quantity>
 						<ButtonProduct
-							backgroundColor={(appointment.status !== 'VOID' && appointment.status !== 'REFUND' && appointment.status !== "no show") ? '#0071c5' : '#dddddd'}
-							disabled={(appointment.status === 'PAID' && !isEditPaidAppointment && !isCheckPaymentCreditCard) || appointment.status === 'VOID' || appointment.status === 'REFUND' || appointment.status === "no show"}
+							backgroundColor={
+								(appointment.status !== 'VOID' &&
+									appointment.status !== 'REFUND' &&
+									appointment.status !== "no show" &&
+									isEditAppointmentCredit
+								) ? '#0071c5' : '#dddddd'
+							}
+							disabled={
+								(appointment.status === 'PAID' && !isEditPaidAppointment && !isEditAppointmentCredit) ||
+								appointment.status === 'VOID' || appointment.status === 'REFUND' ||
+								appointment.status === "no show"
+							}
 							onClick={() => this.props.addProduct(index)}
 						>
 							+
