@@ -17,17 +17,17 @@ export const API_PORT = 8010;
 // export const PROD_API_BASE_URL = `https://dev.harmonypayment.com`;
 // export const SIGNALR = `https://dev-signalr.harmonypayment.com`;
 
-// export const DEV_API_BASE_URL = `https://staging.harmonypayment.com`;
-// export const PROD_API_BASE_URL = `https://staging.harmonypayment.com`;
-// export const SIGNALR = `https://signalr-stage.harmonypayment.com`;
+export const DEV_API_BASE_URL = `https://staging.harmonypayment.com`;
+export const PROD_API_BASE_URL = `https://staging.harmonypayment.com`;
+export const SIGNALR = `https://signalr-stage.harmonypayment.com`;
 
 // export const DEV_API_BASE_URL = `https://staging2.harmonypayment.com`;
 // export const PROD_API_BASE_URL = `https://staging2.harmonypayment.com`;
 // export const SIGNALR = `https://signalr-stage.harmonypayment.com`;
 
-export const DEV_API_BASE_URL = ` https://api2.harmonypayment.com`;
-export const PROD_API_BASE_URL = ` https://api2.harmonypayment.com`;
-export const SIGNALR = `https://signalr.harmonypayment.com`;
+// export const DEV_API_BASE_URL = ` https://api2.harmonypayment.com`;
+// export const PROD_API_BASE_URL = ` https://api2.harmonypayment.com`;
+// export const SIGNALR = `https://signalr.harmonypayment.com`;
 
 export const isDesktopOrLaptop = window.innerWidth > 1000 ? true : false;
 
@@ -40,7 +40,7 @@ export const GET_MEMBERS_API = `${API_BASE_URL}/staff/getbymerchant/${merchantId
 export const GET_MEMBER = `${API_BASE_URL}/staff/getbydate/${merchantId}?date=`;
 export const GET_APPOINTMENT_BY_DATE = `${API_BASE_URL}/appointment/date`;
 export const GET_APPOINTMENT_STATUS = `${API_BASE_URL}/appointment/getbystatus?status=waiting`;
-export const GET_APPOINTMENT_CANCEL = `${API_BASE_URL}/appointment/getbystatus?status=cancel`;
+export const GET_APPOINTMENT_CANCEL = `${API_BASE_URL}/appointment/getbystatus?status=can cel`;
 export const PUT_STATUS_APPOINTMENT_API = `${API_BASE_URL}/appointment`;
 export const PUT_UPDATE_STATUS_APPOINTMENT = `${API_BASE_URL}/appointment/updatestatus`;
 export const GET_BY_PHONE = `${API_BASE_URL}/customer/getbyphone`;

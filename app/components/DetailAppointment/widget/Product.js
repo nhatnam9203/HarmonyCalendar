@@ -80,7 +80,8 @@ export default class Product extends Component {
 								) ? '#0071c5' : '#dddddd'
 							}
 							disabled={
-								(appointment.status === 'PAID' && !isEditPaidAppointment && !isEditAppointmentCredit) ||
+								(appointment.status === 'PAID' && !isEditPaidAppointment) ||
+								(appointment.status === 'PAID' && isEditPaidAppointment && !isEditAppointmentCredit) ||
 								appointment.status === 'VOID' || appointment.status === 'REFUND' ||
 								appointment.status === "no show" || product.quantity <= 1
 							}
@@ -102,7 +103,8 @@ export default class Product extends Component {
 								) ? '#0071c5' : '#dddddd'
 							}
 							disabled={
-								(appointment.status === 'PAID' && !isEditPaidAppointment && !isEditAppointmentCredit) ||
+								(appointment.status === 'PAID' && !isEditPaidAppointment) ||
+								(appointment.status === 'PAID' && isEditPaidAppointment && !isEditAppointmentCredit) ||
 								appointment.status === 'VOID' || appointment.status === 'REFUND' ||
 								appointment.status === "no show"
 							}

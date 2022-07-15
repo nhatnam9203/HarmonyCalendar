@@ -217,6 +217,9 @@ class Calendar extends React.Component {
 		connection.serverTimeoutInMilliseconds = 6000000;
 
 		connection.on('ListWaNotification', async (data) => {
+
+			console.log('response signalr R: ',{ data });
+
 			let app = JSON.parse(data);
 			if (app.data) {
 				let type = app.data.Type;
