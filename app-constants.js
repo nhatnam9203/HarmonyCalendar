@@ -40,7 +40,7 @@ export const GET_MEMBERS_API = `${API_BASE_URL}/staff/getbymerchant/${merchantId
 export const GET_MEMBER = `${API_BASE_URL}/staff/getbydate/${merchantId}?date=`;
 export const GET_APPOINTMENT_BY_DATE = `${API_BASE_URL}/appointment/date`;
 export const GET_APPOINTMENT_STATUS = `${API_BASE_URL}/appointment/getbystatus?status=waiting`;
-export const GET_APPOINTMENT_CANCEL = `${API_BASE_URL}/appointment/getbystatus?status=can cel`;
+export const GET_APPOINTMENT_CANCEL = `${API_BASE_URL}/appointment/getbystatus?status=cancel`;
 export const PUT_STATUS_APPOINTMENT_API = `${API_BASE_URL}/appointment`;
 export const PUT_UPDATE_STATUS_APPOINTMENT = `${API_BASE_URL}/appointment/updatestatus`;
 export const GET_BY_PHONE = `${API_BASE_URL}/customer/getbyphone`;
